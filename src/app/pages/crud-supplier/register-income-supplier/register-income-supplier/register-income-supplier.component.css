@@ -13,11 +13,12 @@ height: 54px;
 .contenedor-global{
   background-color: rgb(255, 255, 255);
   margin: 20px 15px ;
-  padding: 20px;
+  
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   align-items: end;
+  align-content: center;
 }
 .input {
 margin-left: 15px ;
@@ -35,8 +36,11 @@ margin-left: 15px ;
 }
 .btn {
   margin: 10px;
-
+  height: 50px;
 }
+
+
+
 /*----------------tabla de productos ! ----------------*/
 table {
   width: 100%;
