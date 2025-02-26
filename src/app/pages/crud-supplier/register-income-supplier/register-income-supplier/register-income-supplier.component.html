@@ -129,7 +129,7 @@
                             <td>{{ data.stock }}</td>
                             <td>{{data.totalStock}}</td>
                             <td>{{ data.iva }}</td>
-                            <td>{{ data.salePrice * data.quantity | currency }}</td>
+                            <td>{{ data.price * data.quantity | currency }}</td>
                             <td>
                                 <button mat-fab class="btn__delete" (click)="deleteProduct(data.barCode)"
                                     aria-label="Eliminar producto">

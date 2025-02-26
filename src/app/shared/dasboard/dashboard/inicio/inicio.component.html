@@ -1,0 +1,12 @@
+<div class="container-fluid">
+<h2>Tablero Principal</h2>
+
+
+<app-inicio-cards></app-inicio-cards>
+</div>
+@defer () {
+<app-inicio-grafico-ventas></app-inicio-grafico-ventas>
+}@error {
+    <h1>ERROR AL CARGAR EL GRAFICO</h1>
+    console.error('Error al cargar el gráfico:', $error);
+}

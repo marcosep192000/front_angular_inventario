@@ -10,6 +10,7 @@ import { authGuard } from './auth/guard/auth.guard';
 import { CashClosingComponent } from './pages/crud-cash-closing/cash-closing/cash-closing.component';
 import { SupplierService } from './services/supplier.service';
 import { ListSupplierComponent } from './pages/crud-supplier/form-supplier/list-supplier/list-supplier.component';
+import { InicioComponent } from './shared/dasboard/dashboard/inicio/inicio.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -20,6 +21,7 @@ export const routes: Routes = [
     component: NavigationComponent,
     canActivate: [authGuard],
     children: [
+      { path: '', component: InicioComponent, pathMatch: 'full' },
       { path: 'cash-closing', component: CashClosingComponent },
       { path: 'category-list', component: ListCategoryComponent },
       { path: 'product-list', component: ListProductComponent },

@@ -1,0 +1,21 @@
+
+@defer {
+<app-form-factura-datos-proveedor (datosEmitidos)="datosHijo1Change($event)"></app-form-factura-datos-proveedor>
+<app-registrar-detalle-factura-proveedor (productosEmitidos)="datosHijo2Change($event)"></app-registrar-detalle-factura-proveedor>
+}@loading (minimum 2s) {
+    <app-spinner></app-spinner>
+}
+@error{
+console.error('Error en el componente hijo', error);
+<p>ERROR</p>}
+
+
+@if (datosHijo1 && datosHijo2.length > 0) {
+<div class="parent-container">
+    <button class="container__totalSale" (click)="crearFactura()">
+        <h3>Subtotal:{{subtotalFactura|currency}}</h3>
+        <p>Total:</p>
+    </button>
+</div>}
+
+

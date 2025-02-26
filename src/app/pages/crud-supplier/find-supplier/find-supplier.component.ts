@@ -28,7 +28,6 @@ value: any;
   enviarIdProveedor(id:number) {
     const supplierId = id; // No necesitas convertirlo a string si ya es un ID.
     this.mensajeEnviado.emit(supplierId); // Emitir el ID del proveedor
-    this.toastr.success('ID del proveedor seleccionado: ' + supplierId);
     console.log('Proveedor ID:', supplierId);
   }
   findSupplier() {}

@@ -13,8 +13,11 @@ import { MatSelectModule } from '@angular/material/select';
   styleUrl: './pay-supplier.component.css',
 })
 export class PaySupplierComponent {
-formGroup: any;
-onInputChange($event: Event,arg1: string) {
-throw new Error('Method not implemented.');
+  idProveedor :any = null;
+recibirIdProveedor($event: number) {
+this.idProveedor = this.idProveedor;
 }
+formGroup: any;
+
+  
 }

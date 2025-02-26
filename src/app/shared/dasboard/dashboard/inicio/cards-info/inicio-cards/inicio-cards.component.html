@@ -1,0 +1,32 @@
+<div class="container">
+  
+    <div class="card green"> 
+        <p>Productos</p>
+        <h4>{{data_cards?.products}}</h4>
+    </div>
+    
+    <div class="card blue">
+        <p>Total Compras</p>
+        <h4> $500,000.34</h4>
+    </div>
+
+    <div class="card orange">
+        <p>Total Ventas</p>
+        <h4>{{data_cards?.MontoTotal|currency }}</h4>
+    </div>
+
+    <div class="card purple">
+        <p>Total Ganancias</p>
+        <h4>3434</h4>
+    </div>
+
+    <div class="card red">
+        <p>Bajo Stock</p>
+        <h4>{{data_cards?.bajo_stock}}</h4>
+    </div>
+
+    <div class="card yellow">
+        <p>Ventas del Día</p>
+        <h4>{{data_cards?.MontoTotal|currency }}</h4>
+    </div>
+</div>

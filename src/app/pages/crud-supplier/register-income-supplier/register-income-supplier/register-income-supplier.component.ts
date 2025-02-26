@@ -134,8 +134,7 @@ export class RegisterIncomeSupplierComponent implements OnInit {
       invoiceDetailsProviders: [[]],
     });
 
-    this.formInvoice
-      .get('invoiceDetailsProviders')
+    this.formInvoice.get('invoiceDetailsProviders')
       ?.valueChanges.subscribe((details) => {
         const total = details.reduce(
           (sum: number, item: any) => sum + item.subTotal,
@@ -197,7 +196,7 @@ export class RegisterIncomeSupplierComponent implements OnInit {
         salePrice: data.salePrice,
         price: data.price,
         quantity: null,
-        totalStock: data.stock,
+        totalStock: data.price * data.quantity,
       });
 
       this.formProduct.get('description')?.disable();

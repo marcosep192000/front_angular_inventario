@@ -6,6 +6,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { HttpErrorResponse, provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideToastr } from 'ngx-toastr';
 import { authInterceptor } from './auth/interceptor/auth.interceptor';
+import { spinnerInterceptor } from './auth/interceptor/spinner.interceptor';
 
 
 export const appConfig: ApplicationConfig = {
@@ -14,7 +15,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(
     withFetch(),
-    withInterceptors([authInterceptor ])
+    withInterceptors([authInterceptor ,spinnerInterceptor])
   ),
     provideToastr(), 
   ]

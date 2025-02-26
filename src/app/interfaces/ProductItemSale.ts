@@ -16,5 +16,6 @@ export interface ProductItemSale {
   salePrice: number;
   marca: Marca;
   quantity: number;
+  precioTotal: number;
   totalStock: number;
 }

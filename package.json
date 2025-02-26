@@ -4,17 +4,16 @@
   "description": "Inventario Pixels",
   "author": "Your Name <your-email@example.com>",
   "homepage": "https://github.com/your-username/inventario-pixels",
-  
- "main": "./electron/main.js",
+  "main": "./electron/main.js",
   "scripts": {
-    "electron": "electron electron/main.js", 
-    "package": "electron-builder", 
-    "build": "ng build --configuration=production", 
-    "build:electron": "ng build --configuration=production && electron electron/main.js", 
-    "ng": "ng", 
-    "start": "ng serve", 
-    "watch": "ng build --watch --configuration development", 
-    "test": "ng test", 
+    "electron": "electron electron/main.js",
+    "package": "electron-builder",
+    "build": "ng build --configuration=production",
+    "build:electron": "ng build --configuration=production && electron electron/main.js",
+    "ng": "ng",
+    "start": "ng serve",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
     "serve:ssr:inventarioPixels": "node dist/inventario-pixels/server/server.mjs"
   },
   "private": true,
@@ -32,11 +31,12 @@
     "@angular/router": "^17.3.0",
     "@angular/ssr": "^17.3.0",
     "@auth0/angular-jwt": "^5.2.0",
-    "chart.js": "^4.4.7",
+    "chart.js": "^3.9.1",
     "express": "^4.18.2",
     "html2pdf.js": "^0.10.2",
     "jspdf": "^2.5.2",
     "localstorage-polyfill": "^1.0.1",
+    "ng2-charts": "^5.0.4",
     "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
@@ -69,17 +69,16 @@
     "directories": {
       "output": "release"
     },
-  
     "win": {
       "target": "nsis",
-      "icon": "./src/assets/icons/ICONOPIXELS.png" 
+      "icon": "./src/assets/icons/ICONOPIXELS.png"
     },
     "mac": {
-      "icon": "path_to_icon.icns" 
+      "icon": "path_to_icon.icns"
     },
     "linux": {
       "target": "AppImage",
-      "icon": "path_to_icon.png" 
+      "icon": "path_to_icon.png"
     }
   }
 }

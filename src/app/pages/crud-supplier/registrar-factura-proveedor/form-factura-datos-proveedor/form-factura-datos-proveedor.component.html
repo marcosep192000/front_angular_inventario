@@ -1,0 +1,32 @@
+<!-- CARGA DE FACTURA PROVEEDOR (REGISTRAR INGRESOS) -->
+
+    <div class="col-1">
+        <form [formGroup]="formInvoice">
+            <app-find-supplier (mensajeEnviado)="recibirIdMensaje($event)"></app-find-supplier>
+            <app-payment-terms (valueChange)="onPaymentTermChange($event)"></app-payment-terms>
+            <mat-form-field class="example-full-width">
+                <mat-label>Fecha Comp.</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="dateOfEntry">
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker touchUi #picker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field class="mat-form-field input-comp">
+                <mat-label>Comprobante N°</mat-label>
+                <input matInput formControlName="idInvoice" />
+            </mat-form-field>
+
+            <mat-form-field class="example-full-width" *ngIf="selectedPaymentTerm !== 'CONTADO'">
+                <mat-label>Fecha Venc.</mat-label>
+                <input matInput [matDatepicker]="pickerVencimiento" formControlName="dueDate">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerVencimiento"></mat-datepicker-toggle>
+                <mat-datepicker touchUi #pickerVencimiento></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field class="input">
+                <mat-label>Monto total</mat-label>
+                <input matInput type="number" formControlName="amount" />
+            </mat-form-field>
+        </form>
+    </div>
+

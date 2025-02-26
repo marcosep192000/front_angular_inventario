@@ -1,0 +1,13 @@
+.parent-container {
+    text-align: right;
+}
+
+.container__totalSale {
+    width: 23%;
+    background-color: #532e92e4;
+    border-radius: 5px;
+    padding: 10px;
+    color: white;
+    text-align: left;
+    display: inline-block; /* Permite que respete el text-align del padre */
+}
