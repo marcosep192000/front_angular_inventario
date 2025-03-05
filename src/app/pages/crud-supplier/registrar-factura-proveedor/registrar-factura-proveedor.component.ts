@@ -28,7 +28,7 @@ export class RegistrarFacturaProveedorComponent implements OnInit {
 
   ngOnInit(): void {}
   datosHijo1: any = null;
-  datosHijo2: any = null;
+  datosHijo2: any = [];
   subtotalFactura: any = null;
 
   datosHijo1Change(datos: any) {
@@ -54,11 +54,7 @@ export class RegistrarFacturaProveedorComponent implements OnInit {
     );
   }
   crearFactura() {
-    if (this.validarDatos(this.datosHijo1Change)) {
-
-
-     
-    
+    if (this.validarDatos(this.datosHijo1)) {
       if (this.datosHijo1 != null && this.datosHijo2.length >= 1) {
         // Verificar si datosHijo1 es una cadena antes de parsear
         const factura =
@@ -66,12 +62,10 @@ export class RegistrarFacturaProveedorComponent implements OnInit {
             ? JSON.parse(this.datosHijo1)
             : this.datosHijo1;
         // Verificar si datosHijo2 es una cadena antes de parsear
-        const productos =
-          typeof this.datosHijo2 === 'string'
-            ? JSON.parse(this.datosHijo2)
-            : this.datosHijo2;
+        const productos = typeof this.datosHijo2 === 'string' ? JSON.parse(this.datosHijo2) : this.datosHijo2;
         factura.invoiceDetailsProviders = productos; // Agregar productos a la factura
         console.log('Factura creada:', JSON.stringify(factura, null, 2));
+        
         if (factura.amount > 0 && factura.amount > this.subtotal()) {
           this.subtotalFactura = this.subtotal();
           console.log(this.subtotalFactura + 'SUBTOTAL Factura');

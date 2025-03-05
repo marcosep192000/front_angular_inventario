@@ -33,6 +33,7 @@
     "@auth0/angular-jwt": "^5.2.0",
     "chart.js": "^3.9.1",
     "express": "^4.18.2",
+    "file-saver": "^2.0.5",
     "html2pdf.js": "^0.10.2",
     "jspdf": "^2.5.2",
     "localstorage-polyfill": "^1.0.1",
@@ -40,6 +41,7 @@
     "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.14.3"
   },
   "devDependencies": {

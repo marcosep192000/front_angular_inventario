@@ -59,7 +59,7 @@ const CUSTOM_DATE_FORMATS = {
 export class FormFacturaDatosProveedorComponent implements OnInit {
   @Output() datosEmitidos = new EventEmitter<any>();
   formInvoice!: FormGroup;
-  selectedPaymentTerm: string = 'CTA_CTE';
+  selectedPaymentTerm: string = 'CONTADO';
   idProveedorRecibido: number | null = null;
   recibirIdMensaje(mensaje: number) {
     this.idProveedorRecibido = mensaje;
@@ -68,6 +68,15 @@ export class FormFacturaDatosProveedorComponent implements OnInit {
       provider: this.idProveedorRecibido,
     });
   }
+    recibirIdMensajeFormaPago(mensaje:string){ 
+      this.selectedPaymentTerm = mensaje; 
+      // Actualiza el valor del campo 'paymentTerms' en el formulario cuando se recibe el código de la forma de pago
+      this.formInvoice.patchValue({
+        paymentTerms: mensaje,
+        
+      });console.log(mensaje);
+    }
+  
   constructor(
     private productService: ProductService,
     private fb: FormBuilder,
@@ -81,12 +90,13 @@ export class FormFacturaDatosProveedorComponent implements OnInit {
       idInvoice: ['',Validators.required],
       dateOfEntry: ['',Validators.required],
       dueDate: [''],
-      payDay: [''],
+    
       provider: [this.idProveedorRecibido ?? '', Validators.required], // Asegura que el proveedor sea opcional hasta que se reciba el ID
       paymentStatus: [false],
       amount: [0, Validators.required],
       invoiceDetailsProviders: [[]],
     });
+
     this.formInvoice
       .get('invoiceDetailsProviders')
       ?.valueChanges.subscribe((details) => {
@@ -96,6 +106,22 @@ export class FormFacturaDatosProveedorComponent implements OnInit {
         );
         this.formInvoice.patchValue({ amount: total });
       });
+    this.checkPaymentTerm(); 
+  }
+
+  checkPaymentTerm() {
+    if (this.selectedPaymentTerm === 'CONTADO') {  // Si el pago es contado
+      const today = new Date();
+      const formattedDate = today.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+      this.formInvoice.patchValue({
+        dueDate: formattedDate,  // Establecer dueDate con la fecha actual
+      });
+    } else {
+      // Si no es 'CTA_CTE', puedes dejar el campo dueDate vacío o asignar una fecha diferente
+      this.formInvoice.patchValue({
+        dueDate: '', // Dejar vacío si no es contado
+      });
+    }
   }
   ngOnInit(): void {
     this.forms();

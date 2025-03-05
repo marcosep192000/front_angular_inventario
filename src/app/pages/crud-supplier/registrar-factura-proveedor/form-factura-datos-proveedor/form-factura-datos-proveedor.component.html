@@ -3,7 +3,9 @@
     <div class="col-1">
         <form [formGroup]="formInvoice">
             <app-find-supplier (mensajeEnviado)="recibirIdMensaje($event)"></app-find-supplier>
-            <app-payment-terms (valueChange)="onPaymentTermChange($event)"></app-payment-terms>
+            <app-payment-terms (valueChange)="recibirIdMensajeFormaPago($event)"></app-payment-terms>
+
+         
             <mat-form-field class="example-full-width">
                 <mat-label>Fecha Comp.</mat-label>
                 <input matInput [matDatepicker]="picker" formControlName="dateOfEntry">
