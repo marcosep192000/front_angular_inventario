@@ -117,12 +117,12 @@
 
 
                 <!-- DESCRIPCION  -->
-                <mat-form-field class="input" hintLabel="Máximo 20 caracteres">
+                <mat-form-field class="input" hintLabel="Máximo 50 caracteres">
                     <mat-label>Descripción</mat-label>
-                    <input matInput maxlength="20" formControlName="description" />
+                    <input matInput maxlength="50" formControlName="description" />
                     <mat-hint align="end">{{
                         formGroup.get('description')?.value?.length
-                        }}/20</mat-hint>
+                        }}/50</mat-hint>
                 </mat-form-field>
 
                 <!-- STOCK-->
