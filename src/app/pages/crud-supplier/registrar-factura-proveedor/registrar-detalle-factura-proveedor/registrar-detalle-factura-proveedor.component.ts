@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
   ReactiveFormsModule,
   FormsModule,
@@ -19,7 +19,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { ProductService } from '../../../../services/product.service';
 import { SupplierPaymentService } from '../../../../services/supplier-payment.service';
-import { ProductItemBuy } from '../../../../interfaces/productItemBuy';
+import { ProductItemBuy } from '../../../../interfaces/ProductItemBuy';
 import { FormProductComponent } from '../../../crud-product/form-product/form-product.component';
 
 @Component({
@@ -45,12 +45,15 @@ import { FormProductComponent } from '../../../crud-product/form-product/form-pr
 })
 export class RegistrarDetalleFacturaProveedorComponent {
   @Output() productosEmitidos = new EventEmitter<ProductItemBuy[]>();
+  @Output() limpiarTotal = new EventEmitter();
+  @Input() detalleReset: any;
+
   products: ProductItemBuy[] = [];
   code: string = '';
   product!: ProductItemBuy;
   formProduct!: FormGroup;
   showForm?: boolean = false;
-
+  showFormTotal: boolean = false;
   constructor(
     private productService: ProductService,
     private fb: FormBuilder,
@@ -59,6 +62,10 @@ export class RegistrarDetalleFacturaProveedorComponent {
     private supplierPamentService: SupplierPaymentService
   ) {}
 
+  enviarDatosLimpiarTotal() {
+    this.limpiarTotal.emit(this.showFormTotal);
+  }
+
   ngOnInit(): void {
     this.initForms();
     this.EnviarProduct();
@@ -66,8 +73,8 @@ export class RegistrarDetalleFacturaProveedorComponent {
 
   initForms() {
     this.formProduct = this.fb.group({
-      name: ['', ],
-      description: ['',],
+      name: [''],
+      description: [''],
       price: [0, [Validators.required, Validators.min(0)]],
       stock: [0, [Validators.required, Validators.min(0)]],
       iva: [0, [Validators.required, Validators.min(0)]],
@@ -81,7 +88,6 @@ export class RegistrarDetalleFacturaProveedorComponent {
       const price = Number(this.formProduct.get('price')?.value) || 0;
       const iva = Number(this.formProduct.get('iva')?.value) || 0;
       quantity = Number(quantity) || 0;
-
       this.formProduct.patchValue(
         {
           totalStock: stock + quantity,
@@ -121,7 +127,8 @@ export class RegistrarDetalleFacturaProveedorComponent {
         price: data.price,
         quantity: data.quantity ?? 1,
         totalStock: Number(data.stock) + Number(data.quantity ?? 1),
-        precioTotal:Number(data.quantity ?? 1) * data.price * (1 + data.iva / 100),
+        precioTotal:
+          Number(data.quantity ?? 1) * data.price * (1 + data.iva / 100),
       });
 
       ['name', 'description', 'stock', 'iva'].forEach((field) => {
@@ -133,8 +140,6 @@ export class RegistrarDetalleFacturaProveedorComponent {
   }
 
   addListProduct() {
-   
-
     const productData: ProductItemBuy = {
       ...this.formProduct.getRawValue(),
       barCode: this.code,
@@ -161,7 +166,6 @@ export class RegistrarDetalleFacturaProveedorComponent {
       this.showForm = false;
       return;
     }
-
     this.products.push(productData);
     this.toastr.success('Producto agregado a la lista.');
     this.resetForm();
@@ -171,9 +175,12 @@ export class RegistrarDetalleFacturaProveedorComponent {
   EnviarProduct(): void {
     if (this.products.length > 0) {
       this.productosEmitidos.emit(this.products);
+    } else {
+      this.productosEmitidos.emit([]);
     }
   }
 
+  //dialog que llama al componete crear producto
   createProduct(event: Event) {
     event.preventDefault();
     this.dialog.open(FormProductComponent, {
@@ -185,17 +192,36 @@ export class RegistrarDetalleFacturaProveedorComponent {
     });
   }
 
-  deleteProduct(barCode: string) {
-    this.products = this.products.filter(
-      (product) => product.barCode !== barCode
-    );
-    this.toastr.success('Producto eliminado de la lista.');
+  eliminarProducto(index: number) {
+    this.products.splice(index, 1);
+    this.productosEmitidos.emit(this.products);
+    console.log('eliminar producto ' + this.products);
+    if (this.products.length === 0) {
+      this.limpiarTotal.emit((this.showFormTotal = false));
+      console.log('eliminar producto ' + this.products); // Emitir evento cuando la lista esté vacía
+    }
   }
-
-  resetForm() {
-    this.formProduct.reset();
+  deleteProduct(barCode: string) {
+    this.products = this.products.filter((product) => product.barCode !== barCode);
+    this.productosEmitidos.emit(this.products);
+     if (this.products.length === 0) {
+       this.limpiarTotal.emit((this.showFormTotal = false));
+     }
+  }
+  cancelarBtn() {}
+  resetForm(): void {
+    if (this.detalleReset) {
+      this.formProduct.reset();
+    } else {
+      this.formProduct.reset();
+    }
     this.code = '';
     this.showForm = false;
   }
-  cancelarBtn() { }
+  resetListaProductos(): void {
+    
+    this.products = [];
+    this.showFormTotal = false;
+    this.toastr.success('Se han eliminado todos los productos de la lista.');
+  }
 }

@@ -19,8 +19,6 @@ export interface BuySupplier {
   dueDate: string; // fecha vencimiento
   payDay: string; // dia de pago
   provider: number; // proveedor
-  paymentStatus: boolean; // estado del pago
   amount: number; // monto total  de factura
   invoiceDetailsProviders: any[];
-
 }

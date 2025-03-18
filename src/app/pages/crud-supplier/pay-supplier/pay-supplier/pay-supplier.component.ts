@@ -54,6 +54,7 @@ resivirMensaje(mensaje : number) {
     'providerName',
     'amount',
     'saldoPendiente',
+    'tipoDeCuentaEnum',
     'montoTotal',
     'dateOfEntry',
   ];
@@ -64,6 +65,7 @@ resivirMensaje(mensaje : number) {
     providerName: 'Proveedor',
     amount: 'subtotal',
     saldoPendiente: 'Saldo Pendiente',
+    tipoDeCuentaEnum: 'Forma de pago',
     montoTotal: 'Monto Total',
     dateOfEntry: 'Ingreso',
   };
@@ -72,17 +74,18 @@ resivirMensaje(mensaje : number) {
     saldoPendiente: { type: 'currency' },
     montoTotal:{type: 'currency'}
   };
-
   data: facturasProveedor[] = [];
 
   editComponent = FormSupplierComponent;
-  verDetalle = VerDetalleFacturaComponent;
 
+  verDetalle = VerDetalleFacturaComponent;
   constructor(
     public supplierService: SupplierService,
     public pagoAProveedoresService: SupplierPaymentService
-  ) {}
+  ) { }
+  
   ngOnInit(): void {
+
     this.getSupplier(this.mensajeRecibido);
   }
   getSupplier(id : number) {

@@ -2,6 +2,8 @@
 
     <div class="col-1">
         <form [formGroup]="formInvoice">
+        
+        
             <app-find-supplier (mensajeEnviado)="recibirIdMensaje($event)"></app-find-supplier>
             <app-payment-terms (valueChange)="recibirIdMensajeFormaPago($event)"></app-payment-terms>
 
@@ -30,5 +32,5 @@
                 <input matInput type="number" formControlName="amount" />
             </mat-form-field>
         </form>
-    </div>
+     
 

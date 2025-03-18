@@ -52,16 +52,13 @@ export class ListClientComponent implements OnInit {
     'email',
     'Opciones',
   ];
-
   dataSource = new MatTableDataSource<Client>(this.clients);
-
   constructor(public clientService: ClientService, public dialog: MatDialog) {}
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator; // Añadimos el paginador al datasource
   }
-
+  
   ngOnInit(): void {
     this.getClients();
   }
@@ -78,15 +75,12 @@ export class ListClientComponent implements OnInit {
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
   }
-
+  
   createClient() {
-
-    
     const dialogRef = this.dialog.open(FormClientComponent, {
       disableClose: true,
       autoFocus: true,
@@ -96,14 +90,11 @@ export class ListClientComponent implements OnInit {
         tipo: 'createClient',
       },
     });
-
     dialogRef.afterClosed().subscribe(() => {
       this.getClients();
     });
   }
   updateClient(id: number) {
-  
-  
     const dialogRef = this.dialog.open(FormClientComponent, {
       disableClose: true,
       autoFocus: true,
@@ -112,11 +103,8 @@ export class ListClientComponent implements OnInit {
       data: {
         tipo: 'updateClient',
         updateClient: id,
-        
       },
     });
-   
-
     dialogRef.afterClosed().subscribe(() => {
       this.getClients();
     });
@@ -127,7 +115,6 @@ export class ListClientComponent implements OnInit {
       this.getClients();
     });
   }
-
   deleteClient(id: number): void {
       const dialogRef = this.dialog.open(DialogGenericComponent, {
         disableClose: true,

@@ -33,6 +33,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   styleUrl: './tabla-generic.component.css',
 })
 export class TablaGenericComponent<T> implements OnInit {
+onClose() {
+this.dialog.closeAll();
+}
+onCancel() {
+    const dialogRef = this.dialog.closeAll();
+}
   @Input() data: T[] = []; // Recibe los datos
   @Input() displayedColumns: string[] = []; // Columnas a mostrar
   @Input() columnConfig: { [key: string]: { type: string } } = {}; // Configuración de columnas
@@ -43,6 +49,7 @@ export class TablaGenericComponent<T> implements OnInit {
   @Input() columnNames: { [key: string]: string } = {};
   // Componentes personalizados para cada acción
   @Input() editComponent: any = null;
+  @Input() btnCerrar: boolean = false; 
   @Input() verDetalleFacturaComponent: any = null;
   @Input() deleteComponent: any = null;
   @Input() viewComponent: any = null;
@@ -75,16 +82,18 @@ export class TablaGenericComponent<T> implements OnInit {
 
   abonarFactura(component: any, id: number) {
     const dialogRef = this.dialog.open(component, {
-      disableClose: true,
+      disableClose: false,
       autoFocus: true,
       hasBackdrop: true,
-      closeOnNavigation: false,
+      closeOnNavigation: true,
       data: {
         tipo: 'updateSupplier',
         updateSupplier: id,
       },
     });
-    dialogRef.afterClosed().subscribe(() => {});
+    dialogRef.afterClosed().subscribe(() => {
+
+    });
   }
   cancelarFactura() {}
 
