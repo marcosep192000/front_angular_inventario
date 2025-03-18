@@ -1,0 +1,25 @@
+
+@defer {
+
+    <app-form-factura-datos-proveedor (datosEmitidos)="datosHijo1Change($event)" #childRef></app-form-factura-datos-proveedor>
+<app-registrar-detalle-factura-proveedor (productosEmitidos)="datosHijo2Change($event)" (limpiarTotal)="showFormSuBtotal" #childRefDetalle></app-registrar-detalle-factura-proveedor>}
+@loading () {
+    <app-spinner></app-spinner>
+}
+@error{
+console.error('Error en el componente hijo', error);
+<p>ERROR</p>}
+@if (datosHijo1 && datosHijo2.length > 0) {
+@if (showFormSuBtotal){
+      <div class="parent-container">
+    <button class="container__totalSale" (click)="crearFacturaDialog()">
+        <h3>Total:{{subtotalFactura|currency}}</h3>
+    </button>
+</div>  
+}
+ @else {
+    <h3>No tienes productos en la factura!</h3>
+ }}
+
+
+

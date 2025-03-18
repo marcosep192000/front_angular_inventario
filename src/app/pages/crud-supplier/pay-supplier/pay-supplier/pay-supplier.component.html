@@ -1,49 +1,12 @@
-<div class="contenedor-global">
-
-    <div class="row contenedor-form">
-
-        <!-- Find Supplier Component -->
-        <div class="col">
-            <app-find-supplier></app-find-supplier>
-            <mat-form-field class="input" hintLabel="Máximo 5 caracteres">
-                <mat-label>Forma de Pago</mat-label>
-                <input matInput maxlength="5" formControlName="stockMin" (input)="onInputChange($event, 'stockMin')" type="text"
-                    pattern="[0-9]*" />
-                <!-- Opcional: <mat-hint align="end">{{ formGroup.get('stockMin')?.value?.length }}/5</mat-hint> -->
-            </mat-form-field>
-
+<div class="parent">
+    <div class="div1"> 
+    <h2>Facturas por Proveedor</h2>
+        <app-find-supplier (mensajeEnviado)="resivirMensaje($event)"></app-find-supplier> </div>
+    <div class="div2">
+        <div class="row contenedor-form">
+            <app-tabla-generic [data]="data" [displayedColumns]="columns" [columnNames]="columnNames"
+                [showActions]="true" [editComponent]="editComponent" [columnConfig]="columnConfig"
+                [verDetalleFacturaComponent]="verDetalle"></app-tabla-generic>
         </div>
-
-        <!-- Form Fields -->
-        <div class="col">
-
-            <!-- Comprobante N° -->
-            <mat-form-field>
-                <mat-label>Comprobante N°</mat-label>
-                <input matInput />
-            </mat-form-field>
-
-            <!-- Monto -->
-            <mat-form-field class="input" hintLabel="Máximo 5 caracteres">
-                <mat-label>Monto</mat-label>
-                <input matInput maxlength="5" formControlName="stockMin" (input)="onInputChange($event, 'stockMin')"
-                    type="text" pattern="[0-9]*" />
-                <!-- Opcional: <mat-hint align="end">{{ formGroup.get('stockMin')?.value?.length }}/5</mat-hint> -->
-            </mat-form-field>
-
-        </div>
-
-        <!-- Additional Textarea -->
-        <div class="col">
-            <mat-form-field class="comentarios">
-                <mat-label>Comentarios</mat-label>
-                <textarea matInput></textarea>
-            </mat-form-field>
-        </div>
-
     </div>
-
 </div>
-
-
-

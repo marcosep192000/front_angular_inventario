@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 
 import { MatProgressSpinner, MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatNativeDateModule } from '@angular/material/core';
+import { SpinnerComponent } from "./shared/spinner/spinner.component";
 
 @Component({
   selector: 'app-root',
@@ -18,6 +19,8 @@ import { MatNativeDateModule } from '@angular/material/core';
     CommonModule,
     MatProgressSpinnerModule,
     MatNativeDateModule,
+    SpinnerComponent,
+  
   ],
 })
 export class AppComponent {

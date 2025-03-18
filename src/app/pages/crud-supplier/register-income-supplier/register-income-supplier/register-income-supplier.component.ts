@@ -32,7 +32,6 @@ import {
   MatNativeDateModule,
 } from '@angular/material/core';
 import { SupplierPaymentService } from '../../../../services/supplier-payment.service';
-import { subscribe } from 'node:diagnostics_channel';
 
 // Formato de fechas personalizado
 const CUSTOM_DATE_FORMATS = {
@@ -76,6 +75,17 @@ const CUSTOM_DATE_FORMATS = {
   styleUrls: ['./register-income-supplier.component.css'],
 })
 export class RegisterIncomeSupplierComponent implements OnInit {
+  idProveedorRecibido: number | null = null;
+
+  // Recibe el ID del proveedor seleccionado
+  recibirIdMensaje(mensaje: number) {
+    this.idProveedorRecibido = mensaje;
+    // Actualiza el valor del campo 'provider' en el formulario cuando se recibe el ID
+    this.formInvoice.patchValue({
+      provider: this.idProveedorRecibido,
+    });
+  }
+
   // VARIABLES
   products: ProductItemSale[] = [];
   code: string = '';
@@ -83,6 +93,7 @@ export class RegisterIncomeSupplierComponent implements OnInit {
   formProduct!: FormGroup;
   formInvoice!: FormGroup;
   showForm?: boolean = false;
+  selectedPaymentTerm: string = 'CUENTA_CORRIENTE';
 
   constructor(
     private productService: ProductService,
@@ -90,7 +101,9 @@ export class RegisterIncomeSupplierComponent implements OnInit {
     private toastr: ToastrService,
     private dialog: MatDialog,
     private supplierPamentService: SupplierPaymentService
-  ) {
+  ) {}
+
+  forms() {
     this.formProduct = this.fb.group({
       name: ['', Validators.required],
       description: ['', Validators.required],
@@ -111,17 +124,17 @@ export class RegisterIncomeSupplierComponent implements OnInit {
 
     // formulario para realizar la factura
     this.formInvoice = this.fb.group({
-      idInvoice: ['', ],
-      dateOfEntry: ['',],
-      dueDate: ['', ],
-      payDay: ['',],
-      provider: [1, ],
-      paymentStatus: [false, ],
-      amount: [0, ],
-      invoiceDetailsProviders: [[],],
+      idInvoice: [''],
+      dateOfEntry: [''],
+      dueDate: [''],
+      payDay: [''],
+      provider: [this.idProveedorRecibido ?? '', Validators.required], // Asegura que el proveedor sea opcional hasta que se reciba el ID
+      paymentStatus: [false],
+      amount: [0],
+      invoiceDetailsProviders: [[]],
     });
-    this.formInvoice
-      .get('invoiceDetailsProviders')
+
+    this.formInvoice.get('invoiceDetailsProviders')
       ?.valueChanges.subscribe((details) => {
         const total = details.reduce(
           (sum: number, item: any) => sum + item.subTotal,
@@ -131,9 +144,10 @@ export class RegisterIncomeSupplierComponent implements OnInit {
       });
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.forms();
+  }
 
-  selectedPaymentTerm: string = 'CUENTA_CORRIENTE';
   onPaymentTermChange(selected: string): void {
     this.selectedPaymentTerm = selected;
   }
@@ -182,7 +196,7 @@ export class RegisterIncomeSupplierComponent implements OnInit {
         salePrice: data.salePrice,
         price: data.price,
         quantity: null,
-        totalStock: data.stock,
+        totalStock: data.price * data.quantity,
       });
 
       this.formProduct.get('description')?.disable();
@@ -235,36 +249,71 @@ export class RegisterIncomeSupplierComponent implements OnInit {
       data: { tipo: 'createProduct' },
     });
 
-    dialogRef.afterClosed().subscribe(() => { });
+    dialogRef.afterClosed().subscribe(() => {});
   }
 
-  //guarda la factura de proveedor
+  onProviderChange(event: any): void {
+    const selectedProviderId = event.value;
+
+    // Actualiza el proveedor seleccionado en el formulario
+    this.formInvoice.patchValue({
+      provider: selectedProviderId,
+    });
+
+    // Actualiza la variable idProveedorRecibido si es necesario
+    this.idProveedorRecibido = selectedProviderId;
+
+    console.log('Proveedor seleccionado:', selectedProviderId);
+  }
+
+  // Guarda la factura de proveedor
   saveInvoiceSupplier(): void {
     if (this.formInvoice.invalid) {
-      this.toastr.error('Por favor, completa todos los campos obligatorios.');
+      let errorMessage = 'Por favor, completa todos los campos obligatorios.';
+
+      for (const controlName in this.formInvoice.controls) {
+        const control = this.formInvoice.controls[controlName];
+        if (control.invalid) {
+          if (control.errors?.['required']) {
+            errorMessage = `El campo ${controlName} es obligatorio.`;
+          } else if (control.errors?.['minlength']) {
+            errorMessage = `El campo ${controlName} debe tener al menos ${control.errors['minlength'].requiredLength} caracteres.`;
+          } else if (control.errors?.['maxlength']) {
+            errorMessage = `El campo ${controlName} no puede tener más de ${control.errors['maxlength'].requiredLength} caracteres.`;
+          }
+          break;
+        }
+      }
+
+      this.toastr.error(errorMessage);
       return;
     }
 
     const invoiceData = {
-
       ...this.formInvoice.value,
-      invoiceDetailsProviders: this.products.map(product => ({
+      invoiceDetailsProviders: this.products.map((product) => ({
         barCode: product.barCode,
         quantity: product.quantity,
         price: product.price,
+        totalStock: product.totalStock,
+        name: product.name,
+        description: product.description,
+        iva: product.iva,
+        salePrice: product.salePrice,
         subTotal: product.quantity * product.price,
-      
       })),
     };
 
     this.supplierPamentService.createPaymentSupplier(invoiceData).subscribe(
       () => {
+        console.log(invoiceData);
         this.toastr.success('Factura guardada exitosamente.');
         this.formInvoice.reset();
         this.products = [];
       },
       (error) => {
         this.toastr.error('Ocurrió un error al guardar la factura.');
+
         console.error(error);
       }
     );

@@ -1,47 +1,34 @@
 <!-- CARGA DE FACTURA PROVEEDOR (REGISTRAR INGRESOS) -->
 <div class="contenedor-global">
-    <!-- Find Supplier Component -->
     <div class="col-1">
         <form [formGroup]="formInvoice" (ngSubmit)="saveInvoiceSupplier()">
-            <app-find-supplier></app-find-supplier>
-            <!-- LISTADO DE PROVEEDORES -->
-            <!-- Si la condicion es contado no mostrar la fecha de vencimiento e ingresar la actual -->
+            <app-find-supplier (mensajeEnviado)="recibirIdMensaje($event)"></app-find-supplier>
             <app-payment-terms (valueChange)="onPaymentTermChange($event)"></app-payment-terms>
-            <!-- LISTADO DE CONDICIONES DE PAGO -->
-
-            @if (selectedPaymentTerm == 'CONTADO'){
-            }@else {
-            <!-- mostrar un date -->
             <mat-form-field class="example-full-width">
                 <mat-label>Fecha Comprobante</mat-label>
-                <input matInput [matDatepicker]="picker">
-                <mat-hint>MM/DD/YYYY</mat-hint>
+                <input matInput [matDatepicker]="picker" formControlName="dateOfEntry">
                 <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                 <mat-datepicker touchUi #picker></mat-datepicker>
             </mat-form-field>
-            }
-            <!-- Comprobante N° -->
+
             <mat-form-field class="mat-form-field input-comp">
                 <mat-label>Comprobante N°</mat-label>
-                <input matInput />
+                <input matInput formControlName="idInvoice" />
             </mat-form-field>
 
-            <!-- vencimiento  -->
-            <mat-form-field class="example-full-width">
+            <mat-form-field class="example-full-width" *ngIf="selectedPaymentTerm !== 'CONTADO'">
                 <mat-label>Fecha vencimiento</mat-label>
-                <input matInput [matDatepicker]="picker">
-                <mat-hint>MM/DD/YYYY</mat-hint>
-                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker touchUi #picker></mat-datepicker>
+                <input matInput [matDatepicker]="pickerVencimiento" formControlName="dueDate">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerVencimiento"></mat-datepicker-toggle>
+                <mat-datepicker touchUi #pickerVencimiento></mat-datepicker>
             </mat-form-field>
 
-            <!--  Monto-->
-            <mat-form-field class="input" hintLabel="Máximo 5 caracteres">
+            <mat-form-field class="input">
                 <mat-label>Monto total</mat-label>
-                <input matInput maxlength="5" formControlName="stockMin" type="text" pattern="[0-9]*" />
-                <!-- Opcional: <mat-hint align="end">{{ formGroup.get('stockMin')?.value?.length }}/5</mat-hint> -->
+                <input matInput type="number" formControlName="amount" />
             </mat-form-field>
-            <button mat-raised-button color="primary" type="submit">
+
+            <button mat-raised-button color="primary" class="btn" type="submit">
                 Guardar Factura
             </button>
         </form>
@@ -142,7 +129,7 @@
                             <td>{{ data.stock }}</td>
                             <td>{{data.totalStock}}</td>
                             <td>{{ data.iva }}</td>
-                            <td>{{ data.salePrice * data.quantity | currency }}</td>
+                            <td>{{ data.price * data.quantity | currency }}</td>
                             <td>
                                 <button mat-fab class="btn__delete" (click)="deleteProduct(data.barCode)"
                                     aria-label="Eliminar producto">
@@ -154,4 +141,4 @@
                 </table>
             </div>
         </div>
-        <button (onclick)="saveInvoiceSupplier()">Guardar Factura</button>
+  

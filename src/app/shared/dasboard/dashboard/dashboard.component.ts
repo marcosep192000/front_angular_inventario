@@ -1,18 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
 import { map } from 'rxjs/operators';
-import { AsyncPipe } from '@angular/common';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-
-import { FastAccesComponent } from "../fastAcces/fast-acces/fast-acces.component";
-import { ApiDolarComponent } from "../../api-dolar/api-dolar.component";
-import { MatProgressSpinner, MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AppComponent } from "../../../app.component";
-import { CardsIndexComponent } from "../cards-index/cards-index.component";
+import { SpinnerComponent } from "../../spinner/spinner.component";
 
 
 @Component({
@@ -26,11 +22,9 @@ import { CardsIndexComponent } from "../cards-index/cards-index.component";
     MatIconModule,
     MatButtonModule,
     MatCardModule,
-    FastAccesComponent,
-    ApiDolarComponent,
     MatProgressSpinnerModule,
     AppComponent,
-    CardsIndexComponent
+    SpinnerComponent
 ]
 })
 export class DashboardComponent {
@@ -38,6 +32,7 @@ export class DashboardComponent {
 
   /** Based on the screen size, switch from standard to one column per row */
   cards = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
+  
     map(({ matches }) => {
       if (matches) {
         return [
