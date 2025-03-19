@@ -65,7 +65,7 @@ export class FormFacturaDatosProveedorComponent implements OnInit {
   @Input() factura: any;
   private subscription!: Subscription;
 
-  selectedPaymentTerm: string = '';
+  selectedPaymentTerm: string = 'CONTADO';
   idProveedorRecibido: number | null = null;
   //COMBOS HIJOS
   recibirIdMensaje(mensaje: number) {
