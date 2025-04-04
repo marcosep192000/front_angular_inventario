@@ -14,6 +14,8 @@ import { CommonModule } from '@angular/common';
 import { FormProductComponent } from '../form-product/form-product.component';
 import { DialogGenericComponent } from '../../../shared/genericsComponents/dialog-generic/dialog-generic.component';
 import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
+import { DialogRef } from '@angular/cdk/dialog';
+import { AddExcelListProductComponent } from '../add-excel-list-product/add-excel-list-product.component';
 
 @Component({
   selector: 'app-list-product',
@@ -38,6 +40,7 @@ import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
   styleUrl: './list-product.component.css',
 })
 export class ListProductComponent implements OnInit {
+
   products: Product[] = [];
   form!: FormGroup;
   search: string = '';
@@ -45,7 +48,6 @@ export class ListProductComponent implements OnInit {
   displayedColumns: string[] = [
     'barCode',
     'name',
-    'description',
     'salePrice',
     'stock',
     'Opciones',
@@ -104,6 +106,20 @@ export class ListProductComponent implements OnInit {
       this.getProducts();
     });
   }
+  addExcelListProduct() {
+    const dialogRef = this.dialog.open(AddExcelListProductComponent,{
+      disableClose: false,
+      autoFocus: true,
+      hasBackdrop: true,
+      closeOnNavigation: false,
+      data: {
+  
+      },
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getProducts();
+    });
+   }
   /* filtros para la busqueda */
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;

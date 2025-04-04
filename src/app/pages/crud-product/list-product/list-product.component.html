@@ -5,6 +5,7 @@
     </div>
     <div class="actions__btn">
         <button class="actions__btn  btn__new" (click)="createProduct()">Nuevo Producto</button>
+        <button class="actions__btn  btn__new" (click)="addExcelListProduct()">Cargar Ecxel </button>
     </div>
 </div>
 
@@ -25,10 +26,7 @@
         </ng-container>
 
         <!-- Name Column -->
-        <ng-container matColumnDef="description">
-            <th mat-header-cell *matHeaderCellDef> Detalle </th>
-            <td mat-cell *matCellDef="let element"> {{element.description}}</td>
-        </ng-container>
+        
         <!-- Name Column -->
 
         <ng-container matColumnDef="salePrice">

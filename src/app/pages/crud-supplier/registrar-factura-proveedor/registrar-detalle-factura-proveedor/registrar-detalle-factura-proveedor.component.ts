@@ -121,7 +121,7 @@ export class RegistrarDetalleFacturaProveedorComponent {
       this.product = data;
       this.formProduct.patchValue({
         name: data.name,
-        description: data.description,
+        
         stock: data.stock,
         iva: data.iva,
         price: data.price,
@@ -222,6 +222,6 @@ export class RegistrarDetalleFacturaProveedorComponent {
     
     this.products = [];
     this.showFormTotal = false;
-    this.toastr.success('Se han eliminado todos los productos de la lista.');
+   
   }
 }

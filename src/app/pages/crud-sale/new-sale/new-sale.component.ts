@@ -218,7 +218,6 @@ export class NewSaleComponent implements OnInit {
         idProduct: product.id,
         productName: product.name, // Suponiendo que el producto tenga una propiedad 'name'
         barCode: product.barCode, // Suponiendo que el producto tenga un código de barras
-        description: product.description, // Descripción del producto
         salePrice: product.salePrice,
         marca: String(product.marca), // Suponiendo que el producto tenga una propiedad 'brand'
         iva: product.iva, // El IVA que corresponda

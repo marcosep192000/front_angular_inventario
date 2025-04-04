@@ -8,7 +8,6 @@ export interface Product {
   category: Category;
   provider: Supplier;
   name: string;
-  description: string;
   price: Float32Array;
   stock: number;
   iva: number;

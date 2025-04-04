@@ -2,12 +2,33 @@
 
     <div class="col-1">
         <form [formGroup]="formInvoice">
-        
-        
-            <app-find-supplier (mensajeEnviado)="recibirIdMensaje($event)"></app-find-supplier>
-            <app-payment-terms (valueChange)="recibirIdMensajeFormaPago($event)"></app-payment-terms>
-
+            <mat-form-field class="input">
+                <mat-label>Proveedor</mat-label>
+                <mat-select formControlName="provider">
+                  <mat-option *ngFor="let supplier of suppliers" [value]="supplier.id">
+                    {{ supplier.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+             {{selectedSupplier}}
          
+         
+             <mat-form-field class="input-comp">
+                <mat-label>Forma de Pago</mat-label>
+                <mat-select formControlName="tipoDeCuentaEnum">
+                    <mat-option *ngFor="let item of paymentTermsList" [value]="item">
+            
+                        {{ item }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            
+
+
+
+
+
+
             <mat-form-field class="example-full-width">
                 <mat-label>Fecha Comp.</mat-label>
                 <input matInput [matDatepicker]="picker" formControlName="dateOfEntry">

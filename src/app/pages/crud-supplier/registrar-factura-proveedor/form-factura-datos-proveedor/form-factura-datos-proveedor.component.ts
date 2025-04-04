@@ -19,6 +19,8 @@ import { SupplierPaymentService } from '../../../../services/supplier-payment.se
 import { facturasProveedor } from '../../../../interfaces/facturasProveedor';
 import { Subscription } from 'rxjs';
 import { invoiceDetailsProviders } from '../../../../interfaces/buy-supplier';
+import { SupplierService } from '../../../../services/supplier.service';
+import { Supplier } from '../../../../interfaces/supplier';
 // Formato de fechas personalizado
 const CUSTOM_DATE_FORMATS = {
   parse: {
@@ -64,24 +66,16 @@ export class FormFacturaDatosProveedorComponent implements OnInit {
   formInvoice!: FormGroup;
   @Input() factura: any;
   private subscription!: Subscription;
-
   selectedPaymentTerm: string = '';
-  idProveedorRecibido: number | null = null;
+  selectedSupplier: any;
+  suppliers: Supplier[] = [];
   //COMBOS HIJOS
-  recibirIdMensaje(mensaje: number) {
-    this.idProveedorRecibido = mensaje;
-    // Actualiza el valor del campo 'provider' en el formulario cuando se recibe el ID
-    this.formInvoice.patchValue({
-      provider: this.idProveedorRecibido,
-    });
-  }
+
   recibirIdMensajeFormaPago(mensaje: string) {
     this.selectedPaymentTerm = mensaje;
     // Actualiza el valor del campo 'paymentTerms' en el formulario cuando se recibe el código de la forma de pago
     this.formInvoice.patchValue({
-      tipoDeCuentaEnum : mensaje,
-     
-    });
+      tipoDeCuentaEnum : mensaje, });
     console.log(mensaje);
   }
   // COMBOS HIJOS
@@ -90,30 +84,63 @@ export class FormFacturaDatosProveedorComponent implements OnInit {
     private fb: FormBuilder,
     private toastr: ToastrService,
     private dialog: MatDialog,
-    private supplierPamentService: SupplierPaymentService
+    private supplierPamentService: SupplierPaymentService,
+    private supplierService : SupplierService,
   ) {}
+
+ 
+  
+getAllSuppliers() { // COMBO BOSQUEDA DE PROVEEDORES INICIO
+  this.supplierService.getAllSuppliers().subscribe((data) => {
+    this.suppliers = data;
+  });
+}// COMBO BUSQUEDA DE PROVEEDORES FIN----------------------------------------------------------------
+
+
+
+// BUSQUEDA FORMAS DE PAGO INICIO ------------------------------------------
+startDate = new Date(1990, 0, 1);
+paymentTermsList?: string[] = [];
+getAllPayments() {
+  this.supplierService.getPayMethod().subscribe((data) => {
+    this.paymentTermsList = data;
+    console.log(
+      this.paymentTermsList + 'dddddddddddddddddddddddddddddddddddddddddddddd'
+    );
+  });
+}
+// BUSQUEDA FORMA DE PAGO FIN ------------------------------------------------------
   forms() {
     // formulario para realizar la factura
     this.formInvoice = this.fb.group({
       idInvoice: ['', Validators.required],
       dateOfEntry: ['', Validators.required],
-      dueDate: [''],
+      dueDate: ['', ],
       tipoDeCuentaEnum: [this.selectedPaymentTerm ?? ''], // Por defecto selecciona 'CONTADO'
-      provider: [this.idProveedorRecibido ?? 'CONTADO', Validators.required], // Asegura que el proveedor sea opcional hasta que se reciba el ID
+      provider: [this.selectedSupplier ,], // Asegura que el proveedor sea opcional hasta que se reciba el ID
       amount: [0, Validators.required],
-      invoiceDetailsProviders: [[]],
+      montoTotal: [0,],
+       invoiceDetailsProviders: [[]],
+       ivaTotal : [0, Validators.required],
     });
-    this.formInvoice
-      .get('invoiceDetailsProviders')
-      ?.valueChanges.subscribe((details) => {
+    this.formInvoice.get('invoiceDetailsProviders') ?.valueChanges.subscribe((details) => {
         const total = details.reduce(
           (sum: number, item: any) => sum + item.subTotal,
           0
         );
         this.formInvoice.patchValue({ amount: total });
       });
-    this.checkPaymentTerm();
-  }
+      this.formInvoice.get('tipoDeCuentaEnum')?.valueChanges.subscribe((value) => {
+        this.selectedPaymentTerm = value;
+        this.checkPaymentTerm();
+      });
+      this.formInvoice.get('selectedSupplier')?.valueChanges.subscribe((value) => {
+        this.selectedSupplier = value ;
+       console.log(this.selectedSupplier); 
+  });
+ this.formInvoice.patchValue({ provider: this.selectedSupplier});
+ console.log(this.selectedSupplier); 
+}
 
   checkPaymentTerm() {
     if (this.selectedPaymentTerm === 'CONTADO') {
@@ -130,7 +157,12 @@ export class FormFacturaDatosProveedorComponent implements OnInit {
       });
     }
   }
+
+
   ngOnInit(): void {
+    this.getAllPayments();
+    this.getAllSuppliers(); 
+    this.selectedPaymentTerm= "";
     this.forms();
     if (this.formInvoice) {
       this.enviarDatosaRegistrarFactura();
@@ -181,22 +213,20 @@ export class FormFacturaDatosProveedorComponent implements OnInit {
     }
   }
   resetDatosProveedor() {
-     this.formInvoice.reset({
-       idInvoice: '',
-       dateOfEntry: '',
-       dueDate: '',
-       provider: this.idProveedorRecibido ?? '',
-       amount: 0,
-       invoiceDetailsProviders: [], // Reiniciar a vacío
-     });
-    if (this.selectedPaymentTerm) {
-      this.checkPaymentTerm();
-
-     
-
-    }
+    this.selectedPaymentTerm = ''; // Reiniciar la forma de pago
+    this.formInvoice.reset({
+      idInvoice: '',
+      dateOfEntry: '',
+      dueDate: '',
+      provider: null, // Asegurar que el proveedor no tenga valor
+      tipoDeCuentaEnum: '', // Asegurar que la forma de pago se resetee
+      amount: 0,
+      invoiceDetailsProviders: [], // Resetear detalles
+    });
+    // Verifica si recibirIdMensaje se ejecuta automáticamente y lo bloquea
+    
+    this.checkPaymentTerm(); // Asegurar que dueDate no se quede fijo en una opción
   }
-
   onPaymentTermChange(selected: string): void {
     this.selectedPaymentTerm = selected;
   }

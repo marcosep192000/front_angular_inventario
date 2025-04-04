@@ -4,7 +4,6 @@ export interface TicketDetail {
   idProduct: number;
   productName: string;
   barCode: string;
-  description: string;
   salePrice: number;
   marca: String;
   iva: number;
