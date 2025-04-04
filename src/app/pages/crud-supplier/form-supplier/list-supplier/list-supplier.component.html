@@ -28,6 +28,11 @@
             </ng-container>
 
 
+<!-- cuit -->
+<ng-container matColumnDef="cuit">
+    <th mat-header-cell *matHeaderCellDef>Cuit</th>
+    <td mat-cell *matCellDef="let element"> {{element.cuit}}</td>
+</ng-container>
             <!--dni-->
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef>Razon Social</th>
@@ -99,8 +104,5 @@
     </mat-tab>
 
     <mat-tab label="Pago a Proveedores"><app-pay-supplier></app-pay-supplier></mat-tab>
-    <mat-tab label="Registrar Ingresos"> <app-register-income-supplier></app-register-income-supplier>></mat-tab>
+    <mat-tab label="Registrar Ingresos"> <app-registrar-factura-proveedor></app-registrar-factura-proveedor></mat-tab>
 </mat-tab-group>
-
-  
-  

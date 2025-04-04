@@ -3,6 +3,9 @@
   color: white;
   background-color: #522e92;
   font-size: 20px;
+  box-shadow: 21px 20px 24px 0px rgba(0,0,0,0.39);
+-webkit-box-shadow: 21px 20px 24px 0px rgba(0,0,0,0.39);
+-moz-box-shadow: 21px 20px 24px 0px rgba(0,0,0,0.39);
 }
 
 .menu-item {

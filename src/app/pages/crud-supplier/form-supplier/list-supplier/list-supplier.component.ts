@@ -18,6 +18,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { PaySupplierComponent } from '../../pay-supplier/pay-supplier/pay-supplier.component';
 import { RegisterIncomeSupplierComponent } from "../../register-income-supplier/register-income-supplier/register-income-supplier.component";
 import { IconComponent } from "../../../../shared/dasboard/icon/icon.component";
+import { RegistrarFacturaProveedorComponent } from "../../registrar-factura-proveedor/registrar-factura-proveedor.component";
 
 @Component({
   selector: 'app-list-supplier',
@@ -38,8 +39,8 @@ import { IconComponent } from "../../../../shared/dasboard/icon/icon.component";
     MatInputModule,
     MatTooltipModule,
     PaySupplierComponent,
-    RegisterIncomeSupplierComponent,
-    IconComponent
+    IconComponent,
+    RegistrarFacturaProveedorComponent
 ],
 
   templateUrl: './list-supplier.component.html',
@@ -49,6 +50,7 @@ export class ListSupplierComponent implements OnInit {
   suppliers: Supplier[] = [];
   displayedColumns: string[] = [
     'id',
+    'cuit',
     'name',
     'email',
     'phone',

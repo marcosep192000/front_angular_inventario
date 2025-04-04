@@ -1,12 +1,24 @@
 .sidenav-container {
   height: 100%;
+    box-shadow: 21px 20px 24px 0px rgba(0,0,0,0.39);
+-webkit-box-shadow: 21px 20px 24px 0px rgba(0,0,0,0.39);
+-moz-box-shadow: 21px 20px 24px 0px rgba(0,0,0,0.39);
+
 }
+
 
 .sidenav {
   width: 250px;
   color: white;
   background-color:#522e92;
   overflow-y: hidden; 
+}
+.pixels-png {
+  
+  top: 10px; /* Ajusta según necesites */
+  left: 10px;
+  width: 150px;
+  height: auto;
 }
 
 
@@ -63,10 +75,9 @@ text-align:left;
   justify-content: space-between;
   align-items: center;
   width: 100%; /* O un ancho adecuado */
-  padding: 30px; /* Opcional, para agregar espacio interno */
+  padding: 2px; /* Opcional, para agregar espacio interno */
   box-sizing: border-box; /* Asegura que padding no afecte el tamaño total */
 }
-
 
  .barra__span {
   font-size: 18px;

@@ -45,7 +45,7 @@
                     <td>{{ product.description }}</td>
                     <td>{{ product.salePrice | currency }}</td>
                     <td>{{ product.quantity }}</td>
-                    <td>{{ product.stock }}</td>
+                    <td>{{ product.stock - product.quantity }}</td>
                     <td>{{ product.iva }}%</td>
                     <td>{{ product.salePrice * product.quantity | currency }}</td>
                     <td>
@@ -69,11 +69,7 @@
      </div>
 
      <div class="client__data">
-
-
-
-        <div *ngIf="selectedClient">
-              
+        <div *ngIf="selectedClient">     
             <p>Nombre: {{ selectedClient.name }},{{ selectedClient.lastName }}</p>
             <p>Tel: {{ selectedClient.tel}}</p>
         </div>  
@@ -90,15 +86,3 @@
     </div>
 </div>
 
-
-        <!--   id: number;
-            cuit: string; 
-        	name: string;
-        	lastName?: string;
-        	// dato a agregar proximamente birthday: string;
-        	address: string;
-        	tel: string;
-        	email: string;
-        	initialDate?: any;
-        	time?: any;
-        	status: boolean; -->

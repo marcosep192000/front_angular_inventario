@@ -1,0 +1,115 @@
+<hr class="hr">
+<h4>Cargar Productos</h4>
+<!-- Additional Textarea -->
+<div class="col busqueda">
+    <div class="container__search">
+        <!-- Campo de entrada -->
+        <mat-form-field class="mat-form-field container_search">
+            <mat-label>Ingresa el código de barras</mat-label>
+            <input matInput maxlength="20" type="text" name="code" [(ngModel)]="code" (input)="onInputChange($event)" />
+        </mat-form-field>
+        <div class="container_product">
+            Para registrar un producto puedes hacer click
+            <a mat-button color="primary" (click)="createProduct($event)">Aqui.</a>
+        </div>
+    </div>
+</div>
+
+<!-- Productos -->
+<div class="row">
+    <div class="col prod">
+        <div *ngIf="showForm">
+            <form [formGroup]="formProduct">
+                <div class="container__productos">
+
+
+                    @if (product) {
+                
+                
+                        <div class="productos__inputs">
+
+                        <mat-form-field class="input-producto">
+                            <mat-label>Producto</mat-label>
+                            <input matInput formControlName="name"/>
+                        </mat-form-field>
+
+                        <mat-form-field class="mat-form-field input-description">
+                            <mat-label>description</mat-label>
+                            <input matInput placeholder="Ex. Pizza" formControlName="description" />
+                        </mat-form-field>
+
+                        <mat-form-field class="mat-form-field input">
+                            <mat-label>Stock Actual</mat-label>
+                            <input matInput formControlName="stock" />
+                        </mat-form-field>
+
+                        <mat-form-field class="mat-form-field input">
+                            <mat-label>Precio Costo Proveedor</mat-label>
+                            <input matInput formControlName="price"/>
+                        </mat-form-field>
+
+                        <mat-form-field class="mat-form-field input">
+                            <mat-label>Iva</mat-label>
+                            <input matInput formControlName="iva">
+                        </mat-form-field>
+                        <mat-form-field class="mat-form-field input">
+                            <mat-label>Catidad a Registrar</mat-label>
+                            <input matInput formControlName="quantity">
+                        </mat-form-field>
+<button mat-flat-button class="btn primary btn-guardar-producto" color="primary"
+                            (click)="addListProduct()">Agregar</button>
+                        <button mat-flat-button class="btn_cancelar btn" (click)="cancelarBtn()" color="warn">Cancelar</button>
+                        
+                    </div>
+                    }@else {
+                    <p>No hay un producto seleccionado.</p>
+                    }
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <!-- Lista de productos -->
+            <div class="Container-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                        
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Stock Actual</th>
+                            <th>Stock Total</th>
+                            <th>IVA</th>
+                            <th>Precio Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let data of products">
+                            <td>{{ data.barCode }}</td>
+                            <td>{{ data.name }}</td>
+                            <td>{{ data.description }}</td>
+                            <td>{{ data.price | currency }}</td>
+                            <td>{{ data.quantity }}</td>
+                            <td>{{ data.stock }}</td>
+                            <td>{{data.totalStock}}</td>
+                            <td>{{ data.iva }}</td>
+                            <td>{{data.precioTotal| currency}}</td>
+                            <td>
+                                <button mat-fab class="btn__delete" (click)="deleteProduct(data.barCode)"
+                                    aria-label="Eliminar producto">
+                                    <mat-icon class="icon-display">delete</mat-icon>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>

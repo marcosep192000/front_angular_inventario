@@ -40,3 +40,19 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+node_modules/
+
+# Electron builder files
+.electron/
+dist/
+release/
+out/
+
+# Compiled Electron app
+*.asar
+*.exe
+*.dmg
+*.app
+
+# Log files
+*.log

@@ -1,14 +1,8 @@
-
-
-
 <mat-form-field class="custom-form-field">
-            <mat-label>Proveedor </mat-label>
-            <mat-select ngModel="selectedSupplier" name="proveedor">
-                <mat-option *ngFor="let item of suppliers" [value]="item.id">
-                    {{ item.name}}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
-    
-
-        
+    <mat-label>Proveedor</mat-label>
+    <mat-select   name="proveedor" (selectionChange)="enviarIdProveedor($event.value)">
+        <mat-option *ngFor="let item of suppliers" [value]="item.id">
+            {{ item.name }}
+        </mat-option>
+    </mat-select>
+</mat-form-field>

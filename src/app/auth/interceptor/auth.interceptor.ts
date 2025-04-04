@@ -1,5 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 
+// Interceptor que agrega el token al encabezado Authorization si está presente pero no si es distinto 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // Si la URL contiene "Acceso", no agregar el token
   if (req.url.indexOf('Acceso') > 0) {

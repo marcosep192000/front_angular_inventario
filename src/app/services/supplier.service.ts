@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
  
 import { environments } from '../../environments/environments.prod';
-import { Observable } from 'rxjs';
+import { catchError, Observable, pipe, throwError } from 'rxjs';
 import { Supplier } from '../interfaces/supplier';
 
 @Injectable({
@@ -32,16 +32,25 @@ export class SupplierService {
   }
 
   createSupplier(supplier: Supplier): Observable<Supplier> {
-    return this.http.post<Supplier>(`${this.base}provider/create`, supplier);
+    return this.http
+      .post<Supplier>(`${this.base}provider/create-provider`, supplier)
+      .pipe(catchError(this.manejarError));
   }
+  manejarError(error: HttpErrorResponse) {
+    if (error.status === 500) {
+      // Código de conflicto
+      return throwError(() => new Error('El CUIT ya existe.'));
+    }
+    return throwError(() => new Error('Error inesperado.'));
+  }
+
   deleteSupplier(id: number): Observable<Supplier> {
     return this.http.delete<Supplier>(`${this.base}provider/deleted/${id}`);
   }
 
-  getPayMethod(): Observable<string[]> { 
+  getPayMethod(): Observable<string[]> {
     return this.http.get<string[]>(
-      `${this.base}supplier-pay-conditions/type-account`);
+      `${this.base}supplier-pay-conditions/type-account`
+    );
   }
-
-  
 }

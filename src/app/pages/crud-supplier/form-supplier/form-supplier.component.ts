@@ -11,6 +11,8 @@ import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { MatIconModule } from '@angular/material/icon';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { Supplier } from '../../../interfaces/supplier';
+import { error } from 'console';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -84,21 +86,21 @@ export class FormSupplierComponent implements OnInit {
     });
   }
   ngOnInit(): void {
-     if (this.data.updateSupplier != null) {
-       this.suppleierService
-         .findById(this.data.updateSupplier)
-         .subscribe((datos) => {
-           console.log(datos);
-           this.formGroup.patchValue({
-             name: datos.name,
-             cuit:  datos.cuit,
-             phone:datos.phone,
-             address:datos.address,
-             contact:datos.contact,
-             email: datos.email,
-           });
-         });
-     }
+    if (this.data.updateSupplier != null) {
+      this.suppleierService
+        .findById(this.data.updateSupplier)
+        .subscribe((datos) => {
+          console.log(datos);
+          this.formGroup.patchValue({
+            name: datos.name,
+            cuit: datos.cuit,
+            phone: datos.phone,
+            address: datos.address,
+            contact: datos.contact,
+            email: datos.email,
+          });
+        });
+    }
   }
 
   isErrorState(
@@ -118,27 +120,31 @@ export class FormSupplierComponent implements OnInit {
   }
   save() {
     console.log(this.formGroup.value);
-    if (this.formGroup.value) {
+
+    if (this.formGroup.valid) {
+      // Verifica que el formulario sea válido antes de enviarlo
       this.suppleierService.createSupplier(this.formGroup.value).subscribe({
         next: (data) => {
-          // Manejo en caso de éxito
+          // Si la respuesta es exitosa
           this.toast.info('Proveedor guardado correctamente');
           this.dialogRef.close(data);
         },
-        error: (err) => {
-          // Manejo en caso de error
-          this.toast.error(
-            'Formulario inválido. Por favor, revisa los campos.'
-          );
+        error: (err: HttpErrorResponse) => {
+          if (err.status === 500) {
+            this.toast.error('El CUIT ya está registrado. Intente con otro.');
+          } else if (err.status === 400) {
+            this.toast.error('El CUIT ya está registrado. Intente con otro.');
+          } else {
+            this.toast.error('El CUIT ya está registrado. Intente con otro.');
+          }
         },
       });
     } else {
       this.toast.error('Formulario inválido. Por favor, revisa los campos.');
     }
   }
- 
-  update(): void {
 
+  update(): void {
     this.suppleierService
       .update(this.data.updateSupplier, this.formGroup.value)
       .subscribe((data) => {
@@ -146,8 +152,6 @@ export class FormSupplierComponent implements OnInit {
         this.dialogRef.close(data);
       });
   }
-
-
 
   /* hacer que sea una funcion generica para cada formulario con numeros  */
   onInputChange(event: any, controlName: string) {
