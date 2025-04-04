@@ -25,32 +25,26 @@ export class FindSupplierComponent implements OnInit {
   @Output() mensajeEnviado = new EventEmitter<number>();
 value: any;
 
-  enviarIdProveedor(id:number) {
-    const supplierId = id; // No necesitas convertirlo a string si ya es un ID.
-    this.mensajeEnviado.emit(supplierId); // Emitir el ID del proveedor
-    console.log('Proveedor ID:', supplierId);
-  }
-  findSupplier() {}
-  suppliers?: Supplier[] = [];
-  selectedSupplier?: any;
-  constructor(
-    private supplierService: SupplierService,
-    private toastr: ToastrService
-  ) {}
-  ngOnInit(): void {
-    this.getAllSuppliers();
-  }
+suppliers: Supplier[] = [];
+selectedSupplier: Supplier | null = null; // Ningún proveedor seleccionado por defecto
 
-  getAllSuppliers() {
-    this.supplierService.getAllSuppliers().subscribe((data) => {
-      this.suppliers = data;
-      console.log(
-        this.suppliers + 'dddddddddddddddddddddddddddddddddddddddddddddd'
-      );
-    });
+constructor(private supplierService: SupplierService) {}
+
+ngOnInit(): void {
+  this.getAllSuppliers();
+}
+
+getAllSuppliers() {
+  this.supplierService.getAllSuppliers().subscribe((data) => {
+    this.suppliers = data;
+  });
+}
+
+onSupplierChange() {
+  // Este método se llama cuando el usuario selecciona un proveedor
+  if (this.selectedSupplier) {
+    // Emitir el ID del proveedor seleccionado
+    this.mensajeEnviado.emit(this.selectedSupplier.id);
   }
-  selectSupplier(supplier: Supplier) {
-    this.selectedSupplier = supplier;
-    console.log(this.selectedSupplier);
-  }
+}
 }

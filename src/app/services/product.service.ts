@@ -16,7 +16,7 @@ export class ProductService {
   base: String = environments.baseURL;
 
   getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.base}supermarket`);
+    return this.http.get<Product[]>(`${this.base}supermarket/products`);
   }
   findById(id: number): Observable<Product> {
     return this.http.get<Product>(`${this.base}supermarket/find/${id}`);

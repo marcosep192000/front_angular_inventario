@@ -1,0 +1,50 @@
+<div class="container__title">
+    <h1 class="title__color"> Carga de Excel de Productos</h1>
+</div>
+
+<div class="container">
+
+
+    <h2>1. Requisitos Previos</h2>
+    <ul>
+        <li>Un archivo Excel con las siguientes columnas: <strong>codigo,descripcion,nombre,iva,precio Lista,utilidad-ganancia 
+        </strong>.</li>
+        <li>Respetar el orden de las COLUMNAS.</li>
+        <li>Acceso al sistema con permisos para cargar productos.</li>
+    </ul>
+    
+    <h2>2. Procedimiento</h2>
+    <h3>Paso 1: Seleccionar el archivo Excel</h3>
+    <input type="file" (change)="onFileSelected($event)" accept=".xlsx" />
+    
+    <h3>Paso 2: Elegir el proveedor</h3>
+    <p>Selecciona el proveedor correspondiente desde el combo box desplegable.</p>
+    <br>
+    <mat-label>Seleccionar Proveedor</mat-label>
+    <mat-form-field appearance="fill">
+        <mat-label>Selecciona un proveedor</mat-label>
+        <mat-select [(ngModel)]="selectedSupplierId" (selectionChange)="onSupplierChange($event)">
+          <mat-option *ngFor="let item of dataSuplier" [value]="item.id">
+            {{item.id}} - {{ item.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    <br>
+    <h3>Paso 3: Enviar el archivo</h3>
+    <p>Una vez seleccionado el archivo y el proveedor, presiona el botón <strong>“Subir Archivo”</strong>. El sistema validará el formato del archivo.</p>
+    <button (click)="onUpload()">Subir Archivo</button>
+    
+    <h3>Paso 4: Confirmar la carga</h3>
+    <p>Si el archivo es válido, se mostrará un mensaje de confirmación y los productos se registrarán en la base de datos.</p>
+    
+    <h2>3. Posibles Errores y Soluciones</h2>
+    <ul>
+        <li><strong>Error: “Formato de archivo incorrecto”</strong> → Asegúrate de que el archivo sea un Excel (.xlsx) con las columnas correctas.</li>
+        <li><strong>Error: “Proveedor no seleccionado”</strong> → Selecciona un proveedor antes de subir el archivo.</li>
+        <li><strong>Error: “Datos incompletos”</strong> → Revisa que todas las filas contengan los datos necesarios.</li>
+    </ul>
+    
+    <h2>4. Contacto</h2>
+    <p>Si tienes problemas, contacta al soporte técnico.</p>
+
+</div>

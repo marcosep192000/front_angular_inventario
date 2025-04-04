@@ -78,7 +78,6 @@ export class FormProductComponent implements OnInit {
       marca: [1],
       provider: [1],
       barCode: ['', Validators.required],
-      description: ['', Validators.required],
       name: ['', Validators.required],
       price: [
         '',
@@ -113,7 +112,6 @@ export class FormProductComponent implements OnInit {
             marca: datos.marca.id,
             provider: datos.provider.id,
             barCode: datos.barCode,
-            description: datos.description,
             name: datos.name,
             price: datos.price,
             stateIva: datos.stateIva,
@@ -248,10 +246,9 @@ export class FormProductComponent implements OnInit {
     if (stateIva === false) {
       finalPrice = (priceValue * usefulnessValue) / 100 + priceValue;
     } else {
-      // Con IVA
+      // Con IVA 
       const priceWithIva = priceValue * 1.21;
-      finalPrice = priceWithIva + (priceValue * usefulnessValue) / 100;
-      
+      finalPrice = priceWithIva +  (priceWithIva   * usefulnessValue) / 100;
     }
 
     this.calculatedSalePrice = finalPrice;
