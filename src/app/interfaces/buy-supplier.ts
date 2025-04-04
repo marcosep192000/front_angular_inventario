@@ -20,5 +20,7 @@ export interface BuySupplier {
   payDay: string; // dia de pago
   provider: number; // proveedor
   amount: number; // monto total  de factura
+  ivaTotal: number; // monto total del iva 
+  montoTotal: number; // monto total de la factura
   invoiceDetailsProviders: any[];
 }

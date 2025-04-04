@@ -17,35 +17,26 @@ export class VerDetalleFacturaComponent {
   data: ProductItemBuy[] = [];
   verDetalle!: VerDetalleFacturaComponent;
   columns: string[] = [
-    'barCode',
-    'id',
+    'barCode', 
     'name',
     'price',
-    'stock',
-    'stockMin',
     'iva',
-    'marca',
     'quantity',
     'precioTotal',
-    'totalStock',
+    
   ];
   columnNames: { [key: string]: string } = {
     barCode: 'codigo de barras',
-    id: 'id',
     name: 'nombre',
     price: 'precio',
-    stock: 'stock',
-    stockMin: 'stock MIN',
-    iva: 'DSA',
-    marca: 'DA',
-    quantity: 'AD',
-    precioTotal: 'ASD',
-    totalStock: 'DA',
+    iva: 'Iva',
+    quantity: 'Cantidad',
+    precioTotal: 'Precio Total',
   };
   columnConfig = {
     amount: { type: 'currency' },
     saldoPendiente: { type: 'currency' },
-    montoTotal: { type: 'currency' },
+    precioTotal: { type: 'currency' },
   };
 
   getFacturaDetalle(id:number) {

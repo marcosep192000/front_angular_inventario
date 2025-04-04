@@ -1,0 +1,12 @@
+.container{
+    max-height: 80vh;       /* Altura máxima (ajusta según necesidad) */
+    overflow-y: auto;       /* Scroll vertical */
+    overflow-x: hidden;     /* Evita scroll horizontal no deseado */
+    padding: 16px;          /* Espaciado interno */
+  }
+.title__color{
+    color : white;
+    font-size:x-large;
+    text-align: center;
+    padding-top: 10px ;
+}

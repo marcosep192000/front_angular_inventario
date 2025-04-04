@@ -29,7 +29,6 @@
                 <tr>
                     <th>Código</th>
                     <th>Nombre</th>
-                    <th>Descripción</th>
                     <th>Precio</th>
                     <th>Cantidad</th>
                     <th>Stock</th>
@@ -42,7 +41,6 @@
                 <tr *ngFor="let product of products">
                     <td>{{ product.barCode }}</td>
                     <td>{{ product.name }}</td>
-                    <td>{{ product.description }}</td>
                     <td>{{ product.salePrice | currency }}</td>
                     <td>{{ product.quantity }}</td>
                     <td>{{ product.stock - product.quantity }}</td>
