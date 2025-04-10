@@ -1,7 +1,14 @@
 .container{
    
 }
-
+.container__title{
+    display: flex;
+  } .title__color{
+    color: rgb(255, 255, 255);
+  }
+  
+  
+  
 .input__text {
   /* Aplica estilos al input directamente */
      border-radius: 10px;

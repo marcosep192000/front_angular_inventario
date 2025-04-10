@@ -18,6 +18,7 @@ import { DialogGenericComponent } from '../../../shared/genericsComponents/dialo
 import { Observable } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
 
  
 @Component({
@@ -35,10 +36,11 @@ import { CommonModule } from '@angular/common';
     MatButtonModule,
     MatDialogModule,
     MatInputModule,
-    MatTooltip,
     CommonModule, // Agrega CommonModule aquí
     HttpClientModule // Asegúrate de importar HttpClientModule si estás haciendo solicitudes HTTP
-  ],
+    ,
+    IconComponent
+],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './list-category.component.html',
   styleUrl: './list-category.component.css',
@@ -101,6 +103,7 @@ export class ListCategoryComponent implements AfterViewInit, OnInit {
     });
   }
   updateCategory(id: number) {
+    console.log (id)
     const dialogRef = this.dialog.open(FormCategoryComponent, {
       disableClose: true,
       autoFocus: true,
@@ -108,7 +111,7 @@ export class ListCategoryComponent implements AfterViewInit, OnInit {
       closeOnNavigation: false,
       data: {
         tipo: 'updateCategory',
-        idCategory: id,
+        idCategory:id,
       },
     });
 

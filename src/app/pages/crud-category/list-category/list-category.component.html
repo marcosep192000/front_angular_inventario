@@ -1,10 +1,4 @@
-<section *ngIf="categories$ | async as categories; else noData">
-    <ul>
-        <li *ngFor="let category of categories">
-            {{ category.descriptionCategory }} <!-- Ajusta esto según la estructura de tu modelo Category -->
-        </li>
-    </ul>
-</section>
+
 <ng-template #noData>
     <p>No hay categorías disponibles.</p>
 </ng-template>
@@ -22,7 +16,7 @@
 
     <div class="actions__btn">
         <button class="actions__btn  btn__new" (click)="createCategory()">agregar</button>
-        <button class="actions__btn  btn__new" (click)="openDialog()">Dialog Generico</button>
+
     </div>
 
  
@@ -54,13 +48,13 @@
                 <div class="container__accions">
                 <div class="example-button-row">
                     <button mat-fab class="btn__update" (click)="updateCategory(element.id)" aria-label="Example icon button with a delete icon">
-                        <mat-icon>update</mat-icon>
+                        <app-icon [iconSrc]="'assets/icons/task.png'" [size]="'20px'"></app-icon>
                     </button>
                 </div>
                    
                     <div class="example-button-row">
                         <button mat-fab class="btn__delete" (click)="deleteCategory(element.id)" aria-label="Example icon button with a delete icon">
-                            <mat-icon>delete</mat-icon>
+                            <app-icon [iconSrc]="'assets/icons/delete.png'" [size]="'20px'"></app-icon>
                         </button>
                     </div>
                 </div>

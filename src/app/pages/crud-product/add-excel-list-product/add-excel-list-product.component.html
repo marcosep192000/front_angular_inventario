@@ -15,8 +15,7 @@
     
     <h2>2. Procedimiento</h2>
     <h3>Paso 1: Seleccionar el archivo Excel</h3>
-    <input type="file" (change)="onFileSelected($event)" accept=".xlsx" />
-    
+    <input  type="file" (change)="onFileSelected($event)" accept=".xlsx"/>
     <h3>Paso 2: Elegir el proveedor</h3>
     <p>Selecciona el proveedor correspondiente desde el combo box desplegable.</p>
     <br>
@@ -32,7 +31,7 @@
     <br>
     <h3>Paso 3: Enviar el archivo</h3>
     <p>Una vez seleccionado el archivo y el proveedor, presiona el botón <strong>“Subir Archivo”</strong>. El sistema validará el formato del archivo.</p>
-    <button (click)="onUpload()">Subir Archivo</button>
+    <button (click)="onUpload()" mat-raised-button color="primary">Subir Archivo</button>
     
     <h3>Paso 4: Confirmar la carga</h3>
     <p>Si el archivo es válido, se mostrará un mensaje de confirmación y los productos se registrarán en la base de datos.</p>

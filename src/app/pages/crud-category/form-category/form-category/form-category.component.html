@@ -1,22 +1,30 @@
 <div class="container">
-<form [formGroup]="formGroup">
-<h2 mat-dialog-title>{{ data.tipo === 'createCategory' ? 'Crear Nueva Categoria' : 'Actualizar Categoria' }}</h2>
-{{ data.tipo}}
+    <div class="container__title">
+        <app-icon [iconSrc]="'assets/icons/category_search.png'"  [size]="'50px'"></app-icon> 
+        <h2 class="title__color" mat-dialog-title>{{ data.tipo === 'createCategory' ?
+            'Crear Nueva Categoria' : 'Actualizar Categoria' }}</h2>
+    </div>
+
+
+
+    <form  *ngIf="formGroup" [formGroup]="formGroup">
+
+
+
+
+
+
     <mat-dialog-content>
-<!--     <mat-form-field>
-        <input matInput class="input__text" formControlName="nameCategory" name="nameCategory" placeholder="Nombre de la Categoria">
-    </mat-form-field> -->
-<!-- 
-<mat-form-field>
-    <input matInput class="input__text" formControlName="descriptionCategory" name="descriptionCategory" placeholder="NDescripcion">
-</mat-form-field> -->
 
 <div class="container__text">
-<input type="text" class="input__text"  formControlName="nameCategory" name="nameCategory" placeholder="Nombre de la Categoria">
-<input type="text"class="input__text" formControlName="descriptionCategory" name="descriptionCategory" placeholder="NDescripcion">
+     <mat-form-field>
+        <input matInput   formControlName="nameCategory"  placeholder="Nombre de la Categoria">
+    </mat-form-field> 
+
+<mat-form-field>
+    <input matInput   formControlName="descriptionCategory" placeholder="Descripcion Detallada">
+</mat-form-field> 
 </div>
-
-
 
     </mat-dialog-content>
     <mat-dialog-actions>

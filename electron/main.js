@@ -1,92 +1,93 @@
-const { app, BrowserWindow } = require("electron");
-const path = require("path");
-const { spawn } = require("child_process");
-const http = require("http");
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
+const { spawn } = require('child_process');
 
 let mainWindow;
-let springProcess;
-let angularProcess;
 
-// Ruta del JAR de Spring Boot (corregida)
-const springJarPath = "D:/proyectos BACKEND/inventario_Final/Inventario-pixel/target/inventario-pixels-0.0.1-SNAPSHOT.jar";
 
-// Función para verificar si Angular está listo
-function checkAngularReady(callback) {
-  const check = () => {
-    http
-      .get("http://localhost:4200", (res) => {
-        if (res.statusCode === 200) {
-          console.log("✅ Angular está listo");
-          callback();
-        } else {
-          console.log("🔄 Esperando Angular...");
-          setTimeout(check, 2000);
-        }
-      })
-      .on("error", () => {
-        console.log("🔄 Angular aún no está disponible...");
-        setTimeout(check, 2000);
-      });
-  };
-  check();
+const fs = require('fs');
+
+
+// 🔍 Función para buscar la ubicación de Java instalada
+function findJavaExecutable() {
+  const possiblePaths = [
+    process.env.JAVA_HOME && path.join(process.env.JAVA_HOME, 'bin', 'java.exe'),
+    'C:\\Program Files\\Java\\jdk-19\\bin\\java.exe',
+    'C:\\Program Files\\Java\\jre-19\\bin\\java.exe',
+    'C:\\Program Files (x86)\\Java\\jre-19\\bin\\java.exe',
+    'java' // fallback si está en PATH
+  ];
+
+  for (const javaPath of possiblePaths) {
+    if (javaPath && fs.existsSync(javaPath)) {
+      return javaPath;
+    }
+  }
+
+  return null;
+}
+
+// 🚀 Función para iniciar el backend
+function startBackend() {
+  const java = findJavaExecutable();
+
+  if (!java) {
+    dialog.showErrorBox("Error", "No se encontró Java en el sistema. Por favor, instale Java o agréguelo al PATH.");
+    return;
+  }
+
+  let jarPath;
+
+  if (process.defaultApp || /[\\/]electron[\\/]/.test(process.execPath)) {
+    jarPath = path.join(__dirname, '..', 'backend', 'inventario-pixels-0.0.1-SNAPSHOT.jar');
+  } else {
+    jarPath = path.join(process.resourcesPath, 'inventario-pixels-0.0.1-SNAPSHOT.jar');
+  }
+
+  console.log(`🟡 Iniciando backend con Java en: ${jarPath} usando: ${java}`);
+
+  const javaProcess = spawn(java, ['-jar', jarPath], {
+    cwd: path.dirname(jarPath),
+    shell: false
+  });
+
+  javaProcess.stdout.on('data', (data) => {
+    console.log(`🟢 Backend stdout: ${data}`);
+  });
+
+  javaProcess.stderr.on('data', (data) => {
+    console.error(`🔴 Backend stderr: ${data}`);
+  });
+
+  javaProcess.on('close', (code) => {
+    console.log(`🔵 Backend terminó con código: ${code}`);
+  });
+
+  javaProcess.on('error', (err) => {
+    console.error(`🔴 Error al iniciar Java: ${err}`);
+  });
+}
+
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    webPreferences: {
+      contextIsolation: true
+    }
+  });
+
+  // Ruta al frontend Angular compilado
+  const frontendPath = path.join(__dirname, '..', 'dist', 'inventario-pixels', 'browser', 'index.html');
+  mainWindow.loadFile(frontendPath);
 }
 
 app.whenReady().then(() => {
-  console.log("🚀 Iniciando aplicación...");
-
-  // 1️⃣ Iniciar Spring Boot
-  console.log("🔹 Iniciando Spring Boot...");
-  springProcess = spawn("java", ["-jar", springJarPath]);
-
-  springProcess.stdout.on("data", (data) =>
-    console.log(`Spring Boot: ${data}`)
-  );
-  springProcess.stderr.on("data", (data) =>
-    console.error(`Error en Spring Boot: ${data}`)
-  );
-
-  // 2️⃣ Iniciar Angular
-  console.log("🔹 Iniciando Angular...");
-  angularProcess = spawn("cmd", ["/c", "npm", "start"], { shell: true });
-
-  angularProcess.stdout.on("data", (data) => console.log(`Angular: ${data}`));
-  angularProcess.stderr.on("data", (data) =>
-    console.error(`Error en Angular: ${data}`)
-  );
-
-  // 3️⃣ Esperar hasta que Angular esté listo y abrir Electron
-  checkAngularReady(() => {
-    console.log("✅ Creando ventana Electron...");
-    mainWindow = new BrowserWindow({
-      width: 1920,
-      height: 1080,
-      frame: true,
-      resizable: false,
-      webPreferences: { nodeIntegration: false },
-    });
-
-    mainWindow.loadURL("http://localhost:4200");
-
-    mainWindow.on("closed", () => {
-      mainWindow = null;
-      cerrarProcesos();
-    });
-  });
+  startBackend();
+  createWindow();
 });
 
-// Cerrar procesos al cerrar la ventana
-app.on("window-all-closed", () => {
-  cerrarProcesos();
-  if (process.platform !== "darwin") app.quit();
+app.on('window-all-closed', () => {
+  app.quit();
 });
-
-function cerrarProcesos() {
-  if (springProcess) {
-    console.log("🛑 Cerrando Spring Boot...");
-    springProcess.kill();
-  }
-  if (angularProcess) {
-    console.log("🛑 Cerrando Angular...");
-    angularProcess.kill();
-  }
-}

@@ -7,14 +7,15 @@
   "main": "./electron/main.js",
   "scripts": {
     "electron": "electron electron/main.js",
-    "package": "electron-builder",
-    "build": "ng build --configuration=production",
+    "package:exe": "node scripts/build-electron.js",
     "build:electron": "ng build --configuration=production && electron electron/main.js",
     "ng": "ng",
     "start": "ng serve",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:inventarioPixels": "node dist/inventario-pixels/server/server.mjs"
+    "postbuild": "node scripts/copy-angular.js",
+    "package": "npm run build && npm run postbuild && electron-builder",
+    "build": "ng build --configuration=production --base-href ./"
   },
   "private": true,
   "dependencies": {
@@ -31,6 +32,7 @@
     "@angular/router": "^17.3.0",
     "@angular/ssr": "^17.3.0",
     "@auth0/angular-jwt": "^5.2.0",
+    "axios": "^1.8.4",
     "chart.js": "^3.9.1",
     "express": "^4.18.2",
     "file-saver": "^2.0.5",
@@ -53,6 +55,7 @@
     "@types/node": "^18.18.0",
     "electron": "^34.1.1",
     "electron-builder": "^25.1.8",
+    "fs-extra": "^11.3.0",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -63,24 +66,25 @@
   },
   "build": {
     "appId": "com.miempresa.inventario-pixels",
-    "productName": "Pixels",
+    "productName": "Inventario Pixels",
     "files": [
       "dist/**/*",
-      "electron/**/*"
+      "electron/**/*",
+      "backend/**/*",
+      "main.js"
+    ],
+    "extraResources": [
+      {
+        "from": "backend/inventario-pixels-0.0.1-SNAPSHOT.jar",
+        "to": "inventario-pixels-0.0.1-SNAPSHOT.jar"
+      }
     ],
     "directories": {
       "output": "release"
     },
     "win": {
       "target": "nsis",
-      "icon": "./src/assets/icons/ICONOPIXELS.png"
-    },
-    "mac": {
-      "icon": "path_to_icon.icns"
-    },
-    "linux": {
-      "target": "AppImage",
-      "icon": "path_to_icon.png"
+      "icon": "./src/assets/icons/ICONOPIXELS.ico"
     }
   }
 }

@@ -15,6 +15,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { CategoryService } from '../../../../services/category.service';
 import { CommonModule } from '@angular/common';
+import { IconComponent } from "../../../../shared/dasboard/icon/icon.component";
 @Component({
   selector: 'app-form-category',
   standalone: true,
@@ -23,8 +24,7 @@ import { CommonModule } from '@angular/common';
     FormsModule,
     MatDialogModule,
     MatButtonModule,
-    ReactiveFormsModule,
-  ],
+    ReactiveFormsModule, IconComponent],
   templateUrl: './form-category.component.html',
   styleUrl: './form-category.component.css',
 })
@@ -45,6 +45,7 @@ export class FormCategoryComponent implements OnInit {
   cancel(): void {
     this.dialogRef.close();
   }
+
   save(): void {
     this.categoryService
       .createCategory(this.formGroup.value)
@@ -53,25 +54,26 @@ export class FormCategoryComponent implements OnInit {
       });
   }
   update(): void {
+   
     this.categoryService.updateCategory(this.data.idCategory,this.formGroup.value).subscribe((data) => {
       console.log(data + ' updated', this.data.idCategory);
       this.dialogRef.close(data);
     });
+
   }
+
+
+
+
   //inicializar formulario con los campos correspondientes a la seleccion de item si se preciona en update si no
   //inicializar formulario vacío 
   initForm() {
     if (this.data.idCategory != null) {
       this.categoryService.finById(this.data.idCategory).subscribe((datos) => {
+    console.log(datos.nameCategory)
         this.formGroup = this.fb.group({
-          nameCategory: [
-            { value: datos.nameCategory, disabled: false },
-            [Validators.required, Validators.minLength(6)],
-          ],
-          descriptionCategory: [
-            { value: datos.descriptionCategory, disabled: false },
-            [Validators.required, Validators.minLength(6)],
-          ],
+          nameCategory:  datos.nameCategory ,
+          descriptionCategory:datos.descriptionCategory ,
         });
       });
     }

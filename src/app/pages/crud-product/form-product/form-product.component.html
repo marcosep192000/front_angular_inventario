@@ -1,6 +1,7 @@
 <form [formGroup]="formGroup">
 
     <div class="container__title">
+        <app-icon [iconSrc]="'assets/icons/store1.png'"  [size]="'50px'"></app-icon> 
         <h2 class="title__color" mat-dialog-title>{{ data.tipo === 'createProduct' ?
             'Crear Nuevo Producto' : 'Actualizar Producto' }}</h2>
     </div>
@@ -34,10 +35,8 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <button type="button" class="btn__marca" (click)="createSupplier()"><mat-icon color="white"><span
-                                class="material-symbols-outlined">
-                                add_task
-                            </span></mat-icon>
+                    <button type="button" class="btn__marca" (click)="createSupplier()">
+                        <app-icon [iconSrc]="'assets/icons/task.png'"  [size]="'30px'"></app-icon> 
                     </button>
 
                 </div>
@@ -107,9 +106,7 @@
                     </mat-form-field>
                     <button type="button" class="btn__marca" (click)="createMarca()">
 
-                        <mat-icon color="white"><span class="material-symbols-outlined">
-                                add_task
-                            </span></mat-icon>
+                        <app-icon [iconSrc]="'assets/icons/task.png'"  [size]="'30px'"></app-icon> 
 
                     </button>
 
@@ -135,8 +132,13 @@
     <mat-label>Precio de Venta</mat-label>
     <input matInput formControlName="salePrice" type="text" [value]="formattedSalePrice" readonly />
 </mat-form-field>
+
+
+
+
                 <!-- SELECT CATEGORIA  -->
-                <mat-form-field class="input">
+                <div class="col2__btnMarca">
+                <mat-form-field class="input marca">
                     <mat-label>Categorias</mat-label>
                     <mat-select formControlName="category">
                         <mat-option *ngFor="let item of dataCategories; " [value]="item.id">
@@ -144,7 +146,10 @@
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
-
+                <button type="button" class="btn__marca" (click)="createCategoria()">
+                    <app-icon [iconSrc]="'assets/icons/task.png'"  [size]="'30px'"></app-icon> 
+                </button>
+                </div>
             </div><!-- FIN DE COL 2 -->
 
         </div>

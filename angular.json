@@ -13,11 +13,18 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
+
+      
+
             "outputPath": "dist/inventario-pixels",
             "index": "src/index.html",
             "browser": "src/main.ts",
           "allowedCommonJsDependencies": [
-        "jspdf"
+        "jspdf",
+        "canvg",
+        "core-js",
+        "raf",
+        "rgbcolor"
       ],
             "polyfills": [
               "zone.js"
@@ -36,6 +43,7 @@
             "server": "src/main.server.ts",
             "prerender": false,
             "ssr":false
+            
           },
           "configurations": {
             "production": {

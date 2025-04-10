@@ -8,6 +8,10 @@
   align-items: center;
 }
 
+.container__title{
+  display: flex;
+}
+
 .iva {
   width: 100%; 
  height: 55px;

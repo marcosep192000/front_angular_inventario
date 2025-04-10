@@ -29,6 +29,8 @@ import { FormSupplierComponent } from '../../crud-supplier/form-supplier/form-su
 import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { SupplierService } from '../../../services/supplier.service';
 import { Supplier } from '../../../interfaces/supplier';
+import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
+import { FormCategoryComponent } from '../../crud-category/form-category/form-category/form-category.component';
  
 
 
@@ -46,11 +48,13 @@ import { Supplier } from '../../../interfaces/supplier';
     MatSelectModule,
     ReactiveFormsModule,
     MatSlideToggleModule,
-  ],
+    IconComponent
+],
   templateUrl: './form-product.component.html',
   styleUrl: './form-product.component.css',
 })
 export class FormProductComponent implements OnInit {
+
   protected readonly value = signal('');
   calculatedSalePrice: number = 0;
 
@@ -211,6 +215,8 @@ export class FormProductComponent implements OnInit {
       this.loadMarcas();
     });
   }
+
+
   /* nuevo proveedor */
   createSupplier() {
     const dialogRef = this.dialog.open(FormSupplierComponent, {
@@ -270,4 +276,22 @@ export class FormProductComponent implements OnInit {
   get formattedSalePrice(): string {
     return this.calculatedSalePrice.toFixed(2); // Formatea a dos decimales
   }
+
+  createCategoria() {
+    const dialogRef = this.dialog.open(FormCategoryComponent, {
+      disableClose: true,
+      autoFocus: true,
+      hasBackdrop: true,
+      closeOnNavigation: false,
+      data: {
+        tipo: 'createCategory',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.loadMarcas();
+    });
+  }
+
 }
+
