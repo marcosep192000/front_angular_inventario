@@ -289,7 +289,7 @@ export class FormProductComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(() => {
-      this.loadMarcas();
+      this.loadCategories();
     });
   }
 

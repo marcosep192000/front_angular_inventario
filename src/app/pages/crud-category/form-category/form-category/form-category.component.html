@@ -4,18 +4,10 @@
         <h2 class="title__color" mat-dialog-title>{{ data.tipo === 'createCategory' ?
             'Crear Nueva Categoria' : 'Actualizar Categoria' }}</h2>
     </div>
-
-
-
+    
     <form  *ngIf="formGroup" [formGroup]="formGroup">
 
-
-
-
-
-
     <mat-dialog-content>
-
 <div class="container__text">
      <mat-form-field>
         <input matInput   formControlName="nameCategory"  placeholder="Nombre de la Categoria">

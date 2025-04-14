@@ -7,14 +7,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormCategoryComponent } from '../form-category/form-category/form-category.component';
 import { MatInputModule } from '@angular/material/input';
-import { MatTooltip } from '@angular/material/tooltip';
 
 import { DialogGenericService } from '../../../services/dialog-generic.service';
-import { FormProductComponent } from '../../crud-product/form-product/form-product.component';
-import { DialogGenericComponent } from '../../../shared/genericsComponents/dialog-generic/dialog-generic.component';
 import { Observable } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -50,7 +47,7 @@ export class ListCategoryComponent implements AfterViewInit, OnInit {
   public categories$!: Observable<Category[]>;
   search: string = '';
 
-  displayedColumns: string[] = ['id', 'descriptionCategory', 'Opciones'];
+  displayedColumns: string[] = ['id','nameCategory', 'descriptionCategory', 'Opciones'];
   dataSource = new MatTableDataSource<Category>(this.categories);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 

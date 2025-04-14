@@ -32,13 +32,21 @@
         <!--        <div class="submenu-item" >Compras</div>--> 
             </div>
         </div>
-
-        <div class="menu-item" (click)="toggleMenu('productos')"[routerLink]="['product-list']"> 
-    <app-icon [iconSrc]="'assets/icons/store1.png'" [iconAlt]="'Clientes'" [size]="'30px'">klklkl</app-icon>  Productos
-        <div class="submenu" [class.open]="isMenuOpen('productos')">
-            <div class="submenu-item"  [routerLink]="['category-list']"  routerLinkActive="router-link-active"><app-icon [iconSrc]="'assets/icons/category_search.png'" [iconAlt]="'Clientes'" [size]="'24px'">klklkl</app-icon>Categorías</div>
-        </div>
-    </div>
+        <div class="menu-item" (click)="toggleMenu('productos')">
+            <app-icon [iconSrc]="'assets/icons/store1.png'" [iconAlt]="'Clientes'" [size]="'30px'">klklkl</app-icon>
+            Productos
+            <div class="submenu" [class.open]="isMenuOpen('productos')">
+              <div class="submenu-item" [routerLink]="['product-list']">
+                <app-icon [iconSrc]="'assets/icons/store1.png'" [iconAlt]="'Clientes'" [size]="'24px'">klklkl</app-icon>
+                Lista de Productos
+              </div>
+              <div class="submenu-item" [routerLink]="['category-list']">
+                <app-icon [iconSrc]="'assets/icons/category_search.png'" [iconAlt]="'Clientes'" [size]="'24px'">klklkl</app-icon>
+                Categorías
+              </div>
+            </div>
+          </div>
+          
 
         <div class="menu-item" (click)="toggleMenu('reportes')">
         <app-icon [iconSrc]="'assets/icons/monitoring.png'" [iconAlt]="'Clientes'" [size]="'30px'"></app-icon>  Reportes

@@ -1,4 +1,3 @@
-
 <ng-template #noData>
     <p>No hay categorías disponibles.</p>
 </ng-template>
@@ -6,10 +5,11 @@
 
 
 <div class="container__serch">
-     <div class="container__serch">
-         <input  class="search__input" placeholder="Ingresa la categoria a buscar" type="text"  ngModel=""  (keyup)="applyFilter($event)" value="text">
-     </div>
- <!--   
+    <div class="container__serch">
+        <input class="search__input" placeholder="Ingresa la categoria a buscar" type="text" ngModel=""
+            (keyup)="applyFilter($event)" value="text">
+    </div>
+    <!--   
      <div class="actions__btn">
          <button class="actions__btn  btn__search">Buscar</button>
      </div> -->
@@ -19,11 +19,11 @@
 
     </div>
 
- 
 
 
 
- </div>
+
+</div>
 
 <div class="mat-elevation-z8">
     <table mat-table [dataSource]="dataSource" class="table">
@@ -33,6 +33,12 @@
             <th mat-header-cell *matHeaderCellDef> CODIGO</th>
             <td mat-cell *matCellDef="let element"> {{element.id }} </td>
         </ng-container>
+
+        <ng-container matColumnDef="nameCategory">
+            <th mat-header-cell *matHeaderCellDef> DESCRIPCION</th>
+            <td mat-cell *matCellDef="let element"> {{element.nameCategory}}</td>
+        </ng-container>
+
 
         <!-- Name Column -->
         <ng-container matColumnDef="descriptionCategory">
@@ -46,17 +52,18 @@
             <td mat-cell *matCellDef="let element">
 
                 <div class="container__accions">
-                <div class="example-button-row">
-                    <button mat-fab class="btn__update" (click)="updateCategory(element.id)" aria-label="Example icon button with a delete icon">
-                        <app-icon [iconSrc]="'assets/icons/task.png'" [size]="'20px'"></app-icon>
-                    </button>
-                </div>
-                   
                     <div class="example-button-row">
+                        <button mat-fab class="btn__update" (click)="updateCategory(element.id)"
+                            aria-label="Example icon button with a delete icon">
+                            <app-icon [iconSrc]="'assets/icons/task.png'" [size]="'20px'"></app-icon>
+                        </button>
+                    </div>
+
+                    <!-- <div class="example-button-row">
                         <button mat-fab class="btn__delete" (click)="deleteCategory(element.id)" aria-label="Example icon button with a delete icon">
                             <app-icon [iconSrc]="'assets/icons/delete.png'" [size]="'20px'"></app-icon>
                         </button>
-                    </div>
+                    </div> -->
                 </div>
 
             </td>
