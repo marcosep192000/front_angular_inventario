@@ -1,0 +1,9 @@
+.title__color{
+    color: white;
+}
+.container-fluid{
+    padding-left: 15px;
+    display: flex;
+    text-align: center;
+    align-items: center;
+}

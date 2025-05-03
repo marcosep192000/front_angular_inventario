@@ -33,6 +33,15 @@
     height:35px;
     color:white;
 }
+.btn__ctaCte{
+    margin: 10px 10px;
+    background-color: #1cb344e4;
+    border-radius: 10px ;
+    width: 35px;
+    height:35px;
+    color:white;
+}
+
 .table{
       overflow-y: auto;
   overflow-x: auto;

@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ClientService } from '../../../services/client.service';
 import { Client } from '../../../interfaces/Client';
 import { CommonModule } from '@angular/common';
-import { FormGroup, FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,10 +10,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
+import { MatTooltip, MatTooltipModule, TooltipPosition } from '@angular/material/tooltip';
 import { FormClientComponent } from '../form-client/form-client.component';
 import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
 import { DialogGenericComponent } from '../../../shared/genericsComponents/dialog-generic/dialog-generic.component';
+import { CrudCtaCteClienteComponent } from '../../crud-cta-cte-cliente/crud-cta-cte-cliente.component';
+import { FormCtaCteClienteComponent } from '../../form-cta-cte-cliente/form-cta-cte-cliente.component';
 
 @Component({
   selector: 'app-list-client',
@@ -38,10 +40,12 @@ import { DialogGenericComponent } from '../../../shared/genericsComponents/dialo
   styleUrl: './list-client.component.css',
 })
 export class ListClientComponent implements OnInit {
+
   clients: Client[] = [];
   Form!: FormGroup;
   serch: string = '';
-
+  positionOptions: TooltipPosition[] = ['below', 'above', 'left', 'right'];
+  position = new FormControl(this.positionOptions[0]);
   displayedColumns: string[] = [
     'id',
     'dni',
@@ -79,7 +83,8 @@ export class ListClientComponent implements OnInit {
       this.dataSource.paginator.firstPage();
     }
   }
-  
+ 
+
   createClient() {
     const dialogRef = this.dialog.open(FormClientComponent, {
       disableClose: true,
@@ -94,6 +99,40 @@ export class ListClientComponent implements OnInit {
       this.getClients();
     });
   }
+  ctaCteClient(id: number) {
+    const dialogRef = this.dialog.open(FormCtaCteClienteComponent,{
+      disableClose: true,
+      autoFocus: true,
+      hasBackdrop: true,
+      closeOnNavigation: false,
+      data: {
+        tipo: 'updateCtaCte',
+        updateClient: id,
+      },
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getClients();
+    });
+  }
+
+  altaCtaCteClient(id: number) {
+    const dialogRef = this.dialog.open(CrudCtaCteClienteComponent,{
+      disableClose: true,
+      autoFocus: true,
+      hasBackdrop: true,
+      closeOnNavigation: false,
+      data: {
+        tipo: 'altaCtaCte',
+        altaClient: id,
+      },
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getClients();
+    });
+  }
+
+
+  
   updateClient(id: number) {
     const dialogRef = this.dialog.open(FormClientComponent, {
       disableClose: true,

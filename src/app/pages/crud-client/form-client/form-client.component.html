@@ -14,8 +14,14 @@
             <div class="col1">
                 <mat-form-field class="input" hintLabel="Máximo 12 caracteres">
                     <mat-label>Cuit</mat-label>
-                    <input matInput maxlength="12" formControlName="cuit" (input)="onInputChange($event, 'cuit')"
-                        type="text" pattern="[0-9]*" />
+                    <input
+                    matInput
+                    maxlength="14"
+                    formControlName="cuit"
+                    type="text"
+                    pattern="[0-9]*"
+                    (keydown)="onlyAllowNumbers($event)"
+                  />
                     <mat-hint align="end">{{ formGroup.get('cuit')?.value?.length || 0 }}/12</mat-hint>
                 </mat-form-field>
 
@@ -26,11 +32,17 @@
                 </mat-form-field>
 
                 <mat-form-field class="input" hintLabel="Máximo 14 caracteres">
-                    <mat-label>Telefono</mat-label>
-                    <input matInput maxlength="14" formControlName="tel" (input)="onInputChange($event, 'tel')"
-                        type="text" pattern="[0-9]*" />
+                    <mat-label>Teléfono</mat-label>
+                    <input
+                      matInput
+                      maxlength="14"
+                      formControlName="tel"
+                      type="text"
+                      pattern="[0-9]*"
+                      (keydown)="onlyAllowNumbers($event)"
+                    />
                     <mat-hint align="end">{{ formGroup.get('tel')?.value?.length || 0 }}/14</mat-hint>
-                </mat-form-field>
+                  </mat-form-field>
             </div><!-- FIN COLUMNA 1 -->
 
             <!-- COLUMNA 2 -->
@@ -60,36 +72,8 @@
         </div> <!-- FIN CONTAINER-COL -->
  <hr>
 
-    @if (!data.tipo.createClient   ){
-      
-      
-    {{data.cuentaCorriente}}
-<mat-slide-toggle formControlName="isChecked" (change)="onToggleChange($event)">
-    <mat-label>Activar Cuenta Corriente.</mat-label>
-</mat-slide-toggle>}
 
-<!-- Contenido condicional basado en el valor de isChecked -->
-<div *ngIf="formGroup.get('isChecked')?.value" class="container-col">
-    <div class="col1">
-    <div formGroupName="cuentaCorriente">
-        <mat-form-field class="input" hintLabel="Máximo 12 caracteres">
-            <mat-label>Saldo Inicial</mat-label>
-            <!-- Aquí usamos formControlName='saldo' dentro del grupo 'cuentaCorriente' -->
-            <input matInput maxlength="12" formControlName="saldo" (input)="onInputChange($event, 'saldo')" type="text"
-                pattern="^\d*\.?\d*$" />
-            <mat-hint align="end">
-            {{ formGroup.get('cuentaCorriente.saldo')?.value | currency: 'ARS': 'symbol' : '1.0-2' }}
-            </mat-hint>
-            <mat-error *ngIf="formGroup.get('cuentaCorriente.saldo')?.hasError('pattern')">
-                Solo se permiten números y un punto decimal.
-            </mat-error>
-        </mat-form-field>
-    </div>
-        </div>
-        <div class="col2" >
 
-        </div> 
-    </div>
 
 
 

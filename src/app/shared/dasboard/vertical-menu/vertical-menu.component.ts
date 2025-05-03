@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { MatProgressSpinner, MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { IconComponent } from "../icon/icon.component";
 import { TokenService } from '../../../services/token.service';
 import { Component, OnInit } from '@angular/core';

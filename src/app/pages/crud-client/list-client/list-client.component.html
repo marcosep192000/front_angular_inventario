@@ -14,7 +14,7 @@
 
 
 <ng-container matColumnDef="id">
-    <th mat-header-cell *matHeaderCellDef>Id</th>
+    <th mat-header-cell *matHeaderCellDef>Codigo</th>
     <td mat-cell *matCellDef="let element"> {{element.id}}</td>
 </ng-container>
 
@@ -59,24 +59,42 @@
         <ng-container matColumnDef="Opciones">
             <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
             <td mat-cell *matCellDef="let element">
-
                 <div class="container__accions">
+          
+            <!-- cuenta corriente    -->        
+                @if(element.cuentaCorriente !== null ){
+            <div class="example-button-row">
+                        <button mat-fab class="btn__ctaCte" (click)="ctaCteClient(element.id)"
+                        matTooltip="Cuenta Corririente Activa"
+                        aria-label="Example icon button with a delete icon">
+                         <app-icon [iconSrc]="'assets/icons/ctaCte.png'" [size]="'20px'"></app-icon>
+                        </button>
+                    </div> }  @else {  
+                        <button mat-fab class="btn__ctaCte" (click)="altaCtaCteClient(element.id)"
+                        matTooltip="Crear Cuenta Corririente "
+                        aria-label="Example icon button with a delete icon">
+                         <app-icon [iconSrc]="'assets/icons/ctaCte2.png'" [size]="'20px'"></app-icon>
+                        </button>
+                    }
+
+              <!-- // Boton actualizar  -->  
                     <div class="example-button-row">
                         <button mat-fab class="btn__update" (click)="updateClient(element.id)"
-                            aria-label="Example icon button with a delete icon">
-                            <app-icon [iconSrc]="'assets/icons/task.png'" [size]="'20px'"></app-icon>
+                        matTooltip="Actualizar Info"
+                        aria-label="Example icon button with a delete icon">
+                         <app-icon [iconSrc]="'assets/icons/task.png'" [size]="'20px'"></app-icon>
                         </button>
-
                     </div>
 
+               <!-- Boton actualizar--> 
                     <div class="example-button-row">
-                        <button mat-fab class="btn__delete" (click)="deleteClient(element.id)"
-                            aria-label="Example icon button with a delete icon">
+                        <button mat-fab class="btn__delete"              (click)="deleteClient(element.id)"
+                        matTooltip="Eliminar Usuario"
+                        aria-label="Example icon button with a delete icon">
                             <app-icon [iconSrc]="'assets/icons/delete.png'" [size]="'20px'"></app-icon>
                         </button>
                     </div>
                 </div>
-
             </td>
         </ng-container>
         <!-- Name Column -->

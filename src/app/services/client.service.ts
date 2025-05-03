@@ -3,8 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environments } from '../../environments/environments.prod';
 import { Observable } from 'rxjs';
 import { Client } from '../interfaces/Client';
-
-
+import { CtaCte } from '../interfaces/CtaCte';
 
 @Injectable({
   providedIn: 'root',
@@ -43,5 +42,12 @@ export class ClientService {
   // Delete client by ID
   delete(id: number) {
     return this.http.delete(`${this.baseUrl}customer/delete-supplier/${id}`);
+  }
+
+  guardarCuentaCorriente(idClient: number, cuenta: CtaCte) {
+    return this.http.post(
+      `${this.baseUrl}customer/${idClient}/cuenta-corriente`,
+      cuenta
+    );
   }
 }

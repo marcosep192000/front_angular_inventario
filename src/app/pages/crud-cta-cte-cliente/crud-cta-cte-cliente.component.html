@@ -1,0 +1,31 @@
+<form [formGroup]="formGroup">
+
+
+<div class="container__title">
+    <h2 class="title__color" mat-dialog-title>
+        <app-icon [iconSrc]="'assets/icons/point_of_sale.png'" [size]="'50px'"></app-icon>Alta Cuenta Corriente
+    </h2>
+    <div class="btn-sale">
+        <strong></strong>
+    </div>
+</div>
+ <div class = "container-fluid">
+    <mat-form-field class="input" hintLabel="Máximo 12 caracteres">
+        <mat-label>Saldo Inicial</mat-label>
+        <input matInput maxlength="12" formControlName="montoMaximoDeCtaCte" (input)="onInputChange($event,'saldo')" type="text"
+            pattern="^\d*\.?\d*$" />
+        <mat-hint align="end">
+        {{ formGroup.get('cuentaCorriente.saldo')?.value | currency: 'ARS': 'symbol' : '1.0-2' }}
+        </mat-hint>
+        <mat-error *ngIf="formGroup.get('cuentaCorriente.saldo')?.hasError('pattern')">
+            Solo se permiten números y un punto decimal.
+        </mat-error>
+    </mat-form-field>
+    </div>
+    <mat-dialog-actions>
+        <div class="btn"></div> 
+      <button mat-raised-button class="warn" (click)="cancel()">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="save(data.altaClient)">Guardar</button>
+    </mat-dialog-actions>  
+
+</form>

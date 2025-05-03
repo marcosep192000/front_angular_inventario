@@ -13,3 +13,5 @@ export interface Client {
 	status: boolean;
 	cuentaCorriente?: CtaCte;	
 }
+
+

@@ -45,12 +45,12 @@
 
 
                 <!-- PRODUCTO -->
-                <mat-form-field class="input" hintLabel="Máximo 25 caracteres">
+                <mat-form-field class="input" hintLabel="Máximo 50 caracteres">
                     <mat-label>Producto</mat-label>
-                    <input matInput maxlength="25" formControlName="name" />
+                    <input matInput maxlength="50" formControlName="name" />
                     <mat-hint align="end">{{
                         formGroup.get('name')?.value?.length
-                        }}/25</mat-hint>
+                        }}/50</mat-hint>
                 </mat-form-field>
 
         <!-- STOCK MINIMO -->
@@ -60,9 +60,8 @@
                 pattern="[0-9]*" />
             <mat-hint align="end">{{ formGroup.get('stockMin')?.value?.length }}/5</mat-hint>
         </mat-form-field>
-
-                <!-- PRECIO  COSTO -->
-
+ 
+        <!-- PRECIO  COSTO -->
         <mat-form-field class="input" hintLabel="Máximo 12 caracteres">
             <mat-label>Precio de costo</mat-label>
             <input matInput maxlength="12" formControlName="price" (input)="onInputChange($event, 'price')" type="text"
