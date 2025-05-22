@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
-import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ToastrModule } from 'ngx-toastr'; // Asegúrate de importar correctamente ToastrModule
 import { Client } from '../../../interfaces/Client';
 import { ProductItemSale } from '../../../interfaces/ProductItemSale';
@@ -20,6 +20,10 @@ import { CommonSaleService } from '../../../services/common-sale.service';
 import { SaleCommon } from '../../../interfaces/sale-common';
 import { jsPDF } from 'jspdf';
 import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
+import { Console } from 'console';
+import { ClientService } from '../../../services/client.service';
+import { CtaCteService } from '../../../services/cta-cte.service';
+import { registrarDeudaCtaCteCliente } from '../../../interfaces/registrarDeudaCtaCteCliente';
 @Component({
   selector: 'app-new-sale',
   standalone: true,
@@ -43,23 +47,23 @@ import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
 })
 export class NewSaleComponent implements OnInit {
   clients = new Array<Client>();
+  buscarClienteIdCuentaCorriente:any;
   products = new Array<ProductItemSale>();
   code: string = '';
   product?: ProductItemSale;
   errorMessage?: string;
   selectedClient: any;
   saleCommon?: SaleCommon;
-
   constructor(
     fb: FormBuilder,
     private productService: ProductService,
     private toastr: ToastrService,
     public dialog: MatDialog,
-    private commonSale: CommonSaleService
+    private commonSale: CommonSaleService,
+    private ctaCteService: CtaCteService, 
+    private clienteService: ClientService
   ) {}
-
   ngOnInit(): void {}
-
   onSubmit() {
     this.productService.search(this.code).subscribe(
       (data) => {
@@ -88,11 +92,9 @@ export class NewSaleComponent implements OnInit {
     );
     this.getTotalQuantity();
   }
-
   deleteProduct(id: number) {
     this.products = this.products.filter((product) => product.id !== id);
   }
-
   // Cuenta la cantidad de productos en la lista
   getTotalQuantity(): number {
     return this.products.reduce(
@@ -100,14 +102,12 @@ export class NewSaleComponent implements OnInit {
       0
     );
   }
-
   getTotalPrice(): number {
     return this.products.reduce(
       (total, product) => total + product.salePrice * product.quantity,
       0
     );
   }
-
   getClient() {//lama al componente para buscar un cliente y luego mostrarlo 
     const dialogRef = this.dialog.open(SearchClientByDniComponent, {
       disableClose: true,
@@ -127,35 +127,86 @@ export class NewSaleComponent implements OnInit {
   }
 
   // Se llama al formulario de venta y crea el ticket para la nueva venta
-  newSale() {
-    if (this.products.length > 0) {
-      const dialogRef = this.dialog.open(TotalSaleComponent, {
-        disableClose: true,
-        autoFocus: true,
-        hasBackdrop: true,
-        closeOnNavigation: false,
-        data: {
-          tipo: '',
-          client: this.selectedClient.id,
-          totalPrice: this.getTotalPrice(),
+  async newSale() {
+    if (this.products.length === 0) {
+      this.toastr.warning('No hay artículos seleccionados.');
+      return;
+    }
+  
+    const dialogRef = this.dialog.open(TotalSaleComponent, {
+      disableClose: true,
+      autoFocus: true,
+      hasBackdrop: true,
+      closeOnNavigation: false,
+      data: {
+        tipo: '',
+        client: this.selectedClient.id,
+        totalPrice: this.getTotalPrice(),
+      },
+    });
+  
+    dialogRef.afterClosed().subscribe(async (result) => {
+      if (!result || !result.tipoCuenta) {
+        this.toastr.warning('La venta no fue completada.');
+        this.products = [];
+        this.code = '';
+        return;
+      }
+    
+      const tipoCuenta = result.tipoCuenta;
+      const total = result.totalPrice;
+      const idClient = result.idCliente;
+    
+      try {
+        if (tipoCuenta === 'CONTADO') {
+          const sale = this.buildSaleCommon(tipoCuenta, null); // null porque no hay cta cte
+          this.saveCommonSale(sale);
+        } else if (tipoCuenta === 'CTA_CTE') {
+          const idCtaCte = await this.buscarCuentaIdCorrienteCliente(idClient);
+          const sale = this.buildSaleCommon(tipoCuenta, idCtaCte);
+          this.saveCtaCteSale(idClient, total);
+          this.saveCommonSale(sale);
+        }
+      } catch (error) {
+        this.toastr.error('Error al procesar la venta.');
+      }
+    });
+  }
+  
+  buscarCuentaIdCorrienteCliente(id: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.clienteService.getClientById(id).subscribe({
+        next: (data) => {
+          const idCuenta = data.cuentaCorriente?.id;
+          console.log("✅ ID cuenta corriente:", idCuenta);
+          resolve(idCuenta);
         },
-      });
-
-      dialogRef.afterClosed().subscribe((result) => {
-        if (result) {
-          this.saveCommonSale();
-        } else {
-          this.toastr.warning('La venta no fue completada.');
-            this.products = [];
-            this.code = '';
+        error: (err) => {
+          reject(err);
         }
       });
-    } else {
-      this.toastr.warning('No hay articulos seleccionados.');
-    }
+    });
+  }
+  
+
+  saveCtaCteSale(tipoDeCuenta: any, precioTotal: number) {
+    const payload: registrarDeudaCtaCteCliente = {
+      registrarDeudaCtaCte: precioTotal
+    };
+  
+    this.ctaCteService.updateCtaCte(tipoDeCuenta, payload).subscribe(
+      response => {
+        console.log('Actualización exitosa', response);
+      },
+      error => {
+        console.error('Error al actualizar:', error);
+      }
+    );
   }
 
+
   generatePDF(saleCommon: SaleCommon) {
+
     const doc = new jsPDF();
 
     // Título de la factura
@@ -196,51 +247,55 @@ export class NewSaleComponent implements OnInit {
     // Guardar el PDF
     doc.save(`Factura_${saleCommon.numero}.pdf`);
   }
-
-  saveCommonSale() {
-    // Validar si el cliente está seleccionado
-    if (!this.selectedClient) {
-      this.toastr.error('Debe seleccionar un cliente.');
-      return;
-    }
-
-    // Crear el objeto SaleCommon con los datos actuales de la venta
-    const saleCommon: SaleCommon = {
-      tipo: 'FACTURA', // O el tipo de venta que corresponda
-      client: this.selectedClient.id, // Usamos el ID del cliente seleccionado
-      numero: Math.floor(Math.random() * 1000000), // Genera un número de ticket aleatorio (puedes ajustar esto)
-      observation: 'Observación de la venta', // Puedes poner un texto de observación
-      subTotal: this.getTotalPrice(), // El subtotal es el total de los productos
-      total: this.getTotalPrice(), // El total puede ser el mismo en este caso, pero si hay descuentos, ajustes, hazlo aquí
+  buildSaleCommon(tipo: string,ctaCte : any): SaleCommon {
+    const sale: SaleCommon = {
+      tipo: 'FACTURA',
+      stateTicket: tipo == 'CTA_CTE' ? false : true,
+      ctaCte:ctaCte,
+      saleCondition: tipo,
+      client: this.selectedClient.id,
+      numero: Math.floor(Math.random() * 1000000),
+      observation: 'Observación de la venta',
+      subTotal: this.getTotalPrice(),
+      total: this.getTotalPrice(),
       ticketDetails: this.products.map((product) => ({
         amount: product.quantity,
         price: product.salePrice,
         idProduct: product.id,
-        productName: product.name, // Suponiendo que el producto tenga una propiedad 'name'
-        barCode: product.barCode, // Suponiendo que el producto tenga un código de barras
+        productName: product.name,
+        barCode: product.barCode,
         salePrice: product.salePrice,
-        marca: String(product.marca), // Suponiendo que el producto tenga una propiedad 'brand'
-        iva: product.iva, // El IVA que corresponda
-        subTotal: product.salePrice * product.quantity, // El subtotal del producto
-      })),
+        marca: String(product.marca),
+        iva: product.iva,
+        subTotal: product.salePrice * product.quantity,
+      }))
     };
+  
+    console.log('➡️ Objeto saleCommon generado:', sale); // ✅ log correcto
+  
+    return sale;
+  }
+  
 
-    // Llamar al servicio y pasar el objeto saleCommon
+  saveCommonSale(saleCommon: SaleCommon) {
+    if (!this.selectedClient) {
+      this.toastr.error('Debe seleccionar un cliente.');
+      return;
+    }
+  
     this.commonSale.saveCommon(saleCommon).subscribe(
       (response) => {
-        console.log('Venta guardada con éxito:', response);
         this.toastr.success('Venta guardada con éxito');
+        this.generatePDF(saleCommon);
         this.products = [];
         this.code = '';
-        this.generatePDF(saleCommon); // Vaciar la lista de productos seleccionados
-        // Aquí no se necesita cerrar el diálogo de NewSaleComponent porque no usamos MatDialogRef
       },
       (error) => {
-        console.error('Error al guardar la venta:', error);
         this.toastr.error('Hubo un error al guardar la venta');
-          this.products = [];
-          this.code = '';
+        this.products = [];
+        this.code = '';
       }
     );
   }
+  
 }

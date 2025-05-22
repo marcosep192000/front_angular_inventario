@@ -1,0 +1,32 @@
+<div class="cuenta-corriente-dialog">
+  <h2 class="titulo-principal">
+    Vas a agregar esta Compra a tu Cuenta Corriente
+  </h2>
+
+  @if (cliente.cuentaCorriente?.estado) {
+    <mat-card class="cta-card activa">
+      <mat-card-title>Estado de cuenta: <span class="estado-activo">Activa</span></mat-card-title>
+      <mat-card-content>
+        <div class="info-row">
+          <span class="label">Saldo en cuenta actual:</span>
+          <span class="value">{{ cliente.cuentaCorriente?.montoMaximoDeCtaCte | currency }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Pago a registrar:</span>
+          <span class="value">{{ data.totalPrice | currency }}</span>
+        </div>
+        <hr>
+        <div class="info-row resaltado">
+          <span class="label">Saldo actualizado:</span>
+          <span class="value">
+            {{ (cliente.cuentaCorriente?.montoMaximoDeCtaCte || 0) - (data?.totalPrice || 0) | currency }}
+          </span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <mat-card class="cta-card inactiva">
+      <mat-card-title>Estado de cuenta: <span class="estado-inactivo">Inactiva</span></mat-card-title>
+    </mat-card>
+  }
+</div>

@@ -70,9 +70,11 @@ onCancel() {
       this.dataSource.data = this.data;
       if (this.enablePagination && this.paginator)
         this.dataSource.paginator = this.paginator;
-      if (this.enableSorting && this.sort) this.dataSource.sort = this.sort;
+      if (this.enableSorting && this.sort)this.dataSource.sort = this.sort;
     }
   }
+
+    
   delete(component: any, id: number) {}
   applyFilter(event: Event) {
     if (!this.enableFilter) return;

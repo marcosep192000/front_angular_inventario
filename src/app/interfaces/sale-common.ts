@@ -16,10 +16,14 @@ export interface Marca {
 }
 export interface SaleCommon {
   tipo: string; // Tipo de ticket (FACTURA, etc.)
-  client: number; // ID del cliente (número)
+  client: number; 
+  ctaCte: number; 
+  stateTicket: boolean; 
+  saleCondition:string ;//CONDICIO DE VENTA : CONTADO CTA_CTE
   numero: number; // Número de ticket (número)
   observation: string; // Observaciones
   subTotal: number; // Subtotal del ticket
   total: number | null; // Total del ticket, puede ser nulo
   ticketDetails: TicketDetail[]; // Lista de detalles del ticket (productos)
+  
 }

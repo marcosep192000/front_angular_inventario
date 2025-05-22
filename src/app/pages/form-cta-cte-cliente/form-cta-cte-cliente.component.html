@@ -1,1 +1,43 @@
-<p>form-cta-cte-cliente works!</p>
+<div class="cta-cte-container">
+    <h2 class="section-title">Cuenta Corriente del Cliente</h2>
+  
+    <mat-card class="client-info-card">
+      <mat-card-content>
+        <div class="info-row">
+          <span class="label">Nombre:</span>
+          <span class="value">{{ cliente.name }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Apellido:</span>
+          <span class="value">{{ cliente.lastName }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">DNI:</span>
+          <span class="value">{{ cliente.cuit }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  
+    <mat-card class="cta-info-card">
+      <mat-card-content>
+        <div class="info-row">
+          <span class="label">Saldo Disponible:</span>
+          <span class="value positive">
+            {{ cliente.cuentaCorriente?.montoMaximoDeCtaCte | currency:'$ ' }}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="label">Deuda:</span>
+          <span class="value negative">
+            {{ cliente.cuentaCorriente?.saldo | currency:'$ ' }}
+          </span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  
+    <div class="action-buttons">
+      <button mat-raised-button color="warn" (click)="cancel()">Cancelar</button>
+      <button mat-raised-button color="info" (click)="realizarPagoEnCtaCte()">Realizar Pago</button>
+    </div>
+  </div>
+  

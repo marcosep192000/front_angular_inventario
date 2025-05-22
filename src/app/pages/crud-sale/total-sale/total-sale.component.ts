@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
@@ -10,8 +10,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatError, MatFormFieldModule } from '@angular/material/form-field';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
+import { FormCtaCteClienteComponent } from "../../form-cta-cte-cliente/form-cta-cte-cliente.component";
+import { FormNuevaVentaCtaCteComponent } from "../form-nueva-venta-cta-cte/form-nueva-venta-cta-cte.component";
+import { Client } from '../../../interfaces/Client';
 @Component({
   selector: 'app-total-sale',
   standalone: true,
@@ -31,7 +34,8 @@ import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
     MatFormFieldModule,
     MatError,
     ReactiveFormsModule,
-    IconComponent
+    IconComponent,
+    FormNuevaVentaCtaCteComponent
 ],
   templateUrl: './total-sale.component.html',
   styleUrl: './total-sale.component.css',
@@ -41,15 +45,22 @@ export class TotalSaleComponent implements OnInit {
   amountPaid: number = 0; // El monto que el cliente paga (se actualizará en el formulario)
   change: number = 0; // El vuelto
   difference: number = 0; // La diferencia que el cliente tiene que abonar
-
-  ngOnInit(): void {}
+  tipoDeCuenta: string =  ''; 
+  mensajeIdClienteHijo:string =this.data.client;
+  ngOnInit(): void {
+    this.tipoDeCuenta = 'CONTADO'
+    this.amountPaid = 0;
+    this.cdRef.detectChanges();
+    
+  }
   // CONSTRUCTOR -------------------
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<FormProductComponent>,
     public dialog: MatDialog,
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private cdRef: ChangeDetectorRef
   ) {
     this.formGroup = this.fb.group({
       price: [
@@ -66,22 +77,52 @@ export class TotalSaleComponent implements OnInit {
   cancel() {
     this.dialogRef.close();
   }
-  save() {
+
+  //GUARDA DEPENDIENDO EL TIPO DE CUENTA DEL CLIENTE 
+  save(tipoCuenta : string ) {
+   if (tipoCuenta == 'CONTADO'){
+     this.saveCuntaContado(); 
+   }else{
+    this.saveCtaCorriente(); 
+   }
+  }
+
+  //ver carga de elementos 
+  saveCuntaContado(){
     if (this.difference > 0) {
       this.toastr.error('Aún hay un saldo pendiente por abonar.');
       return;
     }
-    
     const saleData = {
       amountPaid: this.amountPaid,
       change: this.change,
+      tipoCuenta:'CONTADO', // saleCondition
       difference: this.difference,
       totalPrice: this.data.totalPrice,
     };
-
     // Emitir los datos de la venta al componente principal (NewSaleComponent)
     this.dialogRef.close(saleData);
   }
+
+  saveCtaCorriente(){
+    const saleData = {
+      amountPaid: this.amountPaid,
+      change: this.change,
+    ctaCte: 1 ,// idCuentaCorriete: ,
+      tipoCuenta:'CTA_CTE', // saleCondition
+      totalPrice: this.data.totalPrice,
+      idCliente : this.data.client, 
+    };
+    // Emitir los datos de la venta al componente principal (NewSaleComponent)
+    this.dialogRef.close(saleData);
+    }
+
+ 
+    
+
+
+
+
 
   onInputChange(event: Event, controlName: string): void {
     const input = event.target as HTMLInputElement;
@@ -115,4 +156,22 @@ export class TotalSaleComponent implements OnInit {
       this.change = 0;
     }
   }
+  
+  onTabChange(event : MatTabChangeEvent):void { 
+    //CAMBIAMOS LAS SOLAPAS DEPENDIENDO EL TIPO DE CUENTA 
+    switch (event.index){
+      case 0: 
+      this.tipoDeCuenta = 'CONTADO'
+      break; 
+      case 1 : this.tipoDeCuenta = 'MIXTO' 
+      break; 
+      case 2: this.tipoDeCuenta= 'CTA_CTE'
+      break; 
+    }
+  }
+  shouldShowGuardar(): boolean {
+  return this.amountPaid !== null &&
+         this.data?.totalPrice !== undefined &&
+         this.amountPaid >= this.data.totalPrice;
+}
 }
