@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environments } from '../../environments/environments.prod';
 import { Caja } from '../interfaces/Caja';
 import { Observable } from 'rxjs';
+import { cajaSaldoApertura } from '../interfaces/cajaSaldoApertura';
 
 @Injectable({
   providedIn: 'root',
@@ -21,8 +22,11 @@ export class CajaService {
   getCajas(): Observable<Caja> {
     return this.httpClient.get<Caja>(`${this.baseUrl}cajas/abierta`);
   }
-  closeCaja(id:number) :Observable<Caja> {
-    return this.httpClient.put<Caja>(`${this.baseUrl}cajas/${id}/cierre`, null);
+  closeCaja(id: number, monto: number): Observable<cajaSaldoApertura> {
+    return this.httpClient.put<cajaSaldoApertura>(
+      `${this.baseUrl}cajas/${id}/cierre`,
+      { saldoApertura: monto }  // <-- Aquí el objeto con la propiedad
+    );
   }
 
 

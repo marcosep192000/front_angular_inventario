@@ -1,111 +1,86 @@
-<div class="container__serch">
-    <div class="container__serch">
-        <input class="search__input" placeholder="Ingresa la categoria a buscar" type="text" ngModel=""
-            (keyup)="applyFilter($event)" value="text">
+<!-- Buscador y botón -->
+<div class="container__search-bar">
+    <div class="search__wrapper">
+      <input class="search__input" placeholder="Ingresa la categoria a buscar" type="text" ngModel=""
+        (keyup)="applyFilter($event)" value="text">
     </div>
-    <div class="actions__btn">
-        <button class="actions__btn  btn__new" (click)="createClient()">Nuevo Cliente</button>
+    <div>
+      <button class="btn__new" (click)="createClient()">Nuevo Cliente</button>
     </div>
-</div>
-
-
-<div class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" class="table">
-
-
-<ng-container matColumnDef="id">
-    <th mat-header-cell *matHeaderCellDef>Codigo</th>
-    <td mat-cell *matCellDef="let element"> {{element.id}}</td>
-</ng-container>
-
-
-<!--dni-->
-<ng-container matColumnDef="dni">
-    <th mat-header-cell *matHeaderCellDef>Dni</th>
-    <td mat-cell *matCellDef="let element"> {{element.cuit}}</td>
-</ng-container>
-
-<!--name-->
-<ng-container matColumnDef="name">
-    <th mat-header-cell *matHeaderCellDef>Nombre/s</th>
-    <td mat-cell *matCellDef="let element"> {{element.name}}</td>
-</ng-container>
-
-<!--lastName-->
-    <ng-container matColumnDef="lastName">
+  </div>
+  
+  <!-- Tabla con scroll horizontal -->
+  <div class="table__wrapper mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" class="mat-table">
+  
+      <!-- Columnas -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>Codigo</th>
+        <td mat-cell *matCellDef="let element"> {{element.id}}</td>
+      </ng-container>
+  
+      <ng-container matColumnDef="dni">
+        <th mat-header-cell *matHeaderCellDef>Dni</th>
+        <td mat-cell *matCellDef="let element"> {{element.cuit}}</td>
+      </ng-container>
+  
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Nombre/s</th>
+        <td mat-cell *matCellDef="let element"> {{element.name}}</td>
+      </ng-container>
+  
+      <ng-container matColumnDef="lastName">
         <th mat-header-cell *matHeaderCellDef>Apellido/s</th>
         <td mat-cell *matCellDef="let element"> {{element.lastName}}</td>
-    </ng-container>
-    
-    <!--address-->
-    <ng-container matColumnDef="address">
-        <th mat-header-cell *matHeaderCellDef>Direccion</th>
+      </ng-container>
+  
+      <ng-container matColumnDef="address">
+        <th mat-header-cell *matHeaderCellDef>Dirección</th>
         <td mat-cell *matCellDef="let element"> {{element.address}}</td>
-    </ng-container>
-<!-- telefono -->
-<ng-container matColumnDef="tel">
-    <th mat-header-cell *matHeaderCellDef>Telefono</th>
-    <td mat-cell *matCellDef="let element"> {{element.tel}}</td>
-</ng-container>
-
-
-<ng-container matColumnDef="email">
-    <th mat-header-cell *matHeaderCellDef>Email</th>
-    <td mat-cell *matCellDef="let element"> {{element.email}}</td>
-</ng-container>
-
-
-
-        <ng-container matColumnDef="Opciones">
-            <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
-            <td mat-cell *matCellDef="let element">
-                <div class="container__accions">
-          
-            <!-- cuenta corriente    -->        
-                @if(element.cuentaCorriente !== null ){
-            <div class="example-button-row">
-                        <button mat-fab class="btn__ctaCte" (click)="ctaCteClient(element.id)"
-                        matTooltip="Cuenta Corririente Activa"
-                        aria-label="Example icon button with a delete icon">
-                         <app-icon [iconSrc]="'assets/icons/ctaCte.png'" [size]="'20px'"></app-icon>
-                        </button>
-                    </div> }  @else {  
-                        <button mat-fab class="btn__ctaCte" (click)="altaCtaCteClient(element.id)"
-                        matTooltip="Crear Cuenta Corririente "
-                        aria-label="Example icon button with a delete icon">
-                         <app-icon [iconSrc]="'assets/icons/ctaCte2.png'" [size]="'20px'"></app-icon>
-                        </button>
-                    }
-
-              <!-- // Boton actualizar  -->  
-                    <div class="example-button-row">
-                        <button mat-fab class="btn__update" (click)="updateClient(element.id)"
-                        matTooltip="Actualizar Info"
-                        aria-label="Example icon button with a delete icon">
-                         <app-icon [iconSrc]="'assets/icons/task.png'" [size]="'20px'"></app-icon>
-                        </button>
-                    </div>
-
-               <!-- Boton actualizar--> 
-                    <div class="example-button-row">
-                        <button mat-fab class="btn__delete"              (click)="deleteClient(element.id)"
-                        matTooltip="Eliminar Usuario"
-                        aria-label="Example icon button with a delete icon">
-                            <app-icon [iconSrc]="'assets/icons/delete.png'" [size]="'20px'"></app-icon>
-                        </button>
-                    </div>
-                </div>
-            </td>
-        </ng-container>
-        <!-- Name Column -->
-
-
-
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </ng-container>
+  
+      <ng-container matColumnDef="tel">
+        <th mat-header-cell *matHeaderCellDef>Teléfono</th>
+        <td mat-cell *matCellDef="let element"> {{element.tel}}</td>
+      </ng-container>
+  
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let element"> {{element.email}}</td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Opciones">
+        <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
+        <td mat-cell *matCellDef="let element">
+          <div class="container__accions">
+            @if(element.cuentaCorriente !== null ){
+              <button mat-fab class="btn__ctaCte" (click)="ctaCteClient(element.id)" matTooltip="Cuenta Corriente Activa">
+                <app-icon [iconSrc]="'assets/icons/ctaCte.png'" [size]="'20px'"></app-icon>
+              </button>
+            } @else {
+              <button mat-fab class="btn__ctaCte" (click)="altaCtaCteClient(element.id)" matTooltip="Crear Cuenta Corriente">
+                <app-icon [iconSrc]="'assets/icons/ctaCte2.png'" [size]="'20px'"></app-icon>
+              </button>
+            }
+  
+            <button mat-fab class="btn__update" (click)="updateClient(element.id)" matTooltip="Actualizar Info">
+              <app-icon [iconSrc]="'assets/icons/task.png'" [size]="'20px'"></app-icon>
+            </button>
+  
+            <button mat-fab class="btn__delete" (click)="deleteClient(element.id)" matTooltip="Eliminar Usuario">
+              <app-icon [iconSrc]="'assets/icons/delete.png'" [size]="'20px'"></app-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+  
+      <!-- Filas -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-
-    <mat-paginator [pageSizeOptions]="[5,8]" showFirstLastButtons aria-label="Select page of periodic elements">
+  
+    <!-- Paginador -->
+    <mat-paginator [pageSizeOptions]="[5, 8]" showFirstLastButtons aria-label="Select page of periodic elements">
     </mat-paginator>
-</div>
+  </div>
+  

@@ -1,49 +1,68 @@
-.container__accions{
+/* Contenedor del buscador */
+.container__search-bar {
     display: flex;
-    
-}
-.container__serch{
-    display: flex; 
-     justify-content: space-between;
+    justify-content: space-between;
     align-items: center;
-    margin: 10px 10px }
-.container__serch{
     background-color: #532e926b;
-    border-radius:5px ;
-    align-items: center;
-}
-.search__input{
-    border-radius: 7px ;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    flex-wrap: wrap;
+  }
+  
+  /* Input del buscador */
+  .search__input {
+    border-radius: 7px;
     width: 400px;
-    height: 30px ;
-}
-.btn__delete{
-    margin: 10px 10px;
+    height: 30px;
+    padding: 0 10px;
+  }
+  
+  /* Tabla con scroll horizontal si hay muchas columnas */
+  .table__wrapper {
+    overflow-x: auto;
+    width: 100%;
+  }
+  
+  /* Botones de acción */
+  .container__accions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .btn__delete {
     background-color: #ff0000d9;
-    border-radius: 10px ;
-    width: 35px;
-    height:35px;
-    color:white;
-}
-.btn__update{
-    margin: 10px 10px;
+  }
+  
+  .btn__update {
     background-color: #532e92e4;
-    border-radius: 10px ;
-    width: 35px;
-    height:35px;
-    color:white;
-}
-.btn__ctaCte{
-    margin: 10px 10px;
+  }
+  
+  .btn__ctaCte {
     background-color: #1cb344e4;
-    border-radius: 10px ;
+  }
+  
+  .btn__delete,
+  .btn__update,
+  .btn__ctaCte {
+    border-radius: 10px;
     width: 35px;
-    height:35px;
-    color:white;
-}
-
-.table{
-      overflow-y: auto;
-  overflow-x: auto;
-}
-
+    height: 35px;
+    color: white;
+  }
+  
+  /* Botón nuevo cliente */
+  .btn__new {
+    padding: 6px 12px;
+    background-color:#532e92e4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .btn__new:hover {
+    background-color: #45a049;
+  }
+  

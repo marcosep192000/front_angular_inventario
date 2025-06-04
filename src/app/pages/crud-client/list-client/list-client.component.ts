@@ -40,7 +40,6 @@ import { FormCtaCteClienteComponent } from '../../form-cta-cte-cliente/form-cta-
   styleUrl: './list-client.component.css',
 })
 export class ListClientComponent implements OnInit {
-
   clients: Client[] = [];
   Form!: FormGroup;
   serch: string = '';

@@ -13,10 +13,11 @@ import { ToastrModule } from 'ngx-toastr';
 
 import { ClientService } from '../../services/client.service';
 import { Client } from '../../interfaces/Client';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { dataDashboard } from '../../interfaces/dashboard';
 import { IconComponent } from "../../shared/dasboard/icon/icon.component";
 import { MatCardModule } from '@angular/material/card';
+import { PagosCtaCteComponent } from '../crud-cta-cte-cliente/pagos-cta-cte/pagos-cta-cte.component';
 
 
 @Component({
@@ -41,7 +42,7 @@ export class FormCtaCteClienteComponent implements  OnInit {
  
   constructor(private clientService: ClientService,
     public dialogRef: MatDialogRef<FormCtaCteClienteComponent>,
-   @Inject(MAT_DIALOG_DATA) public data : any
+   @Inject(MAT_DIALOG_DATA) public data : any, public dialog: MatDialog
   ){}
 cliente!:Client; 
 idCliente : any = this.data.updateClient; 
@@ -66,9 +67,21 @@ this.dialogRef.close();
 }
 
 //dialig form para mostrar las facturas pendiantes y realizar el pago en cuenta corriente 
-realizarPagoEnCtaCte() {
-  
-  }
+realizarPagoEnCtaCte(idCliente: number) {
+  const dialogRef = this.dialog.open(PagosCtaCteComponent,{
+    disableClose: true,
+    autoFocus: true,
+    hasBackdrop: true,
+    closeOnNavigation: false,
+    data: {
+      tipo: 'createClient',
+      idCliente:idCliente, 
+    },
+  });
+  dialogRef.afterClosed().subscribe(() => {
+
+  });
+}
 
 
 

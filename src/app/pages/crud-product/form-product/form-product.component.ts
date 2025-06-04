@@ -21,12 +21,11 @@ import { CommonModule } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
-import { error } from 'console';
 import { Marca } from '../../../interfaces/marca';
 import { MarcaService } from '../../../services/marca.service';
 import { FormMarcaComponent } from '../../crud-marca/form-marca/form-marca.component';
 import { FormSupplierComponent } from '../../crud-supplier/form-supplier/form-supplier.component';
-import { MatIcon, MatIconModule } from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
 import { SupplierService } from '../../../services/supplier.service';
 import { Supplier } from '../../../interfaces/supplier';
 import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
@@ -93,7 +92,6 @@ export class FormProductComponent implements OnInit {
       stock: ['', Validators.required],
       stockMin: ['', Validators.required],
       stateIva: [false, Validators.required],
-      unitOfMeasure: [''],
       status: [true],
       iva: [''],
       salePrice: [null, Validators.required],
@@ -122,7 +120,6 @@ export class FormProductComponent implements OnInit {
             iva: datos.stateIva ? 0:21,
             stock: datos.stock,
             stockMin: datos.stockMin,
-            unitOfMeasure: 32,
             salePrice: datos.salePrice,
             productUsefulness: datos.productUsefulness,
           });

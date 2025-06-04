@@ -28,12 +28,12 @@ export class ProductService {
       product
     );
   }
-  update(id: number, product: Product): Observable<Product> {
-    return this.http.put<Product>(
-      `${this.base}supermarket/update/${id}`,
-      product
-    );
+  update(id: number, product: Product) {
+    return this.http.put(`${this.base}supermarket/update-product/${id}`, product, {
+      responseType: 'text' as 'json'
+    });
   }
+
   delete(id: number): Observable<void> {
     return this.http.delete<void>(
       `${this.base}supermarket/supermarket-delete/${id}`,

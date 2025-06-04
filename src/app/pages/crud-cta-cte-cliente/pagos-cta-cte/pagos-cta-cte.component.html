@@ -1,0 +1,50 @@
+<mat-card class="pagos-container mat-elevation-z4">
+  <h2>Facturas Pendientes</h2>
+
+  <mat-table [dataSource]="dataSource" class="styled-table" multiTemplateDataRows>
+
+    <ng-container matColumnDef="select">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-checkbox (change)="toggleAllRows($event)" [checked]="isAllSelected()"
+          [indeterminate]="selection.hasValue() && !isAllSelected()">
+        </mat-checkbox>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-checkbox (click)="$event.stopPropagation()" (change)="toggleRow(row)"
+          [checked]="selection.isSelected(row)">
+        </mat-checkbox>
+      </mat-cell>
+    </ng-container>
+   <ng-container matColumnDef="fecha">
+      <mat-header-cell *matHeaderCellDef>Fecha</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{element.fechaEmision | date}}</mat-cell>
+   </ng-container>
+    <ng-container matColumnDef="tipo">
+      <mat-header-cell *matHeaderCellDef>Tipo</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{element.tipo}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="total">
+      <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{element.total | currency:'ARS'}}</mat-cell>
+    </ng-container>
+
+
+
+    <mat-header-row *matHeaderRowDef="displayedColumnsWithSelect"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumnsWithSelect;" (click)="toggleRow(row)"
+      class="clickable-row"></mat-row>
+  </mat-table>
+
+  <div class="total-footer">
+    <span>Total seleccionado:</span>
+    <span class="monto">{{ getTotalSeleccionado() | currency:'ARS' }}</span>
+  </div>
+
+  <div class="btn-footer">
+    <button mat-raised-button color="primary" (click)="realizarPagoEnCtaCte()" [disabled]="selection.isEmpty()">
+      Realizar Pago
+    </button>
+    <button mat-button color="warn" (click)="cancel()">Cancelar</button>
+  </div>
+</mat-card>

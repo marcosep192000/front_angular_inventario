@@ -35,6 +35,8 @@ export class InicioCardsComponent implements OnInit, OnDestroy {
     });
   }
 
+  
+
   ngOnDestroy(): void {
     this.subscription.unsubscribe(); // Evita memory leaks
   }

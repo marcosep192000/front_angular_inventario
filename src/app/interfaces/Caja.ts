@@ -6,4 +6,5 @@ export interface Caja {
 	egresos: number;
 	cierre: number;
 	estado: boolean;
+	saldoApertura:number; 
 }

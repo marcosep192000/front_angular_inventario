@@ -1,0 +1,17 @@
+<div class="container__title">
+<h2 mat-dialog-title class="title__color">Esta caja se cerrará y no podra ser modificada estás de Acuerdo?</h2>
+</div>
+
+<h3 mat-dialog-title>Ingresar monto para abrir próxima caja</h3>
+
+<mat-dialog-content>
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Monto</mat-label>
+    <input matInput type="number" [(ngModel)]="monto" min="0" />
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-button color="primary" [disabled]="monto === null || monto === undefined || monto === null" (click)="onConfirm()">Confirmar</button>
+</mat-dialog-actions>

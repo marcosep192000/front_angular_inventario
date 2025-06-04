@@ -7,6 +7,7 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { DialogGenericComponent } from '../../../shared/genericsComponents/dialog-generic/dialog-generic.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { CashAmountDialogComponent } from './dialogs/cash-amount-dialog/cash-amount-dialog.component';
 
 @Component({
   selector: 'app-cash-closing',
@@ -62,29 +63,36 @@ export class CashClosingComponent implements OnInit {
   }
 
   cashClose(id: number) {
-    const dialogRef = this.dialog.open(DialogGenericComponent, {
+    const dialogRef = this.dialog.open(CashAmountDialogComponent, {
       disableClose: true,
       autoFocus: true,
-      hasBackdrop: true,
-      closeOnNavigation: false,
-      data: {
-        data: `¿Estás seguro de Cerrar esta caja? No podra ser modificada.`, // Aquí pasas el mensaje
-        state: 'Cerrar',
-      },
+      width: '400px',
     });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result == true) {
-        this.cajaService.closeCaja(id).subscribe((data) => {
+  
+    dialogRef.afterClosed().subscribe((monto: number | null) => {
+      if (monto != null ) {
+        console.log('Monto ingresado:', monto);
+  
+        this.cajaService.closeCaja(id,monto).subscribe((data) => {
           console.log(data);
           this.getCashOpen();
           this.getAllCash();
         });
       } else {
-        console.log('Cancelado');
+        console.log('Cierre de caja cancelado');
       }
     });
   }
+
+
+
+
+
+
+
+
+
+
 }
 
 

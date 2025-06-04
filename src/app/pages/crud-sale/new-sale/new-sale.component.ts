@@ -191,7 +191,8 @@ export class NewSaleComponent implements OnInit {
 
   saveCtaCteSale(tipoDeCuenta: any, precioTotal: number) {
     const payload: registrarDeudaCtaCteCliente = {
-      registrarDeudaCtaCte: precioTotal
+      registrarDeudaCtaCte: precioTotal,
+      ticketIds: []
     };
   
     this.ctaCteService.updateCtaCte(tipoDeCuenta, payload).subscribe(
@@ -247,6 +248,7 @@ export class NewSaleComponent implements OnInit {
     // Guardar el PDF
     doc.save(`Factura_${saleCommon.numero}.pdf`);
   }
+  
   buildSaleCommon(tipo: string,ctaCte : any): SaleCommon {
     const sale: SaleCommon = {
       tipo: 'FACTURA',

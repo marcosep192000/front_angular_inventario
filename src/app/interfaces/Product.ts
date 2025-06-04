@@ -15,7 +15,6 @@ export interface Product {
   stockMin: number;
   image: string;
   expiration: number;
-  unitOfMeasure: null;
   salePrice: Float32Array;
   productUsefulness: Float32Array;
   barCode: string;
