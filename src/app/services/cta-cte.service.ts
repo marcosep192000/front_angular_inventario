@@ -27,5 +27,11 @@ return this.httpClient.get<TicketCtaCtePendienteCliente[]>(`${this.baseUrl}ticke
 registrarPago(id: number, payload: registrarDeudaCtaCteCliente) {
   return this.httpClient.put(`${this.baseUrl}CtaCte/pagar/${id}`, payload);
  }
+pagarMontoParcial(clienteId: number, monto: number) {
+  return this.httpClient.post<any>(
+    `${this.baseUrl}ticket/cuenta-corriente/pagar-monto?clienteId=${clienteId}&monto=${monto}`,
+    null // sin body
+  );
+}
 }
 

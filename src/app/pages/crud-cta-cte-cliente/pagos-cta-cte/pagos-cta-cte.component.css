@@ -46,3 +46,42 @@
     gap: 12px;
   }
   
+
+.container__pago {
+  padding: 30px;
+  border-radius: 12px;
+  background: #ffffff;
+  margin: 16px;
+  width: auto;
+}
+
+.styled-table {
+  width: 100%;
+  margin-top: 26px;
+  overflow-x: auto;
+  table-layout: auto;
+  border-collapse: collapse;
+}
+
+.styled-table th, .styled-table td {
+  padding: 20px;
+  font-size: 14px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 300px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.styled-table thead {
+  background-color: #f5f5f5;
+}
+
+.btn-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+  

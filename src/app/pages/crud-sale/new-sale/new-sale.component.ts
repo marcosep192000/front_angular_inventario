@@ -126,6 +126,7 @@ export class NewSaleComponent implements OnInit {
     });
   }
 
+  
   // Se llama al formulario de venta y crea el ticket para la nueva venta
   async newSale() {
     if (this.products.length === 0) {
@@ -279,25 +280,80 @@ export class NewSaleComponent implements OnInit {
   }
   
 
-  saveCommonSale(saleCommon: SaleCommon) {
-    if (!this.selectedClient) {
-      this.toastr.error('Debe seleccionar un cliente.');
-      return;
-    }
-  
-    this.commonSale.saveCommon(saleCommon).subscribe(
-      (response) => {
-        this.toastr.success('Venta guardada con éxito');
-        this.generatePDF(saleCommon);
-        this.products = [];
-        this.code = '';
-      },
-      (error) => {
-        this.toastr.error('Hubo un error al guardar la venta');
-        this.products = [];
-        this.code = '';
-      }
-    );
+ saveCommonSale(saleCommon: SaleCommon) {
+  if (!this.selectedClient) {
+    this.toastr.error('Debe seleccionar un cliente.');
+    return;
   }
-  
+
+  this.commonSale.saveCommon(saleCommon).subscribe(
+    () => {
+      this.toastr.success('Venta guardada con éxito');
+
+      // Mostrar confirmación con opción de imprimir
+      const confirmPrint = window.confirm('¿Desea imprimir el ticket?');
+      if (confirmPrint) {
+        this.printTicket(saleCommon);
+      } else {
+        this.generatePDF(saleCommon); // PDF si no imprime
+      }
+
+      this.products = [];
+      this.code = '';
+    },
+    (error) => {
+      this.toastr.error('Hubo un error al guardar la venta');
+      this.products = [];
+      this.code = '';
+    }
+  );
+}
+
+printTicket(saleCommon: SaleCommon) {
+  let ipcRenderer: any = null;
+  try {
+    if ((window as any)?.require) {
+      ipcRenderer = (window as any).require('electron')?.ipcRenderer ?? null;
+    }
+  } catch (error) {
+    console.warn('No se pudo cargar ipcRenderer:', error);
+  }
+
+  const styles = `...`; // Igual al que ya tienes
+  const itemsHTML = `...`; // igual
+
+  const content = `
+    <html>
+      <head>${styles}</head>
+      <body>
+        <h2 style="text-align: center;">BON-BINI</h2>
+        <p style="text-align: center;">CUIT 27-29625726-0</p>
+        <p style="text-align: center;">COMPROBANTE NO VALIDO COMO FACTURA X</p>
+        <hr>
+        <p>Ticket N°: ${saleCommon.numero}</p>
+        <p>Cliente: ${this.selectedClient?.name}</p>
+        <p>Fecha: ${new Date().toLocaleString()}</p>
+        <hr>
+        ${itemsHTML}
+        <hr>
+        <div class="row"><strong>Total:</strong> <strong>$${saleCommon.total?.toFixed(2)}</strong></div>
+        <hr>
+        <p style="text-align: center;">¡Gracias por su compra!</p>
+      </body>
+    </html>
+  `;
+
+  if (ipcRenderer) {
+    ipcRenderer.send('print-sale-ticket', content);
+  } else {
+    // Fallback para versión web
+    const popupWin = window.open('', '_blank', 'width=250,height=600');
+    if (popupWin) {
+      popupWin.document.open();
+      popupWin.document.write(content);
+      popupWin.document.close();
+    }
+  }
+}
+
 }

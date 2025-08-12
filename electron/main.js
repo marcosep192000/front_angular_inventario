@@ -5,6 +5,15 @@ const { spawn } = require('child_process');
 let mainWindow;
 
 
+webPreferences: {
+  contextIsolation: true;
+  preload: path.join(__dirname, '/inventarioPixels/src/app/preload.js')
+}
+
+
+
+
+
 const fs = require('fs');
 
 
@@ -90,4 +99,32 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   app.quit();
+});
+// main.js
+
+
+ipcMain.on('print-sale-ticket', (event, htmlContent) => {
+  const printWindow = new BrowserWindow({
+    show: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+
+  printWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`);
+
+  printWindow.webContents.on('did-finish-load', () => {
+    printWindow.webContents.print({
+      silent: true,
+      printBackground: true,
+      deviceName: 'XP-58'}, (success, errorType) => {
+      if (!success) console.error('Error al imprimir:', errorType);
+      printWindow.close();
+    });
+  });
+});
+// Escucha evento para imprimir
+ipcMain.on('print-ticket', (event, saleData) => {
+  require('./print-ticket')(saleData);
 });

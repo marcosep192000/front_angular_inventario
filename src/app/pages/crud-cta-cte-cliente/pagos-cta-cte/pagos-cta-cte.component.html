@@ -1,50 +1,94 @@
-<mat-card class="pagos-container mat-elevation-z4">
-  <h2>Facturas Pendientes</h2>
+<mat-tab-group>
+  <mat-tab label="Pagar Factura" [disabled]="tabsDisabled.pagarFactura">
+    <mat-card class="pagos-container mat-elevation-z4">
+      <h2>Facturas Pendientes</h2>
+      <mat-table [dataSource]="dataSource" class="styled-table" multiTemplateDataRows>
+        <ng-container matColumnDef="select">
+          <mat-header-cell *matHeaderCellDef>
+            <mat-checkbox (change)="toggleAllRows($event)" [checked]="isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()">
+            </mat-checkbox>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <mat-checkbox (click)="$event.stopPropagation()" (change)="toggleRow(row)"
+              [checked]="selection.isSelected(row)">
+            </mat-checkbox>
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="fecha">
+          <mat-header-cell *matHeaderCellDef>Fecha</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{element.fechaEmision | date}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="tipo">
+          <mat-header-cell *matHeaderCellDef>Tipo</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{element.tipo}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="total">
+          <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{element.total | currency:'ARS'}}</mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumnsWithSelect"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumnsWithSelect;" (click)="toggleRow(row)"
+          class="clickable-row"></mat-row>
+      </mat-table>
+      <div class="total-footer">
+        <span>Total seleccionado:</span>
+        <span class="monto">{{ getTotalSeleccionado() | currency:'ARS' }}</span>
+      </div>
+      <div class="btn-footer">
+        <button mat-raised-button color="primary" (click)="realizarPagoEnCtaCte()" [disabled]="selection.isEmpty()">
+          Realizar Pago
+        </button>
+        <button mat-button color="warn" (click)="cancel()">Cancelar</button>
+      </div>
+    </mat-card>
+  </mat-tab>
 
-  <mat-table [dataSource]="dataSource" class="styled-table" multiTemplateDataRows>
 
-    <ng-container matColumnDef="select">
-      <mat-header-cell *matHeaderCellDef>
-        <mat-checkbox (change)="toggleAllRows($event)" [checked]="isAllSelected()"
-          [indeterminate]="selection.hasValue() && !isAllSelected()">
-        </mat-checkbox>
-      </mat-header-cell>
-      <mat-cell *matCellDef="let row">
-        <mat-checkbox (click)="$event.stopPropagation()" (change)="toggleRow(row)"
-          [checked]="selection.isSelected(row)">
-        </mat-checkbox>
-      </mat-cell>
-    </ng-container>
-   <ng-container matColumnDef="fecha">
-      <mat-header-cell *matHeaderCellDef>Fecha</mat-header-cell>
-      <mat-cell *matCellDef="let element">{{element.fechaEmision | date}}</mat-cell>
-   </ng-container>
-    <ng-container matColumnDef="tipo">
-      <mat-header-cell *matHeaderCellDef>Tipo</mat-header-cell>
-      <mat-cell *matCellDef="let element">{{element.tipo}}</mat-cell>
-    </ng-container>
+  <!-- PAGO PARCIAL COMIENZO -->
+  <mat-tab label="Pago parcial Cta Cte">
+  <mat-card class="pagos-container mat-elevation-z4">
+   
+   
+    <h2>Pago parcial en cuenta corriente</h2>
+   
+   
+    <form [formGroup]="pagoForm" (ngSubmit)="realizarPago()" style="margin-top: 16px;">
+       <mat-form-field floatLabel="always">
+    <mat-label>Monto a Pagar</mat-label>
+    <input matInput type="number" class="example-right-align"  id="monto" formControlName="monto"   required [max]="saldoCtaCte"  placeholder="Ej. 50000" />
+  </mat-form-field>
+<div *ngIf="resultadoPago && resultadoPago.length > 0">
+      <h3>Detalle del pago aplicado:</h3>
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Comprobante</th>
+            <th>Pagado</th>
+            <th>Saldo restante</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pago of resultadoPago">
+            <td>#{{ pago.comprobanteId}}</td>
+            <td>{{ pago.pagado | currency: 'ARS' }}</td>
+            <td>{{ pago.saldoRestante | currency: 'ARS' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <ng-container matColumnDef="total">
-      <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
-      <mat-cell *matCellDef="let element">{{element.total | currency:'ARS'}}</mat-cell>
-    </ng-container>
-
-
-
-    <mat-header-row *matHeaderRowDef="displayedColumnsWithSelect"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumnsWithSelect;" (click)="toggleRow(row)"
-      class="clickable-row"></mat-row>
-  </mat-table>
-
-  <div class="total-footer">
-    <span>Total seleccionado:</span>
-    <span class="monto">{{ getTotalSeleccionado() | currency:'ARS' }}</span>
-  </div>
-
-  <div class="btn-footer">
-    <button mat-raised-button color="primary" (click)="realizarPagoEnCtaCte()" [disabled]="selection.isEmpty()">
-      Realizar Pago
-    </button>
-    <button mat-button color="warn" (click)="cancel()">Cancelar</button>
-  </div>
-</mat-card>
+      <div class="btn-footer">
+ @if (resultadoPago && resultadoPago.length > 0) {
+<button mat-button color="warn" type="button" (click)="cancel()">Salir</button>
+ }
+ @else {
+   <button mat-raised-button color="primary" type="submit" [disabled]="pagoForm.invalid || pagoForm.value.monto > saldoCtaCte">Realizar pago</button>
+   <button mat-button color="warn" type="button" (click)="cancel()">Cancelar</button>
+ }
+       
+      </div>
+    </form>
+  </mat-card>
+</mat-tab>
+</mat-tab-group>

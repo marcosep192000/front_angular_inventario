@@ -226,4 +226,30 @@ body, html {
     margin-right: 8px; /* Espacio entre el ícono y el texto */
 }
 
-
+ @media print {
+      body {
+        font-family: monospace;
+        font-size: 10px;
+        margin: 0;
+        width: 58mm;
+      }
+      h2 {
+        font-size: 14px;
+        text-align: center;
+        margin: 0;
+      }
+      p, .row {
+        margin: 2px 0;
+        text-align: left;
+      }
+      hr {
+        border: none;
+        border-top: 1px dashed #000;
+        margin: 4px 0;
+      }
+      .total {
+        font-weight: bold;
+        font-size: 12px;
+        text-align: right;
+      }
+    }

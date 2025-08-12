@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -16,10 +16,13 @@ import { CtaCteService } from '../../../services/cta-cte.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { registrarDeudaCtaCteCliente } from '../../../interfaces/registrarDeudaCtaCteCliente';
+import { MatTabsModule } from '@angular/material/tabs';
+import { log } from 'node:console';
 @Component({
   selector: 'app-pagos-cta-cte',
   standalone: true,
   imports: [
+    MatTabsModule,
     MatDatepickerModule,
     ToastrModule,
     MatInputModule,
@@ -39,19 +42,30 @@ import { registrarDeudaCtaCteCliente } from '../../../interfaces/registrarDeudaC
   styleUrl: './pagos-cta-cte.component.css'
 })
 export class PagosCtaCteComponent implements OnInit {
+saldoCtaCte: number = 0; // cargalo desde backend
+ tabsDisabled = {
+  pagarFactura: false
+};
+
   displayedColumns: string[] = [ 'fecha','tipo', 'total' ];
   displayedColumnsWithSelect = ['select', ...this.displayedColumns];
   dataSource = new MatTableDataSource<TicketCtaCtePendienteCliente>();
   selection = new SelectionModel<TicketCtaCtePendienteCliente>(true, []);
- 
+ pagoForm!: FormGroup;
+  resultadoPago: any[] = [];
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialog: MatDialog,
     public ctaCteService: CtaCteService, private toastr: ToastrService,
+     private fb: FormBuilder,
   ) {}
   
   ngOnInit(): void {
-    this.mostrarTicketPendiente();
+    this.mostrarTicketPendiente();  this.saldoCtaCte = this.data.saldoCtaCte;
+
+       this.pagoForm = this.fb.group({
+      monto: [null, [Validators.required, Validators.min(1)]]
+    });
   }
 
   mostrarTicketPendiente() {
@@ -107,4 +121,34 @@ export class PagosCtaCteComponent implements OnInit {
   cancel() {
     this.dialog.closeAll();
   }
+
+
+ realizarPago() {
+  const clienteId = this.data.idCliente;
+  const monto = this.pagoForm.value.monto;
+  console.error(monto + " este es el monto despues del realizar pago")
+  if (monto > this.saldoCtaCte) {
+    this.toastr.warning('El monto ingresado supera el saldo de la cuenta corriente');
+    console.log("el salido es mayor");
+    return;
+  }
+
+  this.ctaCteService.pagarMontoParcial(clienteId, monto).subscribe({
+    next: (response: any) => {
+      this.resultadoPago = response;
+      this.tabsDisabled.pagarFactura = true; // ⚠️ bloquear otra pestaña
+    },
+    error: (err) => {
+      console.error('Error al realizar el pago', err);
+      this.toastr.error('Hubo un error al registrar el pago');
+    }
+  });
 }
+
+cancelarPago() {
+  this.pagoForm.reset();
+  this.resultadoPago = [];
+  this.tabsDisabled.pagarFactura = false; // desbloquear
+}
+}
+

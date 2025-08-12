@@ -43,4 +43,7 @@ export class ProductService {
   search(query: string): Observable<ProductItemSale> {
     return this.http.get<ProductItemSale>(`${this.base}supermarket/findByCode/${query}`);
   }
+  productosBajoStock():Observable<Product>{
+    return this.http.get<Product>(`${this.base}supermarket/get-all-low-stock`);
+  }
 }

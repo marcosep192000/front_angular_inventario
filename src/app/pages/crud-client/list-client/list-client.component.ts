@@ -65,7 +65,6 @@ export class ListClientComponent implements OnInit {
   ngOnInit(): void {
     this.getClients();
   }
-
   getClients(): void {
     this.clientService.getClients().subscribe((client) => {
       const filteredProducts = client.filter(
@@ -82,8 +81,6 @@ export class ListClientComponent implements OnInit {
       this.dataSource.paginator.firstPage();
     }
   }
- 
-
   createClient() {
     const dialogRef = this.dialog.open(FormClientComponent, {
       disableClose: true,
@@ -129,8 +126,6 @@ export class ListClientComponent implements OnInit {
       this.getClients();
     });
   }
-
-
   
   updateClient(id: number) {
     const dialogRef = this.dialog.open(FormClientComponent, {
