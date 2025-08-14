@@ -308,52 +308,97 @@ export class NewSaleComponent implements OnInit {
     }
   );
 }
+printTicket(saleCommon: SaleCommon, formato: 'A4' | 'TERMICA' = 'A4') {
+  const styles = `
+    <style>
+      @page { margin: 0; }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 10px;
+        ${formato === 'TERMICA' ? 'width: 58mm;' : 'width: auto;'}
+        font-size: ${formato === 'TERMICA' ? '12px' : '14px'};
+      }
+      hr {
+        border: none;
+        border-top: 1px dashed #000;
+        margin: 5px 0;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+      }
+      .ticket-pagina {
+        page-break-after: always;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: ${formato === 'TERMICA' ? '11px' : '14px'};
+      }
+      th, td {
+        padding: 2px 4px;
+      }
+      th {
+        text-align: left;
+      }
+    </style>
+  `;
 
-printTicket(saleCommon: SaleCommon) {
-  let ipcRenderer: any = null;
-  try {
-    if ((window as any)?.require) {
-      ipcRenderer = (window as any).require('electron')?.ipcRenderer ?? null;
-    }
-  } catch (error) {
-    console.warn('No se pudo cargar ipcRenderer:', error);
-  }
-
-  const styles = `...`; // Igual al que ya tienes
-  const itemsHTML = `...`; // igual
+  const itemsHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cant</th>
+          <th>Precio</th>
+          <th>SubTotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${saleCommon.ticketDetails.map(d => `
+          <tr>
+            <td>${d.productName}</td>
+            <td>${d.amount}</td>
+            <td>$${d.price.toFixed(2)}</td>
+            <td>$${d.subTotal.toFixed(2)}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
 
   const content = `
     <html>
       <head>${styles}</head>
-      <body>
-        <h2 style="text-align: center;">BON-BINI</h2>
-        <p style="text-align: center;">CUIT 27-29625726-0</p>
-        <p style="text-align: center;">COMPROBANTE NO VALIDO COMO FACTURA X</p>
-        <hr>
-        <p>Ticket N°: ${saleCommon.numero}</p>
-        <p>Cliente: ${this.selectedClient?.name}</p>
-        <p>Fecha: ${new Date().toLocaleString()}</p>
-        <hr>
-        ${itemsHTML}
-        <hr>
-        <div class="row"><strong>Total:</strong> <strong>$${saleCommon.total?.toFixed(2)}</strong></div>
-        <hr>
-        <p style="text-align: center;">¡Gracias por su compra!</p>
+      <body onload="window.print(); window.onafterprint = () => window.close();">
+        <div class="ticket-pagina">
+          <h2 style="text-align: center;">BON-BINI</h2>
+          <p style="text-align: center;">CUIT 27-29625726-0</p>
+          <p style="text-align: center;">COMPROBANTE NO VALIDO COMO FACTURA X</p>
+          <hr>
+          <p>Ticket N°: ${saleCommon.numero}</p>
+          <p>Cliente: ${this.selectedClient?.name}</p>
+          <p>Fecha: ${new Date().toLocaleString()}</p>
+          <hr>
+          ${itemsHTML}
+          <hr>
+          <div class="row"><strong>Total:</strong> <strong>$${saleCommon.total?.toFixed(2)}</strong></div>
+          <hr>
+          <p style="text-align: center;">¡Gracias por su compra!</p>
+        </div>
       </body>
     </html>
   `;
 
-  if (ipcRenderer) {
-    ipcRenderer.send('print-sale-ticket', content);
-  } else {
-    // Fallback para versión web
-    const popupWin = window.open('', '_blank', 'width=250,height=600');
-    if (popupWin) {
-      popupWin.document.open();
-      popupWin.document.write(content);
-      popupWin.document.close();
-    }
+  const popupWin = window.open('', '_blank', 'width=250,height=600');
+  if (popupWin) {
+    popupWin.document.open();
+    popupWin.document.write(content);
+    popupWin.document.close();
   }
 }
+
+
 
 }

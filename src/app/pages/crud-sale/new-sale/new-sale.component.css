@@ -227,29 +227,44 @@ body, html {
 }
 
  @media print {
-      body {
-        font-family: monospace;
-        font-size: 10px;
-        margin: 0;
-        width: 58mm;
-      }
-      h2 {
-        font-size: 14px;
-        text-align: center;
-        margin: 0;
-      }
-      p, .row {
-        margin: 2px 0;
-        text-align: left;
-      }
-      hr {
-        border: none;
-        border-top: 1px dashed #000;
-        margin: 4px 0;
-      }
-      .total {
-        font-weight: bold;
-        font-size: 12px;
-        text-align: right;
-      }
-    }
+  @page {
+    size: 58mm auto; /* Ancho fijo del papel, alto dinámico */
+    margin: 0;       /* Sin márgenes */
+  }
+
+  body {
+    font-family: monospace;
+    font-size: 10px;
+    margin: 0;
+    padding: 0;
+    width: 58mm; /* Igual al tamaño del papel */
+  }
+
+  h2 {
+    font-size: 14px;
+    text-align: center;
+    margin: 0;
+  }
+
+  p, .row {
+    margin: 2px 0;
+    text-align: left;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px dashed #000;
+    margin: 4px 0;
+  }
+
+  .total {
+    font-weight: bold;
+    font-size: 12px;
+    text-align: right;
+  }
+
+  /* Evita saltos de página forzados */
+  * {
+    page-break-inside: avoid;
+  }
+}
