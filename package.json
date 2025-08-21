@@ -40,6 +40,7 @@
     "file-saver": "^2.0.5",
     "html2pdf.js": "^0.10.2",
     "jspdf": "^2.5.2",
+    "jspdf-autotable": "^5.0.2",
     "localstorage-polyfill": "^1.0.1",
     "ng2-charts": "^5.0.4",
     "ngx-toastr": "^19.0.0",

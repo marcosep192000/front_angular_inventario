@@ -1,32 +1,32 @@
 <div class="container">
-  
-    <div class="card green"> 
+    <button class="card green"> 
         <p>Productos</p>
         <h4>{{data_cards?.products}}</h4>
-    </div>
-    
-    <div class="card blue">
-        <p>Total Compras</p>
+    </button>    
+    <button class="card blue">
+        <p>Total  Compras</p>
         <h4> a registrar</h4>
-    </div>
+    </button>
 
-    <div class="card orange">
+    <button class="card orange">
         <p>Total Ventas</p>
         <h4>{{data_cards?.MontoTotal|currency }}</h4>
-    </div>
+    </button>
 
-    <div class="card purple">
+    <button class="card purple">
         <p>Total Ganancias</p>
         <h4>a registrar</h4>
-    </div>
-
-    <div class="card red">
-        <p>Bajo Stock</p>
-        <h4>{{data_cards?.bajo_stock}}</h4>
-    </div>
-
-    <div class="card yellow">
+    </button>
+<button
+    type="button"
+    class="card red"
+    [routerLink]="['/dashboard', 'bajo-stock']">
+    <h3>Bajo Stock</h3>
+    <h4>{{ data_cards?.bajo_stock }}</h4>
+  </button>
+    
+    <button class="card yellow">
         <p>Ventas del Día</p>
         <h4>{{data_cards?.MontoTotal|currency}}</h4>
-    </div>
+    </button>
 </div>

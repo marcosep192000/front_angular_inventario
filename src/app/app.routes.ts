@@ -8,9 +8,9 @@ import { RegistroComponent } from './pages/registro/registro.component';
 import { NavigationComponent } from './shared/dasboard/navigation/navigation.component';
 import { authGuard } from './auth/guard/auth.guard';
 import { CashClosingComponent } from './pages/crud-cash-closing/cash-closing/cash-closing.component';
-import { SupplierService } from './services/supplier.service';
 import { ListSupplierComponent } from './pages/crud-supplier/form-supplier/list-supplier/list-supplier.component';
 import { InicioComponent } from './shared/dasboard/dashboard/inicio/inicio.component';
+import { BajoStockComponent } from './shared/dasboard/dashboard/inicio/bajo-stock/bajo-stock.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -28,6 +28,7 @@ export const routes: Routes = [
       { path: 'client-list', component: ListClientComponent },
       { path: 'new-sale', component: NewSaleComponent },
       { path: 'supplier-list', component: ListSupplierComponent },
+      { path:'bajo-stock', component: BajoStockComponent }
     ],
   },
   { path: '**', redirectTo: '/login' },

@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-inicio-cards',
   standalone: true,
@@ -25,7 +26,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       MatDialogModule,
       MatFormFieldModule,
       MatButtonModule,
-      MatDialogModule,
+      MatDialogModule,RouterLink,
       MatInputModule,
       MatTooltipModule],
   templateUrl: './inicio-cards.component.html',
@@ -49,9 +50,7 @@ export class InicioCardsComponent implements OnInit, OnDestroy {
     });
   }
 
-  getProductosBajoStock(){
-
-  }
+  
   ngOnDestroy(): void {
     this.subscription.unsubscribe(); // Evita memory leaks
   }

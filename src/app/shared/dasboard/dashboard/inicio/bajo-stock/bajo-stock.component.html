@@ -1,0 +1,27 @@
+<div *ngIf="loading">Cargando productos...</div>
+
+<div *ngFor="let provider of lowStockList" class="provider-container">
+  <h3>
+    {{ provider.name }}
+    <input type="checkbox" (change)="toggleSelectAll(provider, $event)" /> Seleccionar todos
+  </h3>
+
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>✔</th>
+        <th>Producto</th>
+        <th>Stock minimo actual</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor = "let product of provider.products">
+        <td><input type="checkbox" [(ngModel)]= "product.selected"/></td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.stock }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<button (click)="downloadPDF()">📄 Descargar PDF</button>
