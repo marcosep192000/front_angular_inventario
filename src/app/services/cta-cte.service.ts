@@ -5,7 +5,6 @@ import { environments } from '../../environments/environments.prod';
 import { registrarDeudaCtaCteCliente } from '../interfaces/registrarDeudaCtaCteCliente';
 import { Observable } from 'rxjs';
 import { TicketCtaCtePendienteCliente } from '../interfaces/TicketCtaCtePendienteCliente';
-
 @Injectable({
   providedIn: 'root',
 })
@@ -19,11 +18,9 @@ export class CtaCteService {
 console.log(registrarDeudaCtaCteCliente); 
     return this.httpClient.put<CtaCte>(`${this.baseUrl}CtaCte/update/${id}`, registrarDeudaCtaCteCliente);
   }
-
   buscarticketsCtaCtePendienteCliente(id:number):Observable<TicketCtaCtePendienteCliente[]>{
 return this.httpClient.get<TicketCtaCtePendienteCliente[]>(`${this.baseUrl}ticket/cta-cte/${id}`);
 }
-
 registrarPago(id: number, payload: registrarDeudaCtaCteCliente) {
   return this.httpClient.put(`${this.baseUrl}CtaCte/pagar/${id}`, payload);
  }

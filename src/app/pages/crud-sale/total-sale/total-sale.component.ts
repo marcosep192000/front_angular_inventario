@@ -105,6 +105,8 @@ export class TotalSaleComponent implements OnInit {
   }
 
   saveCtaCorriente(){
+  
+  
     const saleData = {
       amountPaid: this.amountPaid,
       change: this.change,
@@ -114,7 +116,11 @@ export class TotalSaleComponent implements OnInit {
       idCliente : this.data.client, 
     };
     // Emitir los datos de la venta al componente principal (NewSaleComponent)
-    this.dialogRef.close(saleData);
+
+  
+      this.dialogRef.close(saleData);
+    
+    
     }
 
  

@@ -11,13 +11,17 @@
             <div class="barCode">
 
                 <!-- CODIGO DE BARRAS -->
-                <mat-form-field class="input codigo__barras" hintLabel="Máximo 15 caracteres">
-                    <mat-label>Codigo de Barras </mat-label>
-                    <input matInput maxlength="15" formControlName="barCode" />
-                    <mat-hint align="end">{{
-                        formGroup.get('barCode')?.value?.length
-                        }}/15</mat-hint>
-                </mat-form-field>
+          <mat-form-field class="input codigo__barras" hintLabel="Máximo 15 caracteres">
+  <mat-label>Codigo de Barras</mat-label>
+  <input 
+    matInput 
+    maxlength="15" 
+    formControlName="barCode"
+    (keydown.enter)="$event.preventDefault()" />
+  <mat-hint align="end">
+    {{ formGroup.get('barCode')?.value?.length }}/15
+  </mat-hint>
+</mat-form-field>
 
             </div><!-- FIN CODIGO DE BARRAS  -->
 
