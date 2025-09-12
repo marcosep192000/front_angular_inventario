@@ -64,34 +64,45 @@ export class NewSaleComponent implements OnInit {
     private clienteService: ClientService
   ) {}
   ngOnInit(): void {}
-  onSubmit() {
-    this.productService.search(this.code).subscribe(
-      (data) => {
-        const existingProduct = this.products.find(
-          (product) => product.id === data.id
-        );
+ 
 
-        if (existingProduct) {
-          // Si el producto ya está en la lista, aumentar la cantidad
-          if (existingProduct.stock > existingProduct.quantity) {
-            existingProduct.quantity += 1;
-          } else {
-           this.toastr.error('Excede al stock deseado.');
-            
-          }
-        } else {
-          // Si no, agregar el producto a la lista con cantidad inicial 1
-          data.quantity = 1; // Inicializa la cantidad en 1
-          this.products.push(data);
-        }
-        this.errorMessage = undefined; // Limpiar mensaje de error si se encontró el producto
-      },
-      (error) => {
-        this.toastr.error('No se encontró el producto');
-      }
-    );
-    this.getTotalQuantity();
+onSubmit() {
+  if (!this.code.trim()) {
+    return;
   }
+
+  this.productService.search(this.code).subscribe(
+    (data) => {
+      const existingProduct = this.products.find(
+        (product) => product.id === data.id
+      );
+
+      if (existingProduct) {
+        // Si ya está en la lista, aumentar cantidad
+        if (existingProduct.stock > existingProduct.quantity) {
+          existingProduct.quantity += 1;
+        } else {
+          this.toastr.error('Excede al stock disponible.');
+        }
+      } else {
+        // Si no está, agregarlo con cantidad 1
+        data.quantity = 1;
+        this.products.push(data);
+      }
+
+      this.errorMessage = undefined;
+      this.code = ''; // 🧹 limpiar el input después de agregar
+    },
+    (error) => {
+      this.toastr.error('No se encontró el producto');
+      this.code = ''; // 🧹 limpiar también si hay error
+    }
+  );
+
+  this.getTotalQuantity();
+}
+
+
   deleteProduct(id: number) {
     this.products = this.products.filter((product) => product.id !== id);
   }
