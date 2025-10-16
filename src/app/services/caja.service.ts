@@ -4,6 +4,7 @@ import { environments } from '../../environments/environments.prod';
 import { Caja } from '../interfaces/Caja';
 import { Observable } from 'rxjs';
 import { cajaSaldoApertura } from '../interfaces/cajaSaldoApertura';
+import { detalleCajaTipoContado } from '../interfaces/detalleCajaTipoContado';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +29,11 @@ export class CajaService {
       { saldoApertura: monto }  // <-- Aquí el objeto con la propiedad
     );
   }
+
+getDetalleCajaContado():Observable<detalleCajaTipoContado[]>{
+  return this.httpClient.get<detalleCajaTipoContado[]>(`${this.baseUrl}cajas/contado`) ; 
+}
+
 
 
 }

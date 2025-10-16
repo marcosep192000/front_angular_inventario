@@ -19,6 +19,7 @@ export interface SaleCommon {
   client: number; 
   ctaCte: number; 
   stateTicket: boolean; 
+paymentMethod?: string | null;
   saleCondition:string ;//CONDICIO DE VENTA : CONTADO CTA_CTE
   numero: number; // Número de ticket (número)
   observation: string; // Observaciones

@@ -8,6 +8,8 @@ import { DialogGenericComponent } from '../../../shared/genericsComponents/dialo
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { CashAmountDialogComponent } from './dialogs/cash-amount-dialog/cash-amount-dialog.component';
+import { DialogRef } from '@angular/cdk/dialog';
+import { DetallesIngresosCajaComponent } from '../detalles-ingresos-caja/detalles-ingresos-caja.component';
 
 @Component({
   selector: 'app-cash-closing',
@@ -23,6 +25,7 @@ import { CashAmountDialogComponent } from './dialogs/cash-amount-dialog/cash-amo
   styleUrl: './cash-closing.component.css',
 })
 export class CashClosingComponent implements OnInit {
+
   caja?: Caja;
   cajas: Caja[] = []; //
   serch: string = '';
@@ -82,8 +85,17 @@ export class CashClosingComponent implements OnInit {
         console.log('Cierre de caja cancelado');
       }
     });
-  }
 
+  }
+    mostrarDetalleCaja() {
+ const DialogRef = this.dialog.open(DetallesIngresosCajaComponent,{
+     disableClose: true,
+    autoFocus: true,
+    width: '80vw', // 👈 ancho del 80% de la pantalla
+    maxWidth: '1200px',
+     
+ })
+}
 
 
 

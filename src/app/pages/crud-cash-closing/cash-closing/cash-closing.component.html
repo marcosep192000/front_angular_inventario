@@ -8,7 +8,7 @@
                 
             <button mat-raised-button color="primary" class="btn-caja-abierta">Apertura : {{ caja?.apertura | currency }}</button>
             <button mat-raised-button color="primary" class="btn-caja-abierta">Egreso : {{ caja?.egresos| currency }}</button> 
-            <button mat-raised-button color="primary" class="btn-caja-abierta">Ingreso : {{ caja?.ingresos| currency }}</button>
+            <button mat-raised-button color="primary" class="btn-caja-abierta" (click)="mostrarDetalleCaja()">Ingreso : {{ caja?.ingresos| currency }}</button>
 
         </p>
         </div>

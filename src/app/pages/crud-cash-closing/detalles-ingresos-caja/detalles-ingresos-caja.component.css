@@ -1,0 +1,164 @@
+/* Contenedor general del modal */
+.detalle-caja-container {
+  background: #ffffff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  color: #333;
+  width: 80vw;
+  max-width: 1200px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+.modal-header {
+  background-color: #522e92;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.modal-header .titulo {
+  font-size: 1.6rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+.btn-cerrar {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.btn-cerrar:hover {
+  transform: scale(1.2);
+}
+
+/* Contenido sin scroll general */
+.contenido {
+  padding: 20px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Subtítulo */
+.subtitulo {
+  color: #522e92;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+  border-left: 4px solid #522e92;
+  padding-left: 8px;
+}
+
+/* Tabla con scroll */
+.tabla-wrapper {
+  flex: 1;
+  overflow-y: auto; /* 👈 scroll vertical SOLO aquí */
+  overflow-x: auto; /* 👈 scroll horizontal si es necesario */
+  max-height: 45vh; /* 👈 limita la altura visible */
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  background: white;
+}
+
+.tabla-detalles {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+  background-color: #fafafa;
+}
+
+.tabla-detalles thead {
+  background-color: #522e92;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.tabla-detalles th,
+.tabla-detalles td {
+  padding: 10px 14px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.tabla-detalles tr:nth-child(even) {
+  background-color: #f5f5f5;
+}
+
+.tabla-detalles tr:hover {
+  background-color: #e3f2fd;
+  transition: background-color 0.3s;
+}
+
+/* Totales */
+.totales {
+  margin-top: 20px;
+  border-top: 1px solid #ddd;
+  padding-top: 16px;
+}
+
+.total-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  margin: 6px 0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.total-item.contado {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.total-item.transferencia {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.total-item.mercado {
+  background-color: #fff8e1;
+  color: #f9a825;
+}
+
+.total-item.general {
+  background-color: #f3e5f5;
+  color: #6a1b9a;
+}
+
+/* Acciones */
+.acciones {
+  text-align: center;
+  padding: 16px;
+  border-top: 1px solid #eee;
+  background: #fafafa;
+}
+
+button[mat-raised-button] {
+  padding: 10px 28px;
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+button[mat-raised-button]:hover {
+  transform: scale(1.05);
+}

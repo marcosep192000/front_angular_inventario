@@ -12,13 +12,13 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatError, MatFormFieldModule } from '@angular/material/form-field';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
-import { FormCtaCteClienteComponent } from "../../form-cta-cte-cliente/form-cta-cte-cliente.component";
 import { FormNuevaVentaCtaCteComponent } from "../form-nueva-venta-cta-cte/form-nueva-venta-cta-cte.component";
-import { Client } from '../../../interfaces/Client';
+import { MatRadioModule } from '@angular/material/radio';
 @Component({
   selector: 'app-total-sale',
   standalone: true,
   imports: [
+    MatRadioModule,
     MatTabsModule,
     ToastrModule,
     MatInputModule,
@@ -43,6 +43,8 @@ import { Client } from '../../../interfaces/Client';
 export class TotalSaleComponent implements OnInit {
   formGroup!: FormGroup;
   amountPaid: number = 0; // El monto que el cliente paga (se actualizará en el formulario)
+  formaDePagoContado:string ="";
+      
   change: number = 0; // El vuelto
   difference: number = 0; // La diferencia que el cliente tiene que abonar
   tipoDeCuenta: string =  ''; 
@@ -51,7 +53,7 @@ export class TotalSaleComponent implements OnInit {
     this.tipoDeCuenta = 'CONTADO'
     this.amountPaid = 0;
     this.cdRef.detectChanges();
-    
+
   }
   // CONSTRUCTOR -------------------
   constructor(
@@ -63,15 +65,12 @@ export class TotalSaleComponent implements OnInit {
     private cdRef: ChangeDetectorRef
   ) {
     this.formGroup = this.fb.group({
-      price: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern('^\\d*\\.?\\d*$'), // Acepta números decimales
-        ],
-      ],
-      // Add your form controls here
-    });
+  price: [
+    '',
+    [Validators.required, Validators.pattern('^\\d*\\.?\\d*$')],
+  ],
+  paymentMethod: ['EFECTIVO', Validators.required] // 👈 por defecto efectivo
+});
   }
   //---------------------------------
   cancel() {
@@ -86,27 +85,24 @@ export class TotalSaleComponent implements OnInit {
     this.saveCtaCorriente(); 
    }
   }
-
   //ver carga de elementos 
   saveCuntaContado(){
-    if (this.difference > 0) {
-      this.toastr.error('Aún hay un saldo pendiente por abonar.');
-      return;
-    }
-    const saleData = {
-      amountPaid: this.amountPaid,
-      change: this.change,
-      tipoCuenta:'CONTADO', // saleCondition
-      difference: this.difference,
-      totalPrice: this.data.totalPrice,
-    };
-    // Emitir los datos de la venta al componente principal (NewSaleComponent)
-    this.dialogRef.close(saleData);
+  if (this.difference > 0) {
+    this.toastr.error('Aún hay un saldo pendiente por abonar.');
+    return;
   }
-
+  const saleData = {
+    amountPaid: this.amountPaid,
+    paymentMethod: this.formGroup.get('paymentMethod')?.value, // 👈 guardamos EFECTIVO o TRANSFERENCIA 
+    change: this.change,
+    tipoCuenta: 'CONTADO',
+    difference: this.difference,
+    totalPrice: this.data.totalPrice,
+  };
+console.log('Método de pago:', this.formGroup.get('paymentMethod')?.value);
+  this.dialogRef.close(saleData);
+}
   saveCtaCorriente(){
-  
-  
     const saleData = {
       amountPaid: this.amountPaid,
       change: this.change,
@@ -116,19 +112,8 @@ export class TotalSaleComponent implements OnInit {
       idCliente : this.data.client, 
     };
     // Emitir los datos de la venta al componente principal (NewSaleComponent)
-
-  
       this.dialogRef.close(saleData);
-    
-    
     }
-
- 
-    
-
-
-
-
 
   onInputChange(event: Event, controlName: string): void {
     const input = event.target as HTMLInputElement;
@@ -175,9 +160,20 @@ export class TotalSaleComponent implements OnInit {
       break; 
     }
   }
-  shouldShowGuardar(): boolean {
-  return this.amountPaid !== null &&
-         this.data?.totalPrice !== undefined &&
-         this.amountPaid >= this.data.totalPrice;
+shouldShowGuardar(): boolean {
+  const metodo = this.formGroup.get('paymentMethod')?.value;
+
+  if (metodo === 'EFECTIVO') {
+    return this.amountPaid !== null &&
+           this.data?.totalPrice !== undefined &&
+           this.amountPaid >= this.data.totalPrice;
+  }
+
+  // Para TRANSFERENCIA y MERCADO_PAGO no se valida el monto
+  if (metodo === 'TRANSFERENCIA' || metodo === 'MERCADO_PAGO') {
+    return true;
+  }
+
+  return false;
 }
 }

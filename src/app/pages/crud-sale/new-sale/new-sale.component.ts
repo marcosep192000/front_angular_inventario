@@ -20,7 +20,6 @@ import { CommonSaleService } from '../../../services/common-sale.service';
 import { SaleCommon } from '../../../interfaces/sale-common';
 import { jsPDF } from 'jspdf';
 import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
-import { Console } from 'console';
 import { ClientService } from '../../../services/client.service';
 import { CtaCteService } from '../../../services/cta-cte.service';
 import { registrarDeudaCtaCteCliente } from '../../../interfaces/registrarDeudaCtaCteCliente';
@@ -58,12 +57,14 @@ export class NewSaleComponent implements OnInit {
     fb: FormBuilder,
     private productService: ProductService,
     private toastr: ToastrService,
-    public dialog: MatDialog,
+    public  dialog: MatDialog,
     private commonSale: CommonSaleService,
     private ctaCteService: CtaCteService, 
     private clienteService: ClientService
   ) {}
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    
+  }
  
 
 onSubmit() {
@@ -164,18 +165,18 @@ onSubmit() {
         this.code = '';
         return;
       }
-    
+      const formaDePago = result.paymentMethod;
       const tipoCuenta = result.tipoCuenta;
       const total = result.totalPrice;
       const idClient = result.idCliente;
     
       try {
         if (tipoCuenta === 'CONTADO') {
-          const sale = this.buildSaleCommon(tipoCuenta, null); // null porque no hay cta cte
+          const sale = this.buildSaleCommon(tipoCuenta, null,formaDePago); // null porque no hay cta cte
           this.saveCommonSale(sale);
         } else if (tipoCuenta === 'CTA_CTE') {
           const idCtaCte = await this.buscarCuentaIdCorrienteCliente(idClient);
-          const sale = this.buildSaleCommon(tipoCuenta, idCtaCte);
+          const sale = this.buildSaleCommon(tipoCuenta, idCtaCte,formaDePago);
           this.saveCtaCteSale(idClient, total);
           this.saveCommonSale(sale);
         }
@@ -261,34 +262,35 @@ onSubmit() {
     doc.save(`Factura_${saleCommon.numero}.pdf`);
   }
   
-  buildSaleCommon(tipo: string,ctaCte : any): SaleCommon {
-    const sale: SaleCommon = {
-      tipo: 'FACTURA',
-      stateTicket: tipo == 'CTA_CTE' ? false : true,
-      ctaCte:ctaCte,
-      saleCondition: tipo,
-      client: this.selectedClient.id,
-      numero: Math.floor(Math.random() * 1000000),
-      observation: 'Observación de la venta',
-      subTotal: this.getTotalPrice(),
-      total: this.getTotalPrice(),
-      ticketDetails: this.products.map((product) => ({
-        amount: product.quantity,
-        price: product.salePrice,
-        idProduct: product.id,
-        productName: product.name,
-        barCode: product.barCode,
-        salePrice: product.salePrice,
-        marca: String(product.marca),
-        iva: product.iva,
-        subTotal: product.salePrice * product.quantity,
-      }))
-    };
+ buildSaleCommon(tipo: string, ctaCte: any, paymentMethod?: string): SaleCommon {
+  const sale: SaleCommon = {
+    tipo: 'FACTURA',
+    stateTicket: tipo == 'CTA_CTE' ? false : true,
+    ctaCte: ctaCte,
+    saleCondition: tipo,
+    client: this.selectedClient.id,
+    numero: Math.floor(Math.random() * 1000000),
+    observation: 'Observación de la venta',
+    subTotal: this.getTotalPrice(),
+    total: this.getTotalPrice(),
+    paymentMethod: paymentMethod || null, // 👈 agregado
+    ticketDetails: this.products.map((product) => ({
+      amount: product.quantity,
+      price: product.salePrice,
+      idProduct: product.id,
+      productName: product.name,
+      barCode: product.barCode,
+      salePrice: product.salePrice,
+      marca: String(product.marca),
+      iva: product.iva,
+      subTotal: product.salePrice * product.quantity,
+    }))
+  };
+  console.log(sale);
+  return sale;
   
-    console.log('➡️ Objeto saleCommon generado:', sale); // ✅ log correcto
-  
-    return sale;
-  }
+}
+
   
 
  saveCommonSale(saleCommon: SaleCommon) {
