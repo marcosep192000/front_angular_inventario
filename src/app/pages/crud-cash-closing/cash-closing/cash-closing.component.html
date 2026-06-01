@@ -1,19 +1,19 @@
 <section class="caja-actual">
-    <h2>Caja Actual :  <strong> {{ caja?.fecha }}</strong></h2>
+    <h2> 💰 Caja Actual :  <strong> {{ caja?.fecha }}</strong></h2>
     <hr />
 
     <div class="container__search">
         <div class="info">
             <p>
                 
-            <button mat-raised-button color="primary" class="btn-caja-abierta">Apertura : {{ caja?.apertura | currency }}</button>
-            <button mat-raised-button color="primary" class="btn-caja-abierta">Egreso : {{ caja?.egresos| currency }}</button> 
-            <button mat-raised-button color="primary" class="btn-caja-abierta" (click)="mostrarDetalleCaja()">Ingreso : {{ caja?.ingresos| currency }}</button>
-
+            <button mat-raised-button color="primary" class="btn-caja-abierta">🏦Apertura: {{ caja?.apertura | currency }}</button>
+            <button mat-raised-button color="primary" class="btn-caja-abierta">💸Egreso: {{ caja?.egresos| currency }}</button> 
+            <button mat-raised-button color="primary" class="btn-caja-abierta" (click)="mostrarDetalleCaja()">💵Ingreso : {{ caja?.ingresos| currency }}</button>
+            <button mat-raised-button color="primary" class="btn-caja-abierta" (click)="nuevoMovimientoDeCaja(caja!.id)">💹Nuevo movimiento</button>
         </p>
         </div>
         <div class="actions">
-            <button class="btn btn__new" (click)="cashClose(caja!.id)">Cerrar Caja</button>
+            <button class="btn btn__new" (click)="cashClose(caja!.id)"> Cerrar Caja</button>
         </div>
     </div>
 </section>

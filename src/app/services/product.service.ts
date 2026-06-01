@@ -8,15 +8,34 @@ import { ProductItemSale } from '../interfaces/ProductItemSale';
   providedIn: 'root',
 })
 export class ProductService {
+actualizarPreciosMasivo(payload: any): Observable<void> {
+  return this.http.post<void>(
+    `${this.base}supermarket/actualizar-precios-masivo`,
+    payload
+  );
+}
+
+
   form: any;
   constructor(private http: HttpClient) {}
   base: String = environments.baseURL;
-  getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.base}supermarket/products`);
-  }
+  getProducts(page: number, size: number,filter:string ='') {
+  return this.http.get<any>(
+    `${this.base}supermarket/products?page=${page}&size=${size}&filter=${filter}`
+  );
+}
   findById(id: number): Observable<Product> {
     return this.http.get<Product>(`${this.base}supermarket/find/${id}`);
   }
+
+//buscar por proveedor 
+getProductoPorCategoria (idProveedor:number):Observable<Product[]>{
+  return this.http.get<Product[]>(`${this.base}supermarket/find-for-provider/${idProveedor}`);
+}
+getProductoPorProveedor (idProveedor:number):Observable<Product[]>{
+  return this.http.get<Product[]>(`${this.base}supermarket/find-for-provider/${idProveedor}`);
+}
+ 
   save(product: Product): Observable<Product> {
     return this.http.post<Product>(
       `${this.base}supermarket/create-supermarket`,

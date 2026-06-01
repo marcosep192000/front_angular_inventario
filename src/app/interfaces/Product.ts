@@ -19,4 +19,5 @@ export interface Product {
   productUsefulness: Float32Array;
   barCode: string;
   status: boolean ; 
+  fechaUltimaActualizacion:string;
 }

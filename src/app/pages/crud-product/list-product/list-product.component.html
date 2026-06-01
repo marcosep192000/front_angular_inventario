@@ -1,85 +1,101 @@
 <div class="container__serch">
-    <div class="container__serch">
-        <input class="search__input" placeholder="Ingresa el Producto a buscar" type="text" ngModel=""
-            (keyup)="applyFilter($event)" value="text">
-    </div>
-    <div class="actions__btn">
-        <button class="actions__btn  btn__new" (click)="createProduct()">Nuevo Producto</button>
-        <button class="actions__btn  btn__new" (click)="addExcelListProduct()">Cargar Ecxel </button>
-    </div>
+  <div class="container__serch">
+<input
+  class="search__input"
+  placeholder="Buscar por nombre o código"
+  type="text"
+  (input)="onFilter($event)"
+/>
+
+  </div>
+
+  <div class="actions__btn">
+    <button class="actions__btn btn__new" (click)="createProduct()">
+      Agregar
+    </button>
+
+    <button mat-button [matMenuTriggerFor]="menu">
+      Acciones
+    </button>
+
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="addExcelListProduct()">
+        Importar Precios
+      </button>
+
+      <button mat-menu-item (click)="accionesProduct()">
+        Actualizar Precios
+      </button>
+    </mat-menu>
+  </div>
 </div>
 
-
-
 <div class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" class="table">
+  <table mat-table [dataSource]="dataSource" class="table">
 
-        <ng-container matColumnDef="barCode">
-            <th mat-header-cell *matHeaderCellDef>Codigo</th>
-            <td mat-cell *matCellDef="let element"> {{element.barCode }}</td>
-        </ng-container>
+    <ng-container matColumnDef="barCode">
+      <th mat-header-cell *matHeaderCellDef>Codigo</th>
+      <td mat-cell *matCellDef="let element">{{ element.barCode }}</td>
+    </ng-container>
 
-        <!-- Name Column -->
-        <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef> Producto </th>
-            <td mat-cell *matCellDef="let element"> {{element.name }}</td>
-        </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Producto</th>
+      <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+    </ng-container>
 
-        <!-- Name Column -->
-        
-        <!-- Name Column -->
+    <ng-container matColumnDef="provider">
+      <th mat-header-cell *matHeaderCellDef>Proveedor</th>
+      <td mat-cell *matCellDef="let element">{{ element.provider?.name }}</td>
+    </ng-container>
 
-        <ng-container matColumnDef="salePrice">
-            <th mat-header-cell *matHeaderCellDef> Precio Venta</th>
-            <td mat-cell *matCellDef="let element"> {{element.salePrice | currency}}</td>
-        </ng-container>
-
-        <!-- Name Column -->
-        <ng-container matColumnDef="stock">
-            <th mat-header-cell *matHeaderCellDef> Stock Actual </th>
-            <td mat-cell *matCellDef="let element">
-            <ng-container *ngIf="element.stock > 0; else noStock">
-                <span [ngStyle]="{'color': element.stock < element.stockMin ? 'red' : 'black'}">
-                    {{element.stock}}
-                </span>
-            </ng-container>
-            <ng-template #noStock>
-                Sin Stock
-            </ng-template>
-            </td>
-        </ng-container>
-
-        <ng-container matColumnDef="Opciones">
-            <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
-            <td mat-cell *matCellDef="let element">
-
-                <div class="container__accions">
-                    <div class="example-button-row">
-                        <button mat-fab class="btn__update" (click)="updateProduct(element.id)"
-                            aria-label="Example icon button with a delete icon">
-                            <app-icon [iconSrc]="'assets/icons/task.png'" [size]="'20px'"></app-icon>
-                        </button>
-                    </div>
-
-                    <div class="example-button-row">
-                        <button mat-fab class="btn__delete" (click)="deleteProduct(element.id)"
-                            aria-label="Example icon button with a delete icon">
-                            <app-icon [iconSrc]="'assets/icons/delete.png'" [size]="'20px'"></app-icon>
-                        </button>
-                    </div>
-                </div>
-
-            </td>
-        </ng-container>
-        <!-- Name Column -->
+  <ng-container matColumnDef="fechaUltimaActualizacion">
+      <th mat-header-cell *matHeaderCellDef>Actualizado</th>
+      <td mat-cell *matCellDef="let element">{{ element.fechaUltimaActualizacion}}</td>
+    </ng-container>
 
 
+    <ng-container matColumnDef="salePrice">
+      <th mat-header-cell *matHeaderCellDef>Precio Venta</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.salePrice | currency }}
+      </td>
+    </ng-container>
 
+    <ng-container matColumnDef="stock">
+      <th mat-header-cell *matHeaderCellDef>Stock</th>
+      <td mat-cell *matCellDef="let element">
+        <span
+          [ngStyle]="{
+            color: element.stock < element.stockMin ? 'red' : 'black'
+          }"
+        >
+          {{ element.stock > 0 ? element.stock : 'Sin Stock' }}
+        </span>
+      </td>
+    </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+    <ng-container matColumnDef="Opciones">
+      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-fab class = "btn__update"(click)="updateProduct(element.id)">
+          ✏️
+        </button>
+        <button mat-fab  class="btn__delete" (click)="deleteProduct(element.id)">
+          🗑️
+        </button>
+      </td>
+    </ng-container>
 
-    <mat-paginator [pageSizeOptions]="[5,8]" showFirstLastButtons aria-label="Select page of periodic elements">
-    </mat-paginator>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  <mat-paginator
+    [length]="totalElements"
+
+      [pageIndex]="pageIndex"
+  [pageSize]="pageSize"
+    [pageSizeOptions]="[5,8,10]"
+    (page)="onPageChange($event)">
+  </mat-paginator>
 </div>

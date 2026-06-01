@@ -2,7 +2,6 @@
     <mat-label>Forma de Pago</mat-label>
     <mat-select ngModel="selectedSupplier" (selectionChange)="onSelectionChange($event)">
         <mat-option *ngFor="let item of paymentTermsList" [value]="item">
-
             {{ item }}
         </mat-option>
     </mat-select>

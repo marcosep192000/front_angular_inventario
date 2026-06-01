@@ -1,4 +1,4 @@
-import { Component, Inject, InjectionToken, Input, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -10,12 +10,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ToastrModule } from 'ngx-toastr';
-
 import { ClientService } from '../../services/client.service';
 import { Client } from '../../interfaces/Client';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
-import { dataDashboard } from '../../interfaces/dashboard';
-import { IconComponent } from "../../shared/dasboard/icon/icon.component";
 import { MatCardModule } from '@angular/material/card';
 import { PagosCtaCteComponent } from '../crud-cta-cte-cliente/pagos-cta-cte/pagos-cta-cte.component';
 

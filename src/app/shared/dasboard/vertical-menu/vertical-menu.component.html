@@ -37,8 +37,12 @@
             Productos
             <div class="submenu" [class.open]="isMenuOpen('productos')">
               <div class="submenu-item" [routerLink]="['product-list']">
-                <app-icon [iconSrc]="'assets/icons/store1.png'" [iconAlt]="'Clientes'" [size]="'24px'">klklkl</app-icon>
+                <app-icon [iconSrc]="'assets/icons/store1.png'" [iconAlt]="'Clientes'" [size]="'24px'"></app-icon>
                 Lista de Productos
+              </div>
+              <div class="submenu-item" [routerLink]="['buscar-producto-por-proveedor']">
+                <app-icon [iconSrc]="'assets/icons/category_search.png'" [iconAlt]="'Clientes'" [size]="'24px'">klklkl</app-icon>
+                Productos por Proveedor
               </div>
               <div class="submenu-item" [routerLink]="['category-list']">
                 <app-icon [iconSrc]="'assets/icons/category_search.png'" [iconAlt]="'Clientes'" [size]="'24px'">klklkl</app-icon>

@@ -1,0 +1,73 @@
+<div class="movimiento-form-container">
+  <h2>💼 Registrar Movimiento</h2>
+
+  <form [formGroup]="movimientoForm" (ngSubmit)="guardar()" class="form">
+
+    <!-- Tipo de movimiento -->
+    <div class="form-group">
+      <label>Tipo de movimiento</label>
+      <select formControlName="tipo" (change)="onTipoChange()">
+        <option value="">Seleccionar</option>
+        <option *ngFor="let tipo of tipoMovimientoOptions" [value]="tipo">{{ tipo }}</option>
+      </select>
+    </div>
+
+    <!-- Categoría -->
+    <div *ngIf="categoriaOptions.length > 0" class="form-group">
+      <label>Categoría</label>
+      <select formControlName="categoriaMovimiento" (change)="onCategoriaChange()">
+        <option value="">Seleccionar</option>
+        <option *ngFor="let c of categoriaOptions" [value]="c">{{ c }}</option>
+      </select>
+    </div>
+
+    <!-- Monto -->
+    <div *ngIf="movimientoForm.get('categoriaMovimiento')?.value" class="form-group">
+      <label>Monto</label>
+      <input type="number" formControlName="monto" placeholder="Monto en pesos" />
+    </div>
+
+    <!-- Descripción para GASTO MENOR -->
+    <div *ngIf="movimientoForm.get('categoriaMovimiento')?.value === 'GASTO_MENOR'" class="form-group fade">
+      <label>Descripción</label>
+      <input type="text" formControlName="descripcion" placeholder="Detalle del gasto" />
+    </div>
+
+    <!-- Campos para PAGO SUELDO o ADELANTO -->
+    <div *ngIf="['PAGO_SUELDO', 'ADELANTO'].includes(movimientoForm.get('categoriaMovimiento')?.value)" class="fade">
+      <div class="form-group">
+       
+       
+        <label>Empleado</label>
+        <select formControlName="empleadoId">
+          <option value="">Seleccionar</option>
+          <option *ngFor="let e of empleados" [value]="e.id">{{ e.nombre }} {{ e.apellido }}</option>
+        </select>
+
+
+
+      </div>
+
+      <div *ngIf="movimientoForm.get('categoriaMovimiento')?.value === 'PAGO_SUELDO'" class="form-inline">
+        <label>Mes:</label>
+        <input type="number" min="1" max="12" formControlName="mesCorrespondiente" />
+        <label>Año:</label>
+        <input type="number" formControlName="anioCorrespondiente" />
+      </div>
+    </div>
+
+    <!-- Campos para PROVEEDOR -->
+    <div *ngIf="movimientoForm.get('categoriaMovimiento')?.value === 'PROVEEDOR'" class="fade">
+      <div class="form-group">
+        <label>ID Proveedor</label>
+        <input type="number" formControlName="proveedorId" placeholder="ID del proveedor" />
+      </div>
+      <div class="form-group">
+        <label>Número de factura</label>
+        <input type="text" formControlName="numeroFactura" placeholder="Factura Nº" />
+      </div>
+    </div>
+
+    <button type="submit" class="btn-guardar">💾 Guardar</button>
+  </form>
+</div>

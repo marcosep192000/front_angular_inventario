@@ -14,7 +14,7 @@ export class CategoryService implements OnInit {
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void { }
-
+ 
   getCategories(): Observable<Category[]> {
     return this.http.get<Category[]>(`${this.baseUrl}category`);
   }

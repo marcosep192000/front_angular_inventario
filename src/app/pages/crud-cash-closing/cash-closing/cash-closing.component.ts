@@ -10,6 +10,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { CashAmountDialogComponent } from './dialogs/cash-amount-dialog/cash-amount-dialog.component';
 import { DialogRef } from '@angular/cdk/dialog';
 import { DetallesIngresosCajaComponent } from '../detalles-ingresos-caja/detalles-ingresos-caja.component';
+import { MovimientoFormComponent } from '../../movimiento-caja/movimiento-form/movimiento-form.component';
 
 @Component({
   selector: 'app-cash-closing',
@@ -49,6 +50,7 @@ export class CashClosingComponent implements OnInit {
   ngOnInit(): void {
     this.getCashOpen();
     this.getAllCash();
+    
   }
 
   getAllCash(): void {
@@ -95,10 +97,26 @@ export class CashClosingComponent implements OnInit {
     maxWidth: '1200px',
      
  })
+
 }
 
 
 
+nuevoMovimientoDeCaja(id:number) {
+const dialogRef = this.dialog.open(MovimientoFormComponent,{
+    autoFocus: true,
+     width:'auto',
+  data:{
+    id:id,
+  }
+});
+dialogRef.afterClosed().subscribe((result)=> {
+ if ( result )
+{
+  this.getCashOpen()
+}
+})
+}
 
 
 
