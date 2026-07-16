@@ -48,9 +48,10 @@ export class CashClosingComponent implements OnInit {
     this.dataSource.paginator = this.paginator; // Añadimos el paginador al datasource
   }
   ngOnInit(): void {
+this.getAllCash();
     this.getCashOpen();
-    this.getAllCash();
-    
+
+
   }
 
   getAllCash(): void {
@@ -63,6 +64,11 @@ export class CashClosingComponent implements OnInit {
 
   getCashOpen() {
     this.cajaService.getCajas().subscribe((data) => {
+        console.log('Caja recibida:', data);
+         console.log(data);
+    console.log(typeof data.apertura);
+    console.log(typeof data.ingresos);
+    console.log(typeof data.egresos);
       this.caja = data;
     });
   }
@@ -73,11 +79,11 @@ export class CashClosingComponent implements OnInit {
       autoFocus: true,
       width: '400px',
     });
-  
+
     dialogRef.afterClosed().subscribe((monto: number | null) => {
       if (monto != null ) {
         console.log('Monto ingresado:', monto);
-  
+
         this.cajaService.closeCaja(id,monto).subscribe((data) => {
           console.log(data);
           this.getCashOpen();
@@ -95,7 +101,7 @@ export class CashClosingComponent implements OnInit {
     autoFocus: true,
     width: '80vw', // 👈 ancho del 80% de la pantalla
     maxWidth: '1200px',
-     
+
  })
 
 }
@@ -126,5 +132,5 @@ dialogRef.afterClosed().subscribe((result)=> {
 }
 
 
- 
+
 

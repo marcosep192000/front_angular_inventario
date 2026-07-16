@@ -1,15 +1,13 @@
-<section class="caja-actual">
-    <h2> 💰 Caja Actual :  <strong> {{ caja?.fecha }}</strong></h2>
+<section class="caja-actual" *ngIf="caja as c">
+    <h2> 💰 Caja Actual :  <strong> {{ caja.fecha }}</strong></h2>
     <hr />
-
     <div class="container__search">
         <div class="info">
             <p>
-                
-            <button mat-raised-button color="primary" class="btn-caja-abierta">🏦Apertura: {{ caja?.apertura | currency }}</button>
-            <button mat-raised-button color="primary" class="btn-caja-abierta">💸Egreso: {{ caja?.egresos| currency }}</button> 
-            <button mat-raised-button color="primary" class="btn-caja-abierta" (click)="mostrarDetalleCaja()">💵Ingreso : {{ caja?.ingresos| currency }}</button>
-            <button mat-raised-button color="primary" class="btn-caja-abierta" (click)="nuevoMovimientoDeCaja(caja!.id)">💹Nuevo movimiento</button>
+            <button mat-raised-button color="primary" class="btn-caja-abierta">🏦Apertura: {{ caja.apertura | currency }}</button>
+            <button mat-raised-button color="primary" class="btn-caja-abierta">💸Egreso: {{ caja.egresos| currency }}</button>
+            <button mat-raised-button color="primary" class="btn-caja-abierta" (click)="mostrarDetalleCaja()">💵Ingreso : {{ caja.ingresos| currency }}</button>
+            <button mat-raised-button color="primary" class="btn-caja-abierta" (click)="nuevoMovimientoDeCaja(caja.id)">💹Nuevo movimiento</button>
         </p>
         </div>
         <div class="actions">
@@ -38,7 +36,7 @@
             </ng-container>
             <ng-container matColumnDef="ingresos">
                 <th mat-header-cell *matHeaderCellDef> Ingresos </th>
-                <td mat-cell *matCellDef="let element"> {{element.ingresos | currency}} </td>
+                <td mat-cell *matCellDef="let element"> {{element.ingresos }} </td>
             </ng-container>
             <ng-container matColumnDef="egresos">
                 <th mat-header-cell *matHeaderCellDef> Egresos </th>
