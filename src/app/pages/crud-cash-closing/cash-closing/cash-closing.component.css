@@ -1,139 +1,422 @@
-/* Estilo general de la sección */
-.caja-actual {
-  margin: 10px;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 5px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
+/* =======================================================
+   CONTENEDORES
+======================================================= */
+
+.caja-actual{
+
+    margin:20px;
+    padding:25px;
+    background:#ffffff;
+    border-radius:18px;
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,.08);
+
+    border:1px solid #ececec;
 }
 
+.caja-actual h2{
 
-
-/* Estilo para el contenedor con scroll de la tabla */
-.table-container {
-  max-height: 200px; /* Ajusta esta altura según tus necesidades */
-  overflow-y: auto; /* Activa el scroll vertical si el contenido excede la altura */
-  border: 1px solid #ddd; /* Opcional: agrega un borde para delimitar la tabla */
-  padding: 10px; /* Opcional: agrega espacio alrededor de la tabla */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Opcional: para diseño */
-  border-radius: 5px; /* Opcional: bordes redondeados */
-  background-color: #fff; /* Opcional: fondo blanco para la tabla */
+    font-size:24px;
+    color:#303030;
+    margin-bottom:10px;
+    font-weight:700;
 }
 
-/* Opcional: estiliza la tabla para ajustarse al contenedor */
-.table {
-  width: 100%; /* Asegura que la tabla ocupe todo el ancho del contenedor */
-  border-collapse: collapse; /* Elimina espacios entre celdas */
+.caja-actual hr{
+
+    border:none;
+    height:1px;
+    background:#ececec;
+    margin-bottom:20px;
 }
 
+/* =======================================================
+   DASHBOARD
+======================================================= */
 
-.caja-actual h2 {
-  font-size: 1.5rem;
-  color: #4a4a4a;
-  margin-bottom: 2px;
+.dashboard-card{
+
+    background:#fafafa;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    border:1px solid #ececec;
 }
 
-.caja-actual hr {
-  border: none;
-  border-top: 1px solid #ccc;
-  margin: 10px 0;
+/* =======================================================
+   TARJETAS
+======================================================= */
+
+.info{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+
+    gap:18px;
 }
 
-/* Contenedor principal */
-.container__search {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #eae7f6;
-  padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  gap: 15px; /* Espaciado entre elementos */
-  flex-wrap: wrap; /* Permitir que los elementos se ajusten en pantallas pequeñas */
+.card-info{
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:18px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    min-height:90px;
+
+    box-shadow:
+    0 8px 20px rgba(0,0,0,.05);
+
+    border-left:6px solid transparent;
 }
 
-/* Información de la caja */
-.info p {
-  margin: 0;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap; /* Ajustar contenido largo en dispositivos pequeños */
-  justify-content: space-between;
-  font-size: 1rem;
-  color: #333;
-  padding: 10px;
-  font-weight: bold;
+.card-info:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+    0 12px 25px rgba(0,0,0,.12);
 }
 
-.btn-caja-abierta {
-  margin-right: 8px;
+/* colores */
+
+.apertura{
+
+    border-left-color:#3b82f6;
 }
 
-/* Botón de acciones */
-.actions .btn {
-  padding: 10px 15px;
-  font-size: 1rem;
-  color: #fff;
-  background-color: #532e92;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+.ingreso{
+
+    border-left-color:#22c55e;
 }
 
-.actions .btn:hover {
-  background-color: #3a206e;
+.egreso{
+
+    border-left-color:#ef4444;
 }
 
-.actions .btn__new {
-  background-color: #ff5722;
+.accion{
+
+    border-left-color:#7c3aed;
 }
 
-.actions .btn__new:hover {
-  background-color: #e64a19;
+/* texto */
+
+.titulo{
+
+    color:#7b7b7b;
+
+    font-size:14px;
+
+    margin-bottom:8px;
 }
 
-/* Media Queries para Responsividad */
-@media (max-width: 768px) {
-  .caja-actual {
-    margin: 10px;
-    padding: 15px;
-  }
+.card-info strong{
 
-  .container__search {
-    flex-direction: column; /* Apilar elementos en pantallas pequeñas */
-    align-items: stretch;
-  }
+    font-size:24px;
 
-  .info p {
-    font-size: 0.9rem;
-    text-align: left;
-  }
+    color:#202020;
 
-  .actions .btn {
-    width: 100%; /* Botón ocupa todo el ancho */
-    text-align: center;
-  }
+    font-weight:700;
 }
 
-@media (max-width: 480px) {
-  .caja-actual h2 {
-    font-size: 1.2rem;
-  }
+/* =======================================================
+   BOTON
+======================================================= */
 
-  .container__search {
-    padding: 10px;
-  }
+.actions{
 
-  .info p {
-    font-size: 0.8rem;
-    padding: 8px;
-  }
+    margin-top:25px;
 
-  .actions .btn {
-    padding: 8px 12px;
-    font-size: 0.9rem;
-  }
+    display:flex;
+
+    justify-content:flex-end;
+}
+
+.btn{
+
+    border:none;
+
+    border-radius:12px;
+
+    padding:14px 28px;
+
+    cursor:pointer;
+
+    color:white;
+
+    font-weight:600;
+
+    font-size:15px;
+
+    transition:.3s;
+}
+
+.btn__new{
+
+    background:linear-gradient(135deg,#ef4444,#dc2626);
+}
+
+.btn__new:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+    0 10px 20px rgba(220,38,38,.35);
+}
+
+/* =======================================================
+   TABLA
+======================================================= */
+
+.table-container{
+
+    margin-top:20px;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    border:1px solid #ececec;
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,.08);
+
+    max-height:420px;
+
+    overflow:auto;
+}
+
+.table{
+
+    width:100%;
+}
+
+.mat-mdc-header-row{
+
+    background:#f6f8fb;
+}
+
+.mat-mdc-header-cell{
+
+    font-size:14px;
+
+    font-weight:700;
+
+    color:#555;
+}
+
+.mat-mdc-row{
+
+    transition:.25s;
+}
+
+.mat-mdc-row:hover{
+
+    background:#f5f9ff;
+}
+
+/* =======================================================
+   PAGINADOR
+======================================================= */
+
+mat-paginator{
+
+    margin-top:10px;
+
+    border-radius:0 0 18px 18px;
+}
+
+/* =======================================================
+   RESPONSIVE
+======================================================= */
+
+@media(max-width:768px){
+
+.info{
+
+grid-template-columns:1fr;
+
+}
+
+.actions{
+
+justify-content:center;
+
+}
+
+.btn{
+
+width:100%;
+}
+
+}
+.header-caja{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:18px;
+
+}
+
+.header-caja h2{
+
+    margin:0;
+
+    font-size:28px;
+
+    color:#522E92;
+
+    font-weight:700;
+
+}
+
+.fecha-caja{
+
+    display:block;
+
+    margin-top:6px;
+
+    color:#7A7A7A;
+
+    font-size:14px;
+
+}
+
+.info{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:18px;
+
+}
+
+.card-info{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    background:#FFFFFF;
+
+    border:1px solid #E8E8E8;
+
+    border-radius:12px;
+
+    padding:20px;
+
+    transition:.25s;
+
+    cursor:pointer;
+
+    box-shadow:0 3px 10px rgba(0,0,0,.05);
+
+}
+
+.card-info:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 10px 22px rgba(82,46,146,.15);
+
+}
+
+.icono{
+
+    width:56px;
+
+    height:56px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:white;
+
+    font-size:24px;
+
+    flex-shrink:0;
+
+}
+
+.contenido-card{
+
+    display:flex;
+
+    flex-direction:column;
+
+    flex:1;
+
+}
+
+.titulo{
+
+    font-size:13px;
+
+    color:#777;
+
+    margin-bottom:5px;
+
+}
+
+.card-info strong{
+
+    font-size:22px;
+
+    font-weight:700;
+
+    color:#303030;
+
+}
+
+.apertura .icono{
+
+    background:#5E35B1;
+
+}
+
+.ingreso .icono{
+
+    background:#43A047;
+
+}
+
+.egreso .icono{
+
+    background:#D32F2F;
+
+}
+
+.accion .icono{
+
+    background:#1E88E5;
+
 }

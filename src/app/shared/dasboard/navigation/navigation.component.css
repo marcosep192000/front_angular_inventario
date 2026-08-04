@@ -1,99 +1,152 @@
-.sidenav-container {
-  height: 100%;
-    box-shadow: 21px 20px 24px 0px rgba(0,0,0,0.39);
--webkit-box-shadow: 21px 20px 24px 0px rgba(0,0,0,0.39);
--moz-box-shadow: 21px 20px 24px 0px rgba(0,0,0,0.39);
+/* =====================================================
+   LAYOUT
+===================================================== */
 
-}
-
-
-.sidenav {
-  width: 250px;
-  color: white;
-  background-color:#522e92;
-  overflow-y: hidden; 
-}
-.pixels-png {
-  
-  top: 10px; /* Ajusta según necesites */
-  left: 10px;
-  width: 150px;
-  height: auto;
+:host{
+    display:block;
+    width:100%;
+    height:100vh;
+    overflow:hidden;
 }
 
-
-
-.sidenav .mat-toolbar {
-  background: inherit;
-  background-color: #522e92;
-  color:white;
+.layout{
+    display:grid;
+    grid-template-columns:260px 1fr;
+    grid-template-rows:100vh;
+    width:100%;
+    height:100vh;
+    background:#f5f6fa;
+    transition:grid-template-columns .30s ease;
 }
 
-.mat-toolbar.mat-primary {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.color{
-  color: white;
-  text-decoration: none;
-  font-size: 1.4em ;
-}
-.material-icons{
-margin: 0;
-  margin-right: 5px;
-}
-.sidenav__list{
-  list-style: none;
-width: 100%;
-margin: 0;
-padding: 0;
-text-align:left;
-}
-.list__item{
-  width: 100%;
-  height: 60px ;
-  background-color:#522e92 ;
-  align-content: center;
-  padding: 0px  20px ;
-}
-.list__item:hover{
-  background-color: #653dab ;
-}
-.sidenav__image img{
-  margin-left: 10%;
-  margin-top: 30px;
-  border-radius: 50%;
-  width: 150px;
-  height: 150px;
+.layout.collapsed{
+    grid-template-columns:90px 1fr;
 }
 
+/* =====================================================
+   SIDEBAR
+===================================================== */
 
-.container__barra {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%; /* O un ancho adecuado */
-  padding: 2px; /* Opcional, para agregar espacio interno */
-  box-sizing: border-box; /* Asegura que padding no afecte el tamaño total */
+.sidebar{
+    background:#522e92;
+    color:#fff;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    box-shadow:8px 0 18px rgba(0,0,0,.18);
+    z-index:100;
 }
 
- .barra__span {
-  font-size: 18px;
-  font-weight: bold;
-  color: #ffffff; /* Color del texto */
+.sidebar-header{
+    height:64px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    font-weight:600;
 }
 
-.barra__logout button {
-  background-color: transparent; /* Botón sin fondo */
-  border: none; /* Sin borde */
-  cursor: pointer;font-size: 18px;
+.sidebar hr{
+    margin:0;
+    border:none;
+    border-top:1px solid rgba(255,255,255,.15);
 }
 
-.barra__logout mat-icon {
-  font-size: 24px; /* Tamaño del ícono */
-  color: #ffffff; /* Color del ícono */
+/* =====================================================
+   CONTENIDO
+===================================================== */
+
+.content{
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    width:100%;
+    min-width:0;
 }
 
- 
+/* =====================================================
+   TOOLBAR
+===================================================== */
+
+.mat-toolbar.mat-primary{
+    position:sticky;
+    top:0;
+    z-index:20;
+    height:64px;
+}
+
+.container__barra{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.barra__span{
+    color:#fff;
+    font-size:18px;
+    font-weight:600;
+}
+
+.barra__logout button{
+    border:none;
+    background:transparent;
+    cursor:pointer;
+}
+
+/* =====================================================
+   ROUTER
+===================================================== */
+
+.router-content{
+    flex:1;
+    overflow:auto;
+    padding:18px;
+}
+
+/* =====================================================
+   SCROLL
+===================================================== */
+
+.router-content::-webkit-scrollbar{
+    width:10px;
+}
+
+.router-content::-webkit-scrollbar-thumb{
+    background:#c2c2c2;
+    border-radius:10px;
+}
+
+.router-content::-webkit-scrollbar-track{
+    background:#ececec;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width:991px){
+
+    .layout{
+        grid-template-columns:1fr;
+    }
+
+    .sidebar{
+        position:fixed;
+        left:0;
+        top:0;
+        bottom:0;
+        width:260px;
+        transform:translateX(-100%);
+        transition:transform .30s;
+    }
+
+    .layout:not(.collapsed) .sidebar{
+        transform:translateX(0);
+    }
+
+    .content{
+        width:100%;
+    }
+
+}

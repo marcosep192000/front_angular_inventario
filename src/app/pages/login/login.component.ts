@@ -8,6 +8,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { TokenService } from '../../services/token.service';
+import { MatIcon } from "@angular/material/icon";
+import { MatCheckbox } from "@angular/material/checkbox";
+import { MatDivider } from "@angular/material/divider";
 
 @Component({
   selector: 'app-login',
@@ -20,11 +23,15 @@ import { TokenService } from '../../services/token.service';
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-  ],
+    MatIcon,
+    MatCheckbox,
+    MatDivider
+],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
+  hidePassword = true;
   private accesoService = inject(AccessoService);
   private route = inject(Router);
   private formBuild = inject(FormBuilder);

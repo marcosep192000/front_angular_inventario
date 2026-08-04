@@ -1,0 +1,41 @@
+<div class="ventas-list">
+
+    @for (venta of ventas; track venta.numero) {
+
+        <div class="venta-item">
+
+            <div>
+
+                <div class="numero">
+
+                    {{venta.numero}}
+
+                </div>
+
+                <div class="cliente">
+
+                    {{venta.cliente}}
+
+                </div>
+
+            </div>
+
+            <div class="importe">
+
+                {{venta.total | currency:'ARS'}}
+
+            </div>
+
+        </div>
+
+    } @empty {
+
+        <div class="empty">
+
+            No hay ventas registradas.
+
+        </div>
+
+    }
+
+</div>

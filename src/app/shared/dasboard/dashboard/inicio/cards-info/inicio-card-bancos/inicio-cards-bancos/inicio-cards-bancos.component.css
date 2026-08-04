@@ -1,0 +1,67 @@
+.bank-card{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+
+.bank-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    font-size:20px;
+
+    font-weight:600;
+
+    color:#512da8;
+
+}
+
+.payment-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.payment-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:#f7f7f7;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    transition:.25s;
+
+}
+
+.payment-item:hover{
+
+    background:#ede7f6;
+
+}
+
+.payment-item strong{
+
+    color:#512da8;
+
+    font-size:18px;
+
+}

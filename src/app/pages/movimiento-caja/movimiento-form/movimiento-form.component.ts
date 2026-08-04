@@ -1,5 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { MovimientoCajaService } from '../../../services/movimiento-caja.service';
 import { EmpleadoService } from '../../../services/empleado.service';
@@ -26,34 +32,45 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatInputModule,
     MatTooltipModule,
     MatCardModule,
-    ToastrModule
+    ToastrModule,
   ],
   templateUrl: './movimiento-form.component.html',
-  styleUrls: ['./movimiento-form.component.css']
+  styleUrls: ['./movimiento-form.component.css'],
 })
 export class MovimientoFormComponent implements OnInit {
-
   movimientoForm!: FormGroup;
   empleados: any[] = [];
 
   tipoMovimientoOptions = ['INGRESO', 'EGRESO'];
   categoriaOptions: string[] = [];
 
+formaPagoOptions = [
+  'EFECTIVO',
+  'TRANSFERENCIA',
+  'DEBITO',
+  'CREDITO',
+  'MERCADO_PAGO',
+  'CHEQUE',
+  'CUENTA_CORRIENTE',
+  'OTRO'
+];
+
+
   constructor(
     private fb: FormBuilder,
     private movimientoService: MovimientoCajaService,
     private empleadoService: EmpleadoService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
   ) {}
 
   ngOnInit(): void {
-
     this.movimientoForm = this.fb.group({
-
       tipo: ['', Validators.required],
       categoriaMovimiento: ['', Validators.required],
       monto: [null, [Validators.required, Validators.min(1)]],
       descripcion: [''],
+
+medioPago: [null ],
 
       // Sueldos
       empleadoId: [null],
@@ -63,76 +80,70 @@ export class MovimientoFormComponent implements OnInit {
 
       // Proveedor
       numeroFactura: [''],
-      proveedorId: [null]
-
+      proveedorId: [null],
     });
 
     this.empleadoService.getAll().subscribe({
-      next: (data) => this.empleados = data,
-      error: () => this.toastr.error('Error cargando empleados')
+      next: (data) => (this.empleados = data),
+      error: () => this.toastr.error('Error cargando empleados'),
     });
-
   }
 
   onTipoChange(): void {
-
     const tipo = this.movimientoForm.get('tipo')?.value;
 
     if (tipo === 'EGRESO') {
-
       this.categoriaOptions = [
         'GASTO_MENOR',
+
+        'PROVEEDOR',
+
         'PAGO_SUELDO',
+
         'ADELANTO',
-        'PROVEEDOR'
-      ];
 
+        'AJUSTE_NEGATIVO',
+      ];
     } else if (tipo === 'INGRESO') {
-
       this.categoriaOptions = [
-        'VENTA',
-        'APORTE',
-        'OTROS'
+        'APORTE_CAPITAL',
+
+        'OTROS_INGRESOS',
+
+        'PRESTAMO_RECIBIDO',
+
+        'REINTEGRO',
+
+        'AJUSTE_POSITIVO',
       ];
-
     } else {
-
       this.categoriaOptions = [];
-
     }
 
     this.movimientoForm.patchValue({
-      categoriaMovimiento: null
+      categoriaMovimiento: null,
     });
-
   }
 
   onCategoriaChange(): void {
-
     this.movimientoForm.patchValue({
-
       descripcion: '',
       empleadoId: null,
       tipoSueldo: null,
       mesCorrespondiente: null,
       numeroFactura: '',
-      proveedorId: null
-
+      proveedorId: null,
     });
-
   }
 
   guardar(): void {
-
     if (this.movimientoForm.invalid) {
-
       this.toastr.warning('Completa los campos obligatorios');
       return;
-
     }
 
     const movimiento: any = {
-      ...this.movimientoForm.value
+      ...this.movimientoForm.value,
     };
 
     // ====================================================
@@ -140,11 +151,6 @@ export class MovimientoFormComponent implements OnInit {
     // ====================================================
 
     switch (movimiento.categoriaMovimiento) {
-
-      case 'VENTA':
-        movimiento.tipo_movimiento = 'VENTA';
-        break;
-
       case 'GASTO_MENOR':
         movimiento.tipo_movimiento = 'GASTO_MENOR';
         break;
@@ -154,16 +160,21 @@ export class MovimientoFormComponent implements OnInit {
         break;
 
       case 'PAGO_SUELDO':
-      case 'ADELANTO':
         movimiento.tipo_movimiento = 'SUELDO';
-        movimiento.tipoSueldo =
-          movimiento.categoriaMovimiento === 'ADELANTO'
-            ? 'ADELANTO'
-            : 'SUELDO_MENSUAL';
+        movimiento.tipoSueldo = 'SUELDO_MENSUAL';
         break;
 
-      case 'APORTE':
-      case 'OTROS':
+      case 'ADELANTO':
+        movimiento.tipo_movimiento = 'SUELDO';
+        movimiento.tipoSueldo = 'ADELANTO';
+        break;
+
+      case 'APORTE_CAPITAL':
+      case 'OTROS_INGRESOS':
+      case 'PRESTAMO_RECIBIDO':
+      case 'REINTEGRO':
+      case 'AJUSTE_POSITIVO':
+      case 'AJUSTE_NEGATIVO':
         movimiento.tipo_movimiento = 'AJUSTE_CAJA';
         break;
 
@@ -177,33 +188,24 @@ export class MovimientoFormComponent implements OnInit {
     console.log(movimiento);
     console.log(JSON.stringify(movimiento, null, 2));
     console.log('=================================');
-
+console.log('OBJETO A ENVIAR');
+console.log(JSON.stringify(movimiento, null, 2))
     this.movimientoService.create(movimiento).subscribe({
-
       next: () => {
-
         this.toastr.success('Movimiento registrado correctamente');
 
         this.movimientoForm.reset();
 
         this.movimientoForm.patchValue({
-          anioCorrespondiente: new Date().getFullYear()
+          anioCorrespondiente: new Date().getFullYear(),
         });
-
       },
 
       error: (err) => {
-
         console.error(err);
 
-        this.toastr.error(
-          err.error?.message ?? 'Error al guardar movimiento'
-        );
-
-      }
-
+        this.toastr.error(err.error?.message ?? 'Error al guardar movimiento');
+      },
     });
-
   }
-
 }

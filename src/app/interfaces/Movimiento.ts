@@ -1,11 +1,22 @@
 export interface Movimiento {
   id?: number;
-  tipo_movimiento: string;  // <- clave para el backend (Spring lo usa para saber la subclase)
+  tipo_movimiento: string; // <- clave para el backend (Spring lo usa para saber la subclase)
   tipo: 'INGRESO' | 'EGRESO';
   monto: number;
   descripcion?: string;
   numeroComprobante?: string;
-  tipoDeContado?: 'EFECTIVO' | 'TRANSFERENCIA' | 'MERCADO_PAGO';
+  medioPago?:
+    | 'EFECTIVO'
+    | 'TRANSFERENCIA'
+    | 'MERCADO_PAGO'
+    | 'EFECTIVO'
+    | ' TRANSFERENCIA'
+    | 'DEBITO,PAGO_CTA_CTE'
+    | 'CREDITO'
+    | 'MERCADO_PAGO'
+    | 'CHEQUE'
+    | 'CUENTA_CORRIENTE'
+    | 'OTRO';
   categoriaMovimiento?: string;
   cajaId?: number;
 }
@@ -19,7 +30,7 @@ export interface MovimientoProveedor extends Movimiento {
 }
 
 export interface MovimientoSueldo extends Movimiento {
-id?: number;
+  id?: number;
   empleadoId: number;
   monto: number;
   tipoSueldo: 'ADELANTO' | 'SUELDO_MENSUAL';

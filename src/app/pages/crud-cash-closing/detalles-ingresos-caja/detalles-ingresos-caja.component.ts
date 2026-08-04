@@ -1,9 +1,13 @@
-import { DetallesIngresosCajaPorFacturaComponent } from './../detalles-ingresos-caja-por-factura/detalles-ingresos-caja-por-factura.component';
 import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -14,6 +18,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { CajaService } from '../../../services/caja.service';
 import { detalleCajaTipoContado } from '../../../interfaces/detalleCajaTipoContado';
 import { SaleCommon } from '../../../interfaces/sale-common';
+import { DetallesIngresosCajaPorFacturaComponent } from './../detalles-ingresos-caja-por-factura/detalles-ingresos-caja-por-factura.component';
 
 @Component({
   selector: 'app-detalles-ingresos-caja',
@@ -30,73 +35,123 @@ import { SaleCommon } from '../../../interfaces/sale-common';
     MatPaginatorModule,
     MatTableModule,
     MatTooltipModule,
-    ToastrModule,
+    ToastrModule
   ],
   templateUrl: './detalles-ingresos-caja.component.html',
-  styleUrls: ['./detalles-ingresos-caja.component.css'], // 👈 era "styleUrl" (incorrecto)
+  styleUrls: ['./detalles-ingresos-caja.component.css']
 })
 export class DetallesIngresosCajaComponent implements OnInit {
-getDetalleVenta() {
-   const dialogRef  = this.dialog.open(DetallesIngresosCajaPorFacturaComponent,{
-width:'500px' , 
-height:'auto',
- 
-   })
 
-
-
-
-
-}
   movimientos: detalleCajaTipoContado[] = [];
 
-  totalContado: number = 0;
-  totalTransferencia: number = 0;
-  totalMercadoPago: number = 0;
-  totalGeneral: number = 0;
+  totalContado = 0;
+  totalTransferencia = 0;
+  totalMercadoPago = 0;
+  totalCtaCte = 0;
+  totalGeneral = 0;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: SaleCommon,
+    @Inject(MAT_DIALOG_DATA) public data: any,
     private dialogRef: MatDialogRef<DetallesIngresosCajaComponent>,
-    private cajaService: CajaService, public dialog : MatDialog
+    private cajaService: CajaService,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-    // Cargar los movimientos desde el servicio
+
     this.cajaService.getDetalleCajaContado().subscribe({
-      next: (data) => {
-        this.movimientos = data;
-        this.calcularTotales(); // 👈 llama al método correcto
+
+      next: (resp) => {
+
+        this.movimientos = resp.filter(x => x.tipo === this.data.tipo);
+
+        this.calcularTotales();
+
       },
-      error: (err) => {
-        console.error('Error al cargar los movimientos', err);
-      },
+
+      error: err => console.error(err)
+
     });
+
   }
 
+ getDetalleVenta(item: detalleCajaTipoContado) {
+
+  this.dialog.open(DetallesIngresosCajaPorFacturaComponent, {
+
+    width: '900px',
+
+    data: {
+      id: item.id,
+      categoriaMovimiento: item.categoriaMovimiento,
+      numeroComprobante: item.numeroComprobante
+    }
+
+  });
+
+}
+
   calcularTotales(): void {
-    // Reiniciar totales
+
     this.totalContado = 0;
     this.totalTransferencia = 0;
     this.totalMercadoPago = 0;
+    this.totalCtaCte = 0;
 
-    this.movimientos.forEach((mov) => {
-      const tipo = mov.tipoDeContado?.toLowerCase() || '';
-      const monto = mov.monto || 0;
+    this.movimientos.forEach(mov => {
 
-      if (tipo.includes('efectivo')) {
-        this.totalContado += monto;
-      } else if (tipo.includes('transferencia')) {
-        this.totalTransferencia += monto;
-      } else if (tipo.includes('mercado')) {
-        this.totalMercadoPago += monto;
+      const medio = (mov.medioPago || '').toUpperCase();
+
+      switch (medio) {
+
+        case 'EFECTIVO':
+          this.totalContado += mov.monto;
+          break;
+
+        case 'TRANSFERENCIA':
+          this.totalTransferencia += mov.monto;
+          break;
+
+        case 'MERCADO_PAGO':
+          this.totalMercadoPago += mov.monto;
+          break;
+
+        case 'CTA_CTE':
+          this.totalCtaCte += mov.monto;
+          break;
+
       }
+
     });
 
-    this.totalGeneral = this.totalContado + this.totalTransferencia + this.totalMercadoPago;
+    this.totalGeneral =
+      this.totalContado +
+      this.totalTransferencia +
+      this.totalMercadoPago +
+      this.totalCtaCte;
+
+  }
+
+  get titulo(): string {
+    return this.data.tipo === 'INGRESO'
+      ? '📋 Detalles de Ingresos'
+      : '📋 Detalles de Egresos';
+  }
+
+  get subtitulo(): string {
+    return this.data.tipo === 'INGRESO'
+      ? '🟢 Movimientos de Ingreso'
+      : '🔴 Movimientos de Egreso';
+  }
+
+  get colorHeader(): string {
+    return this.data.tipo === 'INGRESO'
+      ? '#ffffff'
+      : '#fefdfd';
   }
 
   cerrarDialog(): void {
     this.dialogRef.close();
   }
+
 }

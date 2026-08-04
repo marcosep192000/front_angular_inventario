@@ -1,270 +1,1183 @@
-.container__accions{
-    display: flex;
-    
+/*====================================================================
+    INVENTARIO PIXELS
+    NEW SALE
+====================================================================*/
+
+:host{
+
+    --primary:#1976d2;
+    --primary-dark:#522e92;
+    --success:#43a047;
+    --warning:#fb8c00;
+    --danger:#e53935;
+
+    --background:#edf2f7;
+
+    --card:#ffffff;
+
+    --border:#dce5ee;
+
+    --text:#263238;
+
+    --text-light:#78909c;
+
+    --radius:14px;
+
+    --shadow:
+        0 3px 12px rgba(0,0,0,.08);
+
+    display:block;
+
+    width:100%;
+
+    height:100vh;
+
+    overflow:hidden;
+
+    background:var(--background);
+
+    font-family:
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+
 }
 
-.btn__new{
-height: 40px;
+/*================================================*/
+
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
 }
 
-.container__serch{
-    display: flex; 
-     justify-content:left;
-    align-items: center;
-    margin: 5px 5px ;
-background-color: #532e926b;
-    border-radius:5px ;
-    align-items: center;
+button{
+
+    transition:.20s;
+
 }
 
-.search__input{
-    border-radius: 7px ;
-    width: 400px;
-    height: 35px ;
+button:hover{
+
+    transform:translateY(-2px);
+
 }
-.btn__delete{
-    margin: 10px 10px;
-    background-color: #ff0000d9;
-    border-radius: 10px ;
-    width: 35px;
-    height:35px;
+
+mat-icon{
+
+    user-select:none;
+
+}
+
+/*================================================*/
+
+.ventas-container{
+
+    width:100%;
+
+    height:100vh;
+
+    display:grid;
+
+    gap:14px;
+
+    padding:14px;
+
+    overflow:hidden;
+
+    grid-template-columns:
+
+        minmax(0,1fr)
+
+        340px;
+
+    grid-template-rows:
+
+        70px
+
+        72px
+
+        minmax(0,1fr);
+
+    grid-template-areas:
+
+        "header header"
+
+        "buscador buscador"
+
+        "tabla lateral";
+
+}
+
+/*================================================*/
+
+.header-ventas{
+
+    grid-area:header;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding: 10px 10px ;
+
+    border-radius:var(--radius);
+
     color:white;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            #1976d2,
+            #0d47a1
+        );
+
+    box-shadow:var(--shadow);
+
 }
-.btn__update{
-    margin: 10px 10px;
-    background-color: #532e92e4;
-    border-radius: 10px ;
-    width: 35px;
-    height:35px;
+
+.header-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.header-info h1{
+
+    font-size:26px;
+
+    font-weight:700;
+
+}
+
+.fecha{
+
+    margin-top:3px;
+
+    color:#d8ebff;
+
+    font-size:13px;
+
+}
+
+.estado-caja{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:
+
+        10px
+        18px;
+
+    border-radius:30px;
+
+    background:
+
+        rgba(255,255,255,.15);
+
+    font-weight:700;
+
+}
+
+.estado-caja mat-icon{
+
+    color:#69f0ae;
+
+}
+
+/*================================================*/
+
+.buscador-card{
+
+    grid-area:buscador;
+
+    display:flex;
+
+    align-items:center;
+
+    padding:10px 16px;
+
+    background:white;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+}
+
+.buscador{
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+
+        52px
+
+        1fr
+
+        135px;
+
+    gap:14px;
+
+    align-items:center;
+
+}
+
+.icon-search{
+
+    width:52px;
+
+    height:52px;
+
+    border-radius:12px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:#edf6ff;
+
+}
+
+.search-input{
+
+    width:100%;
+
+    height:50px;
+
+    padding:0 18px;
+
+    border-radius:12px;
+
+    border:2px solid var(--border);
+
+    outline:none;
+
+    font-size:15px;
+
+    transition:.20s;
+
+}
+
+.search-input:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:
+
+        0 0 0 4px rgba(25,118,210,.12);
+
+}
+
+.search-input::placeholder{
+
+    color:#90a4ae;
+
+}
+
+/*================================================*/
+
+.tabla-card{
+
+    grid-area:tabla;
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
+
+    background:white;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+}
+
+.tabla-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px 22px;
+
+    border-bottom:1px solid var(--border);
+
+    background:#fafbfd;
+
+}
+
+.tabla-header h2{
+
+    font-size:20px;
+
+    color:var(--text);
+
+}
+
+.tabla-header small{
+
+    color:var(--text-light);
+
+}
+
+/*================================================*/
+
+.tabla-wrapper{
+
+    flex:1;
+
+    overflow:auto;
+
+}
+
+/*================================================*/
+
+.tabla-wrapper::-webkit-scrollbar{
+
+    width:9px;
+
+    height:9px;
+
+}
+
+.tabla-wrapper::-webkit-scrollbar-thumb{
+
+    background:#b7c5d2;
+
+    border-radius:20px;
+
+}
+
+.tabla-wrapper::-webkit-scrollbar-track{
+
+    background:#edf2f6;
+
+}
+
+/*================================================*/
+
+.tabla-ventas{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    min-width:1050px;
+
+}
+
+.tabla-ventas thead{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:5;
+
+    background:#f4f8fc;
+
+}
+
+.tabla-ventas th{
+
+    padding:15px 10px;
+
+    font-size:13px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
+
+    color:#607d8b;
+
+    border-bottom:1px solid var(--border);
+
+}
+
+.sale-row{
+
+    height:62px;
+
+    transition:.15s;
+
+}
+
+.sale-row:nth-child(even){
+
+    background:#fafcfe;
+
+}
+
+.sale-row:hover{
+
+    background:#edf6ff;
+
+}
+
+.tabla-ventas td{
+
+    padding:10px;
+
+    text-align:center;
+
+    border-bottom:1px solid #edf2f6;
+
+    color:var(--text);
+
+}
+
+.nombre{
+
+    text-align:left !important;
+
+    min-width:260px;
+
+}
+
+.product-name{
+
+    font-weight:700;
+
+    line-height:1.35;
+
+}
+
+.price{
+
+    font-weight:600;
+
+}
+
+.line-total{
+
+    color:#1976d2;
+
+    font-size:17px;
+
+    font-weight:800;
+
+}
+
+.cantidad-control{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+.cantidad-control span{
+
+    width:42px;
+
+    text-align:center;
+
+    font-size:16px;
+
+    font-weight:700;
+
+}
+
+.cantidad-control .mat-mdc-mini-fab{
+
+    width:38px !important;
+
+    height:38px !important;
+
+    min-width:38px !important;
+
+    box-shadow:none !important;
+
+}
+/*=========================================================
+STOCK
+=========================================================*/
+
+.stock-ok,
+.stock-warning,
+.stock-danger{
+
+    display:inline-flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    min-width:68px;
+
+    height:30px;
+
+    padding:0 12px;
+
+    border-radius:20px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+}
+
+.stock-ok{
+
+    background:#e8f5e9;
+
+    color:#2e7d32;
+
+}
+
+.stock-warning{
+
+    background:#fff3e0;
+
+    color:#ef6c00;
+
+}
+
+.stock-danger{
+
+    background:#ffebee;
+
+    color:#c62828;
+
+}
+
+/*=========================================================
+BOTÓN ELIMINAR
+=========================================================*/
+
+.tabla-ventas .mat-mdc-mini-fab{
+
+    width:38px !important;
+
+    height:38px !important;
+
+    min-width:38px !important;
+
+    box-shadow:none !important;
+
+}
+
+/*=========================================================
+PANEL LATERAL
+=========================================================*/
+
+.panel-inferior{
+
+    grid-area:lateral;
+
+    display:grid;
+
+    grid-template-rows:
+
+        190px
+
+        minmax(0,1fr);
+
+    gap:14px;
+
+    min-height:0;
+
+}
+
+/*=========================================================
+CARDS
+=========================================================*/
+
+.cliente-card,
+.resumen-card{
+
+    background:white;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+    overflow:hidden;
+
+}
+
+/*=========================================================
+CLIENTE
+=========================================================*/
+
+.cliente-card{
+
+    display:flex;
+
+    flex-direction:column;
+
+    padding:18px;
+
+}
+
+.panel-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:16px;
+
+}
+
+.panel-header h2{
+
+    font-size:19px;
+
+    font-weight:700;
+
+}
+
+.cliente-info{
+
+    flex:1;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+}
+
+.cliente-avatar{
+
+    width:62px;
+
+    height:62px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-dark)
+        );
+
     color:white;
+
+    font-size:24px;
+
+    font-weight:700;
+
+    box-shadow:
+
+        0 6px 18px rgba(25,118,210,.25);
+
 }
 
-table {
+.cliente-datos{
 
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 12px;
+    flex:1;
+
+    overflow:hidden;
+
 }
 
-th,td {
+.cliente-datos h3{
 
-  padding: 8px;
-  text-align: center;
+    font-size:17px;
+
+    margin-bottom:5px;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
 }
 
-td {
-    height: auto;
-}
-th {
-    border: 4px;
-  background-color: #532e92e4;
-  color: #fff;
-}
+.cliente-datos p{
 
-tr:hover {
-  background-color: #f5f5f5;
+    color:var(--text-light);
+
+    font-size:13px;
+
+    margin-top:3px;
+
 }
 
-tr:nth-child(even) {
-  background-color: #f9f9f9;
+.cliente-vacio{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:8px;
+
+    color:#90a4ae;
+
 }
 
-button {
-  background-color: #532e92e4  ; /* Cambia el color del botón */
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+.cliente-vacio mat-icon{
+
+    font-size:48px;
+
+    width:48px;
+
+    height:48px;
+
 }
 
-button:hover {
-  background-color: #532e92e4; /* Color al pasar el ratón */
+/*=========================================================
+RESUMEN
+=========================================================*/
+
+.resumen-card{
+
+    display:flex;
+
+    flex-direction:column;
+
+    padding:22px;
+
 }
 
-.error-message {
-  color: red;
-  margin-top: 10px;
+.resumen-header{
+
+    margin-bottom:18px;
+
 }
 
-.btn__delete {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
-    background-color: #ff0000d9;
-    border-radius: 10px;
-    width: 35px;
-    height: 35px;
-    color: white;
-    padding: 0; /* Asegúrate de que no haya padding */
+.resumen-header h2{
+
+    font-size:22px;
+
+    font-weight:700;
+
+    color:var(--text);
+
 }
 
-.icon-display {
-    margin: 0; /* Asegúrate de que no haya margen */
-    transform: scale(1);
-}
-body, html {
-    height: 100%; /* Asegúrate de que el body y html ocupen toda la altura */
-    margin: 0;    /* Elimina el margen por defecto */
-}
+.resumen-item{
 
-.main-container {
-    display: flex;                /* Habilita flexbox */
-    flex-direction: column;       /* Organiza los hijos en columna */
-    height: 100%;                 /* Ocupa toda la altura de la ventana */
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:10px 0;
+
 }
 
-.Container-table {
-    flex-grow: 1;                 /* Permite que la tabla crezca y ocupe el espacio disponible */
-    overflow: auto;               /* Permite el desplazamiento si el contenido es muy grande */
+.resumen-item span{
+
+    color:var(--text-light);
+
+    font-size:14px;
+
 }
 
-.saleDown {  
-  height: 100px;  /* Color de fondo opcional */
-    padding: 5px;                /* Espaciado opcional */
-    text-align: center;
-       margin: 5px  ;         /* Centra el contenido dentro de saleDown */
+.resumen-item strong{
+
+    font-size:18px;
+
+    color:var(--text);
+
 }
 
+.resumen-card hr{
 
+    margin:18px 0;
 
+    border:none;
 
-/* ================================================================= total de ventas */
-.container{
-height: 100%; 
-    display: flex;
-   justify-content: space-between;  
+    border-top:1px solid var(--border);
+
 }
 
+.total-final{
 
+    display:flex;
 
+    flex-direction:column;
 
+    align-items:center;
 
-body, html {
-    height: 100%;                 /* Asegúrate de que el body y html ocupen toda la altura */
-    margin: 0;                    /* Elimina el margen por defecto */
+    justify-content:center;
+
+    gap:10px;
+
+    margin-bottom:24px;
+
 }
 
-.container__totalSale {
-    width: 23%; /* Alinea el contenido al final del contenedor */       /* Asegúrate de que el contenedor ocupe toda la altura disponible */
-    background-color:#532e92e4;    /* Color de fondo opcional */
-    border-radius: 5px;           /* Bordes redondeados opcional */
-    padding: 10px;   
-    color: white;             /* Espaciado opcional */
-    text-align: left;
+.total-final span{
+
+    font-size:16px;
+
+    font-weight:700;
+
+    color:#607d8b;
+
+    letter-spacing:1px;
+
 }
 
+.total-final h1{
 
+    font-size:42px;
 
-.container__totalSale h2 {
-    margin: 0; /* Elimina margen superior */
-}
-.container__totalSale h3 {
-       margin: 0; /* Elimina margen superior */
-}
+    font-weight:800;
 
-.totalSale__button{
-      /* Espaciado inferior para el botón */
-    background-color: #fff; /* Color de fondo del botón */
-    color: #532e92; /* Color del texto del botón */
-    border: none; /* Sin borde */
-    border-radius: 5px; /* Bordes redondeados */
-    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
-    transition: background-color 0.3s; /* Efecto de transición */
-    height: 100%; /* Altura automática para mantener el tamaño del botón */
-    width: 100%; /* Asegura que el botón ocupe todo el ancho del contenedor */
-    font-size: 16px; /* Ajusta el tamaño de la fuente según sea necesario */
-}
-/* ================================================================= */
-.container__client {
-    width: 75%; /* Ancho del contenedor */
-    max-width: 700px; /* Establece un ancho máximo */
-    background-color: #532e92e4; /* Color de fondo */
-    border-radius: 5px; /* Bordes redondeados */
-    padding: 0; /* Elimina el espaciado interno del contenedor */
-    color: white; /* Color del texto */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra opcional para profundidad */
-    display: flex; /* Usa flexbox para alinear elementos */
-    flex-direction: column; /* Coloca los elementos en columna */
-    height: 100%; /* Ajusta la altura del contenedor si es necesario */
+    color:var(--primary);
+
+    line-height:1;
+
 }
 
-.container__client h3 {
-    margin-top: 0; 
-    margin: 1px 0; 
-    /* Elimina margen superior para que esté pegado al contenedor */
+/*=========================================================
+BOTÓN COBRAR
+=========================================================*/
+
+.btn-cobrar{
+
+    margin-top:auto;
+
+    width:100%;
+
+    height:58px;
+
+    border-radius:14px !important;
+
+    font-size:18px !important;
+
+    font-weight:700 !important;
+
+    letter-spacing:.6px;
+
+    box-shadow:
+
+        0 8px 18px rgba(25,118,210,.25);
+
 }
 
-.container__client p {
-    margin: 1px 0; /* Espaciado entre párrafos */
+.btn-cobrar:hover{
+
+    transform:translateY(-2px);
+
 }
 
-/* Botón dentro del contenedor */
-.container__client button {
-   /* Espaciado inferior para el botón */
-    background-color: #fff; /* Color de fondo del botón */
-    color: #532e92; /* Color del texto del botón */
-    border: none; /* Sin borde */
-    border-radius: 5px; /* Bordes redondeados */
-  
-    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
-    transition: background-color 0.3s; /* Efecto de transición */
-    height: 100%; /* Altura automática para mantener el tamaño del botón */
-    width: 100%; /* Asegura que el botón ocupe todo el ancho del contenedor */
-    font-size: 16px; /* Ajusta el tamaño de la fuente según sea necesario */
+/*=========================================================
+ESTADO VACÍO
+=========================================================*/
+
+.empty-sale{
+
+    height:100%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    padding:40px;
+
+    color:#78909c;
+
 }
 
+.empty-sale mat-icon{
 
-.container__client button:hover {
-    background-color: #f0f0f0; /* Cambio de color al pasar el mouse */
+    width:90px;
+
+    height:90px;
+
+    font-size:90px;
+
+    color:#1976d2;
+
+    opacity:.25;
+
+    margin-bottom:20px;
+
 }
-.container__client button mat-icon {
-    font-size: 24px; /* Ajusta el tamaño del ícono aquí */
-    vertical-align: middle; /* Alinea verticalmente el ícono con el texto si es necesario */
-    margin-right: 8px; /* Espacio entre el ícono y el texto */
+
+.empty-sale h2{
+
+    font-size:30px;
+
+    margin-bottom:12px;
+
+    color:#37474f;
+
 }
 
- @media print {
-  @page {
-    size: 58mm auto; /* Ancho fijo del papel, alto dinámico */
-    margin: 0;       /* Sin márgenes */
-  }
+.empty-sale p{
 
-  body {
-    font-family: monospace;
-    font-size: 10px;
-    margin: 0;
-    padding: 0;
-    width: 58mm; /* Igual al tamaño del papel */
-  }
+    max-width:420px;
 
-  h2 {
-    font-size: 14px;
-    text-align: center;
-    margin: 0;
-  }
+    line-height:1.6;
 
-  p, .row {
-    margin: 2px 0;
-    text-align: left;
-  }
+    font-size:15px;
 
-  hr {
-    border: none;
-    border-top: 1px dashed #000;
-    margin: 4px 0;
-  }
-
-  .total {
-    font-weight: bold;
-    font-size: 12px;
-    text-align: right;
-  }
-
-  /* Evita saltos de página forzados */
-  * {
-    page-break-inside: avoid;
-  }
 }
+
+.shortcuts{
+
+    display:flex;
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+    gap:14px;
+
+    margin-top:35px;
+
+}
+
+.shortcuts div{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:12px 18px;
+
+    border-radius:12px;
+
+    background:#f5f9fc;
+
+    border:1px solid #dce5ee;
+
+}
+
+.shortcuts kbd{
+
+    background:#263238;
+
+    color:white;
+
+    padding:6px 10px;
+
+    border-radius:6px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+}
+
+/*=========================================================
+RESPONSIVE
+=========================================================*/
+
+@media(max-width:1100px){
+
+    :host{
+
+        overflow:auto;
+
+    }
+
+    .ventas-container{
+
+        display:flex;
+
+        flex-direction:column;
+
+        height:auto;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .header-ventas{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:12px;
+
+        padding:18px;
+
+        height:auto;
+
+    }
+
+    .estado-caja{
+
+        width:100%;
+
+        justify-content:center;
+
+    }
+
+    .buscador{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .icon-search{
+
+        display:none;
+
+    }
+
+    .panel-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:10px;
+
+    }
+
+    .cliente-info{
+
+        flex-direction:column;
+
+        text-align:center;
+
+    }
+
+}
+
+/*=========================================================
+ANIMACIONES
+=========================================================*/
+
+@keyframes fadeInUp{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(14px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+.header-ventas{
+
+    animation:fadeInUp .25s ease;
+
+}
+
+.buscador-card{
+
+    animation:fadeInUp .35s ease;
+
+}
+
+.tabla-card{
+
+    animation:fadeInUp .45s ease;
+
+}
+
+.panel-inferior{
+
+    animation:fadeInUp .55s ease;
+
+}
+
+/*=========================================================
+PRINT
+=========================================================*/
+
+@media print{
+
+    .header-ventas,
+    .buscador-card,
+    .btn-cobrar,
+    button{
+
+        display:none !important;
+
+    }
+
+    .ventas-container{
+
+        display:block;
+
+        padding:0;
+
+        background:white;
+
+    }
+
+    .tabla-card,
+    .cliente-card,
+    .resumen-card{
+
+        box-shadow:none;
+
+        border:1px solid #ddd;
+
+        margin-bottom:12px;
+
+    }
+
+}
+
+/*=========================================================
+FIN DEL ARCHIVO
+=========================================================*/

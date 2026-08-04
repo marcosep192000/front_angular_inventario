@@ -1,92 +1,539 @@
-<div class="main-container">
-    <form>
-        <div class="container__serch">
-        <app-icon [iconSrc]="'assets/icons/barcode_reader_.png'"  [size]="'40px'"></app-icon> 
-         <input class="search__input" 
-       placeholder="Ingresa el nombre o código de producto" 
-       type="text"
-       [(ngModel)]="code" 
-       name="code"
-       (keyup.enter)="onSubmit()">
-            <div class="actions__btn">
-                <button type="submit" class="btn__new">
-                    <mat-icon color="white">
-                        <app-icon [iconSrc]="'assets/icons/task.png'"  [size]="'20px'"></app-icon>
-                    </mat-icon>
-                   
-                </button>
-            </div>
+<div class="ventas-container">
+
+  <!-- =======================================================
+         HEADER
+    ======================================================== -->
+
+  <div class="header-ventas">
+
+    <div class="header-info">
+
+      <h1>
+
+        🛒 Nueva Venta
+
+      </h1>
+
+      <span class="fecha">
+
+        {{ today | date:'EEEE dd/MM/yyyy HH:mm' }}
+
+      </span>
+
+    </div>
+
+    <div class="estado-caja">
+
+      <mat-icon>
+
+        point_of_sale
+
+      </mat-icon>
+
+      Caja Abierta
+
+    </div>
+
+  </div>
+
+  <!-- =======================================================
+         BUSCADOR
+    ======================================================== -->
+
+  <div class="buscador-card">
+
+    <div class="buscador">
+
+      <div class="icon-search">
+
+        <app-icon [iconSrc]="'assets/icons/barcode_reader_.png'" [size]="'32px'">
+
+        </app-icon>
+
+      </div>
+
+      <input class="search-input" placeholder="Buscar por nombre, código o código de barras..." type="text"
+        [(ngModel)]="code" name="code" (keyup.enter)="onSubmit()">
+
+      <button mat-raised-button color="primary" (click)="onSubmit()">
+
+        <mat-icon>
+
+          search
+
+        </mat-icon>
+
+        Buscar
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- =======================================================
+         CONTENIDO
+    ======================================================== -->
+
+  <div class="tabla-card">
+
+    <div class="tabla-header">
+
+      <div>
+
+        <h2>
+
+          Productos de la Venta
+
+        </h2>
+
+        <small>
+
+          {{ products.length }} producto(s)
+
+        </small>
+
+      </div>
+
+    </div>
+
+    <div class="tabla-wrapper">
+
+      <!-- =======================================================
+                 ESTADO VACÍO
+            ======================================================== -->
+
+      <div class="empty-sale" *ngIf="products.length===0">
+
+        <mat-icon>
+
+          point_of_sale
+
+        </mat-icon>
+
+        <h2>
+
+          Nueva venta lista
+
+        </h2>
+
+        <p>
+
+          Escaneá un código de barras o escribí el nombre del producto
+          para comenzar la venta.
+
+        </p>
+
+        <div class="shortcuts">
+
+          <div>
+
+            <kbd>ENTER</kbd>
+
+            Buscar producto
+
+          </div>
+
+          <div>
+
+            <kbd>F2</kbd>
+
+            Buscar cliente
+
+          </div>
+
+          <div>
+
+            <kbd>F4</kbd>
+
+            Cobrar venta
+
+          </div>
 
         </div>
-    </form>
 
-    <div *ngIf="product">
-        <h3>Producto Encontrado:</h3>
-        <p>{{ product | json }}</p>
+      </div>
+
+      <!-- =======================================================
+                 TABLA
+            ======================================================== -->
+
+      <table class="tabla-ventas" *ngIf="products.length>0">
+
+        <thead>
+
+          <tr>
+
+            <th width="120">
+
+              Código
+
+            </th>
+
+            <th>
+
+              Producto
+
+            </th>
+
+            <th width="120">
+
+              Precio
+
+            </th>
+
+            <th width="170">
+
+              Cantidad
+
+            </th>
+
+            <th width="90">
+
+              Stock
+
+            </th>
+
+            <th width="80">
+
+              IVA
+
+            </th>
+
+            <th width="150">
+
+              Total
+
+            </th>
+
+            <th width="90">
+
+              Acción
+
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <tr class="sale-row" *ngFor="let product of products">
+
+            <td>
+
+              {{ product.barCode }}
+
+            </td>
+
+            <td class="nombre">
+
+              <div class="product-name">
+
+                {{ product.name }}
+
+              </div>
+
+            </td>
+
+            <td>
+
+              <span class="price">
+
+                {{ product.salePrice | currency }}
+
+              </span>
+
+            </td>
+
+            <td>
+
+              <div class="cantidad-control">
+<button
+    mat-mini-fab
+    color="primary"
+    (click)="decreaseQuantity(product)">
+
+    <mat-icon>
+
+        remove
+
+    </mat-icon>
+
+</button>
+
+                <span>
+
+                  {{ product.quantity }}
+
+                </span>
+
+              <button
+    mat-mini-fab
+    color="primary"
+    (click)="increaseQuantity(product)">
+
+    <mat-icon>
+
+        add
+
+    </mat-icon>
+
+</button>
+
+              </div>
+
+            </td>
+            <td>
+
+              <span [ngClass]="{
+
+                                    'stock-ok': product.stock-product.quantity > 10,
+
+                                    'stock-warning': product.stock-product.quantity <= 10 && product.stock-product.quantity > 3,
+
+                                    'stock-danger': product.stock-product.quantity <= 3
+
+                                }">
+
+                {{ product.stock-product.quantity }}
+
+              </span>
+
+            </td>
+
+            <td>
+
+              {{ product.iva }} %
+
+            </td>
+
+            <td class="precio-total">
+
+              <span class="line-total">
+
+                {{ product.salePrice * product.quantity | currency }}
+
+              </span>
+
+            </td>
+
+            <td>
+
+              <button mat-mini-fab color="warn" (click)="deleteProduct(product.id)">
+
+                <mat-icon>
+
+                  delete
+
+                </mat-icon>
+
+              </button>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
     </div>
-    <div *ngIf="errorMessage" class="error-message">
-        <p>{{ errorMessage }}</p>
+
+  </div>
+
+  <!-- =======================================================
+         PANEL LATERAL
+    ======================================================== -->
+
+  <div class="panel-inferior">
+
+    <!-- =======================================================
+             CLIENTE
+        ======================================================== -->
+
+    <div class="cliente-card">
+
+      <div class="panel-header">
+
+        <h2>
+
+          👤 Cliente
+
+        </h2>
+
+        <button mat-stroked-button color="primary" (click)="getClient()">
+
+          <mat-icon>
+
+            person_search
+
+          </mat-icon>
+
+          Buscar Cliente
+
+        </button>
+
+      </div>
+
+      <div class="cliente-info" *ngIf="selectedClient; else consumidorFinal">
+
+        <div class="cliente-avatar">
+
+          {{ selectedClient.name.charAt(0) }}
+
+        </div>
+
+        <div class="cliente-datos">
+
+          <h3>
+
+            {{ selectedClient.name }}
+
+            {{ selectedClient.lastName }}
+
+          </h3>
+
+          <p>
+
+            📞 {{ selectedClient.tel }}
+
+          </p>
+
+          <p>
+
+            Cliente registrado
+
+          </p>
+
+        </div>
+
+      </div>
+
+      <ng-template #consumidorFinal>
+
+        <div class="cliente-vacio">
+
+          <mat-icon>
+
+            person_outline
+
+          </mat-icon>
+
+          <h3>
+
+            Consumidor Final
+
+          </h3>
+
+          <p>
+
+            No hay cliente seleccionado.
+
+          </p>
+
+        </div>
+
+      </ng-template>
+
     </div>
 
-    <div class="Container-table">
-        <table>
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Nombre</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
-                    <th>Stock</th>
-                    <th>IVA</th>
-                    <th>Precio Total</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let product of products">
-                    <td>{{ product.barCode }}</td>
-                    <td>{{ product.name }}</td>
-                    <td>{{ product.salePrice | currency }}</td>
-                    <td>{{ product.quantity }}</td>
-                    <td>{{ product.stock - product.quantity }}</td>
-                    <td>{{ product.iva }}%</td>
-                    <td>{{ product.salePrice * product.quantity | currency }}</td>
-                    <td>
-                        <button mat-fab class="btn__delete" (click)="deleteProduct(product.id)"
-                            aria-label="Eliminar producto">
-                            <app-icon [iconSrc]="'assets/icons/delete.png'" [size]="'20px'"></app-icon>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- =======================================================
+             RESUMEN
+        ======================================================== -->
+
+    <div class="resumen-card">
+
+      <div class="resumen-header">
+
+        <h2>
+
+          🧾 Resumen de la Venta
+
+        </h2>
+
+      </div>
+
+      <div class="resumen-item">
+
+        <span>
+
+          Productos
+
+        </span>
+
+        <strong>
+
+          {{ getTotalQuantity() }}
+
+        </strong>
+
+      </div>
+
+      <div class="resumen-item">
+
+        <span>
+
+          Subtotal
+
+        </span>
+
+        <strong>
+
+          {{ getTotalPrice() | currency }}
+
+        </strong>
+
+      </div>
+
+      <div class="resumen-item">
+
+        <span>
+
+          IVA
+
+        </span>
+
+        <strong>
+
+          Incluido
+
+        </strong>
+
+      </div>
+
+      <hr>
+
+      <div class="total-final">
+
+        <span>
+
+          TOTAL
+
+        </span>
+
+        <h1>
+
+          {{ getTotalPrice() | currency }}
+
+        </h1>
+
+      </div>
+
+      <button mat-raised-button color="primary" class="btn-cobrar" (click)="newSale()">
+
+        <mat-icon>
+
+          payments
+
+        </mat-icon>
+
+        COBRAR VENTA
+
+      </button>
+
     </div>
 
-    <div class="saleDown">
+  </div>
 
- 
-<div class="container">
-    <div class="container__client">
-       <div class="client__buton">
-        <button (click)="getClient()"   > Buscar Cliente    <app-icon [iconSrc]="'assets/icons/cliente.png'" [iconAlt]="'salir'" [size]="'30px'"></app-icon></button>
-     </div>
-
-     <div class="client__data">
-        <div *ngIf="selectedClient">     
-            <p>Nombre: {{ selectedClient.name }},{{ selectedClient.lastName }}</p>
-            <p>Tel: {{ selectedClient.tel}}</p>
-        </div> 
-     </div>
-    </div>
-
-    <button class="container__totalSale"  (click)="newSale()">
-      
-   <h3><p> Productos: {{ getTotalQuantity() }}</p></h3>  
-   <h2><p><strong>Total: $ {{ getTotalPrice() | number: '1.2-2'}}</strong></p></h2>
-
-    </button>
 </div>
-    </div>
-</div>
-
-

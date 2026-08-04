@@ -12,7 +12,7 @@ import {
 import { NgChartsModule } from 'ng2-charts';
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
- 
+
 
 Chart.register(...registerables);
 
@@ -24,10 +24,28 @@ Chart.register(...registerables);
   styleUrl: './inicio-grafico-ventas.component.css',
 })
 export class InicioGraficoVentasComponent {
-  public barChartOptions: ChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-  };
+  public barChartOptions: ChartOptions<'bar'> = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'top'
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      grid: {
+        color: '#ececec'
+      }
+    },
+    x: {
+      grid: {
+        display: false
+      }
+    }
+  }
+};
 
   public barChartLabels: string[] = [];
   public barChartType: ChartType = 'bar';
@@ -79,4 +97,7 @@ export class InicioGraficoVentasComponent {
       console.log('Datos del gráfico:', this.barChartData.datasets);
     });
   }
+
+
+
 }

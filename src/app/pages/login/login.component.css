@@ -1,31 +1,983 @@
-.body{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-background: rgb(116,2,182);
-background: radial-gradient(circle farthest-corner at center center, rgb(116,2,182) 40%, #523eb2 80%);
-background: -webkit-radial-gradient(circle farthest-corner at center center, rgb(116,2,182) 40%, #523eb2 80%);
-background: -moz-radial-gradient(circle farthest-corner at center center, rgb(116,2,182) 40%, #523eb2 80%);
+/*==========================================================
+        INVENTARIO PIXELS LOGIN V5
+==========================================================*/
+
+/*==========================
+        VARIABLES
+==========================*/
+
+:root{
+
+    --primary:#522E92;
+
+    --primary-light:#673AB7;
+
+    --primary-dark:#45257A;
+
+    --secondary:#FFD54F;
+
+    --white:#FFFFFF;
+
+    --background:#F5F7FB;
+
+    --text:#2F3542;
+
+    --text-light:#707A8A;
+
+    --border:#E5E7EB;
+
 }
-.card
-{
-  display: flex;
-  flex-direction: row;
-  align-items:center;
-  justify-content:center;
-  width: 400px;
-  padding: 20px;
-box-shadow: 21px 20px 24px 0px rgba(0,0,0,0.39);
--webkit-box-shadow: 21px 20px 24px 0px rgba(0,0,0,0.39);
--moz-box-shadow: 21px 20px 24px 0px rgba(0,0,0,0.39);
+
+/*==========================
+        RESET
+==========================*/
+
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
 }
-.ancho{
-  width: 100%;
+
+html,
+body{
+
+    width:100%;
+
+    height:100%;
+
+    font-family:Roboto,"Helvetica Neue",sans-serif;
+
+    background:var(--background);
+
 }
-.btn{
-  height: 50px;
+
+/*==========================
+        CONTENEDOR
+==========================*/
+
+.login-page{
+
+    display:grid;
+
+    grid-template-columns:55% 45%;
+
+    width:100%;
+
+    min-height:100vh;
+
+    overflow:hidden;
+
 }
-.spinner{
-margin: 0 auto;
+
+/*==========================================================
+        PANEL IZQUIERDO
+==========================================================*/
+
+.branding{
+
+    position:relative;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:45px;
+
+    overflow:hidden;
+
+    background:
+
+    linear-gradient(
+
+        135deg,
+
+        var(--primary),
+
+        var(--primary-light)
+
+    );background:linear-gradient(
+135deg,
+#4E2A84 0%,
+#6036A5 45%,
+#7B52D1 100%
+);
+
+}
+
+/*==========================
+        EFECTOS
+==========================*/
+
+.background-effects{
+
+    position:absolute;
+
+    inset:0;
+
+    overflow:hidden;
+
+}
+
+.background-effects::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:700px;
+
+    height:700px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.05);
+
+    top:-260px;
+
+    right:-220px;
+
+}
+
+.background-effects::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:420px;
+
+    height:420px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.05);
+
+    bottom:-150px;
+
+    left:-120px;
+
+}
+
+/*==========================================================
+        CONTENIDO
+==========================================================*/
+
+.branding-content{
+
+    position:relative;
+
+    z-index:5;
+
+    width:100%;
+
+    max-width:720px;
+
+    color:white;
+
+}
+
+/*==========================
+        HEADER
+==========================*/
+
+.brand-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    margin-bottom:22px;
+
+}
+
+.brand-logo{
+
+    width:72px;
+
+    height:72px;
+
+    object-fit:contain;
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:8px;
+
+    box-shadow:
+
+        0 10px 25px rgba(0,0,0,.20);
+
+}
+
+.enterprise{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:8px 16px;
+
+    border-radius:30px;
+
+    background:rgba(255,255,255,.12);
+
+    border:1px solid rgba(255,255,255,.18);
+
+    color:white;
+
+    font-size:11px;
+
+    letter-spacing:2px;
+
+    font-weight:700;
+
+}
+
+/*==========================================================
+        TITULO
+==========================================================*/
+
+.branding h1{
+
+    font-size:56px;
+
+    line-height:1;
+
+    font-weight:800;
+
+    margin-bottom:8px;
+
+}
+
+.branding h1 span{
+
+    display:block;
+
+    margin-top:8px;
+
+    color:var(--secondary);
+
+    font-size:26px;
+
+    letter-spacing:7px;
+
+}
+
+/*==========================================================
+        DESCRIPCION
+==========================================================*/
+
+.brand-description{
+
+    max-width:520px;
+
+    margin-top:18px;
+
+    margin-bottom:28px;
+
+    font-size:17px;
+
+    line-height:1.6;
+
+    color:rgba(255,255,255,.92);
+
+}
+/*==========================================================
+        MODULOS
+==========================================================*/
+
+.modules-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:16px;
+
+    margin-bottom:28px;
+
+}
+
+.module-card{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+    padding:16px 18px;
+
+    min-height:78px;
+
+    border-radius:18px;
+
+    background:rgba(255,255,255,.14);
+
+    border:1px solid rgba(255,255,255,20);
+
+    backdrop-filter:blur(15px);
+
+    transition:.30s;
+
+    cursor:pointer;
+
+}
+
+.module-card:hover{
+
+    transform:translateY(-5px);
+
+    background:rgba(255,255,255,.18);
+
+    box-shadow:
+
+        0 18px 30px rgba(0,0,0,.15);
+
+}
+
+.module-card mat-icon{
+
+    width:50px;
+
+    height:50px;
+
+    min-width:50px;
+
+    border-radius:14px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:rgba(255,255,255,.15);
+
+    color:#FFD54F;
+
+    font-size:26px;
+
+}
+
+.module-card strong{
+
+    display:block;
+
+    color:white;
+
+    font-size:16px;
+
+    margin-bottom:4px;
+
+}
+
+.module-card span{
+
+    color:rgba(255,255,255,.88);
+
+    font-size:13px;
+
+    line-height:1.4;
+
+}
+
+/*==========================================================
+        DEVELOPER CARD
+==========================================================*/
+
+.developer-card{
+
+    display:grid;
+
+    grid-template-columns:80px 1fr;
+
+    gap:20px;
+
+    align-items:center;
+
+    margin-top:10px;
+
+    padding:18px 20px;
+
+    border-radius:22px;
+
+    background:rgba(255,255,255,.15);
+
+    border:1px solid rgba(255,255,255,.15);
+
+    backdrop-filter:blur(18px);
+
+    box-shadow:
+
+        0 15px 30px rgba(0,0,0,.18);
+
+}
+
+.developer-left{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.developer-logo{
+
+    width:70px;
+
+    height:70px;
+
+    object-fit:contain;
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:8px;
+
+}
+
+.developer-right{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.developer-label{
+
+    color:#FFD54F;
+
+    font-size:11px;
+
+    letter-spacing:2px;
+
+    font-weight:700;
+
+    margin-bottom:6px;
+
+}
+
+.developer-right h2{
+
+    color:white;
+
+    font-size:25px;
+
+    margin-bottom:3px;
+
+}
+
+.developer-right p{
+
+    color:rgba(255,255,255,.90);
+
+    margin-bottom:12px;
+
+}
+
+/*==========================================================
+        TECNOLOGIAS
+==========================================================*/
+
+.tech-stack{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:8px;
+
+    margin-bottom:14px;
+
+}
+
+.tech-stack span{
+
+    padding:7px 12px;
+
+    border-radius:30px;
+
+    background:rgba(255,255,255,.12);
+
+    color:white;
+
+    font-size:12px;
+
+}
+
+/*==========================================================
+        PORTFOLIO
+==========================================================*/
+
+.portfolio{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    width:fit-content;
+
+    text-decoration:none;
+
+    color:white;
+
+    padding:10px 16px;
+
+    border-radius:12px;
+
+    background:rgba(255,255,255,.10);
+
+    transition:.30s;
+
+}
+
+.portfolio:hover{
+
+    background:rgba(255,255,255,.18);
+
+    transform:translateY(-2px);
+
+}
+
+.portfolio mat-icon{
+
+    color:#FFD54F;
+
+}
+/*==========================================================
+        PANEL DERECHO
+==========================================================*/
+
+.login-panel{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:40px;
+
+    background:#F4F6FB;
+
+}
+
+.login-card{
+
+    width:100%;
+
+    max-width:460px;
+
+    border-radius:24px !important;
+
+    border:none;
+
+    padding:38px;
+
+    background:white;
+
+    box-shadow:
+
+        0 25px 60px rgba(0,0,0,.12);
+
+    transition:.30s;
+
+}
+
+.login-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+
+        0 35px 70px rgba(82,46,146,.18);
+
+}
+
+/*==========================================================
+        HEADER LOGIN
+==========================================================*/
+
+.login-header{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+}
+
+.login-logo{
+
+    width:90px;
+
+    height:90px;
+
+    object-fit:contain;
+
+    margin-bottom:16px;
+
+}
+
+.login-header h2{
+
+    color:var(--primary);
+
+    font-size:34px;
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+}
+
+.login-header p{
+
+    color:var(--text-light);
+
+    font-size:15px;
+
+}
+
+/*==========================================================
+        INPUTS
+==========================================================*/
+
+.full-width{
+
+    width:100%;
+
+    margin-bottom:18px;
+
+}
+
+.mat-mdc-form-field{
+
+    width:100%;
+
+}
+
+.mat-mdc-text-field-wrapper{
+
+    border-radius:14px !important;
+
+    background:#FAFAFA;
+
+}
+
+.mat-mdc-form-field.mat-focused .mdc-notched-outline{
+
+    border-color:var(--primary)!important;
+
+    border-width:2px!important;
+
+}
+
+.mat-mdc-form-field mat-icon{
+
+    color:var(--primary);
+
+}
+
+/*==========================================================
+        OPCIONES
+==========================================================*/
+
+.login-options{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:24px;
+
+}
+
+.login-options a{
+
+    color:var(--primary);
+
+    text-decoration:none;
+
+    font-size:14px;
+
+}
+
+.login-options a:hover{
+
+    text-decoration:underline;
+
+}
+
+/*==========================================================
+        BOTON
+==========================================================*/
+
+.login-button{
+
+    width:100%;
+
+    height:56px;
+
+    border-radius:14px!important;
+
+    font-size:16px;
+
+    font-weight:600;
+
+   background:linear-gradient(
+135deg,
+#522E92,
+#7447CF
+)!important;
+
+    color:white!important;
+
+    box-shadow:
+
+        0 14px 30px rgba(82,46,146,.30);
+
+}
+
+.login-button:hover{
+
+    transform:translateY(-3px);
+
+}
+
+.login-button mat-icon{
+
+    margin-right:8px;
+
+}
+
+/*==========================================================
+        SEGURIDAD
+==========================================================*/
+
+.security{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-top:24px;
+
+    color:#43A047;
+
+    font-size:14px;
+
+}
+
+.security mat-icon{
+
+    color:#43A047;
+
+}
+
+/*==========================================================
+        FOOTER
+==========================================================*/
+
+.login-footer{
+
+    margin-top:22px;
+
+    text-align:center;
+
+}
+
+.login-footer strong{
+
+    display:block;
+
+    color:var(--primary);
+
+    font-size:18px;
+
+}
+
+.login-footer span{
+
+    display:block;
+
+    margin-top:4px;
+
+    color:var(--text-light);
+
+}
+
+.login-footer small{
+
+    display:block;
+
+    margin-top:10px;
+
+    color:#9CA3AF;
+
+    line-height:1.5;
+
+}
+
+/*==========================================================
+        ANIMACIONES
+==========================================================*/
+
+@keyframes fadeLeft{
+
+    from{
+
+        opacity:0;
+
+        transform:translateX(-35px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:none;
+
+    }
+
+}
+
+@keyframes fadeRight{
+
+    from{
+
+        opacity:0;
+
+        transform:translateX(35px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:none;
+
+    }
+
+}
+
+.branding-content{
+
+    animation:fadeLeft .8s ease;
+
+}
+
+.login-card{
+
+    animation:fadeRight .8s ease;
+
+}
+
+/*==========================================================
+        RESPONSIVE
+==========================================================*/
+
+@media(max-width:1300px){
+
+    .branding{
+
+        padding:30px;
+
+    }
+
+    .branding h1{
+
+        font-size:48px;
+
+    }
+
+    .modules-grid{
+
+        gap:12px;
+
+    }
+
+}
+
+@media(max-width:1100px){
+
+    .login-page{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .branding{
+
+        display:none;
+
+    }
+
+    .login-panel{
+
+        background:
+
+            linear-gradient(
+                135deg,
+                var(--primary),
+                var(--primary-light)
+            );
+
+        padding:30px;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .login-card{
+
+        padding:28px;
+
+        border-radius:18px!important;
+
+    }
+
+    .login-options{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:12px;
+
+    }
+
+    .login-header h2{
+
+        font-size:28px;
+
+    }
+
 }

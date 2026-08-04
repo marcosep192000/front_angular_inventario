@@ -1,4 +1,4 @@
- 
+
  .grid_container >* {
   text-align: center;
   border-radius: 1px 1px 0px 0px;
@@ -13,7 +13,7 @@
   grid-area: section;
   width: 450px;
   position: relative; /* Asegura que el pseudo-elemento se posicione correctamente */
- 
+
 }
 
 .section::after {
@@ -38,18 +38,18 @@
   margin-top: 10px;
   display: grid;
   gap: 10px;
-  grid-template-areas: 
+  grid-template-areas:
     "section"
     "sidebar";
     height: 85vh;
-      
+
 }
 
 @media (min-width: 600px) {
   /* fast Access */
   .section {
     grid-area: section;
-    width:98%; 
+    width:98%;
   }
 
   .sidebar {
@@ -61,7 +61,7 @@
     grid-template-columns: 78%; /* Define dos columnas, una 70% y la otra 30% */
     padding: 0px 15px 10px 10px  ;
     grid-template-rows: auto; /* Las filas se adaptan automáticamente al contenido */
-    grid-template-areas: 
+    grid-template-areas:
       "sidebar sidebar"; /* Coloca la barra lateral en la primera columna y la sección en la segunda */
   }
 }

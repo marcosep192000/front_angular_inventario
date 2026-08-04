@@ -1,18 +1,449 @@
-<div class="body">
-    <form (ngSubmit)="iniciarSession()" [formGroup]="formGroup">
-        <mat-card class="card">
-            <mat-card-content>
-                <h1><strong>Iniciar Sesion</strong></h1>
-                <mat-form-field class="ancho">
-                    <mat-label>Usuario</mat-label>
-                    <input matInput formControlName="email">
+<div class="login-page">
+
+    <!-- =======================================================
+                        PANEL IZQUIERDO
+    ======================================================== -->
+
+    <section class="branding">
+
+        <div class="background-effects"></div>
+
+        <div class="branding-content">
+
+            <!-- ===================== LOGO ===================== -->
+
+            <div class="brand-header">
+
+                <img
+                    src="assets/logo.png"
+                    alt="Inventario Pixels"
+                    class="brand-logo">
+
+                <div>
+
+                    <span class="enterprise">
+
+                        ENTERPRISE EDITION
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- ===================== TITULO ===================== -->
+
+            <h1>
+
+                INVENTARIO
+
+                <span>
+
+                    PIXELS
+
+                </span>
+
+            </h1>
+
+            <p class="brand-description">
+
+                Sistema integral para la gestión de empresas.
+                Inventario, ventas, compras, caja y reportes
+                desde una única plataforma.
+
+            </p>
+
+            <!-- ===================== MODULOS ===================== -->
+
+            <div class="modules-grid">
+
+                <div class="module-card">
+
+                    <mat-icon>
+
+                        inventory_2
+
+                    </mat-icon>
+
+                    <div>
+
+                        <strong>
+
+                            Inventario
+
+                        </strong>
+
+                        <span>
+
+                            Control de stock en tiempo real
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="module-card">
+
+                    <mat-icon>
+
+                        point_of_sale
+
+                    </mat-icon>
+
+                    <div>
+
+                        <strong>
+
+                            Ventas
+
+                        </strong>
+
+                        <span>
+
+                            Facturación rápida
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="module-card">
+
+                    <mat-icon>
+
+                        shopping_cart
+
+                    </mat-icon>
+
+                    <div>
+
+                        <strong>
+
+                            Compras
+
+                        </strong>
+
+                        <span>
+
+                            Gestión de proveedores
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="module-card">
+
+                    <mat-icon>
+
+                        analytics
+
+                    </mat-icon>
+
+                    <div>
+
+                        <strong>
+
+                            Reportes
+
+                        </strong>
+
+                        <span>
+
+                            Indicadores comerciales
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ===================== DESARROLLADOR ===================== -->
+
+            <div class="developer-card">
+
+                <div class="developer-left">
+
+                    <img
+
+                        src="assets/logo.png"
+
+                        class="developer-logo"
+
+                        alt="Marcos">
+
+                </div>
+
+                <div class="developer-right">
+
+                    <span class="developer-label">
+
+                        DESARROLLADO POR
+
+                    </span>
+
+                    <h2>
+
+                        Marcos Paz Goncheff
+
+                    </h2>
+
+                    <p>
+
+                        Analista en Sistemas
+
+                    </p>
+
+                    <div class="tech-stack">
+
+                        <span>Java</span>
+
+                        <span>Spring Boot</span>
+
+                        <span>Angular</span>
+
+                        <span>PostgreSQL</span>
+
+                    </div>
+
+                    <a
+
+                        href="https://marcosep192000.github.io/porfolioMarcosPaz/"
+
+                        target="_blank"
+
+                        class="portfolio">
+
+                        <mat-icon>
+
+                            language
+
+                        </mat-icon>
+
+                        Portfolio Profesional
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- =======================================================
+                        LOGIN
+    ======================================================== -->
+
+    <section class="login-panel">
+
+        <mat-card class="login-card">
+
+            <div class="login-header">
+
+                <img
+
+                    src="assets/logo.png"
+
+                    class="login-logo"
+
+                    alt="Inventario Pixels">
+
+                <h2>
+
+                    Bienvenido
+
+                </h2>
+
+                <p>
+
+                    Inicie sesión para acceder al sistema.
+
+                </p>
+
+            </div>
+
+            <form
+
+                [formGroup]="formGroup"
+
+                (ngSubmit)="iniciarSession()"
+
+                autocomplete="off">
+                <!-- ===================================================
+                        USUARIO
+                ==================================================== -->
+
+                <mat-form-field
+                    appearance="outline"
+                    class="full-width">
+
+                    <mat-label>
+
+                        Usuario
+
+                    </mat-label>
+
+                    <mat-icon matPrefix>
+
+                        person
+
+                    </mat-icon>
+
+                    <input
+                        matInput
+                        formControlName="email"
+                        placeholder="Ingrese su usuario"
+                        autocomplete="username">
+
                 </mat-form-field>
-                <mat-form-field class="ancho">
-                    <mat-label>Contraseña</mat-label>
-                    <input matInput formControlName="password" type="password">
+
+                <!-- ===================================================
+                        CONTRASEÑA
+                ==================================================== -->
+
+                <mat-form-field
+                    appearance="outline"
+                    class="full-width">
+
+                    <mat-label>
+
+                        Contraseña
+
+                    </mat-label>
+
+                    <mat-icon matPrefix>
+
+                        lock
+
+                    </mat-icon>
+
+                    <input
+                        matInput
+                        [type]="hidePassword ? 'password' : 'text'"
+                        formControlName="password"
+                        autocomplete="current-password">
+
+                    <button
+                        mat-icon-button
+                        matSuffix
+                        type="button"
+                        (click)="hidePassword = !hidePassword">
+
+                        <mat-icon>
+
+                            {{ hidePassword ? 'visibility_off' : 'visibility' }}
+
+                        </mat-icon>
+
+                    </button>
+
                 </mat-form-field>
-                <button mat-raised-button class="ancho btn" type="submit" ng color="primary">Ingresar</button>
-            </mat-card-content>
+
+                <!-- ===================================================
+                        OPCIONES
+                ==================================================== -->
+
+                <div class="login-options">
+
+                    <mat-checkbox color="primary">
+
+                        Recordarme
+
+                    </mat-checkbox>
+
+                    <a href="#">
+
+                        ¿Olvidó su contraseña?
+
+                    </a>
+
+                </div>
+
+                <!-- ===================================================
+                        BOTON
+                ==================================================== -->
+
+                <button
+                    mat-raised-button
+                    color="primary"
+                    class="login-button"
+                    type="submit">
+
+                    <mat-icon>
+
+                        login
+
+                    </mat-icon>
+
+                    Ingresar
+
+                </button>
+
+                <!-- ===================================================
+                        SEGURIDAD
+                ==================================================== -->
+
+                <div class="security">
+
+                    <mat-icon>
+
+                        verified_user
+
+                    </mat-icon>
+
+                    <span>
+
+                        Conexión protegida
+
+                    </span>
+
+                </div>
+
+                <!-- ===================================================
+                        DIVISOR
+                ==================================================== -->
+
+                <mat-divider>
+
+                </mat-divider>
+
+                <!-- ===================================================
+                        FOOTER
+                ==================================================== -->
+
+                <div class="login-footer">
+
+                    <strong>
+
+                        Inventario Pixels
+
+                    </strong>
+
+                    <span>
+
+                        Enterprise Edition
+
+                    </span>
+
+                    <small>
+
+                        Java • Spring Boot • Angular • PostgreSQL
+
+                    </small>
+
+                </div>
+
+            </form>
+
         </mat-card>
-    </form>
+
+    </section>
+
 </div>

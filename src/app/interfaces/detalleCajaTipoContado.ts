@@ -1,8 +1,9 @@
 export interface detalleCajaTipoContado{
-	fechaHora?: any;
+id:number;
+  fechaHora?: any;
 	tipo: string;
 	monto: number;
 	descripcion?: any;
 	numeroComprobante?: any;
-	tipoDeContado?: any;
+	medioPago ?: any;categoriaMovimiento: string;
 }

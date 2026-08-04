@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
- 
+
 import { environments } from '../../environments/environments.prod';
 import { catchError, Observable, pipe, throwError } from 'rxjs';
 import { Supplier } from '../interfaces/supplier';
@@ -53,4 +53,6 @@ export class SupplierService {
       `${this.base}supplier-pay-conditions/type-account`
     );
   }
+
+ 
 }

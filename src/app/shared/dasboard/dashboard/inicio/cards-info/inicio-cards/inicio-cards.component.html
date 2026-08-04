@@ -1,32 +1,144 @@
-<div class="container">
-    <button class="card green"> 
-        <p>Productos</p>
-        <h4>{{data_cards?.products}}</h4>
-    </button>    
-    <button class="card blue">
-        <p>Total  Compras</p>
-        <h4> a registrar</h4>
+<div class="cards-container">
+
+    <!-- Productos -->
+    <button class="dashboard-card products">
+
+        <mat-icon>inventory_2</mat-icon>
+
+        <span class="title">
+            Productos
+        </span>
+
+        <span class="value">
+            {{data_cards?.products}}
+        </span>
+
+        <span class="subtitle">
+            Productos registrados
+        </span>
+
     </button>
 
-    <button class="card orange">
-        <p>Total Ventas</p>
-        <h4>{{data_cards?.MontoTotal|currency }}</h4>
+    <!-- Compras -->
+
+    <button class="dashboard-card purchases">
+
+        <mat-icon>shopping_cart</mat-icon>
+
+        <span class="title">
+            Compras
+        </span>
+
+        <span class="value">
+            —
+        </span>
+
+        <span class="subtitle">
+            Próximamente
+        </span>
+
     </button>
 
-    <button class="card purple">
-        <p>Total Ganancias</p>
-        <h4>a registrar</h4>
+    <!-- Ventas -->
+
+    <button class="dashboard-card sales">
+
+        <mat-icon>point_of_sale</mat-icon>
+
+        <span class="title">
+            Ventas Totales
+        </span>
+
+        <span class="value">
+            {{data_cards?.MontoTotal | currency:'ARS'}}
+        </span>
+
+        <span class="subtitle">
+            Facturación acumulada
+        </span>
+
     </button>
-<button
-    type="button"
-    class="card red"
-    [routerLink]="['/dashboard', 'bajo-stock']">
-    <h3>Bajo Stock</h3>
-    <h4>{{ data_cards?.bajo_stock }}</h4>
-  </button>
-    
-    <button class="card yellow">
-        <p>Ventas del Día</p>
-        <h4>{{data_cards?.MontoTotal|currency}}</h4>
+
+    <!-- Ganancias -->
+
+    <button class="dashboard-card profit">
+
+        <mat-icon>trending_up</mat-icon>
+
+        <span class="title">
+            Ganancias
+        </span>
+
+        <span class="value">
+            —
+        </span>
+
+        <span class="subtitle">
+            Pendiente
+        </span>
+
     </button>
+
+    <!-- Bajo stock -->
+
+    <button
+
+        class="dashboard-card stock"
+
+        [routerLink]="['/dashboard','bajo-stock']">
+
+
+
+            <mat-icon fontIcon="inventory_2"></mat-icon>
+
+        <span class="title">
+
+            Bajo Stock
+
+        </span>
+
+        <span class="value">
+
+            {{data_cards?.bajo_stock}}
+
+        </span>
+
+        <span class="subtitle">
+
+            Revisar productos
+
+        </span>
+
+    </button>
+
+    <!-- Hoy -->
+
+    <button class="dashboard-card today">
+
+        <mat-icon>
+
+            today
+
+        </mat-icon>
+
+        <span class="title">
+
+            Ventas del Día
+
+        </span>
+
+        <span class="value">
+
+            {{data_cards?.MontoTotal | currency:'ARS'}}
+
+        </span>
+
+        <span class="subtitle">
+
+            Actualizado
+
+        </span>
+
+    </button>
+
 </div>

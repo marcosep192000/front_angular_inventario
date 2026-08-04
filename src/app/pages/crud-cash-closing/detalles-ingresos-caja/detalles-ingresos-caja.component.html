@@ -1,53 +1,189 @@
 <div class="detalle-caja-container">
-  <div class="modal-header">
-    <h2 class="titulo">📋 Detalles de Caja</h2>
-    <button class="btn-cerrar" (click)="cerrarDialog()">✖</button>
+
+  <div class="modal-header" [style.background]="colorHeader">
+
+    <h2 class="titulo">
+      {{ titulo }}
+    </h2>
+
+    <button class="btn-cerrar" (click)="cerrarDialog()">
+      ✖
+    </button>
+
   </div>
 
   <div class="contenido">
-    <h3 class="subtitulo">🛒 Detalles de Venta</h3>
+
+    <h3 class="subtitulo">
+      {{ subtitulo }}
+    </h3>
 
     <div class="tabla-wrapper">
+
       <table class="tabla-detalles">
+
         <thead>
+
           <tr>
+
             <th>Fecha</th>
-            <th>Comprobante N°</th>
-            <th>Transacción</th>
-            <th>Monto total</th>
-            <th>Acciones</th>
+
+            <th>Comprobante</th>
+
+            <th>
+              {{ data.tipo === 'INGRESO'
+                  ? 'Forma de Pago'
+                  : 'Categoría' }}
+            </th>
+
+            <th>Monto</th>
+
+            <th>
+              Acciones
+            </th>
+
           </tr>
+
         </thead>
+
         <tbody>
+
           <tr *ngFor="let item of movimientos">
-            <td>{{ item.fechaHora | date: 'short' }}</td>
-            <td>{{ item.numeroComprobante || '-' }}</td>
-            <td>{{ item.tipoDeContado || '-' }}</td>
-            <td>{{ item.monto | currency:'ARS' }}</td>
-            <td><button (click)="getDetalleVenta()">🔍</button></td>
+
+            <td>
+
+              {{ item.fechaHora | date:'short' }}
+
+            </td>
+
+            <td>
+
+              {{ item.numeroComprobante }}
+
+            </td>
+
+            <td>
+
+              <span *ngIf="data.tipo==='INGRESO'">
+
+                {{ item.medioPago }}
+
+              </span>
+
+              <span *ngIf="data.tipo==='EGRESO'">
+
+                {{ item.categoriaMovimiento }}
+
+              </span>
+
+            </td>
+
+            <td>
+
+              {{ item.monto | currency:'ARS' }}
+
+            </td>
+
+            <td>
+
+              <button
+
+                mat-icon-button
+
+                color="primary"
+
+                matTooltip="Ver detalle"
+
+                (click)="getDetalleVenta(item)">
+
+                <mat-icon>
+
+                  visibility
+
+                </mat-icon>
+
+              </button>
+
+            </td>
+
           </tr>
+
         </tbody>
+
       </table>
+
     </div>
 
-    <div class="totales">
-      <div class="total-item contado">
-        💵 Contado: <strong>{{ totalContado | currency:'ARS' }}</strong>
-      </div>
-      <div class="total-item transferencia">
-        💳 Transferencia: <strong>{{ totalTransferencia | currency:'ARS' }}</strong>
-      </div>
-      <div class="total-item mercado">
-        📱 Mercado Pago: <strong>{{ totalMercadoPago | currency:'ARS' }}</strong>
-      </div>
-      <hr />
-      <div class="total-item general">
-        🧾 Total General: <strong>{{ totalGeneral | currency:'ARS' }}</strong>
-      </div>
+  <div class="cards-resumen">
+
+  <div class="card-resumen contado">
+    <div class="icono">💵</div>
+    <div class="titulo-card">Contado</div>
+    <div class="valor">
+      {{ totalContado | currency:'ARS' }}
     </div>
+  </div>
+
+  <div class="card-resumen transferencia">
+    <div class="icono">💳</div>
+    <div class="titulo-card">Transferencia</div>
+    <div class="valor">
+      {{ totalTransferencia | currency:'ARS' }}
+    </div>
+  </div>
+
+  <div class="card-resumen mercado">
+    <div class="icono">📱</div>
+    <div class="titulo-card">Mercado Pago</div>
+    <div class="valor">
+      {{ totalMercadoPago | currency:'ARS' }}
+    </div>
+  </div>
+
+  <div class="card-resumen cta">
+    <div class="icono">📒</div>
+    <div class="titulo-card">Cuenta Corriente</div>
+    <div class="valor">
+      {{ totalCtaCte | currency:'ARS' }}
+    </div>
+  </div>
+
+</div>
+
+<div class="card-total">
+
+  <div class="texto-total">
+
+    {{ data.tipo === 'INGRESO'
+      ? '🟢 TOTAL INGRESOS'
+      : '🔴 TOTAL EGRESOS' }}
+
+  </div>
+
+  <div class="valor-total">
+
+    {{ totalGeneral | currency:'ARS' }}
+
+  </div>
+
+</div>
+
   </div>
 
   <div class="acciones">
-    <button mat-raised-button color="primary" (click)="cerrarDialog()">Cerrar</button>
+
+    <button
+
+      mat-raised-button
+
+      color="primary"
+
+      (click)="cerrarDialog()">
+
+      Cerrar
+
+    </button>
+
   </div>
+
 </div>

@@ -6,5 +6,8 @@ export interface Product {
 }
 export interface LowStockByProvider {
   name: string;
-  products: Product[];
+  products: Product[]; id: number;
+  stockMin: number;
+  stock: number;
+  selected?: boolean;
 }

@@ -1,42 +1,93 @@
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer class="sidenav" fixedInViewport
-    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-    [mode]="(isHandset$ | async) ? 'over' : 'side'"
-    [opened]="(isHandset$ | async) === false">
-    <mat-toolbar>Menu</mat-toolbar>
+<div
+    class="layout"
+    [class.collapsed]="menuCollapsed"
+    (mouseenter)="expandMenu()"
+    (mouseleave)="collapseMenu()">
 
-    <!--     <div class="sidenav__image">
-     <img src="https://media.istockphoto.com/id/1483652033/es/foto/mujer-turista-usa-la-aplicaci%C3%B3n-de-mapas-para-navegar-por-la-ciudad-planificar-la-ruta-desde.webp?s=2048x2048&w=is&k=20&c=f_weXBG8qbY1mP_-9Dn0hVxn_s_2uxTRO9wPIZIBBpI=" alt="usuario">
-    </div> -->
-    <hr>
-    <app-vertical-menu></app-vertical-menu>
+    <!-- ===========================
+         SIDEBAR
+    ============================ -->
 
-  </mat-sidenav>
-  <mat-sidenav-content>
-   
-    <mat-toolbar color="primary">
-      @if (isHandset$ | async) {
-      <button type="button" aria-label="Toggle sidenav" mat-icon-button
-        (click)="drawer.toggle()">
-        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-      </button>
-      }
-      <div class="container__barra">
-    
-    
-   
-        <span class="barra__span"> </span>
+    <aside class="sidebar">
 
-        <div class="barra__logout">
-          <button mat-icon-button (click)="logout()">
-          <app-icon [iconSrc]="'assets/icons/power.png'" [iconAlt]="'salir'" [size]="'30px'"></app-icon>
-          </button>
-        </div>
-     </div>  
+        @if (!menuCollapsed) {
 
-    </mat-toolbar> 
-    <app-dashboard></app-dashboard>
- 
-  </mat-sidenav-content>
+            <div class="sidebar-header">
 
-</mat-sidenav-container>
+                <span class="menu-title">
+
+                    Menu
+
+                </span>
+
+            </div>
+
+            <hr>
+
+        }
+
+        <app-vertical-menu
+            [collapsed]="menuCollapsed">
+        </app-vertical-menu>
+
+    </aside>
+
+    <!-- ===========================
+         CONTENIDO
+    ============================ -->
+
+    <main class="content">
+
+        <mat-toolbar color="primary">
+
+            @if (isHandset$ | async) {
+
+                <button
+                    mat-icon-button
+                    (click)="toggleMenu()">
+
+                    <mat-icon>
+
+                        menu
+
+                    </mat-icon>
+
+                </button>
+
+            }
+
+            <div class="container__barra">
+
+                <span class="barra__span">
+
+                </span>
+
+                <div class="barra__logout">
+
+                    <button
+                        mat-icon-button
+                        (click)="logout()">
+
+                        <app-icon
+                            [iconSrc]="'assets/icons/power.png'"
+                            [iconAlt]="'Salir'"
+                            [size]="'30px'">
+                        </app-icon>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </mat-toolbar>
+
+        <section class="router-content">
+
+            <router-outlet></router-outlet>
+
+        </section>
+
+    </main>
+
+</div>

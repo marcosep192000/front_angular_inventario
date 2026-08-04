@@ -1,65 +1,250 @@
-
 <div class="menu">
-<div class="menu-item" (click)="toggleMenu('inicio')  " routerLink="/dashboard">
-    <app-icon [iconSrc]="'assets/icons/home.png'" [iconAlt]="'Clientes'" [size]="'30px'"></app-icon> Inicio
+  <div class="logo">
 
-</div>
+    <img src="assets/logo.png" alt="Logo" class="logo-img">
 
-<div class="menu-item" (click)="toggleMenu('ventas')">
-    <app-icon [iconSrc]="'assets/icons/point_of_sale.png'" [iconAlt]="'Clientes'" [size]="'30px'"></app-icon> Ventas
-    <div class="submenu" routerLink="new-sale" [class.open]="isMenuOpen('ventas')">
-        <div class="submenu-item"><app-icon [iconSrc]="'assets/icons/sell.png'" [iconAlt]="'Clientes'" [size]="'24px'">
-            </app-icon> Nueva Venta</div>  
-    </div>
-<div class="submenu" [routerLink]="['cash-closing']" [class.open]="isMenuOpen('ventas')">
- <div class="submenu-item" ><app-icon [iconSrc]="'assets/icons/savings.png'"   [size]="'24px'">
-                </app-icon> Caja</div>
-</div>
+    @if(!collapsed){
 
-</div>
+    <div class="logo-text">
 
+      <h2>Inventario</h2>
 
-    <div class="menu-item" (click)="toggleMenu('proveedores')"routerLink="supplier-list">
-        <app-icon [iconSrc]="'assets/icons/real_estate_agent.png'"   [size]="'30px'"></app-icon>Proveedores
-        <div class="submenu" [class.open]="isMenuOpen('proveedores')">
-            <div class="submenu-item"><app-icon [iconSrc]="'assets/icons/trending.png'" [size]="'24px'"></app-icon>Reportes</div>
-        </div>
+      <span>PIXELS</span>
+
     </div>
 
-    <div class="menu-item"  routerLink="client-list" (click)="toggleMenu('clientes')">
-        <app-icon [iconSrc]="'assets/icons/group_person.png'" [iconAlt]="'Clientes'" [size]="'34px'">klklkl</app-icon>   Clientes
-            <div class="submenu" [class.open]="isMenuOpen('clientes')">
-        <!--        <div class="submenu-item" >Compras</div>--> 
-            </div>
-        </div>
-        <div class="menu-item" (click)="toggleMenu('productos')">
-            <app-icon [iconSrc]="'assets/icons/store1.png'" [iconAlt]="'Clientes'" [size]="'30px'">klklkl</app-icon>
-            Productos
-            <div class="submenu" [class.open]="isMenuOpen('productos')">
-              <div class="submenu-item" [routerLink]="['product-list']">
-                <app-icon [iconSrc]="'assets/icons/store1.png'" [iconAlt]="'Clientes'" [size]="'24px'"></app-icon>
-                Lista de Productos
-              </div>
-              <div class="submenu-item" [routerLink]="['buscar-producto-por-proveedor']">
-                <app-icon [iconSrc]="'assets/icons/category_search.png'" [iconAlt]="'Clientes'" [size]="'24px'">klklkl</app-icon>
-                Productos por Proveedor
-              </div>
-              <div class="submenu-item" [routerLink]="['category-list']">
-                <app-icon [iconSrc]="'assets/icons/category_search.png'" [iconAlt]="'Clientes'" [size]="'24px'">klklkl</app-icon>
-                Categorías
-              </div>
-            </div>
-          </div>
-          
+    }
 
-        <div class="menu-item" (click)="toggleMenu('reportes')">
-        <app-icon [iconSrc]="'assets/icons/monitoring.png'" [iconAlt]="'Clientes'" [size]="'30px'"></app-icon>  Reportes
-            <div class="submenu" [class.open]="isMenuOpen('reportes')">
-                <div class="submenu-item">Ventas</div>
-                <div class="submenu-item">Compras</div>
-            </div>
-        </div>
- 
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- INICIO -->
+
+  <div class="menu-item" routerLink="/dashboard">
+
+    <div class="menu-title">
+
+      <app-icon [iconSrc]="'assets/icons/home.png'" [size]="'28px'">
+      </app-icon>
+
+      @if(!collapsed){
+
+      <span>Inicio</span>
+
+      }
+
+    </div>
+
+  </div>
+
+  <!-- VENTAS -->
+
+  <div class="menu-item">
+
+    <div class="menu-title" (click)="toggleMenu('ventas')">
+
+      <app-icon [iconSrc]="'assets/icons/point_of_sale.png'" [size]="'28px'">
+      </app-icon>
+
+      @if(!collapsed){
+
+      <span>Ventas</span>
+
+      }
+
+      @if(!collapsed){
+
+      <span class="arrow" [class.rotate]="isMenuOpen('ventas')">
+
+        ▼
+
+      </span>
+
+      }
+
+    </div>
+    @if(!collapsed){
+    <div class="submenu" [class.open]="isMenuOpen('ventas')">
+
+      <div class="submenu-item" routerLink="new-sale">
+
+        <app-icon [iconSrc]="'assets/icons/sell.png'" [size]="'22px'">
+        </app-icon>
+
+        Nueva Venta
+
+      </div>
+
+      <div class="submenu-item" routerLink="cash-closing">
+
+        <app-icon [iconSrc]="'assets/icons/savings.png'" [size]="'22px'">
+        </app-icon>
+
+        Caja
+
+      </div>
+
+   </div> }
+
+  </div>
+
+  <!-- CLIENTES -->
+
+  <div class="menu-item" routerLink="client-list">
+
+    <div class="menu-title">
+
+      <app-icon [iconSrc]="'assets/icons/group_person.png'" [size]="'28px'">
+      </app-icon>
+@if(!collapsed){
+
+<span>Clientes</span>
+
+}
+
+    </div>
+
+  </div>
+
+  <!-- PROVEEDORES -->
+
+  <div class="menu-item" routerLink="supplier-list">
+
+    <div class="menu-title">
+
+      <app-icon [iconSrc]="'assets/icons/real_estate_agent.png'" [size]="'28px'">
+      </app-icon>
+
+      @if(!collapsed){
+
+    <span>Proveedores</span>
+
+}
+
+    </div>
+
+  </div>
+
+  <!-- PRODUCTOS -->
+
+  <div class="menu-item">
+
+    <div class="menu-title" (click)="toggleMenu('productos')">
+
+      <app-icon [iconSrc]="'assets/icons/store1.png'" [size]="'28px'">
+      </app-icon>
+
+      @if(!collapsed){
+
+<span>Productos</span>
+
+}
+
+     @if(!collapsed){
+
+    <span
+        class="arrow"
+        [class.rotate]="isMenuOpen('productos')">
+
+        ▼
+
+    </span>
+
+}
+
+    </div>
+@if(!collapsed){
+
+
+
+
+    <div class="submenu" [class.open]="isMenuOpen('productos')">
+
+      <div class="submenu-item" routerLink="product-list">
+
+        <app-icon [iconSrc]="'assets/icons/store1.png'" [size]="'22px'">
+        </app-icon>
+
+        Lista de Productos
+
+      </div>
+
+      <div class="submenu-item" routerLink="buscar-producto-por-proveedor">
+
+        <app-icon [iconSrc]="'assets/icons/category_search.png'" [size]="'22px'">
+        </app-icon>
+
+        Productos por Proveedor
+
+      </div>
+
+      <div class="submenu-item" routerLink="category-list">
+
+        <app-icon [iconSrc]="'assets/icons/category_search.png'" [size]="'22px'">
+        </app-icon>
+
+        Categorías
+
+      </div>
+
+    </div>}
+
+  </div>
+
+  <!-- REPORTES -->
+
+  <div class="menu-item">
+
+    <div class="menu-title" (click)="toggleMenu('reportes')">
+
+      <app-icon [iconSrc]="'assets/icons/monitoring.png'" [size]="'28px'">
+      </app-icon>
+
+     @if(!collapsed){
+
+    <span>Reportes</span>
+
+}
+
+@if(!collapsed){
+
+    <span
+        class="arrow"
+        [class.rotate]="isMenuOpen('reportes')">
+
+        ▼
+
+    </span>
+
+}
+
+    </div>
+@if(!collapsed){
+
+<div
+    class="submenu"
+    [class.open]="isMenuOpen('reportes')">
+
+    ...
+
 </div>
 
+
+
+      <div class="submenu-item">
+
+        Ventas
+
+      </div>
+
+      <div class="submenu-item">
+
+        Compras
+
+      </div>
+
+    }</div>
+
+  </div>
 

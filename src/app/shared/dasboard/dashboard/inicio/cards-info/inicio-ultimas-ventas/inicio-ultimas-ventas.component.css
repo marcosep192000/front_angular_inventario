@@ -1,0 +1,75 @@
+.ventas-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.venta-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:14px;
+
+    border-radius:12px;
+
+    background:#f8f9fc;
+
+    transition:.25s;
+
+}
+
+.venta-item:hover{
+
+    background:#ede7f6;
+
+}
+
+.numero{
+
+    font-weight:600;
+
+    color:#512da8;
+
+}
+
+.cliente{
+
+    color:#777;
+
+    font-size:13px;
+
+    margin-top:3px;
+
+}
+
+.importe{
+
+    font-size:17px;
+
+    font-weight:700;
+
+    color:#2E7D32;
+
+}
+
+.empty{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    height:220px;
+
+    color:#999;
+
+}

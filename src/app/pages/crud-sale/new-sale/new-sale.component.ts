@@ -23,6 +23,11 @@ import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
 import { ClientService } from '../../../services/client.service';
 import { CtaCteService } from '../../../services/cta-cte.service';
 import { registrarDeudaCtaCteCliente } from '../../../interfaces/registrarDeudaCtaCteCliente';
+import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from "@angular/material/card";
+import { MatOption } from "@angular/material/core";
+import { MatSelect } from "@angular/material/select";
+import { MatDivider } from "@angular/material/divider";
+import { MatDatepicker } from "@angular/material/datepicker";
 @Component({
   selector: 'app-new-sale',
   standalone: true,
@@ -39,7 +44,8 @@ import { registrarDeudaCtaCteCliente } from '../../../interfaces/registrarDeudaC
     MatTableModule,
     MatTooltipModule,
     ToastrModule,
-    IconComponent
+    IconComponent,
+
 ],
   templateUrl: './new-sale.component.html',
   styleUrls: ['./new-sale.component.css'],
@@ -52,20 +58,20 @@ export class NewSaleComponent implements OnInit {
   product?: ProductItemSale;
   errorMessage?: string;
   selectedClient: any;
-  saleCommon?: SaleCommon;
-  constructor(
+  saleCommon?: SaleCommon;  today: Date = new Date();
+   constructor(
     fb: FormBuilder,
     private productService: ProductService,
     private toastr: ToastrService,
     public  dialog: MatDialog,
     private commonSale: CommonSaleService,
-    private ctaCteService: CtaCteService, 
+    private ctaCteService: CtaCteService,
     private clienteService: ClientService
   ) {}
   ngOnInit(): void {
-    
+
   }
- 
+
 
 onSubmit() {
   if (!this.code.trim()) {
@@ -120,7 +126,7 @@ onSubmit() {
       0
     );
   }
-  getClient() {//lama al componente para buscar un cliente y luego mostrarlo 
+  getClient() {//lama al componente para buscar un cliente y luego mostrarlo
     const dialogRef = this.dialog.open(SearchClientByDniComponent, {
       disableClose: true,
       autoFocus: true,
@@ -138,14 +144,14 @@ onSubmit() {
     });
   }
 
-  
+
   // Se llama al formulario de venta y crea el ticket para la nueva venta
   async newSale() {
     if (this.products.length === 0) {
       this.toastr.warning('No hay artículos seleccionados.');
       return;
     }
-  
+
     const dialogRef = this.dialog.open(TotalSaleComponent, {
       disableClose: true,
       autoFocus: true,
@@ -157,7 +163,7 @@ onSubmit() {
         totalPrice: this.getTotalPrice(),
       },
     });
-  
+
     dialogRef.afterClosed().subscribe(async (result) => {
       if (!result || !result.tipoCuenta) {
         this.toastr.warning('La venta no fue completada.');
@@ -169,7 +175,7 @@ onSubmit() {
       const tipoCuenta = result.tipoCuenta;
       const total = result.totalPrice;
       const idClient = result.idCliente;
-    
+
       try {
         if (tipoCuenta === 'CONTADO') {
           const sale = this.buildSaleCommon(tipoCuenta, null,formaDePago); // null porque no hay cta cte
@@ -185,7 +191,7 @@ onSubmit() {
       }
     });
   }
-  
+
   buscarCuentaIdCorrienteCliente(id: number): Promise<any> {
     return new Promise((resolve, reject) => {
       this.clienteService.getClientById(id).subscribe({
@@ -200,14 +206,14 @@ onSubmit() {
       });
     });
   }
-  
+
 
   saveCtaCteSale(tipoDeCuenta: any, precioTotal: number) {
     const payload: registrarDeudaCtaCteCliente = {
       registrarDeudaCtaCte: precioTotal,
       ticketIds: []
     };
-  
+
     this.ctaCteService.updateCtaCte(tipoDeCuenta, payload).subscribe(
       response => {
         console.log('Actualización exitosa', response);
@@ -261,7 +267,7 @@ onSubmit() {
     // Guardar el PDF
     doc.save(`Factura_${saleCommon.numero}.pdf`);
   }
-  
+
  buildSaleCommon(tipo: string, ctaCte: any, paymentMethod?: string): SaleCommon {
   const sale: SaleCommon = {
     tipo: 'FACTURA',
@@ -288,10 +294,10 @@ onSubmit() {
   };
   console.log(sale);
   return sale;
-  
+
 }
 
-  
+
 
  saveCommonSale(saleCommon: SaleCommon) {
   if (!this.selectedClient) {
@@ -412,6 +418,32 @@ printTicket(saleCommon: SaleCommon, formato: 'A4' | 'TERMICA' = 'A4') {
   }
 }
 
+increaseQuantity(product: ProductItemSale): void {
 
+  if (product.quantity < product.stock) {
+
+    product.quantity++;
+
+  } else {
+
+    this.toastr.warning('No hay más stock disponible.');
+
+  }
+
+}
+
+decreaseQuantity(product: ProductItemSale): void {
+
+  if (product.quantity > 1) {
+
+    product.quantity--;
+
+    return;
+
+  }
+
+  this.deleteProduct(product.id);
+
+}
 
 }

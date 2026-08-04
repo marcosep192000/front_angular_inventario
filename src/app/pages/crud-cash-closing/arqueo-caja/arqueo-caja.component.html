@@ -1,0 +1,400 @@
+<div class="detalle-caja-container" *ngIf="arqueo">
+
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+
+    <div class="modal-header">
+
+        <div>
+
+            <h2 class="titulo">
+                📒 Arqueo de Caja
+            </h2>
+
+            <div class="subtitulo">
+                Resumen del cierre de caja
+            </div>
+
+        </div>
+
+        <div class="fecha-header">
+
+            {{ arqueo.fecha | date:'dd/MM/yyyy' }}
+
+        </div>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- CONTENIDO -->
+    <!-- ===================================================== -->
+
+    <div class="contenido">
+
+        <!-- ================= RESUMEN ================= -->
+
+        <div class="cards-resumen">
+
+            <div class="card-resumen apertura">
+
+                <div class="icono">
+                    💰
+                </div>
+
+                <div class="card-info">
+
+                    <div class="titulo-card">
+
+                        Saldo Apertura
+
+                    </div>
+
+                    <div class="valor">
+
+                        {{ arqueo.saldoApertura | currency:'ARS' }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card-resumen ingresos">
+
+                <div class="icono">
+                    🟢
+                </div>
+
+                <div class="card-info">
+
+                    <div class="titulo-card">
+
+                        Total Ingresos
+
+                    </div>
+
+                    <div class="valor">
+
+                        {{ arqueo.totalIngresos | currency:'ARS' }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card-resumen egresos">
+
+                <div class="icono">
+                    🔴
+                </div>
+
+                <div class="card-info">
+
+                    <div class="titulo-card">
+
+                        Total Egresos
+
+                    </div>
+
+                    <div class="valor">
+
+                        {{ arqueo.totalEgresos | currency:'ARS' }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card-resumen saldo">
+
+                <div class="icono">
+                    💳
+                </div>
+
+                <div class="card-info">
+
+                    <div class="titulo-card">
+
+                        Saldo Esperado
+
+                    </div>
+
+                    <div class="valor">
+
+                        {{ arqueo.saldoEsperado | currency:'ARS' }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= CONTEO ================= -->
+
+        <div class="conteo-grid">
+
+            <div class="conteo-card">
+
+                <h3>
+
+                    Conteo de efectivo
+
+                </h3>
+
+                <mat-form-field appearance="outline" class="input-efectivo">
+
+                    <mat-label>
+
+                        Efectivo contado
+
+                    </mat-label>
+
+                    <input
+                        matInput
+                        type="number"
+                        [(ngModel)]="efectivoContado"
+                        (keyup)="calcularDiferencia()"
+                        (change)="calcularDiferencia()">
+
+                </mat-form-field>
+
+            </div>
+
+            <div
+                class="diferencia-card"
+                [class.positivo]="diferencia>=0"
+                [class.negativo]="diferencia<0">
+
+                <div class="texto-total">
+
+                    Diferencia
+
+                </div>
+
+                <div class="valor-total">
+
+                    {{ diferencia | currency:'ARS' }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= TABLA ================= -->
+
+        <h3 class="subtitulo">
+
+            Libro Diario
+
+        </h3>
+
+        <div class="tabla-wrapper">
+
+            <table
+                mat-table
+                [dataSource]="arqueo.movimientos"
+                class="tabla-detalles">
+
+                <ng-container matColumnDef="fecha">
+
+                    <th mat-header-cell *matHeaderCellDef>
+
+                        Fecha
+
+                    </th>
+
+                    <td mat-cell *matCellDef="let m">
+
+                        {{ m.fechaHora | date:'dd/MM HH:mm' }}
+
+                    </td>
+
+                </ng-container>
+
+                <ng-container matColumnDef="tipo">
+
+                    <th mat-header-cell *matHeaderCellDef>
+
+                        Tipo
+
+                    </th>
+
+                    <td mat-cell *matCellDef="let m">
+
+                        {{ m.tipo }}
+
+                    </td>
+
+                </ng-container>
+
+                <ng-container matColumnDef="categoria">
+
+                    <th mat-header-cell *matHeaderCellDef>
+
+                        Categoría
+
+                    </th>
+
+                    <td mat-cell *matCellDef="let m">
+
+                        {{ m.categoriaMovimiento }}
+
+                    </td>
+
+                </ng-container>
+
+                <ng-container matColumnDef="comprobante">
+
+                    <th mat-header-cell *matHeaderCellDef>
+
+                        Comprobante
+
+                    </th>
+
+                    <td mat-cell *matCellDef="let m">
+
+                        {{ m.numeroComprobante }}
+
+                    </td>
+
+                </ng-container>
+
+                <ng-container matColumnDef="ingreso">
+
+                    <th mat-header-cell *matHeaderCellDef>
+
+                        Ingreso
+
+                    </th>
+
+                    <td mat-cell *matCellDef="let m">
+
+                        {{ m.ingreso | currency:'ARS' }}
+
+                    </td>
+
+                </ng-container>
+
+                <ng-container matColumnDef="egreso">
+
+                    <th mat-header-cell *matHeaderCellDef>
+
+                        Egreso
+
+                    </th>
+
+                    <td mat-cell *matCellDef="let m">
+
+                        {{ m.egreso | currency:'ARS' }}
+
+                    </td>
+
+                </ng-container>
+
+                <ng-container matColumnDef="saldo">
+
+                    <th mat-header-cell *matHeaderCellDef>
+
+                        Saldo
+
+                    </th>
+
+                    <td mat-cell *matCellDef="let m">
+
+                        <strong>
+
+                            {{ m.saldo | currency:'ARS' }}
+
+                        </strong>
+
+                    </td>
+
+                </ng-container>
+
+                <tr
+                    mat-header-row
+                    *matHeaderRowDef="displayedColumns">
+
+                </tr>
+
+                <tr
+                    mat-row
+                    *matRowDef="let row; columns: displayedColumns;">
+
+                </tr>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- FOOTER -->
+    <!-- ===================================================== -->
+
+    <div class="acciones">
+
+        <button
+            mat-raised-button
+            color="primary"
+            (click)="exportarPdf()">
+
+            <mat-icon>
+
+                picture_as_pdf
+
+            </mat-icon>
+
+            PDF
+
+        </button>
+
+        <button
+            mat-raised-button
+            color="primary">
+
+            <mat-icon>
+
+                table_view
+
+            </mat-icon>
+
+            Excel
+
+        </button>
+
+        <span class="spacer"></span>
+
+        <button
+            mat-raised-button
+            color="warn"
+            (click)="confirmarCierre()">
+
+            <mat-icon>
+
+                task_alt
+
+            </mat-icon>
+
+            Confirmar Cierre
+
+        </button>
+
+        <button
+            mat-stroked-button
+            (click)="cerrar()">
+
+            Cancelar
+
+        </button>
+
+    </div>
+
+</div>

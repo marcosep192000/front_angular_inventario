@@ -1,6 +1,12 @@
-<div class="container">
-<h3>Ventas Diarias</h3>
-<canvas baseChart [datasets]="barChartData.datasets" [labels]="barChartData.labels" [options]="barChartOptions"
-    [legend]="true" chartType="bar">
-</canvas>
+<div class="chart-container">
+
+    <canvas
+        baseChart
+        [datasets]="barChartData.datasets"
+        [labels]="barChartData.labels"
+        [options]="barChartOptions"
+        [legend]="true"
+        chartType="bar">
+    </canvas>
+
 </div>

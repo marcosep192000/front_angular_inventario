@@ -1,10 +1,10 @@
 export interface Caja {
 	id: number;
 	fecha: string;
-	apertura: number;
-	ingresos: number;
-	egresos: number;
-	cierre: number;
+	saldoApertura: number;
+	totalIngresos: number;
+	totalEgresos: number;
+	saldoCierre: number;
 	estado: boolean;
-	saldoApertura:number; 
+
 }

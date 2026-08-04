@@ -5,6 +5,7 @@ import { Caja } from '../interfaces/Caja';
 import { Observable } from 'rxjs';
 import { cajaSaldoApertura } from '../interfaces/cajaSaldoApertura';
 import { detalleCajaTipoContado } from '../interfaces/detalleCajaTipoContado';
+import { CajaArqueo } from '../interfaces/caja-arqueo';
 
 @Injectable({
   providedIn: 'root',
@@ -31,9 +32,27 @@ export class CajaService {
   }
 
 getDetalleCajaContado():Observable<detalleCajaTipoContado[]>{
-  return this.httpClient.get<detalleCajaTipoContado[]>(`${this.baseUrl}cajas/contado`) ; 
+  return this.httpClient.get<detalleCajaTipoContado[]>(`${this.baseUrl}cajas/contado`) ;
 }
 
+getArqueo(id: number) {
 
+  return this.httpClient.get<CajaArqueo>(
+      `${this.baseUrl}cajas/${id}/arqueo`
+  );
 
+}
+descargarPdf(id: number) {
+
+  return this.httpClient.get(
+
+    `${this.baseUrl}cajas/${id}/arqueo/pdf`,
+
+    {
+      responseType: 'blob'
+    }
+
+  );
+
+}
 }

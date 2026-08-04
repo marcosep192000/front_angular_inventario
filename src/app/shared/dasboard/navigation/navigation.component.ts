@@ -1,58 +1,120 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Component, OnInit, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+
+import { Observable } from 'rxjs';
+import { filter, map, shareReplay } from 'rxjs/operators';
+
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
-import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
-import { RouterLink, RouterOutlet } from '@angular/router';
-import { DashboardComponent } from "../dashboard/dashboard.component";
-import { VerticalMenuComponent } from "../vertical-menu/vertical-menu.component";
-import { TokenService } from '../../../services/token.service';
-import { IconComponent } from "../icon/icon.component";
 
+import { VerticalMenuComponent } from '../vertical-menu/vertical-menu.component';
+import { IconComponent } from '../icon/icon.component';
+
+import { TokenService } from '../../../services/token.service';
 
 @Component({
     selector: 'app-navigation',
+    standalone: true,
     templateUrl: './navigation.component.html',
     styleUrl: './navigation.component.css',
-    standalone: true,
     imports: [
-    MatToolbarModule,
-    MatButtonModule,
-    MatSidenavModule,
-    MatListModule,
-    MatIconModule,
-    AsyncPipe,
-    DashboardComponent,
-    VerticalMenuComponent,
-    IconComponent
-]
+        AsyncPipe,
+        RouterOutlet,
+        MatToolbarModule,
+        MatButtonModule,
+        MatIconModule,
+        VerticalMenuComponent,
+        IconComponent
+    ]
 })
-export class NavigationComponent  implements OnInit {
-logout() {
- 
-    this.tokenService.logOut();
-  
-}
- 
-  constructor(   private tokenService: TokenService) { }
-  ngOnInit(): void {
-this.username = this.tokenService.getUserName();
-this.roles = this.tokenService.getAuthorities();
-console.log('Usuario:', this.username);
-console.log('Roles:', this.roles);
-  }
-  private breakpointObserver = inject(BreakpointObserver);
+export class NavigationComponent implements OnInit {
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
+    private breakpointObserver = inject(BreakpointObserver);
+
+    isHandset$: Observable<boolean> = this.breakpointObserver
+        .observe(Breakpoints.Handset)
+        .pipe(
+            map(result => result.matches),
+            shareReplay(1)
+        );
+
+    username: string = '';
+    roles: string[] = [];
+
+    /**
+     * Menú expandido o contraído.
+     */
+    menuCollapsed = false;
+
+    constructor(
+        private tokenService: TokenService,
+        private router: Router
+    ) { }
+
+    ngOnInit(): void {
+
+        this.username = this.tokenService.getUserName();
+        this.roles = this.tokenService.getAuthorities();
+
+        this.updateMenuState(this.router.url);
+
+   this.router.events
     .pipe(
-      map(result => result.matches),
-      shareReplay()
-    );
-username: any;
-roles: any;
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+    )
+    .subscribe(event => {
+
+        this.updateMenuState(event.urlAfterRedirects);
+
+    });
+
+    }
+
+    private updateMenuState(url: string): void {
+
+        this.menuCollapsed =
+
+            url.includes('/dashboard/new-sale') ||
+
+            url.includes('/dashboard/cash-closing');
+
+    }
+
+    expandMenu(): void {
+
+        this.menuCollapsed = false;
+
+    }
+
+    collapseMenu(): void {
+
+        if (!this.isDesktop()) {
+            return;
+        }
+
+        this.menuCollapsed = true;
+
+    }
+
+    toggleMenu(): void {
+
+        this.menuCollapsed = !this.menuCollapsed;
+
+    }
+
+    private isDesktop(): boolean {
+
+        return window.innerWidth >= 992;
+
+    }
+
+    logout(): void {
+
+        this.tokenService.logOut();
+
+    }
+
 }

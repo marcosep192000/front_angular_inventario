@@ -1,72 +1,200 @@
-.container{
-  margin-left:0;
-  display: flex;
-  flex-wrap: wrap;
-margin: 10px;
-  justify-content: center;
-align-items: center;
-}
+.cards-container{
 
-.card {
-  display: flex;
-  margin: 5px;
-  padding: auto;
-  flex-direction: column;
-  justify-content:center;
-  align-items: center;
-  width: 160px;
-  height: 90px;
-  background: #e63946;
-  color: #f1faee;
-  font-size: 16px;
-  font-weight: 700;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.1s 0s linear;
-  position: relative;
-  overflow: hidden;
-}
-.card:active {
-  scale: 0.95;
-}
-.card::after {
-  content: "";
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  background-color: #f1faee;
-  position: absolute;
-  top: 260px;
-  transition: top 0.2s 0s ease-in-out;
-  z-index: 1;
-}
-.card:hover::after {
-  top: -50px;
-}
-.card:hover {
-  color: #000000;
-}
-.card p, h4 {
-  position:relative;
-  z-index: 10;
+    display:grid;
+
+    grid-template-columns:repeat(6,1fr);
+
+    gap:18px;
+
+    margin-bottom:25px;
 
 }
 
+@media(max-width:1500px){
 
-.green { background-color: #4CAF50; }  /* Productos */
-.blue { background-color: #2196F3; }   /* Total Compras */
-.orange { background-color: #FF9800; } /* Total Ventas */
-.purple { background-color: #9C27B0; } /* Total Ganancias */
-.red { background-color: #F44336; }    /* Bajo Stock */
-.yellow { background-color: #FFC107; } /* Ventas del Día */
+    .cards-container{
 
-.btn-yellow {
-  background-color: #FFEB3B;
-height: 100%;
-padding: 20px;
-border: none;
-  border-radius: 0px;
-  text-align: center;
-  align-items: center;
-} /* Ventas del Día */
+        grid-template-columns:repeat(3,1fr);
 
+    }
+
+}
+
+@media(max-width:900px){
+
+    .cards-container{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+@media(max-width:600px){
+
+    .cards-container{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+.dashboard-card{
+
+    position:relative;
+
+    overflow:hidden;
+
+    border:none;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    min-height:150px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:.30s;
+
+    box-shadow:0 12px 28px rgba(0,0,0,.18);
+
+}
+.dashboard-card mat-icon{
+
+    font-size:32px;
+
+    width:32px;
+
+    height:32px;
+
+    margin-bottom:10px;
+
+}
+
+.dashboard-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 18px 35px rgba(0,0,0,.25);
+
+}
+
+.dashboard-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:170px;
+
+    height:170px;
+
+    border-radius:50%;
+
+    right:-40px;
+
+    top:-40px;
+
+    background:rgba(255,255,255,.10);
+
+}
+
+.dashboard-card mat-icon{
+
+    font-size:42px;
+
+    width:42px;
+
+    height:42px;
+
+    z-index:2;
+
+}
+
+.title{
+
+    font-size:18px;
+
+    font-weight:500;
+
+    z-index:2;
+
+}
+
+.value{
+
+    font-size:24px;
+
+    font-weight:700;
+
+    line-height:1.1;
+
+}
+
+.subtitle{
+
+    font-size:13px;
+
+    opacity:.85;
+
+    z-index:2;
+
+}
+
+/* Productos */
+
+.products{
+
+    background:linear-gradient(135deg,#43A047,#2E7D32);
+
+}
+
+/* Compras */
+
+.purchases{
+
+    background:linear-gradient(135deg,#039BE5,#0277BD);
+
+}
+
+/* Ventas */
+
+.sales{
+
+    background:linear-gradient(135deg,#FB8C00,#EF6C00);
+
+}
+
+/* Ganancias */
+
+.profit{
+
+    background:linear-gradient(135deg,#8E24AA,#6A1B9A);
+
+}
+
+/* Bajo stock */
+
+.stock{
+
+    background:linear-gradient(135deg,#E53935,#C62828);
+
+}
+
+/* Día */
+
+.today{
+
+    background:linear-gradient(135deg,#FBC02D,#F57F17);
+
+}

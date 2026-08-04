@@ -1,12 +1,115 @@
-<div class="container-fluid">
-<h2>Tablero Principal</h2>
+<div class="dashboard-container">
+
+    <!-- Header -->
+    <div class="dashboard-header">
+
+        <div>
+
+            <h1>Dashboard</h1>
+
+            <span class="subtitle">
+                Bienvenido a Inventario Pixels
+            </span>
+
+        </div>
+
+        <div class="header-date">
+            {{ today | date:'EEEE d MMMM y':'':'es' }}
+        </div>
+
+    </div>
+
+    <!-- Cards -->
+
+    <app-inicio-cards></app-inicio-cards>
+
+    <!-- Fila superior -->
+
+    <div class="dashboard-row">
+
+        <div class="panel panel-large">
+
+            <div class="panel-header">
+
+                <mat-icon>show_chart</mat-icon>
+
+                <span>Ventas Diarias</span>
+
+            </div>
+
+            @defer {
+
+                <app-inicio-grafico-ventas></app-inicio-grafico-ventas>
+
+            } @error {
+
+                <div class="panel-error">
+
+                    Error al cargar el gráfico
+
+                </div>
+
+            }
+
+        </div>
+
+        <div class="panel">
+
+            <div class="panel-header">
+
+               
 
 
-<app-inicio-cards></app-inicio-cards>
+
+            </div>
+
+            <app-inicio-cards-bancos></app-inicio-cards-bancos>
+
+        </div>
+
+    </div>
+
+    <!-- Fila inferior -->
+
+    <div class="dashboard-row dashboard-bottom">
+
+        <div class="panel">
+
+            <div class="panel-header">
+
+                <mat-icon color="warn">
+
+                    warning
+
+                </mat-icon>
+
+                <span>Bajo Stock</span>
+
+
+            </div>
+<app-inicio-bajo-stock></app-inicio-bajo-stock>
+
+
+        </div>
+
+        <div class="panel">
+
+            <div class="panel-header">
+
+                <mat-icon>
+
+                    receipt_long
+
+                </mat-icon>
+
+                <span>Últimas Ventas</span>
+
+            </div>
+
+            <app-inicio-ultimas-ventas></app-inicio-ultimas-ventas>
+
+        </div>
+
+    </div>
+
 </div>
-@defer () {
-<app-inicio-grafico-ventas></app-inicio-grafico-ventas>
-}@error {
-    <h1>ERROR AL CARGAR EL GRAFICO</h1>
-    console.error('Error al cargar el gráfico:', $error);
-}

@@ -6,6 +6,8 @@ import { ReturnStatement } from '@angular/compiler';
 import { error } from 'console';
 import { dataDashboard } from '../interfaces/dashboard';
 import { VentasPorDia } from '../interfaces/VentasPorDia';
+import { UltimaVenta } from '../interfaces/UltimaVenta';
+import { LowStockByProvider } from '../interfaces/producto-bajo-stock';
 
 @Injectable({
   providedIn: 'root'
@@ -20,4 +22,18 @@ export class DashboardService {
   getVentasPorDia(): Observable<VentasPorDia[]> {
   return this.http.get<VentasPorDia[]>(`${this.apiUrl}dashboard/ventas-por-dia`);  }
 
+
+getUltimasVentas(): Observable<UltimaVenta[]>{
+
+   return this.http.get<UltimaVenta[]>(
+      `${this.apiUrl}dashboard/ultimas-ventas`
+   );
+
+}
+getProductosBajoStock(): Observable<LowStockByProvider[]> {
+
+  return this.http.get<LowStockByProvider[]>(`${this.apiUrl}dashboard/get-all-low-stock`);
+
+
+}
 }
