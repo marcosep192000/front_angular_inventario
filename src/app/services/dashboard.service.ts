@@ -4,7 +4,7 @@ import { catchError, forkJoin, Observable, of } from 'rxjs';
 import { environments } from '../../environments/environments';
 import { ReturnStatement } from '@angular/compiler';
 import { error } from 'console';
-import { dataDashboard } from '../interfaces/dashboard';
+import { dashboardInfoGeneral, dataDashboard } from '../interfaces/dashboard';
 import { VentasPorDia } from '../interfaces/VentasPorDia';
 import { UltimaVenta } from '../interfaces/UltimaVenta';
 import { LowStockByProvider } from '../interfaces/producto-bajo-stock';
@@ -32,8 +32,13 @@ getUltimasVentas(): Observable<UltimaVenta[]>{
 }
 getProductosBajoStock(): Observable<LowStockByProvider[]> {
 
-  return this.http.get<LowStockByProvider[]>(`${this.apiUrl}dashboard/get-all-low-stock`);
+  return this.http.get<LowStockByProvider[]>(`${this.apiUrl}supermarket/get-all-low-stock`);
 
 
+}
+getDashboardInfoGeneral(): Observable<dashboardInfoGeneral> {
+  return this.http.get<dashboardInfoGeneral>(
+    `${this.apiUrl}dashboard/resumen`
+  );
 }
 }

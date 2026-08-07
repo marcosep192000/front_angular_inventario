@@ -5,14 +5,14 @@
 .movimiento-form-container{
 
     max-width:760px;
-    margin:30px auto;
+    margin:0px auto;
     padding:32px;
 
     background:#fff;
 
     border-radius:18px;
 
-    border:1px solid #e6e6e6;
+    border:0px solid #e6e6e6;
 
     box-shadow:
         0 12px 35px rgba(0,0,0,.08);

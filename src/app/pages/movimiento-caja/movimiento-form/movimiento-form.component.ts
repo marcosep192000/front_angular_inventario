@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { ToastrModule, ToastrService } from 'ngx-toastr';import { MatDialogRef } from '@angular/material/dialog';
 import { MovimientoCajaService } from '../../../services/movimiento-caja.service';
 import { EmpleadoService } from '../../../services/empleado.service';
 import { CommonModule } from '@angular/common';
@@ -61,6 +61,7 @@ formaPagoOptions = [
     private movimientoService: MovimientoCajaService,
     private empleadoService: EmpleadoService,
     private toastr: ToastrService,
+    private dialogRef: MatDialogRef<MovimientoFormComponent>
   ) {}
 
   ngOnInit(): void {
@@ -193,7 +194,7 @@ console.log(JSON.stringify(movimiento, null, 2))
     this.movimientoService.create(movimiento).subscribe({
       next: () => {
         this.toastr.success('Movimiento registrado correctamente');
-
+ this.dialogRef.close(true); // Cierra el diálogo y pasa true para indicar éxito
         this.movimientoForm.reset();
 
         this.movimientoForm.patchValue({

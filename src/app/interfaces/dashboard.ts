@@ -4,3 +4,21 @@ export interface dataDashboard {
   products: number;
   bajo_stock: number;
 }
+export interface dashboardInfoGeneral {
+
+
+
+  ventasHoy: number;
+ ventasSemana: number;
+ ventasMes: number;
+ gananciaHoy: number;
+ gananciaSemana: number;
+ gananciaMes: number,
+ cajaActual: number,
+ ticketsHoy: number,
+ productosVendidosHoy: number,
+ clientesHoy: number
+
+
+ 
+}

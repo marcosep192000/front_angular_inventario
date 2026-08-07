@@ -28,14 +28,14 @@ actualizarPreciosMasivo(payload: any): Observable<void> {
     return this.http.get<Product>(`${this.base}supermarket/find/${id}`);
   }
 
-//buscar por proveedor 
+//buscar por proveedor
 getProductoPorCategoria (idProveedor:number):Observable<Product[]>{
   return this.http.get<Product[]>(`${this.base}supermarket/find-for-provider/${idProveedor}`);
 }
 getProductoPorProveedor (idProveedor:number):Observable<Product[]>{
   return this.http.get<Product[]>(`${this.base}supermarket/find-for-provider/${idProveedor}`);
 }
- 
+
   save(product: Product): Observable<Product> {
     return this.http.post<Product>(
       `${this.base}supermarket/create-supermarket`,
@@ -56,6 +56,9 @@ getProductoPorProveedor (idProveedor:number):Observable<Product[]>{
   search(query: string): Observable<ProductItemSale> {
     return this.http.get<ProductItemSale>(`${this.base}supermarket/findByCode/${query}`);
   }
+
+
+  
   productosBajoStock():Observable<Product>{
     return this.http.get<Product>(`${this.base}supermarket/get-all-low-stock`);
   }

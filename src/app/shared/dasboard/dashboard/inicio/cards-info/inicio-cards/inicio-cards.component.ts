@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DashboardService } from '../../../../../../services/dashboard.service';
 import { Subscription } from 'rxjs';
-import { dataDashboard } from '../../../../../../interfaces/dashboard';
+import { dashboardInfoGeneral, dataDashboard } from '../../../../../../interfaces/dashboard';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,10 +34,12 @@ import { RouterLink } from '@angular/router';
 })
 export class InicioCardsComponent implements OnInit, OnDestroy {
   data_cards: dataDashboard | undefined;
+  data_general: dashboardInfoGeneral | undefined;
   private subscription: Subscription = new Subscription();
   constructor(private dashboardService: DashboardService) {}
   ngOnInit(): void {
     this.getProductosMasVendidos();
+    this.getDashboardInfoGeneral();
   }
   getProductosMasVendidos(): void {
     this.subscription = this.dashboardService.getDashboardData().subscribe({
@@ -50,8 +52,25 @@ export class InicioCardsComponent implements OnInit, OnDestroy {
     });
   }
 
-  
+  getDashboardInfoGeneral(): void {
+    this.subscription = this.dashboardService.getDashboardInfoGeneral().subscribe({
+      next: (data) => {
+
+        this.data_general = data;
+          console.log('Datos del dashboard general:', this.data_general);
+      },
+      error: (err) =>
+        console.error('Error al obtener los datos del dashboard general', err),
+    });
+  }
+
+
+
+
   ngOnDestroy(): void {
     this.subscription.unsubscribe(); // Evita memory leaks
   }
+
+
+
 }

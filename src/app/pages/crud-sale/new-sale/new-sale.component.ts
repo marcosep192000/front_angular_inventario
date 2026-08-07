@@ -101,9 +101,11 @@ onSubmit() {
       this.code = ''; // 🧹 limpiar el input después de agregar
     },
     (error) => {
-      this.toastr.error('No se encontró el producto');
-      this.code = ''; // 🧹 limpiar también si hay error
-    }
+  const mensaje = error.error?.error || 'Ocurrió un error';
+
+  this.toastr.error(mensaje);
+  this.code = '';
+}
   );
 
   this.getTotalQuantity();
