@@ -1,0 +1,314 @@
+/* ==========================================================
+   CONTENEDOR
+   ========================================================== */
+
+.dialog-container {
+  width: 100%;
+  min-width: 360px;
+  max-width: 520px;
+
+  background: #ffffff;
+
+  border-radius: 16px;
+
+  overflow: hidden;
+
+  font-family:
+    Roboto,
+    "Helvetica Neue",
+    sans-serif;
+}
+
+
+/* ==========================================================
+   ICONO SUPERIOR
+   ========================================================== */
+
+.dialog-icon {
+  width: 64px;
+  height: 64px;
+
+  margin: 24px auto 10px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #fff3cd;
+
+  border: 1px solid #ffe08a;
+
+  font-size: 30px;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ==========================================================
+   TÍTULO
+   ========================================================== */
+
+.dialog-container h2[mat-dialog-title] {
+  margin: 8px 24px 0;
+
+  text-align: center;
+
+  color: #522e92;
+
+  font-size: 23px;
+
+  font-weight: 700;
+
+  line-height: 1.3;
+}
+
+
+/* ==========================================================
+   CONTENIDO
+   ========================================================== */
+
+mat-dialog-content {
+  padding: 18px 28px 10px !important;
+
+  text-align: center;
+}
+
+
+/* ==========================================================
+   MENSAJE PRINCIPAL
+   ========================================================== */
+
+.mensaje-principal {
+  margin: 0 0 10px;
+
+  color: #303030;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  line-height: 1.5;
+}
+
+
+/* ==========================================================
+   MENSAJE SECUNDARIO
+   ========================================================== */
+
+.mensaje-secundario {
+  margin: 0 auto;
+
+  max-width: 430px;
+
+  color: #757575;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+
+/* ==========================================================
+   ADVERTENCIA
+   ========================================================== */
+
+.advertencia {
+  margin-top: 20px;
+
+  padding: 14px 16px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+
+  text-align: left;
+
+  background: #fff8e1;
+
+  border: 1px solid #ffe082;
+
+  border-left: 5px solid #f9a825;
+
+  border-radius: 10px;
+}
+
+
+/* ==========================================================
+   TÍTULO ADVERTENCIA
+   ========================================================== */
+
+.advertencia strong {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  color: #8a6200;
+
+  font-size: 14px;
+
+  font-weight: 700;
+}
+
+
+/* ==========================================================
+   TEXTO ADVERTENCIA
+   ========================================================== */
+
+.advertencia span {
+  color: #6d5a20;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+/* ==========================================================
+   ACCIONES
+   ========================================================== */
+
+mat-dialog-actions {
+  margin: 0 !important;
+
+  padding: 18px 24px 22px !important;
+
+  display: flex;
+
+  gap: 10px;
+
+  background: #fafafa;
+
+  border-top: 1px solid #eeeeee;
+}
+
+
+/* ==========================================================
+   BOTONES
+   ========================================================== */
+
+mat-dialog-actions button {
+  min-width: 120px;
+
+  height: 42px;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+/* ==========================================================
+   BOTÓN CANCELAR
+   ========================================================== */
+
+mat-dialog-actions button[mat-stroked-button] {
+  color: #522e92;
+
+  border-color: #522e92;
+
+  background: #ffffff;
+}
+
+
+mat-dialog-actions button[mat-stroked-button]:hover {
+  background: #f7f3fc;
+
+  transform: translateY(-1px);
+}
+
+
+/* ==========================================================
+   BOTÓN CONFIRMAR
+   ========================================================== */
+
+mat-dialog-actions button[mat-raised-button] {
+  background: #d32f2f;
+
+  color: #ffffff;
+
+  box-shadow: none;
+}
+
+
+mat-dialog-actions button[mat-raised-button]:hover {
+  background: #c62828;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 5px 12px rgba(211, 47, 47, 0.25);
+}
+
+
+/* ==========================================================
+   FOCUS
+   ========================================================== */
+
+mat-dialog-actions button:focus-visible {
+  outline: 3px solid rgba(82, 46, 146, 0.25);
+
+  outline-offset: 2px;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 500px) {
+
+  .dialog-container {
+    min-width: 0;
+
+    border-radius: 14px;
+  }
+
+
+  .dialog-icon {
+    width: 58px;
+    height: 58px;
+
+    font-size: 27px;
+
+    margin-top: 20px;
+  }
+
+
+  .dialog-container h2[mat-dialog-title] {
+    font-size: 20px;
+
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+
+
+  mat-dialog-content {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+
+  mat-dialog-actions {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+
+    flex-direction: column-reverse;
+  }
+
+
+  mat-dialog-actions button {
+    width: 100%;
+  }
+
+}

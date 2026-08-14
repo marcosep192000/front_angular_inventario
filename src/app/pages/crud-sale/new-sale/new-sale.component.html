@@ -42,32 +42,139 @@
 
   <div class="buscador-card">
 
-    <div class="buscador">
+   <div class="buscador">
 
-      <div class="icon-search">
+  <div class="icon-search">
 
-        <app-icon [iconSrc]="'assets/icons/barcode_reader_.png'" [size]="'32px'">
+    <app-icon
+      [iconSrc]="'assets/icons/barcode_reader_.png'"
+      [size]="'32px'">
+    </app-icon>
 
-        </app-icon>
+  </div>
+
+
+  <div class="busqueda-wrapper">
+
+    <input
+      #buscadorProducto
+      class="search-input"
+      type="text"
+      autocomplete="off"
+      placeholder="Buscar producto por nombre o código..."
+      [(ngModel)]="code"
+      name="code"
+      (ngModelChange)="buscarProductos($event)"
+      (keydown)="manejarTeclado($event)"
+    >
+
+
+    <!-- =================================================
+         CARGANDO
+         ================================================= -->
+
+    <div
+      class="buscando"
+      *ngIf="buscandoProductos"
+    >
+
+      <mat-icon>
+        search
+      </mat-icon>
+
+      Buscando productos...
+
+    </div>
+
+
+    <!-- =================================================
+         RESULTADOS
+         ================================================= -->
+
+    <div
+      class="resultados-productos"
+      *ngIf="mostrarResultados"
+    >
+
+      <div
+        class="resultado-producto"
+        *ngFor="
+          let producto of productosEncontrados;
+          let i = index
+        "
+        [class.seleccionado]="
+          i === indiceSeleccionado
+        "
+        (mousedown)="
+          seleccionarProducto(producto)
+        "
+      >
+
+        <div class="resultado-icono">
+
+          <mat-icon>
+            inventory_2
+          </mat-icon>
+
+        </div>
+
+
+        <div class="resultado-info">
+
+          <strong>
+            {{ producto.name }}
+          </strong>
+
+          <span>
+            Código:
+            {{ producto.barCode }}
+          </span>
+
+        </div>
+
+
+        <div class="resultado-datos">
+
+          <strong>
+            {{ producto.salePrice | currency }}
+          </strong>
+
+          <span
+            [class.sin-stock]="
+              producto.stock <= 0
+            "
+          >
+
+            Stock:
+            {{ producto.stock }}
+
+          </span>
+
+        </div>
 
       </div>
 
-      <input class="search-input" placeholder="Buscar por nombre, código o código de barras..." type="text"
-        [(ngModel)]="code" name="code" (keyup.enter)="onSubmit()">
-
-      <button mat-raised-button color="primary" (click)="onSubmit()">
-
-        <mat-icon>
-
-          search
-
-        </mat-icon>
-
-        Buscar
-
-      </button>
-
     </div>
+
+  </div>
+
+
+  <button
+    mat-raised-button
+    color="primary"
+    type="button"
+    (click)="onSubmit()"
+  >
+
+    <mat-icon>
+      search
+    </mat-icon>
+
+    Buscar
+
+  </button>
+
+</div>
 
   </div>
 

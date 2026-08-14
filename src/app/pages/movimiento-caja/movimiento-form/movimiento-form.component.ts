@@ -184,6 +184,11 @@ medioPago: [null ],
         return;
     }
 
+    if (movimiento.tipo_movimiento === 'AJUSTE_CAJA') {
+  movimiento.observacion = movimiento.descripcion;
+  delete movimiento.descripcion;
+}
+
     console.log('=================================');
     console.log('OBJETO A ENVIAR');
     console.log(movimiento);

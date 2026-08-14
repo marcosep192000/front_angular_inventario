@@ -1,195 +1,742 @@
-<section class="caja-actual" *ngIf="caja as c">
+<div class="cash-closing-container">
+
+  <!-- =====================================================
+       HEADER PRINCIPAL
+       ===================================================== -->
+
+  <section class="page-header">
+
+    <div class="header-left">
+
+      <div class="header-icon">
+        <mat-icon>point_of_sale</mat-icon>
+      </div>
+
+      <div>
+        <h1>Gestión de Caja</h1>
+
+        <p>
+          Control de caja, movimientos y cierres
+        </p>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       CAJA ABIERTA
+       false = ABIERTA
+       ===================================================== -->
+
+  <section
+    class="caja-actual"
+    *ngIf="caja && caja.estado === false"
+  >
 
     <div class="header-caja">
 
+      <div class="titulo-caja">
+
+        <div class="icono-caja">
+          <mat-icon>point_of_sale</mat-icon>
+        </div>
+
         <div>
 
-            <h2>
-                💰 Caja Actual
-            </h2>
+          <span class="etiqueta">
+            CAJA ACTUAL
+          </span>
 
-            <span class="fecha-caja">
+          <h2>
+            Caja #{{ caja.id }}
+          </h2>
 
-                {{ caja.fecha | date:'dd/MM/yyyy' }}
-
-            </span>
+          <span class="fecha-caja">
+            {{ caja.fecha | date:'dd/MM/yyyy' }}
+          </span>
 
         </div>
 
+      </div>
+
+
+      <div class="estado-abierta">
+
+        <span class="estado-punto"></span>
+
+        Caja abierta
+
+      </div>
+
+
+      <!-- CERRAR CAJA -->
+      <button
+        mat-raised-button
+        class="btn-cerrar"
+        (click)="cashClose()"
+      >
+
+        <mat-icon>
+          lock
+        </mat-icon>
+
+        Cerrar Caja
+
+      </button>
+
+    </div>
+
+
+    <hr>
+
+
+    <!-- =====================================================
+         RESUMEN
+         ===================================================== -->
+
+    <div class="resumen-caja">
+
+
+      <!-- APERTURA -->
+
+      <div class="card-info apertura">
+
+        <div class="icono">
+          <mat-icon>
+            account_balance_wallet
+          </mat-icon>
+        </div>
+
+        <div class="contenido-card">
+
+          <span class="titulo">
+            Saldo Apertura
+          </span>
+
+          <strong>
+            {{
+              caja.saldoApertura || 0
+                | currency:'ARS':'symbol-narrow':'1.2-2'
+            }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- INGRESOS -->
+
+      <div
+        class="card-info ingreso"
+        (click)="mostrarDetalleCajaIngresos()"
+      >
+
+        <div class="icono">
+          <mat-icon>
+            trending_up
+          </mat-icon>
+        </div>
+
+        <div class="contenido-card">
+
+          <span class="titulo">
+            Ingresos
+          </span>
+
+          <strong>
+            {{
+              caja.totalIngresos || 0
+                | currency:'ARS':'symbol-narrow':'1.2-2'
+            }}
+          </strong>
+
+          <small>
+            Ver detalle
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <!-- EGRESOS -->
+
+      <div
+        class="card-info egreso"
+        (click)="mostrarDetalleCaja()"
+      >
+
+        <div class="icono">
+          <mat-icon>
+            trending_down
+          </mat-icon>
+        </div>
+
+        <div class="contenido-card">
+
+          <span class="titulo">
+            Egresos
+          </span>
+
+          <strong>
+            {{
+              caja.totalEgresos || 0
+                | currency:'ARS':'symbol-narrow':'1.2-2'
+            }}
+          </strong>
+
+          <small>
+            Ver detalle
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <!-- NUEVO MOVIMIENTO -->
+
+      <div
+        class="card-info accion"
+        (click)="nuevoMovimientoDeCaja(caja.id)"
+      >
+
+        <div class="icono">
+          <mat-icon>
+            add
+          </mat-icon>
+        </div>
+
+        <div class="contenido-card">
+
+          <span class="titulo">
+            Movimiento
+          </span>
+
+          <strong>
+            Nuevo movimiento
+          </strong>
+
+          <small>
+            Registrar operación
+          </small>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SALDO ACTUAL
+         ===================================================== -->
+
+    <div class="saldo-barra">
+
+      <div class="saldo-icono">
+
+        <mat-icon>
+          account_balance
+        </mat-icon>
+
+      </div>
+
+      <div class="saldo-texto">
+
+        <span>
+          Saldo actual calculado
+        </span>
+
+        <strong>
+          {{
+            (
+              (caja.saldoApertura || 0)
+              +
+              (caja.totalIngresos || 0)
+              -
+              (caja.totalEgresos || 0)
+            )
+            | currency:'ARS':'symbol-narrow':'1.2-2'
+          }}
+        </strong>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       CAJA PENDIENTE DE APERTURA
+       null = PENDIENTE
+       ===================================================== -->
+
+  <section
+    class="caja-pendiente"
+    *ngIf="
+      !caja &&
+      cajaPendiente &&
+      cajaPendiente.estado === null
+    "
+  >
+
+    <div class="pendiente-contenido">
+
+      <div class="pendiente-icono">
+
+        <mat-icon>
+          lock_clock
+        </mat-icon>
+
+      </div>
+
+
+      <div class="pendiente-info">
+
+        <span class="pendiente-etiqueta">
+          APERTURA PENDIENTE
+        </span>
+
+        <h2>
+          Hay dinero disponible para la nueva caja
+        </h2>
+
+        <p>
+          La caja anterior fue cerrada y dejó efectivo
+          destinado a la próxima apertura.
+        </p>
+
+
+        <div class="saldo-heredado">
+
+          <span>
+            Saldo disponible para apertura
+          </span>
+
+          <strong>
+            {{
+              cajaPendiente.saldoApertura || 0
+                | currency:'ARS':'symbol-narrow':'1.2-2'
+            }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <div class="pendiente-accion">
+
         <button
-            mat-raised-button
-            color="warn"
-            (click)="cashClose()">
+          mat-raised-button
+          class="btn-abrir"
+          [disabled]="abriendoCaja"
+          (click)="abrirCaja()"
+        >
 
-            <mat-icon>
+          <mat-icon>
+            {{
+              abriendoCaja
+                ? 'hourglass_empty'
+                : 'lock_open'
+            }}
+          </mat-icon>
 
-                lock
-
-            </mat-icon>
-
-            Cerrar Caja
+          <span>
+            {{
+              abriendoCaja
+                ? 'Abriendo...'
+                : 'Abrir nueva caja'
+            }}
+          </span>
 
         </button>
 
-    </div>
-
-    <hr>
-
-    <div class="info">
-
-        <div
-            class="card-info apertura">
-
-            <div class="icono">
-                🏦
-            </div>
-
-            <div class="contenido-card">
-
-                <span class="titulo">
-
-                    Saldo Apertura
-
-                </span>
-
-                <strong>
-
-                    {{ caja.saldoApertura | currency }}
-
-                </strong>
-
-            </div>
-
-        </div>
-
-        <div
-            class="card-info ingreso"
-            (click)="mostrarDetalleCajaIngresos()">
-
-            <div class="icono">
-                💵
-            </div>
-
-            <div class="contenido-card">
-
-                <span class="titulo">
-
-                    Ingresos
-
-                </span>
-
-                <strong>
-
-                    {{ caja.totalIngresos | currency }}
-
-                </strong>
-
-            </div>
-
-        </div>
-
-        <div
-            class="card-info egreso"
-            (click)="mostrarDetalleCaja()">
-
-            <div class="icono">
-                💸
-            </div>
-
-            <div class="contenido-card">
-
-                <span class="titulo">
-
-                    Egresos
-
-                </span>
-
-                <strong>
-
-                    {{ caja.totalEgresos | currency }}
-
-                </strong>
-
-            </div>
-
-        </div>
-
-        <div
-            class="card-info accion"
-            (click)="nuevoMovimientoDeCaja(caja.id)">
-
-            <div class="icono">
-                ➕
-
-            </div>
-
-            <div class="contenido-card">
-
-                <span class="titulo">
-
-                    Movimiento
-
-                </span>
-
-                <strong>
-
-                    Nuevo Movimiento
-
-                </strong>
-
-            </div>
-
-        </div>
+      </div>
 
     </div>
 
-</section>
+  </section>
 
 
 
-<section class="caja-actual">
-    <h2>Cajas Anteriores</h2>
-    <hr>
+  <!-- =====================================================
+       SIN CAJA ABIERTA NI PENDIENTE
+       ===================================================== -->
 
-    <div class="mat-elevation-z8 table-container">
-        <table mat-table [dataSource]="dataSource" class="table">
-            <!-- Columnas de la tabla -->
-            <ng-container matColumnDef="id">
-                <th mat-header-cell *matHeaderCellDef> No. </th>
-                <td mat-cell *matCellDef="let element"> {{element.id}} </td>
-            </ng-container>
-            <ng-container matColumnDef="fecha">
-                <th mat-header-cell *matHeaderCellDef> Fecha Apertura </th>
-                <td mat-cell *matCellDef="let element"> {{element.fecha | date}} </td>
-            </ng-container>
-            <ng-container matColumnDef="apertura">
-                <th mat-header-cell *matHeaderCellDef> Monto Apertura </th>
-                <td mat-cell *matCellDef="let element"> {{element.saldoApertura | currency}} </td>
-            </ng-container>
-            <ng-container matColumnDef="ingresos">
-                <th mat-header-cell *matHeaderCellDef> Ingresos </th>
-                <td mat-cell *matCellDef="let element"> {{element.totalIngresos | currency}} </td>
-            </ng-container>
-            <ng-container matColumnDef="egresos">
-                <th mat-header-cell *matHeaderCellDef> Egresos </th>
-                <td mat-cell *matCellDef="let element"> {{element.totalEgresos | currency}} </td>
-            </ng-container>
-            <ng-container matColumnDef="cierre">
-                <th mat-header-cell *matHeaderCellDef> Cierre </th>
-                <td mat-cell *matCellDef="let element"> {{element.saldoCierre | currency}} </td>
-            </ng-container>
-            <ng-container matColumnDef="estado">
-                <th mat-header-cell *matHeaderCellDef> Estado </th>
-                <td mat-cell *matCellDef="let element">
-                    <span *ngIf="element.estado">Cerrado</span>
-                </td>
-            </ng-container>
+  <section
+    class="sin-caja"
+    *ngIf="
+      !caja &&
+      !cajaPendiente
+    "
+  >
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+    <div class="sin-caja-icono">
+
+      <mat-icon>
+        point_of_sale
+      </mat-icon>
+
     </div>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of periodic elements">
-    </mat-paginator>
-</section>
+    <h2>
+      No hay una caja disponible
+    </h2>
+
+    <p>
+      No existe una caja abierta ni una caja pendiente
+      de apertura.
+    </p>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       HISTORIAL
+       ===================================================== -->
+
+  <section class="historial">
+
+    <div class="historial-header">
+
+      <div>
+
+        <span class="historial-etiqueta">
+          HISTORIAL
+        </span>
+
+        <h2>
+          Cajas anteriores
+        </h2>
+
+        <p>
+          Registro de aperturas y cierres de caja
+        </p>
+
+      </div>
+
+      <div class="historial-icono">
+
+        <mat-icon>
+          history
+        </mat-icon>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TABLA
+         ===================================================== -->
+
+    <div class="table-container">
+
+      <table
+        mat-table
+        [dataSource]="dataSource"
+        class="table"
+      >
+
+
+        <!-- ID -->
+
+        <ng-container matColumnDef="id">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+          >
+            No.
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let element"
+          >
+
+            <span class="id-badge">
+              #{{ element.id }}
+            </span>
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- FECHA -->
+
+        <ng-container matColumnDef="fecha">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+          >
+            Fecha apertura
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let element"
+          >
+            {{ element.fecha | date:'dd/MM/yyyy' }}
+          </td>
+
+        </ng-container>
+
+
+        <!-- APERTURA -->
+
+        <ng-container matColumnDef="apertura">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+          >
+            Monto apertura
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let element"
+            class="valor-apertura"
+          >
+
+            {{
+              element.saldoApertura || 0
+                | currency:'ARS':'symbol-narrow':'1.2-2'
+            }}
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- INGRESOS -->
+
+        <ng-container matColumnDef="ingresos">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+          >
+            Ingresos
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let element"
+            class="valor-ingreso"
+          >
+
+            {{
+              element.totalIngresos || 0
+                | currency:'ARS':'symbol-narrow':'1.2-2'
+            }}
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- EGRESOS -->
+
+        <ng-container matColumnDef="egresos">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+          >
+            Egresos
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let element"
+            class="valor-egreso"
+          >
+
+            {{
+              element.totalEgresos || 0
+                | currency:'ARS':'symbol-narrow':'1.2-2'
+            }}
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- CIERRE -->
+
+        <ng-container matColumnDef="cierre">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+          >
+            Cierre
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let element"
+            class="valor-cierre"
+          >
+
+            {{
+              element.saldoCierre || 0
+                | currency:'ARS':'symbol-narrow':'1.2-2'
+            }}
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ESTADO -->
+
+        <ng-container matColumnDef="estado">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+          >
+            Estado
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let element"
+          >
+
+            <!-- ABIERTA -->
+
+            <span
+              *ngIf="element.estado === false"
+              class="estado-badge abierta"
+            >
+
+              <span class="estado-punto"></span>
+
+              Abierta
+
+            </span>
+
+
+            <!-- CERRADA -->
+
+            <span
+              *ngIf="element.estado === true"
+              class="estado-badge cerrada"
+            >
+
+              <span class="estado-punto"></span>
+
+              Cerrada
+
+            </span>
+
+
+            <!-- PENDIENTE -->
+
+            <span
+              *ngIf="element.estado === null"
+              class="estado-badge pendiente"
+            >
+
+              <span class="estado-punto"></span>
+
+              Pendiente
+
+            </span>
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- HEADER -->
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns"
+        ></tr>
+
+
+        <!-- FILAS -->
+
+        <tr
+          mat-row
+          *matRowDef="
+            let row;
+            columns: displayedColumns;
+          "
+        ></tr>
+
+
+        <!-- SIN DATOS -->
+
+        <tr
+          class="fila-sin-datos"
+          *matNoDataRow
+        >
+
+          <td colspan="7">
+
+            <mat-icon>
+              inventory_2
+            </mat-icon>
+
+            <span>
+              No hay cajas registradas
+            </span>
+
+          </td>
+
+        </tr>
+
+      </table>
+
+    </div>
+
+
+    <!-- =====================================================
+         PAGINADOR
+         3 / 5 / 10
+         ===================================================== -->
+
+    <div class="paginador-container">
+
+      <div class="paginador-info">
+
+        <mat-icon>
+          view_list
+        </mat-icon>
+
+        <span>
+          Cajas por página
+        </span>
+
+      </div>
+
+      <mat-paginator
+        [pageSize]="3"
+        [pageSizeOptions]="[3, 5, 10]"
+        showFirstLastButtons
+        aria-label="Paginación de cajas"
+      >
+      </mat-paginator>
+
+    </div>
+
+  </section>
+
+</div>

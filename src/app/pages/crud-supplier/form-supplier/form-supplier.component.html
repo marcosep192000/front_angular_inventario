@@ -1,23 +1,23 @@
 <form [formGroup]="formGroup">
 
-    
+
     <div class="container__title">
      <h2 class="title__color"mat-dialog-title>{{ data.tipo === 'createSupplier' ?
-        'Registrar Proveedor' : 'Actualizar Proveedor' }}</h2>  
+        'Registrar Proveedor' : 'Actualizar Proveedor' }}</h2>
     </div>
-    
+
 
     <mat-dialog-content>
 
         <div class="container">
 
             <div class="col-1">
-                <mat-form-field class="input" hintLabel="Máximo 15 caracteres">
+                <mat-form-field class="input" hintLabel="Máximo 80 caracteres">
                     <mat-label>Proveedor</mat-label>
-                    <input matInput maxlength="15" formControlName="name" />
+                    <input matInput maxlength="80" formControlName="name" />
                     <mat-hint align="end">{{
                         formGroup.get('name')?.value?.length
-                        }}/15</mat-hint>
+                        }}/80</mat-hint>
                 </mat-form-field>
 
                 <mat-form-field class="input" hintLabel="Máximo 30 caracteres">

@@ -33,8 +33,6 @@ getUltimasVentas(): Observable<UltimaVenta[]>{
 getProductosBajoStock(): Observable<LowStockByProvider[]> {
 
   return this.http.get<LowStockByProvider[]>(`${this.apiUrl}supermarket/get-all-low-stock`);
-
-
 }
 getDashboardInfoGeneral(): Observable<dashboardInfoGeneral> {
   return this.http.get<dashboardInfoGeneral>(

@@ -1,422 +1,1762 @@
-/* =======================================================
-   CONTENEDORES
-======================================================= */
+/* ==========================================================
+   CONTENEDOR PRINCIPAL
+   ========================================================== */
 
-.caja-actual{
+.cash-closing-container {
+  width: 100%;
+  min-height: 100%;
 
-    margin:20px;
-    padding:25px;
-    background:#ffffff;
-    border-radius:18px;
+  padding: 24px;
 
-    box-shadow:
-    0 10px 30px rgba(0,0,0,.08);
+  box-sizing: border-box;
 
-    border:1px solid #ececec;
+  background: #f5f5f7;
+
+  font-family:
+    Roboto,
+    "Helvetica Neue",
+    sans-serif;
 }
 
-.caja-actual h2{
 
-    font-size:24px;
-    color:#303030;
-    margin-bottom:10px;
-    font-weight:700;
+/* ==========================================================
+   HEADER PRINCIPAL
+   ========================================================== */
+
+.page-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 22px;
+
+  padding: 20px 24px;
+
+  background: #ffffff;
+
+  border: 1px solid #e7e7e7;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.05);
 }
 
-.caja-actual hr{
 
-    border:none;
-    height:1px;
-    background:#ececec;
-    margin-bottom:20px;
+.header-left {
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
 }
 
-/* =======================================================
-   DASHBOARD
-======================================================= */
 
-.dashboard-card{
+.header-icon {
+  width: 56px;
+  height: 56px;
 
-    background:#fafafa;
+  display: flex;
 
-    border-radius:18px;
+  align-items: center;
 
-    padding:20px;
+  justify-content: center;
 
-    border:1px solid #ececec;
+  border-radius: 12px;
+
+  background: #522e92;
+
+  color: #ffffff;
 }
 
-/* =======================================================
+
+.header-icon mat-icon {
+  width: 30px;
+  height: 30px;
+
+  font-size: 30px;
+}
+
+
+.page-header h1 {
+  margin: 0;
+
+  color: #303030;
+
+  font-size: 25px;
+
+  font-weight: 700;
+}
+
+
+.page-header p {
+  margin: 5px 0 0;
+
+  color: #777777;
+
+  font-size: 14px;
+}
+
+
+/* ==========================================================
+   CAJA ACTUAL
+   ========================================================== */
+
+.caja-actual {
+  margin-bottom: 20px;
+
+  padding: 22px;
+
+  background: #ffffff;
+
+  border: 1px solid #e4e4e4;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+
+/* ==========================================================
+   HEADER CAJA
+   ========================================================== */
+
+.header-caja {
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+}
+
+
+.titulo-caja {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  flex: 1;
+}
+
+
+.icono-caja {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  background: #eee8f8;
+
+  color: #522e92;
+}
+
+
+.icono-caja mat-icon {
+  width: 27px;
+  height: 27px;
+
+  font-size: 27px;
+}
+
+
+.etiqueta {
+  display: block;
+
+  margin-bottom: 2px;
+
+  color: #522e92;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+}
+
+
+.titulo-caja h2 {
+  margin: 0;
+
+  color: #303030;
+
+  font-size: 21px;
+
+  font-weight: 700;
+}
+
+
+.fecha-caja {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #888888;
+
+  font-size: 12px;
+}
+
+
+/* ==========================================================
+   ESTADO ABIERTA
+   ========================================================== */
+
+.estado-abierta {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 8px 13px;
+
+  border-radius: 20px;
+
+  background: #eaf7ee;
+
+  color: #2e7d32;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+.estado-punto {
+  width: 8px;
+  height: 8px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #43a047;
+
+  box-shadow:
+    0 0 0 4px rgba(67, 160, 71, 0.12);
+}
+
+
+/* ==========================================================
+   BOTÓN CERRAR CAJA
+   ========================================================== */
+
+.btn-cerrar {
+  height: 42px;
+
+  padding: 0 18px;
+
+  border-radius: 8px !important;
+
+  background: #d32f2f !important;
+
+  color: #ffffff !important;
+
+  box-shadow: none !important;
+
+  font-weight: 600;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
+}
+
+
+.btn-cerrar:hover {
+  transform: translateY(-2px);
+
+  background: #c62828 !important;
+
+  box-shadow:
+    0 6px 15px rgba(211, 47, 47, .22) !important;
+}
+
+
+.btn-cerrar mat-icon {
+  margin-right: 5px;
+}
+
+
+/* ==========================================================
+   SEPARADOR
+   ========================================================== */
+
+.caja-actual hr {
+  margin: 20px 0;
+
+  border: 0;
+
+  border-top: 1px solid #eeeeee;
+}
+
+
+/* ==========================================================
+   RESUMEN
+   ========================================================== */
+
+.resumen-caja {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 15px;
+}
+
+
+/* ==========================================================
    TARJETAS
-======================================================= */
+   ========================================================== */
 
-.info{
+.card-info {
+  display: flex;
 
-    display:grid;
+  align-items: center;
+
+  gap: 13px;
+
+  min-height: 78px;
+
+  padding: 16px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #e7e7e7;
+
+  border-radius: 11px;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    border-color .2s ease;
+}
+
+
+.card-info:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 7px 17px rgba(0, 0, 0, .08);
+}
+
+
+.card-info.ingreso,
+.card-info.egreso,
+.card-info.accion {
+  cursor: pointer;
+}
+
+
+.card-info.ingreso:hover {
+  border-color: #43a047;
+}
+
+
+.card-info.egreso:hover {
+  border-color: #e53935;
+}
+
+
+.card-info.accion:hover {
+  border-color: #522e92;
+}
+
+
+/* ==========================================================
+   ICONOS TARJETAS
+   ========================================================== */
+
+.card-info .icono {
+  width: 48px;
+  height: 48px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  color: #ffffff;
+}
+
+
+.card-info .icono mat-icon {
+  width: 23px;
+  height: 23px;
+
+  font-size: 23px;
+}
+
+
+.card-info.apertura .icono {
+  background: #5e35b1;
+}
+
+
+.card-info.ingreso .icono {
+  background: #43a047;
+}
+
+
+.card-info.egreso .icono {
+  background: #e53935;
+}
+
+
+.card-info.accion .icono {
+  background: #1e88e5;
+}
+
+
+/* ==========================================================
+   CONTENIDO TARJETAS
+   ========================================================== */
+
+.contenido-card {
+  display: flex;
+
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+
+.contenido-card .titulo {
+  color: #777777;
+
+  font-size: 12px;
+}
+
+
+.contenido-card strong {
+  margin-top: 4px;
+
+  color: #303030;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+.card-info.ingreso strong {
+  color: #2e7d32;
+}
+
+
+.card-info.egreso strong {
+  color: #d32f2f;
+}
+
+
+.card-info.accion strong {
+  color: #1565c0;
+
+  font-size: 15px;
+}
+
+
+.contenido-card small {
+  margin-top: 4px;
+
+  color: #999999;
+
+  font-size: 11px;
+}
+
+
+/* ==========================================================
+   SALDO ACTUAL
+   ========================================================== */
+
+.saldo-barra {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin-top: 16px;
+
+  padding: 15px 18px;
+
+  border-radius: 10px;
+
+  background: #f5f1fa;
+
+  border: 1px solid #e4d9f2;
+}
+
+
+.saldo-icono {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+
+  background: #522e92;
+
+  color: #ffffff;
+}
+
+
+.saldo-icono mat-icon {
+  width: 22px;
+  height: 22px;
+
+  font-size: 22px;
+}
+
+
+.saldo-texto {
+  display: flex;
+
+  flex-direction: column;
+}
+
+
+.saldo-texto span {
+  color: #777777;
+
+  font-size: 12px;
+}
+
+
+.saldo-texto strong {
+  margin-top: 3px;
+
+  color: #522e92;
+
+  font-size: 22px;
+
+  font-weight: 800;
+}
+
+
+/* ==========================================================
+   CAJA PENDIENTE
+   ========================================================== */
+
+.caja-pendiente {
+  margin-bottom: 20px;
+
+  padding: 22px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fffaf0,
+      #fff7df
+    );
+
+  border: 1px solid #f1d58a;
+
+  border-left: 6px solid #f9a825;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 4px 14px rgba(249, 168, 37, .10);
+}
+
+
+.pendiente-contenido {
+  display: grid;
+
+  grid-template-columns:
+    auto 1fr auto;
+
+  align-items: center;
+
+  gap: 20px;
+}
+
+
+.pendiente-icono {
+  width: 62px;
+  height: 62px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #fff0c2;
+
+  color: #d58b00;
+}
+
+
+.pendiente-icono mat-icon {
+  width: 32px;
+  height: 32px;
+
+  font-size: 32px;
+}
+
+
+.pendiente-info {
+  min-width: 0;
+}
+
+
+.pendiente-etiqueta {
+  display: block;
+
+  color: #a16a00;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+}
+
+
+.pendiente-info h2 {
+  margin: 5px 0 5px;
+
+  color: #4b3a15;
+
+  font-size: 20px;
+
+  font-weight: 700;
+}
+
+
+.pendiente-info p {
+  margin: 0 0 12px;
+
+  color: #75643b;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+.saldo-heredado {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+
+.saldo-heredado span {
+  color: #75643b;
+
+  font-size: 12px;
+}
+
+
+.saldo-heredado strong {
+  color: #522e92;
+
+  font-size: 23px;
+
+  font-weight: 800;
+}
+
+
+/* ==========================================================
+   BOTÓN ABRIR CAJA
+   ========================================================== */
+
+.pendiente-accion {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+
+.btn-abrir {
+  min-width: 175px;
+
+  height: 46px;
+
+  padding: 0 20px;
+
+  border-radius: 9px !important;
+
+  background: #522e92 !important;
+
+  color: #ffffff !important;
+
+  font-weight: 700;
+
+  box-shadow: none !important;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
+}
+
+
+.btn-abrir:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  background: #45267d !important;
+
+  box-shadow:
+    0 7px 17px rgba(82, 46, 146, .25) !important;
+}
+
+
+.btn-abrir:disabled {
+  opacity: .65;
+
+  cursor: not-allowed;
+}
+
+
+.btn-abrir mat-icon {
+  margin-right: 6px;
+}
+
+
+/* ==========================================================
+   SIN CAJA
+   ========================================================== */
+
+.sin-caja {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-bottom: 20px;
+
+  padding: 45px 20px;
+
+  background: #ffffff;
+
+  border: 1px dashed #cccccc;
+
+  border-radius: 14px;
+
+  text-align: center;
+}
+
+
+.sin-caja-icono {
+  width: 64px;
+  height: 64px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-bottom: 12px;
+
+  border-radius: 50%;
+
+  background: #f0edf5;
+
+  color: #777777;
+}
+
+
+.sin-caja-icono mat-icon {
+  width: 32px;
+  height: 32px;
+
+  font-size: 32px;
+}
+
+
+.sin-caja h2 {
+  margin: 0;
+
+  color: #444444;
+
+  font-size: 20px;
+}
+
+
+.sin-caja p {
+  margin: 7px 0 0;
+
+  color: #888888;
+
+  font-size: 13px;
+}
+
+
+/* ==========================================================
+   HISTORIAL
+   ========================================================== */
+
+.historial {
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e5e5;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, .05);
+}
+
+
+.historial-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 20px 22px;
+
+  border-bottom: 1px solid #eeeeee;
+}
+
+
+.historial-etiqueta {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #522e92;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+}
+
+
+.historial-header h2 {
+  margin: 0;
+
+  color: #303030;
+
+  font-size: 20px;
+
+  font-weight: 700;
+}
+
+
+.historial-header p {
+  margin: 5px 0 0;
+
+  color: #888888;
+
+  font-size: 13px;
+}
+
+
+.historial-icono {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #f1ecf8;
+
+  color: #522e92;
+}
+
+
+.historial-icono mat-icon {
+  width: 24px;
+  height: 24px;
+
+  font-size: 24px;
+}
+
+
+/* ==========================================================
+   TABLA
+   ========================================================== */
+
+.table-container {
+  width: 100%;
+
+  overflow-x: auto;
+
+  scrollbar-width: thin;
+
+  scrollbar-color: #b9acd0 #f4f1f8;
+}
+
+
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+
+.table-container::-webkit-scrollbar-track {
+  background: #f4f1f8;
+}
+
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #b9acd0;
+
+  border-radius: 10px;
+}
+
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #8f7baa;
+}
+
+
+.table {
+  width: 100%;
+
+  min-width: 850px;
+
+  background: #ffffff;
+
+  border-collapse: separate;
+
+  border-spacing: 0;
+}
+
+
+/* ==========================================================
+   CABECERA TABLA
+   ========================================================== */
+
+.table th {
+  height: 48px;
+
+  padding: 0 16px;
+
+  background: #522e92;
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  border: none;
+}
+
+
+.table th:first-child {
+  padding-left: 20px;
+}
+
+
+.table th:last-child {
+  padding-right: 20px;
+}
+
+
+/* ==========================================================
+   CELDAS
+   ========================================================== */
+
+.table td {
+  height: 52px;
+
+  padding: 0 16px;
+
+  color: #444444;
+
+  font-size: 13px;
+
+  white-space: nowrap;
+
+  border-bottom: 1px solid #eeeeee;
+}
+
+
+.table td:first-child {
+  padding-left: 20px;
+}
+
+
+.table td:last-child {
+  padding-right: 20px;
+}
+
+
+/* ==========================================================
+   FILAS
+   ========================================================== */
+
+.table .mat-mdc-row {
+  height: 52px;
+
+  transition:
+    background .15s ease;
+}
+
+
+.table .mat-mdc-row:hover {
+  background: #faf7ff;
+}
+
+
+.table .mat-mdc-row:nth-child(even) {
+  background: #fcfcfc;
+}
+
+
+.table .mat-mdc-row:nth-child(even):hover {
+  background: #faf7ff;
+}
+
+
+/* ==========================================================
+   ID
+   ========================================================== */
+
+.id-badge {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 42px;
+
+  padding: 4px 8px;
+
+  border-radius: 6px;
+
+  background: #f1ecf8;
+
+  color: #522e92;
+
+  font-weight: 700;
+}
+
+
+/* ==========================================================
+   VALORES TABLA
+   ========================================================== */
+
+.valor-apertura {
+  color: #522e92 !important;
+
+  font-weight: 600;
+}
+
+
+.valor-ingreso {
+  color: #2e7d32 !important;
+
+  font-weight: 600;
+}
+
+
+.valor-egreso {
+  color: #d32f2f !important;
+
+  font-weight: 600;
+}
+
+
+.valor-cierre {
+  color: #1565c0 !important;
+
+  font-weight: 700;
+}
+
+
+/* ==========================================================
+   ESTADOS
+   ========================================================== */
+
+.estado-badge {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 6px 11px;
+
+  border-radius: 20px;
+
+  font-size: 12px;
+
+  font-weight: 700;
+}
+
+
+.estado-badge.abierta {
+  background: #eaf7ee;
+
+  color: #2e7d32;
+}
+
+
+.estado-badge.cerrada {
+  background: #f3f3f3;
+
+  color: #777777;
+}
+
+
+.estado-badge.pendiente {
+  background: #fff4d6;
+
+  color: #a16a00;
+}
+
+
+.estado-badge .estado-punto {
+  width: 7px;
+  height: 7px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: currentColor;
+}
+
+
+/* ==========================================================
+   SIN DATOS
+   ========================================================== */
+
+.fila-sin-datos {
+  height: 160px;
+
+  text-align: center;
+}
+
+
+.fila-sin-datos td {
+  color: #999999;
+}
+
+
+.fila-sin-datos mat-icon {
+  display: block;
+
+  width: 32px;
+  height: 32px;
+
+  margin: 0 auto 8px;
+
+  font-size: 32px;
+
+  color: #bbbbbb;
+}
+
+
+/* ==========================================================
+   PAGINADOR
+   ========================================================== */
+
+.paginador-container {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  min-height: 64px;
+
+  padding: 0 18px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border-top: 1px solid #eeeeee;
+}
+
+
+.paginador-info {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  color: #777777;
+
+  font-size: 12px;
+
+  font-weight: 500;
+}
+
+
+.paginador-info mat-icon {
+  width: 20px;
+  height: 20px;
+
+  font-size: 20px;
+
+  color: #522e92;
+}
+
+
+/* ==========================================================
+   MAT PAGINATOR
+   ========================================================== */
+
+.paginador-container mat-paginator {
+  min-height: 56px;
+
+  border-top: none;
+
+  background: transparent;
+}
+
+
+/* ==========================================================
+   TEXTO DEL PAGINADOR
+   ========================================================== */
+
+::ng-deep
+.paginador-container
+.mat-mdc-paginator-page-size-label {
+
+  color: #777777;
+
+  font-size: 12px;
+}
+
+
+::ng-deep
+.paginador-container
+.mat-mdc-paginator-range-label {
+
+  color: #555555;
+
+  font-size: 12px;
+}
+
+
+/* ==========================================================
+   SELECT DEL PAGINADOR
+   ========================================================== */
+
+::ng-deep
+.paginador-container
+.mat-mdc-form-field {
+
+  margin: 0;
+}
+
+
+::ng-deep
+.paginador-container
+.mat-mdc-text-field-wrapper {
+
+  background: #fafafa !important;
+
+  border-radius: 7px;
+}
+
+
+/* ==========================================================
+   BOTONES PAGINADOR
+   ========================================================== */
+
+::ng-deep
+.paginador-container
+.mat-mdc-icon-button {
+
+  color: #522e92;
+}
+
+
+::ng-deep
+.paginador-container
+.mat-mdc-icon-button:hover {
+
+  background: #f1ecf8;
+}
+
+
+::ng-deep
+.paginador-container
+.mat-mdc-icon-button:disabled {
+
+  color: #cccccc;
+}
+
+
+/* ==========================================================
+   EFECTO DEL HISTORIAL
+   ========================================================== */
+
+.historial {
+  transition:
+    box-shadow .2s ease,
+    transform .2s ease;
+}
+
+
+.historial:hover {
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, .07);
+}
+
+
+/* ==========================================================
+   RESPONSIVE 1100px
+   ========================================================== */
+
+@media (max-width: 1100px) {
+
+  .resumen-caja {
 
     grid-template-columns:
-    repeat(auto-fit,minmax(220px,1fr));
+      repeat(2, minmax(0, 1fr));
 
-    gap:18px;
-}
+  }
 
-.card-info{
 
-    background:white;
+  .pendiente-contenido {
 
-    border-radius:15px;
+    grid-template-columns:
+      auto 1fr;
 
-    padding:18px;
+  }
 
-    cursor:pointer;
 
-    transition:.25s;
+  .pendiente-accion {
 
-    display:flex;
+    grid-column: 2;
 
-    flex-direction:column;
+    justify-content: flex-start;
 
-    justify-content:center;
-
-    min-height:90px;
-
-    box-shadow:
-    0 8px 20px rgba(0,0,0,.05);
-
-    border-left:6px solid transparent;
-}
-
-.card-info:hover{
-
-    transform:translateY(-4px);
-
-    box-shadow:
-    0 12px 25px rgba(0,0,0,.12);
-}
-
-/* colores */
-
-.apertura{
-
-    border-left-color:#3b82f6;
-}
-
-.ingreso{
-
-    border-left-color:#22c55e;
-}
-
-.egreso{
-
-    border-left-color:#ef4444;
-}
-
-.accion{
-
-    border-left-color:#7c3aed;
-}
-
-/* texto */
-
-.titulo{
-
-    color:#7b7b7b;
-
-    font-size:14px;
-
-    margin-bottom:8px;
-}
-
-.card-info strong{
-
-    font-size:24px;
-
-    color:#202020;
-
-    font-weight:700;
-}
-
-/* =======================================================
-   BOTON
-======================================================= */
-
-.actions{
-
-    margin-top:25px;
-
-    display:flex;
-
-    justify-content:flex-end;
-}
-
-.btn{
-
-    border:none;
-
-    border-radius:12px;
-
-    padding:14px 28px;
-
-    cursor:pointer;
-
-    color:white;
-
-    font-weight:600;
-
-    font-size:15px;
-
-    transition:.3s;
-}
-
-.btn__new{
-
-    background:linear-gradient(135deg,#ef4444,#dc2626);
-}
-
-.btn__new:hover{
-
-    transform:translateY(-2px);
-
-    box-shadow:
-    0 10px 20px rgba(220,38,38,.35);
-}
-
-/* =======================================================
-   TABLA
-======================================================= */
-
-.table-container{
-
-    margin-top:20px;
-
-    border-radius:18px;
-
-    overflow:hidden;
-
-    border:1px solid #ececec;
-
-    box-shadow:
-    0 10px 30px rgba(0,0,0,.08);
-
-    max-height:420px;
-
-    overflow:auto;
-}
-
-.table{
-
-    width:100%;
-}
-
-.mat-mdc-header-row{
-
-    background:#f6f8fb;
-}
-
-.mat-mdc-header-cell{
-
-    font-size:14px;
-
-    font-weight:700;
-
-    color:#555;
-}
-
-.mat-mdc-row{
-
-    transition:.25s;
-}
-
-.mat-mdc-row:hover{
-
-    background:#f5f9ff;
-}
-
-/* =======================================================
-   PAGINADOR
-======================================================= */
-
-mat-paginator{
-
-    margin-top:10px;
-
-    border-radius:0 0 18px 18px;
-}
-
-/* =======================================================
-   RESPONSIVE
-======================================================= */
-
-@media(max-width:768px){
-
-.info{
-
-grid-template-columns:1fr;
+  }
 
 }
 
-.actions{
 
-justify-content:center;
+/* ==========================================================
+   RESPONSIVE 800px
+   ========================================================== */
 
-}
+@media (max-width: 800px) {
 
-.btn{
+  .cash-closing-container {
 
-width:100%;
-}
+    padding: 16px;
 
-}
-.header-caja{
+  }
 
-    display:flex;
 
-    justify-content:space-between;
+  .header-caja {
 
-    align-items:center;
+    flex-wrap: wrap;
 
-    margin-bottom:18px;
+  }
 
-}
 
-.header-caja h2{
+  .titulo-caja {
 
-    margin:0;
+    min-width: 250px;
 
-    font-size:28px;
+  }
 
-    color:#522E92;
 
-    font-weight:700;
+  .btn-cerrar {
 
-}
+    margin-left: auto;
 
-.fecha-caja{
+  }
 
-    display:block;
 
-    margin-top:6px;
+  .estado-abierta {
 
-    color:#7A7A7A;
+    order: 3;
 
-    font-size:14px;
+  }
 
-}
 
-.info{
+  .resumen-caja {
 
-    display:grid;
+    grid-template-columns: 1fr 1fr;
 
-    grid-template-columns:repeat(4,1fr);
+  }
 
-    gap:18px;
 
-}
+  .pendiente-contenido {
 
-.card-info{
+    grid-template-columns: 1fr;
 
-    display:flex;
+    text-align: center;
 
-    align-items:center;
+  }
 
-    gap:18px;
 
-    background:#FFFFFF;
+  .pendiente-icono {
 
-    border:1px solid #E8E8E8;
+    margin: auto;
 
-    border-radius:12px;
+  }
 
-    padding:20px;
 
-    transition:.25s;
+  .pendiente-accion {
 
-    cursor:pointer;
+    grid-column: auto;
 
-    box-shadow:0 3px 10px rgba(0,0,0,.05);
+    justify-content: center;
 
-}
+  }
 
-.card-info:hover{
 
-    transform:translateY(-3px);
+  .saldo-heredado {
 
-    box-shadow:0 10px 22px rgba(82,46,146,.15);
+    justify-content: center;
 
-}
+  }
 
-.icono{
 
-    width:56px;
+  .paginador-container {
 
-    height:56px;
+    flex-direction: column;
 
-    border-radius:50%;
+    align-items: stretch;
 
-    display:flex;
+    justify-content: center;
 
-    justify-content:center;
+    gap: 2px;
 
-    align-items:center;
+    padding: 8px 10px;
 
-    color:white;
+  }
 
-    font-size:24px;
 
-    flex-shrink:0;
+  .paginador-info {
 
-}
+    justify-content: center;
 
-.contenido-card{
+  }
 
-    display:flex;
 
-    flex-direction:column;
+  .paginador-container mat-paginator {
 
-    flex:1;
+    width: 100%;
+
+  }
 
 }
 
-.titulo{
 
-    font-size:13px;
+/* ==========================================================
+   RESPONSIVE 600px
+   ========================================================== */
 
-    color:#777;
+@media (max-width: 600px) {
 
-    margin-bottom:5px;
+  .cash-closing-container {
+
+    padding: 10px;
+
+  }
+
+
+  .page-header {
+
+    padding: 16px;
+
+  }
+
+
+  .header-left {
+
+    gap: 10px;
+
+  }
+
+
+  .header-icon {
+
+    width: 46px;
+    height: 46px;
+
+  }
+
+
+  .header-icon mat-icon {
+
+    width: 25px;
+    height: 25px;
+
+    font-size: 25px;
+
+  }
+
+
+  .page-header h1 {
+
+    font-size: 21px;
+
+  }
+
+
+  .page-header p {
+
+    font-size: 12px;
+
+  }
+
+
+  .caja-actual {
+
+    padding: 16px;
+
+  }
+
+
+  .titulo-caja {
+
+    width: 100%;
+
+  }
+
+
+  .estado-abierta {
+
+    margin-left: 0;
+
+  }
+
+
+  .btn-cerrar {
+
+    width: 100%;
+
+    margin-left: 0;
+
+  }
+
+
+  .resumen-caja {
+
+    grid-template-columns: 1fr;
+
+  }
+
+
+  .card-info {
+
+    min-height: 70px;
+
+  }
+
+
+  .caja-pendiente {
+
+    padding: 18px;
+
+  }
+
+
+  .pendiente-info h2 {
+
+    font-size: 18px;
+
+  }
+
+
+  .saldo-heredado {
+
+    flex-direction: column;
+
+    gap: 4px;
+
+  }
+
+
+  .btn-abrir {
+
+    width: 100%;
+
+  }
+
+
+  .historial-header {
+
+    padding: 17px;
+
+  }
+
+
+  .historial-header h2 {
+
+    font-size: 18px;
+
+  }
+
+
+  .table {
+
+    min-width: 850px;
+
+  }
+
+
+  .paginador-info {
+
+    font-size: 11px;
+
+  }
 
 }
 
-.card-info strong{
 
-    font-size:22px;
+/* ==========================================================
+   RESPONSIVE 450px
+   ========================================================== */
 
-    font-weight:700;
+@media (max-width: 450px) {
 
-    color:#303030;
+  .cash-closing-container {
 
+    padding: 8px;
+
+  }
+
+
+  .page-header {
+
+    border-radius: 10px;
+
+  }
+
+
+  .header-left {
+
+    align-items: flex-start;
+
+  }
+
+
+  .header-icon {
+
+    width: 42px;
+    height: 42px;
+
+  }
+
+
+  .page-header h1 {
+
+    font-size: 19px;
+
+  }
+
+
+  .caja-actual,
+  .caja-pendiente,
+  .historial {
+
+    border-radius: 10px;
+
+  }
+
+
+  .header-caja {
+
+    gap: 12px;
+
+  }
+
+
+  .icono-caja {
+
+    width: 45px;
+    height: 45px;
+
+  }
+
+
+  .titulo-caja h2 {
+
+    font-size: 18px;
+
+  }
+
+
+  .estado-abierta {
+
+    font-size: 11px;
+
+  }
+
+
+  .saldo-texto strong {
+
+    font-size: 20px;
+
+  }
+
+.table .mat-mdc-row {
+  display: table-row !important;
+  height: 52px !important;
 }
 
-.apertura .icono{
-
-    background:#5E35B1;
-
+.table .mat-mdc-cell {
+  display: table-cell !important;
 }
 
-.ingreso .icono{
-
-    background:#43A047;
-
+.table .mat-mdc-header-row {
+  display: table-row !important;
 }
 
-.egreso .icono{
-
-    background:#D32F2F;
-
+.table .mat-mdc-header-cell {
+  display: table-cell !important;
 }
-
-.accion .icono{
-
-    background:#1E88E5;
-
 }

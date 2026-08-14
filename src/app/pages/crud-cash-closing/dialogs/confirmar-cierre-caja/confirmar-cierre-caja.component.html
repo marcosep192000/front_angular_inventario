@@ -1,0 +1,58 @@
+<div class="dialog-container">
+
+    <div class="dialog-icon">
+        ⚠️
+    </div>
+
+    <h2 mat-dialog-title>
+        Confirmar cierre de caja
+    </h2>
+
+    <mat-dialog-content>
+
+        <p class="mensaje-principal">
+            ¿Está seguro de que desea cerrar la caja?
+        </p>
+
+        <p class="mensaje-secundario">
+            Una vez cerrada, no se podrán registrar nuevos
+            movimientos en esta caja.
+        </p>
+
+        <div class="advertencia">
+
+            <strong>
+                ⚠️ Importante
+            </strong>
+
+            <span>
+                Verifique el efectivo contado y la diferencia
+                antes de confirmar el cierre.
+            </span>
+
+        </div>
+
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+
+        <button
+            mat-stroked-button
+            [mat-dialog-close]="false">
+
+            Cancelar
+
+        </button>
+
+        <button
+            mat-raised-button
+            color="warn"
+            [mat-dialog-close]="true">
+
+            Confirmar cierre
+
+        </button>
+
+    </mat-dialog-actions>
+
+</div>

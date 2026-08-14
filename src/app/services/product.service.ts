@@ -57,8 +57,17 @@ getProductoPorProveedor (idProveedor:number):Observable<Product[]>{
     return this.http.get<ProductItemSale>(`${this.base}supermarket/findByCode/${query}`);
   }
 
+searchForSale(query: string): Observable<ProductItemSale[]> {
+  return this.http.get<ProductItemSale[]>(
+    `${this.base}supermarket/search-for-sale`,
+    {
+      params: {
+        query: query.trim()
+      }
+    }
+  );
+}
 
-  
   productosBajoStock():Observable<Product>{
     return this.http.get<Product>(`${this.base}supermarket/get-all-low-stock`);
   }

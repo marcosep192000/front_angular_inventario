@@ -24,13 +24,20 @@ export class CajaService {
   getCajas(): Observable<Caja> {
     return this.httpClient.get<Caja>(`${this.baseUrl}cajas/abierta`);
   }
-  closeCaja(id: number, monto: number): Observable<cajaSaldoApertura> {
-    return this.httpClient.put<cajaSaldoApertura>(
-      `${this.baseUrl}cajas/${id}/cierre`,
-      { saldoApertura: monto }  // <-- Aquí el objeto con la propiedad
-    );
-  }
+closeCaja(
+  cajaId: number,
+  efectivoContado: number,
+  efectivoParaProximaCaja: number
+) {
 
+  return this.httpClient.put(
+    `${this.baseUrl}cajas/${cajaId}/cierre`,
+    {
+      efectivoContado,
+      efectivoParaProximaCaja
+    }
+  );
+}
 getDetalleCajaContado():Observable<detalleCajaTipoContado[]>{
   return this.httpClient.get<detalleCajaTipoContado[]>(`${this.baseUrl}cajas/contado`) ;
 }
@@ -52,6 +59,21 @@ descargarPdf(id: number) {
       responseType: 'blob'
     }
 
+  );
+
+}
+
+abrirCaja(cajaId: number) {
+
+  return this.httpClient.put<Caja>(
+    `${this.baseUrl}cajas/${cajaId}/apertura`,
+    {}
+  );
+
+}getCajaPendiente(): Observable<Caja | null> {
+
+  return this.httpClient.get<Caja | null>(
+    `${this.baseUrl}cajas/pendiente`
   );
 
 }
