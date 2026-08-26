@@ -43,6 +43,7 @@ export class NavigationComponent implements OnInit {
 
     username: string = '';
     roles: string[] = [];
+    isHandset = false;
 
     /**
      * Menú expandido o contraído.
@@ -59,43 +60,21 @@ export class NavigationComponent implements OnInit {
         this.username = this.tokenService.getUserName();
         this.roles = this.tokenService.getAuthorities();
 
-        this.updateMenuState(this.router.url);
+        this.isHandset$
+            .subscribe(isHandset => {
+                this.isHandset = isHandset;
+                this.menuCollapsed = isHandset;
+            });
 
-   this.router.events
-    .pipe(
-        filter((event): event is NavigationEnd => event instanceof NavigationEnd)
-    )
-    .subscribe(event => {
-
-        this.updateMenuState(event.urlAfterRedirects);
-
-    });
-
-    }
-
-    private updateMenuState(url: string): void {
-
-        this.menuCollapsed =
-
-            url.includes('/dashboard/new-sale') ||
-
-            url.includes('/dashboard/cash-closing');
-
-    }
-
-    expandMenu(): void {
-
-        this.menuCollapsed = false;
-
-    }
-
-    collapseMenu(): void {
-
-        if (!this.isDesktop()) {
-            return;
-        }
-
-        this.menuCollapsed = true;
+        this.router.events
+            .pipe(
+                filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+            )
+            .subscribe(() => {
+                if (this.isHandset) {
+                    this.menuCollapsed = true;
+                }
+            });
 
     }
 
@@ -105,10 +84,15 @@ export class NavigationComponent implements OnInit {
 
     }
 
-    private isDesktop(): boolean {
+    get roleLabel(): string {
+        if (!this.roles.length) {
+            return 'Usuario';
+        }
 
-        return window.innerWidth >= 992;
-
+        return this.roles
+            .map(role => role.replace(/^ROLE_/, '').replace(/_/g, ' ').toLowerCase())
+            .map(role => role.charAt(0).toUpperCase() + role.slice(1))
+            .join(' · ');
     }
 
     logout(): void {

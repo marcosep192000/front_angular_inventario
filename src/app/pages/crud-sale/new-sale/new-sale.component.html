@@ -1,259 +1,388 @@
-<div class="ventas-container">
+<div class="ventas-container compact-layout">
 
-  <!-- =======================================================
-         HEADER
-    ======================================================== -->
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
 
-  <div class="header-ventas">
+<!-- =======================================================
+     HEADER
+======================================================== -->
 
-    <div class="header-info">
+<div class="header-ventas">
 
-      <h1>
+  <!-- =====================================================
+       TÍTULO
+  ====================================================== -->
 
-        🛒 Nueva Venta
+  <div class="header-info">
 
-      </h1>
+    <h1>
+      🛒 Nueva Venta
+    </h1>
 
-      <span class="fecha">
+    <span class="fecha">
+      {{ today | date:'EEEE dd/MM/yyyy HH:mm' }}
+    </span>
 
-        {{ today | date:'EEEE dd/MM/yyyy HH:mm' }}
+  </div>
 
-      </span>
 
-    </div>
+  <!-- =====================================================
+       CONTROLES DEL HEADER
+  ====================================================== -->
+
+  <div class="header-actions">
+
+
+    <!-- =================================================
+         CAJA
+    ================================================== -->
 
     <div class="estado-caja">
 
       <mat-icon>
-
         point_of_sale
-
       </mat-icon>
 
-      Caja Abierta
-
-    </div>
-
-  </div>
-
-  <!-- =======================================================
-         BUSCADOR
-    ======================================================== -->
-
-  <div class="buscador-card">
-
-   <div class="buscador">
-
-  <div class="icon-search">
-
-    <app-icon
-      [iconSrc]="'assets/icons/barcode_reader_.png'"
-      [size]="'32px'">
-    </app-icon>
-
-  </div>
-
-
-  <div class="busqueda-wrapper">
-
-    <input
-      #buscadorProducto
-      class="search-input"
-      type="text"
-      autocomplete="off"
-      placeholder="Buscar producto por nombre o código..."
-      [(ngModel)]="code"
-      name="code"
-      (ngModelChange)="buscarProductos($event)"
-      (keydown)="manejarTeclado($event)"
-    >
-
-
-    <!-- =================================================
-         CARGANDO
-         ================================================= -->
-
-    <div
-      class="buscando"
-      *ngIf="buscandoProductos"
-    >
-
-      <mat-icon>
-        search
-      </mat-icon>
-
-      Buscando productos...
+      <span>
+        Caja Abierta
+      </span>
 
     </div>
 
 
     <!-- =================================================
-         RESULTADOS
-         ================================================= -->
+         COMPROBANTE
+    ================================================== -->
 
-    <div
-      class="resultados-productos"
-      *ngIf="mostrarResultados"
-    >
+    <div class="documento-selector">
 
-      <div
-        class="resultado-producto"
-        *ngFor="
-          let producto of productosEncontrados;
-          let i = index
-        "
-        [class.seleccionado]="
-          i === indiceSeleccionado
-        "
-        (mousedown)="
-          seleccionarProducto(producto)
-        "
-      >
+      <mat-icon class="documento-icon">
+        description
+      </mat-icon>
 
-        <div class="resultado-icono">
+      <span class="documento-label">
+        Comprobante
+      </span>
+
+      <select
+        class="documento-select"
+        [(ngModel)]="tipoDocumento"
+        name="tipoDocumento">
+
+        <option value="FACTURA_A">
+          Factura A
+        </option>
+
+        <option value="FACTURA_B">
+          Factura B
+        </option>
+
+        <option value="FACTURA_C">
+          Factura C
+        </option>
+
+        <option value="PRESUPUESTO">
+          Presupuesto
+        </option>
+
+        <option value="REMITO">
+          Remito
+        </option>
+
+        <option value="NOTA_CREDITO_A">
+          Nota de Crédito A
+        </option>
+
+        <option value="NOTA_CREDITO_B">
+          Nota de Crédito B
+        </option>
+
+        <option value="NOTA_CREDITO_C">
+          Nota de Crédito C
+        </option>
+
+        <option value="NOTA_DEBITO_A">
+          Nota de Débito A
+        </option>
+
+        <option value="NOTA_DEBITO_B">
+          Nota de Débito B
+        </option>
+
+        <option value="NOTA_DEBITO_C">
+          Nota de Débito C
+        </option>
+
+      </select>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+  <!-- ============================================================
+       BUSCADOR DE PRODUCTOS
+       ============================================================ -->
+
+  <section class="buscador-card">
+
+    <div class="buscador">
+
+
+      <!-- ICONO -->
+
+      <div class="icon-search">
+
+        <app-icon
+          [iconSrc]="'assets/icons/barcode_reader_.png'"
+          [size]="'32px'">
+        </app-icon>
+
+      </div>
+
+
+      <!-- INPUT -->
+
+      <div class="busqueda-wrapper">
+
+        <input
+          #buscadorProducto
+          class="search-input"
+          type="text"
+          autocomplete="off"
+          placeholder="Buscar producto por nombre, código o código de barras..."
+          [(ngModel)]="code"
+          name="code"
+          (ngModelChange)="buscarProductos($event)"
+          (keydown)="manejarTeclado($event)"
+        />
+
+
+        <!-- BUSCANDO -->
+
+        <div
+          class="buscando"
+          *ngIf="buscandoProductos">
 
           <mat-icon>
-            inventory_2
+            search
           </mat-icon>
 
-        </div>
-
-
-        <div class="resultado-info">
-
-          <strong>
-            {{ producto.name }}
-          </strong>
-
           <span>
-            Código:
-            {{ producto.barCode }}
+            Buscando productos...
           </span>
 
         </div>
 
 
-        <div class="resultado-datos">
+        <!-- RESULTADOS -->
 
-          <strong>
-            {{ producto.salePrice | currency }}
-          </strong>
+        <div
+          class="resultados-productos"
+          *ngIf="
+            mostrarResultados &&
+            productosEncontrados.length > 0
+          ">
 
-          <span
-            [class.sin-stock]="
-              producto.stock <= 0
+          <div
+            class="resultado-producto"
+            *ngFor="
+              let producto of productosEncontrados;
+              let i = index
             "
-          >
+            [class.seleccionado]="
+              i === indiceSeleccionado
+            "
+            (mousedown)="
+              seleccionarProducto(producto)
+            ">
 
-            Stock:
-            {{ producto.stock }}
 
-          </span>
+            <!-- ICONO -->
+
+            <div class="resultado-icono">
+
+              <mat-icon>
+                inventory_2
+              </mat-icon>
+
+            </div>
+
+
+            <!-- INFORMACIÓN -->
+
+            <div class="resultado-info">
+
+              <strong>
+                {{ producto.name }}
+              </strong>
+
+              <span>
+                Código:
+                {{ producto.barCode || 'Sin código' }}
+              </span>
+
+            </div>
+
+
+            <!-- PRECIO / STOCK -->
+
+            <div class="resultado-datos">
+
+              <strong>
+                {{ producto.salePrice | currency:'ARS' }}
+              </strong>
+
+              <span
+                [class.sin-stock]="
+                  producto.stock <= 0
+                ">
+
+                Stock:
+                {{ producto.stock }}
+
+              </span>
+
+            </div>
+
+          </div>
 
         </div>
 
       </div>
 
+
+      <!-- BOTÓN BUSCAR -->
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="btn-buscar"
+        type="button"
+        (click)="onSubmit()">
+
+        <mat-icon>
+          search
+        </mat-icon>
+
+        <span>
+          Buscar
+        </span>
+
+      </button>
+
     </div>
 
-  </div>
+  </section>
 
 
-  <button
-    mat-raised-button
-    color="primary"
-    type="button"
-    (click)="onSubmit()"
-  >
+  <!-- ============================================================
+       CONTENIDO PRINCIPAL
+       ============================================================ -->
 
-    <mat-icon>
-      search
-    </mat-icon>
+  <section class="tabla-card">
 
-    Buscar
 
-  </button>
-
-</div>
-
-  </div>
-
-  <!-- =======================================================
-         CONTENIDO
-    ======================================================== -->
-
-  <div class="tabla-card">
+    <!-- HEADER TABLA -->
 
     <div class="tabla-header">
 
       <div>
 
-        <h2>
+        <div class="tabla-title">
 
-          Productos de la Venta
+          <mat-icon>
+            shopping_basket
+          </mat-icon>
 
-        </h2>
+          <h2>
+            Productos de la Venta
+          </h2>
+
+        </div>
 
         <small>
-
           {{ products.length }} producto(s)
-
         </small>
 
       </div>
 
     </div>
 
+
+    <!-- CONTENEDOR -->
+
     <div class="tabla-wrapper">
 
-      <!-- =======================================================
-                 ESTADO VACÍO
-            ======================================================== -->
 
-      <div class="empty-sale" *ngIf="products.length===0">
+      <!-- ========================================================
+           ESTADO VACÍO
+           ======================================================== -->
 
-        <mat-icon>
+      <div
+        class="empty-sale"
+        *ngIf="products.length === 0">
 
-          point_of_sale
+        <div class="empty-icon">
 
-        </mat-icon>
+          <mat-icon>
+            point_of_sale
+          </mat-icon>
+
+        </div>
 
         <h2>
-
           Nueva venta lista
-
         </h2>
 
         <p>
-
-          Escaneá un código de barras o escribí el nombre del producto
-          para comenzar la venta.
-
+          Escribí el nombre, código o código de barras
+          del producto para comenzar la venta.
         </p>
+
+
+        <!-- ATAJOS -->
 
         <div class="shortcuts">
 
-          <div>
+          <div class="shortcut">
 
-            <kbd>ENTER</kbd>
+            <kbd>
+              ENTER
+            </kbd>
 
-            Buscar producto
-
-          </div>
-
-          <div>
-
-            <kbd>F2</kbd>
-
-            Buscar cliente
+            <span>
+              Buscar producto
+            </span>
 
           </div>
 
-          <div>
 
-            <kbd>F4</kbd>
+          <div class="shortcut">
 
-            Cobrar venta
+            <kbd>
+              F2
+            </kbd>
+
+            <span>
+              Buscar cliente
+            </span>
+
+          </div>
+
+
+          <div class="shortcut">
+
+            <kbd>
+              F4
+            </kbd>
+
+            <span>
+              Cobrar venta
+            </span>
 
           </div>
 
@@ -261,77 +390,71 @@
 
       </div>
 
-      <!-- =======================================================
-                 TABLA
-            ======================================================== -->
 
-      <table class="tabla-ventas" *ngIf="products.length>0">
+      <!-- ========================================================
+           TABLA DE PRODUCTOS
+           ======================================================== -->
+
+      <table
+        class="tabla-ventas"
+        *ngIf="products.length > 0">
 
         <thead>
 
           <tr>
 
             <th width="120">
-
               Código
-
             </th>
 
             <th>
-
               Producto
-
             </th>
 
             <th width="120">
-
               Precio
-
             </th>
 
             <th width="170">
-
               Cantidad
-
             </th>
 
             <th width="90">
-
               Stock
-
             </th>
 
             <th width="80">
-
               IVA
-
             </th>
 
             <th width="150">
-
               Total
-
             </th>
 
             <th width="90">
-
               Acción
-
             </th>
 
           </tr>
 
         </thead>
 
+
         <tbody>
 
-          <tr class="sale-row" *ngFor="let product of products">
+          <tr
+            class="sale-row"
+            *ngFor="let product of products">
+
+
+            <!-- CÓDIGO -->
 
             <td>
-
-              {{ product.barCode }}
-
+              {{ product.barCode || 'N/A' }}
             </td>
+
+
+            <!-- PRODUCTO -->
 
             <td class="nombre">
 
@@ -343,71 +466,95 @@
 
             </td>
 
+
+            <!-- PRECIO -->
+
             <td>
 
               <span class="price">
 
-                {{ product.salePrice | currency }}
+                {{ product.salePrice | currency:'ARS' }}
 
               </span>
 
             </td>
+
+
+            <!-- CANTIDAD -->
 
             <td>
 
               <div class="cantidad-control">
-<button
-    mat-mini-fab
-    color="primary"
-    (click)="decreaseQuantity(product)">
 
-    <mat-icon>
+                <button
+                  mat-mini-fab
+                  color="primary"
+                  type="button"
+                  (click)="decreaseQuantity(product)">
 
-        remove
+                  <mat-icon>
+                    remove
+                  </mat-icon>
 
-    </mat-icon>
+                </button>
 
-</button>
 
                 <span>
-
                   {{ product.quantity }}
-
                 </span>
 
-              <button
-    mat-mini-fab
-    color="primary"
-    (click)="increaseQuantity(product)">
 
-    <mat-icon>
+                <button
+                  mat-mini-fab
+                  color="primary"
+                  type="button"
+                  (click)="increaseQuantity(product)">
 
-        add
+                  <mat-icon>
+                    add
+                  </mat-icon>
 
-    </mat-icon>
-
-</button>
+                </button>
 
               </div>
 
             </td>
+
+
+            <!-- STOCK -->
+
             <td>
 
-              <span [ngClass]="{
+              <span
+                [ngClass]="{
 
-                                    'stock-ok': product.stock-product.quantity > 10,
+                  'stock-ok':
+                    product.stock -
+                    product.quantity > 10,
 
-                                    'stock-warning': product.stock-product.quantity <= 10 && product.stock-product.quantity > 3,
+                  'stock-warning':
+                    product.stock -
+                    product.quantity <= 10 &&
+                    product.stock -
+                    product.quantity > 3,
 
-                                    'stock-danger': product.stock-product.quantity <= 3
+                  'stock-danger':
+                    product.stock -
+                    product.quantity <= 3
 
-                                }">
+                }">
 
-                {{ product.stock-product.quantity }}
+                {{
+                  product.stock -
+                  product.quantity
+                }}
 
               </span>
 
             </td>
+
+
+            <!-- IVA -->
 
             <td>
 
@@ -415,24 +562,36 @@
 
             </td>
 
+
+            <!-- TOTAL -->
+
             <td class="precio-total">
 
               <span class="line-total">
 
-                {{ product.salePrice * product.quantity | currency }}
+                {{
+                  product.salePrice *
+                  product.quantity
+                  | currency:'ARS'
+                }}
 
               </span>
 
             </td>
 
+
+            <!-- ELIMINAR -->
+
             <td>
 
-              <button mat-mini-fab color="warn" (click)="deleteProduct(product.id)">
+              <button
+                mat-mini-fab
+                color="warn"
+                type="button"
+                (click)="deleteProduct(product.id)">
 
                 <mat-icon>
-
                   delete
-
                 </mat-icon>
 
               </button>
@@ -447,34 +606,45 @@
 
     </div>
 
-  </div>
+  </section>
 
-  <!-- =======================================================
-         PANEL LATERAL
-    ======================================================== -->
 
-  <div class="panel-inferior">
+  <!-- ============================================================
+       PANEL LATERAL
+       ============================================================ -->
 
-    <!-- =======================================================
-             CLIENTE
-        ======================================================== -->
+  <aside class="panel-inferior">
 
-    <div class="cliente-card">
+
+    <!-- ==========================================================
+         CLIENTE
+         ========================================================== -->
+
+    <section class="cliente-card">
 
       <div class="panel-header">
 
-        <h2>
-
-          👤 Cliente
-
-        </h2>
-
-        <button mat-stroked-button color="primary" (click)="getClient()">
+        <div class="panel-title">
 
           <mat-icon>
+            person
+          </mat-icon>
 
+          <h2>
+            Cliente
+          </h2>
+
+        </div>
+
+
+        <button
+          mat-stroked-button
+          color="primary"
+          type="button"
+          (click)="getClient()">
+
+          <mat-icon>
             person_search
-
           </mat-icon>
 
           Buscar Cliente
@@ -483,13 +653,26 @@
 
       </div>
 
-      <div class="cliente-info" *ngIf="selectedClient; else consumidorFinal">
+
+      <!-- CLIENTE SELECCIONADO -->
+
+      <div
+        class="cliente-info"
+        *ngIf="
+          selectedClient;
+          else consumidorFinal
+        ">
 
         <div class="cliente-avatar">
 
-          {{ selectedClient.name.charAt(0) }}
+          {{
+            selectedClient.name
+              ? selectedClient.name.charAt(0)
+              : '?'
+          }}
 
         </div>
+
 
         <div class="cliente-datos">
 
@@ -501,146 +684,152 @@
 
           </h3>
 
+
           <p>
-
             📞 {{ selectedClient.tel }}
-
           </p>
 
+
           <p>
-
             Cliente registrado
-
           </p>
 
         </div>
 
       </div>
+
+
+      <!-- CONSUMIDOR FINAL -->
 
       <ng-template #consumidorFinal>
 
         <div class="cliente-vacio">
 
           <mat-icon>
-
             person_outline
-
           </mat-icon>
 
           <h3>
-
             Consumidor Final
-
           </h3>
 
           <p>
-
             No hay cliente seleccionado.
-
           </p>
 
         </div>
 
       </ng-template>
 
-    </div>
+    </section>
 
-    <!-- =======================================================
-             RESUMEN
-        ======================================================== -->
 
-    <div class="resumen-card">
+    <!-- ==========================================================
+         RESUMEN
+         ========================================================== -->
+
+    <section class="resumen-card">
 
       <div class="resumen-header">
 
-        <h2>
+        <div class="panel-title">
 
-          🧾 Resumen de la Venta
+          <mat-icon>
+            receipt_long
+          </mat-icon>
 
-        </h2>
+          <h2>
+            Resumen de la Venta
+          </h2>
+
+        </div>
 
       </div>
+
+
+      <!-- PRODUCTOS -->
 
       <div class="resumen-item">
 
         <span>
-
           Productos
-
         </span>
 
         <strong>
-
           {{ getTotalQuantity() }}
-
         </strong>
 
       </div>
 
+
+      <!-- SUBTOTAL -->
+
       <div class="resumen-item">
 
         <span>
-
           Subtotal
-
         </span>
 
         <strong>
-
-          {{ getTotalPrice() | currency }}
-
+          {{ getTotalPrice() | currency:'ARS' }}
         </strong>
 
       </div>
+
+
+      <!-- IVA -->
 
       <div class="resumen-item">
 
         <span>
-
           IVA
-
         </span>
 
         <strong>
-
           Incluido
-
         </strong>
 
       </div>
+
 
       <hr>
+
+
+      <!-- TOTAL -->
 
       <div class="total-final">
 
         <span>
-
           TOTAL
-
         </span>
 
         <h1>
-
-          {{ getTotalPrice() | currency }}
-
+          {{ getTotalPrice() | currency:'ARS' }}
         </h1>
 
       </div>
 
-      <button mat-raised-button color="primary" class="btn-cobrar" (click)="newSale()">
 
-        <mat-icon>
+      <!-- COBRAR -->
 
-          payments
+      <button
+        mat-raised-button
+        color="primary"
+        class="btn-cobrar"
+        type="button"
+        [disabled]="products.length === 0"
+        (click)="newSale()">
 
-        </mat-icon>
+          <mat-icon>
+    {{ iconoAccionDocumento }}
+  </mat-icon>
 
-        COBRAR VENTA
+  {{ textoAccionDocumento }}
 
       </button>
 
-    </div>
+    </section>
 
-  </div>
+  </aside>
 
 </div>

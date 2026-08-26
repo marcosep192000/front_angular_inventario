@@ -1,15 +1,290 @@
-<div class="parent">
-  
-    <div class="div1">
-        <h2>Detalle de Factura</h2>
+<div class="detalle-factura-container">
+
+  <!-- HEADER -->
+
+  <div class="header">
+
+    <div>
+
+      <h2>
+        📄 Detalle de Factura
+      </h2>
+
+      <span *ngIf="factura">
+
+        Factura:
+
+        <strong>
+          {{ factura.idInvoice || factura.numeroFactura || factura.id }}
+        </strong>
+
+      </span>
+
     </div>
-    <div class="div2">
-        <div class="row contenedor-form">
-            <app-tabla-generic [data]="data" [displayedColumns]="columns" [columnNames]="columnNames"
-                [verDetalleFacturaComponent]="VerDetalleFacturaComponent"   [showActions]="false"  [btnCerrar]="true"></app-tabla-generic>
+
+
+    <button
+      mat-icon-button
+      type="button"
+      (click)="cerrar()">
+
+      ✖
+
+    </button>
+
+  </div>
+
+
+  <!-- LOADING -->
+
+  <div
+    class="loading"
+    *ngIf="cargando">
+
+    <mat-spinner
+      diameter="50">
+    </mat-spinner>
+
+    <p>
+      Cargando productos...
+    </p>
+
+  </div>
+
+
+  <!-- CONTENIDO -->
+
+  <div
+    class="contenido"
+    *ngIf="!cargando && !error">
+
+
+    <!-- RESUMEN -->
+
+    <section class="resumen">
+
+      <div class="resumen-title">
+
+        <h3>
+          🧾 Productos de la factura
+        </h3>
+
+        <span>
+          {{ productos.length }}
+          productos /
+          {{ cantidadProductos }}
+          unidades
+        </span>
+
+      </div>
+
+
+      <!-- TABLA -->
+
+      <div
+        class="tabla-wrapper"
+        *ngIf="productos.length > 0">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Código
+              </th>
+
+              <th>
+                Producto
+              </th>
+
+              <th>
+                Marca
+              </th>
+
+              <th>
+                Cantidad
+              </th>
+
+              <th>
+                Precio
+              </th>
+
+              <th>
+                IVA
+              </th>
+
+              <th>
+                Total
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            <tr
+              *ngFor="
+                let producto of productos
+              ">
+
+              <td>
+                {{ producto.barCode }}
+              </td>
+
+
+              <td>
+
+                <strong>
+                  {{ producto.name }}
+                </strong>
+
+              </td>
+
+
+              <td>
+
+                {{
+                  producto.marca?.marca
+                    || 'Sin marca'
+                }}
+
+              </td>
+
+
+              <td class="cantidad">
+
+                {{ producto.quantity }}
+
+              </td>
+
+
+              <td>
+
+                {{
+                  producto.price
+                    | currency:'ARS':'symbol-narrow'
+                }}
+
+              </td>
+
+
+              <td>
+
+                {{ producto.iva }}%
+
+              </td>
+
+
+              <td class="precio-total">
+
+                {{
+                  producto.precioTotal
+                    | currency:'ARS':'symbol-narrow'
+                }}
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+
+          <tfoot>
+
+            <tr>
+
+              <td
+                colspan="6"
+                class="total-label">
+
+                TOTAL
+
+              </td>
+
+              <td class="total-value">
+
+                {{
+                  totalProductos
+                    | currency:'ARS':'symbol-narrow'
+                }}
+
+              </td>
+
+            </tr>
+
+          </tfoot>
+
+        </table>
+
+      </div>
+
+
+      <!-- SIN PRODUCTOS -->
+
+      <div
+        class="sin-productos"
+        *ngIf="productos.length === 0">
+
+        <div class="icono">
+          📦
         </div>
+
+        <h3>
+          No hay productos
+        </h3>
+
+        <p>
+          Esta factura no tiene productos
+          registrados.
+        </p>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- ERROR -->
+
+  <div
+    class="error-container"
+    *ngIf="!cargando && error">
+
+    <div>
+      ⚠️
     </div>
+
+    <h3>
+      No se pudo cargar el detalle
+    </h3>
+
+    <p>
+      Ocurrió un problema al obtener
+      los productos de la factura.
+    </p>
+
+  </div>
+
+
+  <!-- FOOTER -->
+
+  <div class="acciones">
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="button"
+      (click)="cerrar()">
+
+      Cerrar
+
+    </button>
+
+  </div>
+
 </div>
-
-
-

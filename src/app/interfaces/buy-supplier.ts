@@ -1,3 +1,5 @@
+import { ImpuestoFacturaProveedor } from "./impuesto-factura-proveedor";
+import { ProductItemBuy } from "./ProductItemBuy";
 
 export interface invoiceDetailsProviders {
   barCode: string;
@@ -9,18 +11,37 @@ export interface invoiceDetailsProviders {
   salePrice: number;
   marca: String;
   iva: number;
-  
+
   totalStock: number;
   subTotal: number;
 }
 export interface BuySupplier {
+
   idInvoice: string;
-  dateOfEntry: string; //fecha ingreso
-  dueDate: string; // fecha vencimiento
-  payDay: string; // dia de pago
-  provider: number; // proveedor
-  amount: number; // monto total  de factura
-  ivaTotal: number; // monto total del iva 
-  montoTotal: number; // monto total de la factura
-  invoiceDetailsProviders: any[];
+
+  dateOfEntry: string;
+
+  dueDate: string | null;
+
+  payDay: string | null;
+
+  tipoDeCuentaEnum: string;
+
+  provider: number;
+
+  payamentStatus: boolean;
+
+  invoiceDetailsProviders: ProductItemBuy[];
+
+  subtotalNeto?: number;
+
+  ivaTotal?: number;
+
+  totalCalculado?: number;
+
+  redondeo?: number;
+
+  montoTotal?: number;
+
+  impuestos: ImpuestoFacturaProveedor[];
 }

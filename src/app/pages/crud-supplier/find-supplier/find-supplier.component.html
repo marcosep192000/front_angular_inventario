@@ -1,9 +1,127 @@
-<mat-form-field class="custom-form-field">
-    <mat-label>Proveedor</mat-label>
-    <mat-select [(value)]="selectedSupplier" (selectionChange)="onSupplierChange()">
-      <mat-option *ngFor="let supplier of suppliers" [value]="supplier">
-        {{ supplier.name }}
+<div class="find-supplier-container">
+
+  <mat-form-field
+    appearance="outline"
+    class="supplier-field">
+
+    <mat-label>
+      Proveedor
+    </mat-label>
+
+
+    <mat-select
+      [(value)]="selectedSupplier"
+      (selectionChange)="onSupplierChange()">
+
+
+      <!-- =================================================
+           OPCIÓN VACÍA
+      ================================================== -->
+
+      <mat-option
+        [value]="null">
+
+        Seleccionar proveedor...
+
       </mat-option>
+
+
+      <!-- =================================================
+           PROVEEDORES
+      ================================================== -->
+
+      <mat-option
+        *ngFor="let supplier of suppliers"
+        [value]="supplier">
+
+        <div class="supplier-option">
+
+          <strong>
+            {{ supplier.name }}
+          </strong>
+
+          <span
+            *ngIf="supplier.cuit">
+
+            CUIT:
+            {{ supplier.cuit }}
+
+          </span>
+
+        </div>
+
+      </mat-option>
+
+
     </mat-select>
+
+
+    <!-- ===================================================
+         LOADING
+    ==================================================== -->
+
+    <mat-hint
+      *ngIf="loading">
+
+      Cargando proveedores...
+
+    </mat-hint>
+
+
+    <!-- ===================================================
+         ERROR
+    ==================================================== -->
+
+    <mat-error
+      *ngIf="error">
+
+      No se pudieron cargar los proveedores.
+
+    </mat-error>
+
+
   </mat-form-field>
-  
+
+
+  <!-- =====================================================
+       PROVEEDOR SELECCIONADO
+  ====================================================== -->
+
+  <div
+    class="supplier-selected"
+    *ngIf="selectedSupplier">
+
+
+    <div class="supplier-selected-icon">
+
+      👤
+
+    </div>
+
+
+    <div class="supplier-selected-info">
+
+      <span>
+        Proveedor seleccionado
+      </span>
+
+      <strong>
+        {{ selectedSupplier.name }}
+      </strong>
+
+
+      <small
+        *ngIf="selectedSupplier.cuit">
+
+        CUIT:
+        {{ selectedSupplier.cuit }}
+
+      </small>
+
+    </div>
+
+
+  </div>
+
+
+</div>

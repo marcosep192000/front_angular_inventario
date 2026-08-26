@@ -1,12 +1,1892 @@
-<div class="parent">
-    <div class="div1"> 
-    <h2>Facturas por Proveedor</h2>
-        <app-find-supplier (mensajeEnviado)="resivirMensaje($event)"></app-find-supplier> </div>
-    <div class="div2">
-        <div class="row contenedor-form">
-            <app-tabla-generic [data]="data" [displayedColumns]="columns" [columnNames]="columnNames"
-                [showActions]="true" [editComponent]="editComponent" [columnConfig]="columnConfig"
-                [verDetalleFacturaComponent]="verDetalle"></app-tabla-generic>
-        </div>
+<div class="pay-supplier-container">
+
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+
+  <div class="pay-supplier-header">
+
+    <div>
+
+      <h2>
+        💰 Pagos a Proveedores
+      </h2>
+
+      <p *ngIf="supplier">
+        Gestión de facturas, cuenta corriente y cheques
+      </p>
+
+      <p *ngIf="!supplier">
+        Gestión de pagos a proveedores
+      </p>
+
     </div>
+
+    <button *ngIf="dialogRef" mat-icon-button type="button" matTooltip="Cerrar" (click)="cerrar()">
+
+      <mat-icon>
+        close
+      </mat-icon>
+
+    </button>
+
+  </div>
+
+
+  <!-- =========================================================
+       INFORMACIÓN DEL PROVEEDOR
+  ========================================================== -->
+
+  <section class="pay-supplier-card" *ngIf="supplier">
+
+    <div class="factura-info">
+
+      <!-- PROVEEDOR -->
+
+      <div class="factura-item">
+
+        <span>
+          Proveedor
+        </span>
+
+        <strong>
+          {{ supplier.name }}
+        </strong>
+
+      </div>
+
+
+      <!-- CUIT -->
+
+      <div class="factura-item">
+
+        <span>
+          CUIT
+        </span>
+
+        <strong>
+          {{ supplier.cuit || '-' }}
+        </strong>
+
+      </div>
+
+
+      <!-- TELÉFONO -->
+
+      <div class="factura-item">
+
+        <span>
+          Teléfono
+        </span>
+
+        <strong>
+          {{ supplier.phone || '-' }}
+        </strong>
+
+      </div>
+
+
+      <!-- SALDO -->
+
+      <div class="factura-item saldo">
+
+        <span>
+          Saldo pendiente
+        </span>
+
+        <strong>
+
+          {{
+          totalPendiente
+          | currency:'ARS':'symbol':'1.2-2'
+          }}
+
+        </strong>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================================================
+       RESUMEN GENERAL
+  ========================================================== -->
+
+  <section class="pay-supplier-card resumen-general">
+
+    <div class="resumen-title">
+
+      <div>
+
+        <h3>
+          📊 Resumen
+        </h3>
+
+        <span>
+          Estado financiero del proveedor
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="resumen-grid">
+
+
+      <!-- TOTAL FACTURADO -->
+
+      <div class="resumen-card">
+
+        <span>
+          Total facturado
+        </span>
+
+        <strong>
+
+          {{
+          totalFacturado
+          | currency:'ARS':'symbol':'1.2-2'
+          }}
+
+        </strong>
+
+      </div>
+
+
+      <!-- TOTAL PAGADO -->
+
+      <div class="resumen-card pagado">
+
+        <span>
+          Total pagado
+        </span>
+
+        <strong>
+
+          {{
+          totalPagado
+          | currency:'ARS':'symbol':'1.2-2'
+          }}
+
+        </strong>
+
+      </div>
+
+
+      <!-- SALDO -->
+
+      <div class="resumen-card pendiente">
+
+        <span>
+          Saldo pendiente
+        </span>
+
+        <strong>
+
+          {{
+          totalPendiente
+          | currency:'ARS':'symbol':'1.2-2'
+          }}
+
+        </strong>
+
+      </div>
+
+
+      <!-- CHEQUES -->
+
+      <div class="resumen-card cheques">
+
+        <span>
+          Cheques pendientes
+        </span>
+
+        <strong>
+          {{ cheques.length }}
+        </strong>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================================================
+       TABS
+  ========================================================== -->
+
+  <mat-tab-group [(selectedIndex)]="tabSeleccionada" animationDuration="250ms">
+
+
+    <!-- =======================================================
+         TAB FACTURAS
+    ======================================================== -->
+
+    <mat-tab>
+
+      <ng-template mat-tab-label>
+
+        <mat-icon>
+          receipt_long
+        </mat-icon>
+
+        <span class="tab-label">
+          Facturas
+        </span>
+
+      </ng-template>
+
+
+      <div class="tab-content">
+
+
+        <!-- HEADER -->
+
+        <div class="section-header">
+
+          <div>
+
+            <h3>
+              📄 Facturas del proveedor
+            </h3>
+
+            <span>
+              {{ facturas.length }}
+              factura(s)
+            </span>
+
+          </div>
+
+
+          <button mat-stroked-button type="button" (click)="cargarFacturas()">
+
+            <mat-icon>
+              refresh
+            </mat-icon>
+
+            Actualizar
+
+          </button>
+
+        </div>
+
+
+        <!-- LOADING -->
+
+        <div class="procesando" *ngIf="loadingFacturas">
+
+          <mat-spinner diameter="35">
+          </mat-spinner>
+
+          <span>
+            Cargando facturas...
+          </span>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div class="mensaje-error" *ngIf="!loadingFacturas && errorFacturas">
+
+          ⚠️ No se pudieron cargar las facturas.
+
+          <button mat-button type="button" (click)="cargarFacturas()">
+
+            Reintentar
+
+          </button>
+
+        </div>
+
+
+        <!-- SIN FACTURAS -->
+
+        <div class="empty-state" *ngIf="
+            !loadingFacturas &&
+            !errorFacturas &&
+            facturas.length === 0
+          ">
+
+          <mat-icon>
+            receipt_long
+          </mat-icon>
+
+          <h3>
+            No hay facturas
+          </h3>
+
+          <p>
+            Este proveedor no tiene facturas registradas.
+          </p>
+
+        </div>
+
+
+        <!-- ===================================================
+             TABLA FACTURAS
+        ==================================================== -->
+
+        <div class="tabla-wrapper" *ngIf="
+            !loadingFacturas &&
+            facturas.length > 0
+          ">
+
+          <table mat-table [dataSource]="facturas" class="tabla-facturas">
+
+
+            <!-- NÚMERO -->
+
+            <ng-container matColumnDef="numero">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Factura
+
+              </th>
+
+              <td mat-cell *matCellDef="let factura">
+
+                <strong>
+
+                  {{ obtenerNumeroFactura(factura) }}
+
+                </strong>
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- FECHA -->
+
+            <ng-container matColumnDef="fecha">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Fecha
+
+              </th>
+
+              <td mat-cell *matCellDef="let factura">
+
+                {{
+                factura.dateOfEntry
+                | date:'dd/MM/yyyy'
+                }}
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- TIPO -->
+
+            <ng-container matColumnDef="tipo">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Cuenta
+
+              </th>
+
+              <td mat-cell *matCellDef="let factura">
+
+                <span class="badge badge-cuenta">
+
+                  {{
+                  obtenerTipoCuenta(factura)
+                  }}
+
+                </span>
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- TOTAL -->
+
+            <ng-container matColumnDef="total">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Total
+
+              </th>
+
+              <td mat-cell *matCellDef="let factura">
+
+                <strong>
+
+                  {{
+                  factura.montoTotal
+                  | currency:'ARS':'symbol':'1.2-2'
+                  }}
+
+                </strong>
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- PAGADO -->
+
+            <ng-container matColumnDef="pagado">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Pagado
+
+              </th>
+
+              <td mat-cell *matCellDef="let factura">
+
+                {{
+                (
+                factura.montoTotal -
+                obtenerSaldoFactura(factura)
+                )
+                | currency:'ARS':'symbol':'1.2-2'
+                }}
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- SALDO -->
+
+            <ng-container matColumnDef="saldo">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Saldo
+
+              </th>
+
+              <td mat-cell *matCellDef="let factura">
+
+                <strong class="saldo-tabla">
+
+                  {{
+                  obtenerSaldoFactura(factura)
+                  | currency:'ARS':'symbol':'1.2-2'
+                  }}
+
+                </strong>
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- ESTADO -->
+
+            <ng-container matColumnDef="estado">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Estado
+
+              </th>
+
+              <td mat-cell *matCellDef="let factura">
+
+                <span class="estado" [ngClass]="{
+
+                    'estado-pagada':
+                      obtenerEstadoFactura(factura) === 'PAGADA',
+
+                    'estado-pendiente':
+                      obtenerEstadoFactura(factura) === 'PENDIENTE',
+
+                    'estado-parcial':
+                      obtenerEstadoFactura(factura) === 'PARCIAL',
+
+                    'estado-vencida':
+                      obtenerEstadoFactura(factura) === 'VENCIDA'
+
+                  }">
+
+                  {{
+                  obtenerEstadoFactura(factura)
+                  }}
+
+                </span>
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- ACCIONES -->
+
+            <ng-container matColumnDef="acciones">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Acciones
+
+              </th>
+
+              <td mat-cell *matCellDef="let factura">
+
+                <div class="acciones-tabla">
+
+
+                  <!-- VER -->
+
+                  <button mat-icon-button type="button" matTooltip="Ver detalle" (click)="verDetalleFactura(factura)">
+
+                    <mat-icon>
+                      visibility
+                    </mat-icon>
+
+                  </button>
+
+
+                  <!-- PAGAR -->
+
+                  <button mat-raised-button color="primary" type="button" *ngIf="
+                      obtenerSaldoFactura(factura) > 0
+                    " (click)="pagarFactura(factura)">
+
+                    <mat-icon>
+                      payments
+                    </mat-icon>
+
+                    Pagar
+
+                  </button>
+  <!-- Ver pagos -->
+  <button
+    mat-icon-button
+    color="primary"
+    matTooltip="Ver historial de pagos"
+    (click)="verPagosFactura(factura)">
+
+    <mat-icon>
+      payments
+    </mat-icon>
+
+  </button>
+
+                  <!-- PAGADA -->
+
+                  <span class="estado estado-pagada" *ngIf="
+                      obtenerSaldoFactura(factura) <= 0
+                    ">
+
+                    Pagada
+
+                  </span>
+
+                </div>
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- HEADER -->
+
+            <tr mat-header-row *matHeaderRowDef="columnasFacturas">
+            </tr>
+
+
+            <!-- ROW -->
+
+            <tr mat-row *matRowDef="
+                let row;
+                columns: columnasFacturas
+              ">
+            </tr>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </mat-tab>
+
+
+    <!-- =======================================================
+         TAB CUENTA CORRIENTE
+    ======================================================== -->
+
+    <mat-tab>
+
+      <ng-template mat-tab-label>
+
+        <mat-icon>
+          account_balance
+        </mat-icon>
+
+        <span class="tab-label">
+          Cuenta Corriente
+        </span>
+
+      </ng-template>
+
+
+      <div class="tab-content">
+
+
+        <!-- HEADER -->
+
+        <div class="section-header">
+
+          <div>
+
+            <h3>
+              🏦 Cuenta corriente
+            </h3>
+
+            <span>
+              Movimientos y facturas pendientes
+            </span>
+
+          </div>
+
+
+          <button mat-stroked-button type="button" (click)="cargarCuentaCorriente()">
+
+            <mat-icon>
+              refresh
+            </mat-icon>
+
+            Actualizar
+
+          </button>
+
+        </div>
+
+
+        <!-- LOADING -->
+
+        <div class="procesando" *ngIf="loadingCuenta">
+
+          <mat-spinner diameter="35">
+          </mat-spinner>
+
+          <span>
+            Cargando cuenta corriente...
+          </span>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div class="mensaje-error" *ngIf="
+            !loadingCuenta &&
+            errorCuenta
+          ">
+
+          ⚠️ No se pudo cargar la cuenta corriente.
+
+          <button mat-button type="button" (click)="cargarCuentaCorriente()">
+
+            Reintentar
+
+          </button>
+
+        </div>
+
+
+        <!-- RESUMEN CUENTA -->
+
+        <div class="cuenta-resumen" *ngIf="
+            !loadingCuenta &&
+            cuentaCorriente
+          ">
+
+
+          <div class="cuenta-card">
+
+            <span>
+              Total facturado
+            </span>
+
+            <strong>
+
+              {{
+              cuentaCorriente.totalFacturado
+              | currency:'ARS':'symbol':'1.2-2'
+              }}
+
+            </strong>
+
+          </div>
+
+
+          <div class="cuenta-card pagado">
+
+            <span>
+              Total pagado
+            </span>
+
+            <strong>
+
+              {{
+              cuentaCorriente.totalPagado
+              | currency:'ARS':'symbol':'1.2-2'
+              }}
+
+            </strong>
+
+          </div>
+
+
+          <div class="cuenta-card saldo">
+
+            <span>
+              Saldo pendiente
+            </span>
+
+            <strong>
+
+              {{
+              cuentaCorriente.saldoPendiente
+              | currency:'ARS':'symbol':'1.2-2'
+              }}
+
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <!-- ===================================================
+             FACTURAS CUENTA CORRIENTE
+        ==================================================== -->
+
+        <section class="subsection" *ngIf="
+            !loadingCuenta &&
+            facturasCuentaCorriente.length > 0
+          ">
+
+
+          <div class="subsection-header">
+
+            <div>
+
+              <h3>
+                📑 Facturas de cuenta corriente
+              </h3>
+
+              <span>
+                {{ facturasCuentaCorriente.length }}
+                factura(s)
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <div class="tabla-wrapper">
+
+            <table class="tabla-cuenta">
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    Factura
+                  </th>
+
+                  <th>
+                    Fecha
+                  </th>
+
+                  <th>
+                    Vencimiento
+                  </th>
+
+                  <th>
+                    Total
+                  </th>
+
+                  <th>
+                    Pagado
+                  </th>
+
+                  <th>
+                    Saldo
+                  </th>
+
+                  <th>
+                    Estado
+                  </th>
+
+                  <th>
+                    Acción
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+                <tr *ngFor="
+                    let factura of facturasCuentaCorriente
+                  ">
+
+
+                  <!-- FACTURA -->
+
+                  <td>
+
+                    <strong>
+                      {{ factura.numeroFactura }}
+                    </strong>
+
+                  </td>
+
+
+                  <!-- FECHA -->
+
+                  <td>
+
+                    {{
+                    factura.fecha
+                    | date:'dd/MM/yyyy'
+                    }}
+
+                  </td>
+
+
+                  <!-- VENCIMIENTO -->
+
+                  <td>
+
+                    {{
+                    factura.vencimiento
+                    | date:'dd/MM/yyyy'
+                    }}
+
+                  </td>
+
+
+                  <!-- TOTAL -->
+
+                  <td>
+
+                    {{
+                    factura.total
+                    | currency:'ARS':'symbol':'1.2-2'
+                    }}
+
+                  </td>
+
+
+                  <!-- PAGADO -->
+
+                  <td>
+
+                    {{
+                    factura.totalPagado
+                    | currency:'ARS':'symbol':'1.2-2'
+                    }}
+
+                  </td>
+
+
+                  <!-- SALDO -->
+
+                  <td>
+
+                    <strong class="saldo-tabla">
+
+                      {{
+                      factura.saldo
+                      | currency:'ARS':'symbol':'1.2-2'
+                      }}
+
+                    </strong>
+
+                  </td>
+
+
+                  <!-- ESTADO -->
+
+                  <td>
+
+                    <span class="estado" [ngClass]="{
+
+                        'estado-pagada':
+                          factura.estado === 'PAGADA',
+
+                        'estado-pendiente':
+                          factura.estado === 'PENDIENTE',
+
+                        'estado-parcial':
+                          factura.estado === 'PARCIAL',
+
+                        'estado-vencida':
+                          factura.estado === 'VENCIDA'
+
+                      }">
+
+                      {{ factura.estado }}
+
+                    </span>
+
+                  </td>
+
+
+                  <!-- ACCIÓN -->
+
+                  <td>
+
+                    <button mat-icon-button type="button" matTooltip="Ver detalle" (click)="verDetalleFactura(factura)">
+
+                      <mat-icon>
+                        visibility
+                      </mat-icon>
+
+                    </button>
+<button
+  mat-icon-button
+  color="primary"
+  type="button"
+  matTooltip="Ver historial de pagos"
+  (click)="verPagosFactura(factura)">
+
+  <mat-icon>
+    payments
+  </mat-icon>
+
+</button>
+                    <button mat-raised-button color="primary" type="button" *ngIf="factura.saldo > 0"
+                      matTooltip="Pagar factura de cuenta corriente" (click)="pagarFacturaCuentaCorriente(factura)">
+
+                      <mat-icon>
+                        payments
+                      </mat-icon>
+
+                      Pagar
+
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </section>
+
+
+        <!-- SIN FACTURAS -->
+
+        <div class="empty-state" *ngIf="
+            !loadingCuenta &&
+            cuentaCorriente &&
+            facturasCuentaCorriente.length === 0
+          ">
+
+          <mat-icon>
+            account_balance
+          </mat-icon>
+
+          <h3>
+            Sin facturas en cuenta corriente
+          </h3>
+
+          <p>
+            No existen facturas pendientes asociadas.
+          </p>
+
+        </div>
+
+      </div>
+
+    </mat-tab>
+
+
+    <!-- =======================================================
+         TAB CHEQUES
+    ======================================================== -->
+
+    <mat-tab>
+
+      <ng-template mat-tab-label>
+
+        <mat-icon>
+          receipt
+        </mat-icon>
+
+        <span class="tab-label">
+          Cheques
+        </span>
+
+        <span class="tab-count" *ngIf="cheques.length > 0">
+
+          {{ cheques.length }}
+
+        </span>
+
+      </ng-template>
+
+
+      <div class="tab-content">
+
+
+        <!-- HEADER -->
+
+        <div class="section-header">
+
+          <div>
+
+            <h3>
+              🧾 Cheques pendientes
+            </h3>
+
+            <span>
+              Cheques entregados al proveedor
+            </span>
+
+          </div>
+
+
+          <div class="acciones-cheques-header">
+
+            <button mat-stroked-button type="button" (click)="verReporteCheques()">
+
+              <mat-icon>
+                assessment
+              </mat-icon>
+
+              Ver reporte
+
+            </button>
+
+            <button mat-stroked-button type="button" (click)="cargarCheques()">
+
+              <mat-icon>
+                refresh
+              </mat-icon>
+
+              Actualizar
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- LOADING -->
+
+        <div class="procesando" *ngIf="loadingCheques">
+
+          <mat-spinner diameter="35">
+          </mat-spinner>
+
+          <span>
+            Cargando cheques...
+          </span>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div class="mensaje-error" *ngIf="
+            !loadingCheques &&
+            errorCheques
+          ">
+
+          ⚠️ No se pudieron cargar los cheques.
+
+          <button mat-button type="button" (click)="cargarCheques()">
+
+            Reintentar
+
+          </button>
+
+        </div>
+
+
+        <!-- SIN CHEQUES -->
+
+        <div class="empty-state" *ngIf="
+            !loadingCheques &&
+            !errorCheques &&
+            cheques.length === 0
+          ">
+
+          <mat-icon>
+            receipt_long
+          </mat-icon>
+
+          <h3>
+            No hay cheques pendientes
+          </h3>
+
+          <p>
+            No existen cheques pendientes para este proveedor.
+          </p>
+
+        </div>
+
+
+        <!-- ===================================================
+             TABLA CHEQUES
+        ==================================================== -->
+
+        <div class="tabla-wrapper" *ngIf="
+            !loadingCheques &&
+            cheques.length > 0
+          ">
+
+          <table mat-table [dataSource]="cheques" class="tabla-cheques">
+
+
+            <!-- NÚMERO -->
+
+            <ng-container matColumnDef="numero">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Nº Cheque
+
+              </th>
+
+              <td mat-cell *matCellDef="let cheque">
+
+                <strong>
+
+                  {{ cheque.numeroCheque }}
+
+                </strong>
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- BANCO -->
+
+            <ng-container matColumnDef="banco">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Banco
+
+              </th>
+
+              <td mat-cell *matCellDef="let cheque">
+
+                {{ cheque.banco || '-' }}
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- TITULAR -->
+
+            <ng-container matColumnDef="titular">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Titular
+
+              </th>
+
+              <td mat-cell *matCellDef="let cheque">
+
+                {{ cheque.titularCheque }}
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- MONTO -->
+
+            <ng-container matColumnDef="monto">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Monto
+
+              </th>
+
+              <td mat-cell *matCellDef="let cheque">
+
+                <strong>
+
+                  {{
+                  cheque.monto
+                  | currency:'ARS':'symbol':'1.2-2'
+                  }}
+
+                </strong>
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- EMISIÓN -->
+
+            <ng-container matColumnDef="emision">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Emisión
+
+              </th>
+
+              <td mat-cell *matCellDef="let cheque">
+
+                {{
+                cheque.fechaEmision
+                | date:'dd/MM/yyyy'
+                }}
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- COBRO -->
+
+            <ng-container matColumnDef="cobro">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Fecha de cobro
+
+              </th>
+
+              <td mat-cell *matCellDef="let cheque">
+
+                {{
+                cheque.fechaCobro
+                | date:'dd/MM/yyyy'
+                }}
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- ESTADO -->
+
+            <ng-container matColumnDef="estado">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Estado
+
+              </th>
+
+              <td mat-cell *matCellDef="let cheque">
+
+                <span class="estado estado-pendiente">
+
+                  {{ cheque.estado }}
+
+                </span>
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- ACCIONES -->
+
+            <ng-container matColumnDef="acciones">
+
+              <th mat-header-cell *matHeaderCellDef>
+
+                Acciones
+
+              </th>
+
+              <td mat-cell *matCellDef="let cheque">
+
+                <div class="acciones-tabla">
+
+
+                  <!-- COBRAR -->
+
+                  <button mat-raised-button color="primary" type="button" matTooltip="Registrar cobro"
+                    (click)="cobrarCheque(cheque)">
+
+                    <mat-icon>
+                      payments
+                    </mat-icon>
+
+                    Cobrar
+
+                  </button>
+
+
+                  <!-- RECHAZAR -->
+
+                  <button mat-stroked-button color="warn" type="button" matTooltip="Rechazar cheque"
+                    (click)="rechazarCheque(cheque)">
+
+                    <mat-icon>
+                      cancel
+                    </mat-icon>
+
+                    Rechazar
+
+                  </button>
+
+                </div>
+
+              </td>
+
+            </ng-container>
+
+
+            <!-- HEADER -->
+
+            <tr mat-header-row *matHeaderRowDef="columnasCheques">
+            </tr>
+
+
+            <!-- ROW -->
+
+            <tr mat-row *matRowDef="
+                let row;
+                columns: columnasCheques
+              ">
+            </tr>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </mat-tab>
+
+  </mat-tab-group>
+
+
+  <!-- =========================================================
+       FORMULARIO DE PAGO
+  ========================================================== -->
+
+  <section id="formulario-pago-proveedor" class="pay-supplier-card formulario-pago-card" *ngIf="mostrarFormularioPago">
+
+
+    <!-- HEADER -->
+
+    <div class="section-header">
+
+      <div>
+
+        <h3>
+          💳 Registrar pago
+        </h3>
+
+        <span *ngIf="facturaSeleccionada">
+
+          Factura:
+
+          <strong>
+            {{ obtenerNumeroFactura(facturaSeleccionada) }}
+          </strong>
+
+        </span>
+
+      </div>
+
+
+      <button mat-icon-button type="button" matTooltip="Cancelar" (click)="cancelarPago()">
+
+        <mat-icon>
+          close
+        </mat-icon>
+
+      </button>
+
+    </div>
+
+
+    <!-- DATOS FACTURA -->
+
+    <div class="factura-info" *ngIf="facturaSeleccionada">
+
+
+      <div class="factura-item">
+
+        <span>
+          Factura
+        </span>
+
+        <strong>
+          {{ obtenerNumeroFactura(facturaSeleccionada) }}
+        </strong>
+
+      </div>
+
+
+      <div class="factura-item">
+
+        <span>
+          Fecha
+        </span>
+
+        <strong>
+
+         {{ obtenerFechaFactura(facturaSeleccionada) | date:'dd/MM/yyyy' }}
+
+        </strong>
+
+      </div>
+
+
+      <div class="factura-item">
+
+        <span>
+          Total
+        </span>
+
+        <strong>
+
+        {{ obtenerTotalFactura(facturaSeleccionada) | currency:'ARS' }}
+        </strong>
+
+      </div>
+
+
+      <div class="factura-item saldo">
+
+        <span>
+          Saldo a pagar
+        </span>
+
+        <strong>
+
+          {{
+          obtenerSaldoFactura(facturaSeleccionada)
+          | currency:'ARS':'symbol':'1.2-2'
+          }}
+
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <!-- =======================================================
+         FORMULARIO
+    ======================================================== -->
+
+    <form class="formulario-pago" [formGroup]="formPago" (ngSubmit)="registrarPago()">
+
+
+      <!-- FORMA Y MEDIO -->
+
+      <div class="form-row">
+        <!-- El tipo de cuenta pertenece a la factura. -->
+        <!-- MEDIO -->
+
+        <mat-form-field appearance="outline" class="full-width">
+
+          <mat-label>
+            Medio de pago
+          </mat-label>
+
+          <mat-select formControlName="medioPago">
+
+            <mat-option value="EFECTIVO">
+
+              💵 Efectivo
+
+            </mat-option>
+
+            <mat-option value="TRANSFERENCIA">
+
+              🏦 Transferencia
+
+            </mat-option>
+
+            <mat-option value="CHEQUE">
+
+              🧾 Cheque
+
+            </mat-option>
+
+            <mat-option value="TARJETA_DEBITO">
+
+              💳 Tarjeta de débito
+
+            </mat-option>
+
+            <mat-option value="TARJETA_CREDITO">
+
+              💳 Tarjeta de crédito
+
+            </mat-option>
+
+            <mat-option value="MERCADO_PAGO">
+
+              📱 Mercado Pago
+
+            </mat-option>
+
+            <mat-option value="OTRO">
+
+              Otro
+
+            </mat-option>
+
+          </mat-select>
+
+        </mat-form-field>
+
+      </div>
+
+
+      <!-- MONTO -->
+
+      <div class="form-row">
+
+
+        <mat-form-field appearance="outline" class="full-width">
+
+          <mat-label>
+            Monto
+          </mat-label>
+
+          <input matInput type="number" min="0.01" step="0.01" formControlName="monto">
+
+          <span matTextPrefix>
+            $
+          </span>
+
+          <mat-error *ngIf="
+              formPago.get('monto')?.hasError('required')
+            ">
+
+            El monto es obligatorio.
+
+          </mat-error>
+
+          <mat-error *ngIf="
+              formPago.get('monto')?.hasError('min')
+            ">
+
+            El monto debe ser mayor a cero.
+
+          </mat-error>
+
+        </mat-form-field>
+
+
+        <mat-form-field appearance="outline" class="full-width">
+
+          <mat-label>
+            Descripción
+          </mat-label>
+
+          <input matInput formControlName="descripcion" placeholder="Descripción del pago">
+
+        </mat-form-field>
+
+      </div>
+
+
+      <!-- =====================================================
+           DATOS CHEQUE
+      ====================================================== -->
+
+      <div class="cheque-container" *ngIf="mostrarDatosCheque">
+
+
+        <div class="cheque-header">
+
+          <mat-icon>
+            receipt
+          </mat-icon>
+
+          <div>
+
+            <h3>
+              Datos del cheque
+            </h3>
+
+            <span>
+              Complete la información del cheque entregado.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- FILA 1 -->
+
+        <div class="form-row">
+
+
+          <mat-form-field appearance="outline">
+
+            <mat-label>
+              Número de cheque
+            </mat-label>
+
+            <input matInput formControlName="numeroCheque">
+
+            <mat-error *ngIf="
+                formPago.get('numeroCheque')?.hasError('required')
+              ">
+
+              Obligatorio.
+
+            </mat-error>
+
+          </mat-form-field>
+
+
+          <mat-form-field appearance="outline">
+
+            <mat-label>
+              Banco
+            </mat-label>
+
+            <input matInput formControlName="banco">
+
+            <mat-error *ngIf="
+                formPago.get('banco')?.hasError('required')
+              ">
+
+              Obligatorio.
+
+            </mat-error>
+
+          </mat-form-field>
+
+        </div>
+
+
+        <!-- FILA 2 -->
+
+        <div class="form-row">
+
+
+          <mat-form-field appearance="outline">
+
+            <mat-label>
+              Titular
+            </mat-label>
+
+            <input matInput formControlName="titular">
+
+            <mat-error *ngIf="
+                formPago.get('titular')?.hasError('required')
+              ">
+
+              Obligatorio.
+
+            </mat-error>
+
+          </mat-form-field>
+
+
+          <mat-form-field appearance="outline">
+
+            <mat-label>
+              Quién entrega
+            </mat-label>
+
+            <input matInput formControlName="quienEntrego">
+
+            <mat-error *ngIf="
+                formPago.get('quienEntrego')?.hasError('required')
+              ">
+
+              Obligatorio.
+
+            </mat-error>
+
+          </mat-form-field>
+
+        </div>
+
+
+        <!-- FILA 3 -->
+
+        <div class="form-row">
+
+
+          <mat-form-field appearance="outline">
+
+            <mat-label>
+              Nombre de entrega
+            </mat-label>
+
+            <input matInput formControlName="nombreEntrega">
+
+            <mat-error *ngIf="
+                formPago.get('nombreEntrega')?.hasError('required')
+              ">
+
+              Obligatorio.
+
+            </mat-error>
+
+          </mat-form-field>
+
+
+          <mat-form-field appearance="outline">
+
+            <mat-label>
+              Fecha de emisión
+            </mat-label>
+
+            <input matInput type="date" formControlName="fechaEmision">
+
+            <mat-error *ngIf="
+                formPago.get('fechaEmision')?.hasError('required')
+              ">
+
+              Obligatorio.
+
+            </mat-error>
+
+          </mat-form-field>
+
+        </div>
+
+
+        <!-- FILA 4 -->
+
+        <div class="form-row">
+
+
+          <mat-form-field appearance="outline">
+
+            <mat-label>
+              Fecha de cobro
+            </mat-label>
+
+            <input matInput type="date" formControlName="fechaCobro">
+
+            <mat-error *ngIf="
+                formPago.get('fechaCobro')?.hasError('required')
+              ">
+
+              Obligatorio.
+
+            </mat-error>
+
+          </mat-form-field>
+
+
+          <mat-form-field appearance="outline">
+
+            <mat-label>
+              Observación
+            </mat-label>
+
+            <input matInput formControlName="observacionCheque">
+
+          </mat-form-field>
+
+        </div>
+
+      </div>
+
+
+      <!-- =====================================================
+           BOTONES
+      ====================================================== -->
+
+      <div class="acciones">
+
+
+        <button mat-stroked-button type="button" class="btn-cancelar" [disabled]="procesandoPago"
+          (click)="cancelarPago()">
+
+          <mat-icon>
+            close
+          </mat-icon>
+
+          Cancelar
+
+        </button>
+
+
+        <button mat-raised-button color="primary" type="submit" class="btn-pagar" [disabled]="
+            procesandoPago ||
+            formPago.invalid
+          ">
+
+
+          <mat-spinner *ngIf="procesandoPago" diameter="20">
+          </mat-spinner>
+
+
+          <mat-icon *ngIf="!procesandoPago">
+
+            payments
+
+          </mat-icon>
+
+
+          <span *ngIf="!procesandoPago">
+
+            Registrar pago
+
+          </span>
+
+
+          <span *ngIf="procesandoPago">
+
+            Procesando...
+
+          </span>
+
+        </button>
+
+      </div>
+
+    </form>
+
+  </section>
+
+
+  <!-- =========================================================
+       MENSAJE FINAL
+  ========================================================== -->
+
+  <div class="mensaje-info" *ngIf="
+      !mostrarFormularioPago &&
+      facturas.length > 0
+    ">
+
+    💡 Seleccioná una factura y presioná
+    <strong>Pagar</strong> para registrar un pago.
+
+  </div>
+
 </div>

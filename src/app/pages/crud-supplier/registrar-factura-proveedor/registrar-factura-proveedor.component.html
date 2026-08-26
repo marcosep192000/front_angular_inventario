@@ -1,27 +1,156 @@
-
 @defer {
 
-    <app-form-factura-datos-proveedor (datosEmitidos)="datosHijo1Change($event)" #childRef></app-form-factura-datos-proveedor>
-<app-registrar-detalle-factura-proveedor (productosEmitidos)="datosHijo2Change($event)" (limpiarTotal)="showFormSuBtotal" #childRefDetalle></app-registrar-detalle-factura-proveedor>}
-@loading () {
-    <app-spinner></app-spinner>
+  <app-form-factura-datos-proveedor
+    #childRef
+    (datosEmitidos)="datosHijo1Change($event)">
+  </app-form-factura-datos-proveedor>
+
+
+  <app-registrar-detalle-factura-proveedor
+    #childRefDetalle
+    (productosEmitidos)="datosHijo2Change($event)"
+    (limpiarTotal)="limpiarTotal($event)">
+  </app-registrar-detalle-factura-proveedor>
+<app-impuestos-factura
+  [baseImponible]="subtotalFactura"
+  (impuestosChange)="datosImpuestosChange($event)">
+</app-impuestos-factura>
 }
-@error{
-console.error('Error en el componente hijo', error);
-<p>ERROR</p>}
+@loading {
 
-@if (showFormSuBtotal){
-      <div class="parent-container">
-    <button class="container__totalSale" (click)="crearFacturaDialog()">
-       <h4>Iva:{{totalIva | currency}}</h4>
-     <h4>Sub Total:{{totalFacturaSinIva | currency}}</h4>
-        <h3>Total:{{subtotalFactura|currency}}</h3>
-    </button>
-</div>  
+  <app-spinner></app-spinner>
+
 }
- @else {
-    <h3>No tienes productos en la factura!</h3>
- }
+@error {
+
+  <p>
+    Error al cargar el componente.
+  </p>
+
+}
 
 
+@if (showFormSubtotal) {
 
+  <div class="parent-container">
+
+    <div class="container__totalSale">
+
+      <div class="total-line">
+
+        <span>
+          Subtotal:
+        </span>
+
+        <strong>
+          {{ subtotalFactura | currency:'ARS' }}
+        </strong>
+
+      </div>
+
+
+    <div class="total-line">
+
+  <span>
+    Subtotal:
+  </span>
+
+  <strong>
+    {{
+      subtotalFactura
+        | currency:'ARS'
+    }}
+  </strong>
+
+</div>
+
+
+<div class="total-line">
+
+  <span>
+    IVA:
+  </span>
+
+  <strong>
+    {{
+      totalIva
+        | currency:'ARS'
+    }}
+  </strong>
+
+</div>
+
+
+<div class="total-line">
+
+  <span>
+    Impuestos adicionales:
+  </span>
+
+  <strong>
+    {{
+      impuestosTotal
+        | currency:'ARS'
+    }}
+  </strong>
+
+</div>
+
+
+<div class="total-line total-final">
+
+  <span>
+    TOTAL:
+  </span>
+
+  <strong>
+    {{
+      totalFactura
+        | currency:'ARS'
+    }}
+  </strong>
+
+</div>
+
+
+      <div class="total-line total-final">
+
+        <span>
+          TOTAL:
+        </span>
+
+        <strong>
+          {{ totalFactura | currency:'ARS' }}
+        </strong>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="btn-crear-factura"
+        (click)="crearFacturaDialog()"
+        [disabled]="guardando">
+
+        {{ guardando
+          ? 'Guardando...'
+          : 'Registrar Factura' }}
+
+      </button>
+
+    </div>
+
+  </div>
+
+}
+@else {
+
+  <div class="sin-productos">
+
+    <h3>
+      Agrega productos para registrar la factura.
+    </h3>
+
+  </div>
+
+}

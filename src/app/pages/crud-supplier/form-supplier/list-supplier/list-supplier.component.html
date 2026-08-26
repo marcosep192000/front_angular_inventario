@@ -1,108 +1,498 @@
-  <!-- PAGINA PRINCIPAL DE PROVEEDOR -->
-<mat-tab-group class="tab_group" [selectedIndex]="2">
-    <mat-tab label="Administracion Proveedores"> 
-<!--  primer formulario  -->
+<!-- =========================================================
+     PÁGINA PRINCIPAL DE PROVEEDORES
+========================================================== -->
 
-<section class="contenedor-global">
-    <div class="container__serch">
-        <div class="container__serch">
-            <input class="search__input" placeholder="  Ingresa El Proveedor a buscar" type="text" ngModel=""
-                (keyup)="applyFilter($event)" value="text">
+<mat-tab-group
+  class="tab_group"
+  [selectedIndex]="0">
+
+
+  <!-- =======================================================
+       ADMINISTRACIÓN DE PROVEEDORES
+  ======================================================== -->
+
+  <mat-tab label="Administración Proveedores">
+
+
+    <!-- =====================================================
+         BUSCADOR / ACCIONES
+    ====================================================== -->
+
+    <section class="contenedor-global">
+
+      <div class="toolbar">
+
+
+        <!-- BUSCAR -->
+
+        <div class="search-container">
+
+          <mat-form-field
+            appearance="outline"
+            class="search-field">
+
+            <mat-label>
+              Buscar proveedor
+            </mat-label>
+
+            <input
+              matInput
+              type="text"
+              placeholder="CUIT, nombre, email..."
+              (input)="applyFilter($event)">
+
+            <mat-icon matSuffix>
+              search
+            </mat-icon>
+
+          </mat-form-field>
+
         </div>
-        <div class="actions__btn">
-            <button class="actions__btn  btn__new" (click)="createSupplier()">Nuevo Proveedor</button>
+
+
+        <!-- NUEVO -->
+
+        <div class="actions-container">
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            (click)="createSupplier()">
+
+            <mat-icon>
+              add
+            </mat-icon>
+
+            Nuevo proveedor
+
+          </button>
+
         </div>
-    </div>
-</section>
-<section class="contenedor-global">
-    <h2>Listado de Proveedores</h2>
-    <hr>
 
-    <div class="mat-elevation-z8 table-container">
-        <table mat-table [dataSource]="dataSource" class="table">
+      </div>
+
+    </section>
 
 
-            <ng-container matColumnDef="id">
-                <th mat-header-cell *matHeaderCellDef>Id</th>
-                <td mat-cell *matCellDef="let element"> {{element.id}}</td>
-            </ng-container>
+    <!-- =====================================================
+         LISTADO
+    ====================================================== -->
+
+    <section class="contenedor-global">
+
+      <div class="header-listado">
+
+        <div>
+
+          <h2>
+            Listado de Proveedores
+          </h2>
+
+          <p>
+            {{ dataSource.data.length }}
+            proveedor(es)
+          </p>
+
+        </div>
+
+      </div>
 
 
-<!-- cuit -->
-<ng-container matColumnDef="cuit">
-    <th mat-header-cell *matHeaderCellDef>Cuit</th>
-    <td mat-cell *matCellDef="let element"> {{element.cuit}}</td>
-</ng-container>
-            <!--dni-->
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef>Razon Social</th>
-                <td mat-cell *matCellDef="let element"> {{element.name}}</td>
-            </ng-container>
-
-            <!--name-->
-            <ng-container matColumnDef="email">
-                <th mat-header-cell *matHeaderCellDef>Email</th>
-                <td mat-cell *matCellDef="let element"> {{element.email}}</td>
-            </ng-container>
-
-            <!--lastName-->
-            <ng-container matColumnDef="phone">
-                <th mat-header-cell *matHeaderCellDef>Telefono</th>
-                <td mat-cell *matCellDef="let element"> {{element.phone}}</td>
-            </ng-container>
-
-            <!--address-->
-            <ng-container matColumnDef="address">
-                <th mat-header-cell *matHeaderCellDef>Direccion</th>
-                <td mat-cell *matCellDef="let element"> {{element.address}}</td>
-            </ng-container>
-            <!-- telefono -->
-            <ng-container matColumnDef="contact">
-                <th mat-header-cell *matHeaderCellDef>Contacto</th>
-                <td mat-cell *matCellDef="let element"> {{element.contact}}</td>
-            </ng-container>
+      <hr>
 
 
+      <!-- ===================================================
+           LOADING
+      ==================================================== -->
+
+      <div
+        class="loading"
+        *ngIf="loading">
+
+        <mat-icon class="loading-icon">
+          sync
+        </mat-icon>
+
+        Cargando proveedores...
+
+      </div>
 
 
+      <!-- ===================================================
+           TABLA
+      ==================================================== -->
+
+      <div
+        class="table-container"
+        *ngIf="!loading">
+
+        <table
+          mat-table
+          [dataSource]="dataSource"
+          class="table">
 
 
-            <ng-container matColumnDef="Opciones">
-                <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
-                <td mat-cell *matCellDef="let element">
+          <!-- =================================================
+               ID
+          ================================================== -->
 
-                    <div class="container__accions">
-                        <div class="example-button-row">
-                            <button mat-fab class="btn__update" (click)="updateSupplier(element.id)"
-                                aria-label="Example icon button with a delete icon">
-                                <app-icon [iconSrc]="'assets/icons/task.png'" [size]="'20px'"></app-icon>
-                            </button>
+          <ng-container matColumnDef="id">
 
-                        </div>
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
-                        <div class="example-button-row">
-                            <button mat-fab class="btn__delete" (click)="deleteSupplier(element.id)"
-                                aria-label="Example icon button with a delete icon">
-                                <app-icon [iconSrc]="'assets/icons/delete.png'" [size]="'20px'"></app-icon>
-                            </button>
-                        </div>
-                    </div>
+              ID
 
-                </td>
+            </th>
 
-            </ng-container>
-            <!-- Name Column -->
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <td
+              mat-cell
+              *matCellDef="let element">
+
+              {{ element.id }}
+
+            </td>
+
+          </ng-container>
+
+
+          <!-- =================================================
+               CUIT
+          ================================================== -->
+
+          <ng-container matColumnDef="cuit">
+
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+
+              CUIT
+
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let element">
+
+              {{ element.cuit }}
+
+            </td>
+
+          </ng-container>
+
+
+          <!-- =================================================
+               RAZÓN SOCIAL
+          ================================================== -->
+
+          <ng-container matColumnDef="name">
+
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+
+              Razón Social
+
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let element">
+
+              <strong>
+                {{ element.name }}
+              </strong>
+
+            </td>
+
+          </ng-container>
+
+
+          <!-- =================================================
+               EMAIL
+          ================================================== -->
+
+          <ng-container matColumnDef="email">
+
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+
+              Email
+
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let element">
+
+              {{ element.email }}
+
+            </td>
+
+          </ng-container>
+
+
+          <!-- =================================================
+               TELÉFONO
+          ================================================== -->
+
+          <ng-container matColumnDef="phone">
+
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+
+              Teléfono
+
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let element">
+
+              {{ element.phone }}
+
+            </td>
+
+          </ng-container>
+
+
+          <!-- =================================================
+               CONTACTO
+          ================================================== -->
+
+          <ng-container matColumnDef="contact">
+
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+
+              Contacto
+
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let element">
+
+              {{ element.contact || '-' }}
+
+            </td>
+
+          </ng-container>
+
+
+          <!-- =================================================
+               DIRECCIÓN
+          ================================================== -->
+
+          <ng-container matColumnDef="address">
+
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+
+              Dirección
+
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let element">
+
+              {{ element.address || '-' }}
+
+            </td>
+
+          </ng-container>
+
+
+          <!-- =================================================
+               ACCIONES
+          ================================================== -->
+
+          <ng-container matColumnDef="Opciones">
+
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              class="acciones-header">
+
+              Acciones
+
+            </th>
+
+
+            <td
+              mat-cell
+              *matCellDef="let element">
+
+              <div class="container__accions">
+
+
+                <!-- =================================================
+                     EDITAR
+                ================================================== -->
+
+                <button
+                  mat-mini-fab
+                  class="btn__update"
+                  type="button"
+                  matTooltip="Editar proveedor"
+                  (click)="updateSupplier(element.id)">
+
+                  <app-icon
+                    [iconSrc]="'assets/icons/task.png'"
+                    [size]="'18px'">
+                  </app-icon>
+
+                </button>
+
+
+                <!-- =================================================
+                     ELIMINAR
+                ================================================== -->
+
+                <button
+                  mat-mini-fab
+                  class="btn__delete"
+                  type="button"
+                  matTooltip="Eliminar proveedor"
+                  [disabled]="deleting"
+                  (click)="deleteSupplier(element)">
+
+                  <app-icon
+                    [iconSrc]="'assets/icons/delete.png'"
+                    [size]="'18px'">
+                  </app-icon>
+
+                </button>
+
+
+                <!-- =================================================
+                     PAGAR PROVEEDOR
+                ================================================== -->
+
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="button"
+                  matTooltip="Pagos del proveedor"
+                  (click)="pagarProveedor(element)">
+
+                  <mat-icon>
+                    payments
+                  </mat-icon>
+
+                  Pagar
+
+                </button>
+
+
+              </div>
+
+            </td>
+
+          </ng-container>
+
+
+          <!-- =================================================
+               HEADER
+          ================================================== -->
+
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns">
+
+          </tr>
+
+
+          <!-- =================================================
+               FILAS
+          ================================================== -->
+
+          <tr
+            mat-row
+            *matRowDef="
+              let row;
+              columns: displayedColumns;
+            "
+            [attr.data-id]="row.id">
+
+          </tr>
+
+
+          <!-- =================================================
+               SIN RESULTADOS
+          ================================================== -->
+
+          <tr
+            class="mat-row"
+            *matNoDataRow>
+
+            <td
+              class="no-data"
+              [attr.colspan]="displayedColumns.length">
+
+              <mat-icon>
+                search_off
+              </mat-icon>
+
+              <span>
+                No se encontraron proveedores.
+              </span>
+
+            </td>
+
+          </tr>
+
+
         </table>
-    </div>
-    <mat-paginator [pageSizeOptions]="[5,8]" showFirstLastButtons aria-label="Select page of periodic elements">
-    </mat-paginator>
 
-</section>
-<!--  fin primer formulario  -->
-    </mat-tab>
+      </div>
 
-    <mat-tab label="Pago a Proveedores"><app-pay-supplier></app-pay-supplier></mat-tab>
-    <mat-tab label="Registrar Ingresos"> <app-registrar-factura-proveedor></app-registrar-factura-proveedor></mat-tab>
+
+      <!-- ===================================================
+           PAGINADOR
+      ==================================================== -->
+
+      <mat-paginator
+        [pageSize]="8"
+        [pageSizeOptions]="[
+          5,
+          8,
+          15,
+          25
+        ]"
+        showFirstLastButtons
+        aria-label="Paginación de proveedores">
+
+      </mat-paginator>
+
+
+    </section>
+
+  </mat-tab>
+
+
+  <!-- =======================================================
+       PAGO A PROVEEDORES
+  ======================================================== -->
+ 
+
+  <!-- =======================================================
+       REGISTRAR FACTURA
+  ======================================================== -->
+
+  <mat-tab label="Registrar Factura">
+
+    <app-registrar-factura-proveedor>
+    </app-registrar-factura-proveedor>
+
+  </mat-tab>
+
+
 </mat-tab-group>

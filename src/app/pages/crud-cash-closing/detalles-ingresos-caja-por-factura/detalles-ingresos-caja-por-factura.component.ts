@@ -9,9 +9,7 @@ import {
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { TicketService } from '../../../services/ticket.service';
-import { MovimientoCajaService
-
- } from '../../../services/movimiento-caja.service';
+import { MovimientoCajaService } from '../../../services/movimiento-caja.service';
 
 import { SaleCommon } from '../../../interfaces/sale-common';
 import { MovimientoDetalle } from '../../../interfaces/movimiento-detalle';
@@ -36,6 +34,7 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
 
   movimiento?: MovimientoDetalle;
 
+
   constructor(
 
     @Inject(MAT_DIALOG_DATA)
@@ -45,9 +44,11 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
 
     private movimientoService: MovimientoCajaService,
 
-    private dialogRef: MatDialogRef<DetallesIngresosCajaPorFacturaComponent>
+    private dialogRef:
+      MatDialogRef<DetallesIngresosCajaPorFacturaComponent>
 
-  ) { }
+  ) {}
+
 
   ngOnInit(): void {
 
@@ -62,6 +63,7 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
     }
 
   }
+
 
   private cargarVenta(): void {
 
@@ -79,7 +81,10 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
 
         error: err => {
 
-          console.error(err);
+          console.error(
+            'Error al cargar la venta:',
+            err
+          );
 
           this.cargando = false;
 
@@ -88,6 +93,7 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
       });
 
   }
+
 
   private cargarMovimiento(): void {
 
@@ -105,7 +111,10 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
 
         error: err => {
 
-          console.error(err);
+          console.error(
+            'Error al cargar el movimiento:',
+            err
+          );
 
           this.cargando = false;
 
@@ -115,17 +124,20 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
 
   }
 
+
   get esVenta(): boolean {
 
     return this.ticket != null;
 
   }
 
+
   get esMovimiento(): boolean {
 
     return this.movimiento != null;
 
   }
+
 
   cerrar(): void {
 

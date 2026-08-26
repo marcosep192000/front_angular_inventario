@@ -1,57 +1,165 @@
-<!-- CARGA DE FACTURA PROVEEDOR (REGISTRAR INGRESOS) -->
+<form [formGroup]="formInvoice">
 
-    <div class="col-1">
-        <form [formGroup]="formInvoice">
-            <mat-form-field class="input">
-                <mat-label>Proveedor</mat-label>
-                <mat-select formControlName="provider">
-                  <mat-option *ngFor="let supplier of suppliers" [value]="supplier.id">
-                    {{ supplier.name }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-             {{selectedSupplier}}
-         
-         
-             <mat-form-field class="input-comp">
-                <mat-label>Forma de Pago</mat-label>
-                <mat-select formControlName="tipoDeCuentaEnum">
-                    <mat-option *ngFor="let item of paymentTermsList" [value]="item">
-            
-                        {{ item }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
-            
+  <div class="col-1">
+
+    <!-- =====================================================
+         PROVEEDOR
+    ====================================================== -->
+
+    <mat-form-field class="input">
+
+      <mat-label>
+        Proveedor
+      </mat-label>
+
+      <mat-select
+        formControlName="provider">
+
+        <mat-option
+          *ngFor="let supplier of suppliers"
+          [value]="supplier.id">
+
+          {{ supplier.name }}
+
+        </mat-option>
+
+      </mat-select>
+
+      <mat-error
+        *ngIf="
+          formInvoice.get('provider')?.hasError('required')
+        ">
+
+        Debes seleccionar un proveedor.
+
+      </mat-error>
+
+    </mat-form-field>
 
 
+    <!-- =====================================================
+         FORMA DE PAGO
+    ====================================================== -->
+
+    <mat-form-field class="input-comp">
+
+      <mat-label>
+        Forma de pago
+      </mat-label>
+
+      <mat-select
+        formControlName="tipoDeCuentaEnum">
+
+        <mat-option
+          *ngFor="let item of paymentTermsList"
+          [value]="item">
+
+          {{ item }}
+
+        </mat-option>
+
+      </mat-select>
+
+      <mat-error
+        *ngIf="
+          formInvoice
+            .get('tipoDeCuentaEnum')
+            ?.hasError('required')
+        ">
+
+        Debes seleccionar una forma de pago.
+
+      </mat-error>
+
+    </mat-form-field>
 
 
+    <!-- =====================================================
+         FECHA DE INGRESO
+    ====================================================== -->
+
+    <mat-form-field
+      class="example-full-width">
+
+      <mat-label>
+        Fecha de factura
+      </mat-label>
+
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="dateOfEntry">
+
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="picker">
+      </mat-datepicker-toggle>
+
+      <mat-datepicker
+        #picker>
+      </mat-datepicker>
+
+    </mat-form-field>
 
 
-            <mat-form-field class="example-full-width">
-                <mat-label>Fecha Comp.</mat-label>
-                <input matInput [matDatepicker]="picker" formControlName="dateOfEntry">
-                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker touchUi #picker></mat-datepicker>
-            </mat-form-field>
+    <!-- =====================================================
+         NÚMERO DE FACTURA
+    ====================================================== -->
 
-            <mat-form-field class="mat-form-field input-comp">
-                <mat-label>Comprobante N°</mat-label>
-                <input matInput formControlName="idInvoice" />
-            </mat-form-field>
+    <mat-form-field
+      class="mat-form-field input-comp">
 
-            <mat-form-field class="example-full-width" *ngIf="selectedPaymentTerm !== 'CONTADO'">
-                <mat-label>Fecha Venc.</mat-label>
-                <input matInput [matDatepicker]="pickerVencimiento" formControlName="dueDate">
-                <mat-datepicker-toggle matIconSuffix [for]="pickerVencimiento"></mat-datepicker-toggle>
-                <mat-datepicker touchUi #pickerVencimiento></mat-datepicker>
-            </mat-form-field>
+      <mat-label>
+        Comprobante N°
+      </mat-label>
 
-            <mat-form-field class="input">
-                <mat-label>Monto total</mat-label>
-                <input matInput type="number" formControlName="amount" />
-            </mat-form-field>
-        </form>
-     
+      <input
+        matInput
+        formControlName="idInvoice">
 
+      <mat-error
+        *ngIf="
+          formInvoice.get('idInvoice')
+            ?.hasError('required')
+        ">
+
+        El número de comprobante es obligatorio.
+
+      </mat-error>
+
+    </mat-form-field>
+
+
+    <!-- =====================================================
+         VENCIMIENTO
+    ====================================================== -->
+
+    <mat-form-field
+      class="example-full-width"
+      *ngIf="
+        selectedPaymentTerm !== 'CONTADO'
+      ">
+
+      <mat-label>
+        Fecha de vencimiento
+      </mat-label>
+
+      <input
+        matInput
+        [matDatepicker]="pickerVencimiento"
+        formControlName="dueDate">
+
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="pickerVencimiento">
+      </mat-datepicker-toggle>
+
+      <mat-datepicker
+        #pickerVencimiento>
+      </mat-datepicker>
+
+    </mat-form-field>
+
+  </div>
+
+</form>

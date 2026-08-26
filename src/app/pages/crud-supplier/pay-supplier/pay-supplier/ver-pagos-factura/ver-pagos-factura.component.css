@@ -1,0 +1,377 @@
+.dialog-container {
+  width: min(1050px, 92vw);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  color: #263238;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  color: #fff;
+  background: linear-gradient(135deg, #4b0082, #673ab7);
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.header-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, .16);
+}
+
+.header-title h2 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.header-title p {
+  margin: 4px 0 0;
+  opacity: .9;
+  font-size: 13px;
+}
+
+.dialog-header button {
+  color: #fff;
+}
+
+.contenido {
+  overflow: auto;
+  padding: 20px;
+}
+
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.resumen-card {
+  padding: 16px;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  background: #fafbfc;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.resumen-card span {
+  color: #667085;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.resumen-card strong {
+  font-size: 20px;
+}
+
+.resumen-card.pagado {
+  background: #f1fbf4;
+  border-color: #b7e4c7;
+}
+
+.resumen-card.pagado strong {
+  color: #218739;
+}
+
+.resumen-card.saldo {
+  background: #fff8ed;
+  border-color: #ffdca8;
+}
+
+.resumen-card.saldo strong {
+  color: #c76a00;
+}
+
+.resumen-card.cantidad strong {
+  color: #673ab7;
+}
+
+.section-header {
+  margin-bottom: 14px;
+}
+
+.section-header h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+.section-header span {
+  color: #667085;
+  font-size: 13px;
+}
+
+.pagos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.pago-card {
+  border: 1px solid #e1e5eb;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
+}
+
+.pago-top {
+  display: grid;
+  grid-template-columns: 42px 1fr auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 17px;
+}
+
+.pago-numero {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #ede7f6;
+  color: #5e35b1;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.pago-medio {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.medio-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #f2f4f7;
+}
+
+.pago-medio strong,
+.pago-medio span {
+  display: block;
+}
+
+.pago-medio strong {
+  font-size: 14px;
+}
+
+.pago-medio span {
+  margin-top: 3px;
+  color: #667085;
+  font-size: 12px;
+}
+
+.pago-monto {
+  text-align: right;
+}
+
+.pago-monto strong {
+  font-size: 18px;
+}
+
+.estado {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.estado-pagado {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.estado-aplicado {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.estado-pendiente {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.estado-default {
+  background: #f2f4f7;
+  color: #475467;
+}
+
+.pago-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 12px 17px;
+  border-top: 1px solid #eef0f3;
+  background: #fafbfc;
+}
+
+.pago-info div,
+.cheque-grid div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pago-info span,
+.cheque-grid span {
+  color: #667085;
+  font-size: 11px;
+}
+
+.pago-info strong,
+.cheque-grid strong {
+  font-size: 13px;
+}
+
+.cheque {
+  padding: 15px 17px 18px;
+  border-top: 1px solid #dce8f7;
+  background: #f7fbff;
+}
+
+.cheque-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 13px;
+  color: #1565c0;
+}
+
+.cheque-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 13px;
+}
+
+.sin-pagos {
+  padding: 45px 20px;
+  text-align: center;
+  border: 1px dashed #cfd4dc;
+  border-radius: 14px;
+  color: #667085;
+}
+
+.sin-pagos mat-icon {
+  font-size: 42px;
+  width: 42px;
+  height: 42px;
+}
+
+.sin-pagos h3 {
+  margin: 12px 0 5px;
+  color: #344054;
+}
+
+.sin-pagos p {
+  margin: 0;
+}
+
+.loading-container {
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  color: #667085;
+}
+
+.error-container {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 25px;
+  color: #667085;
+}
+
+.error-container mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #c62828;
+}
+
+.error-container h3 {
+  margin: 12px 0 5px;
+  color: #344054;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 20px;
+  border-top: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+
+@media (max-width: 850px) {
+  .resumen {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cheque-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pago-top {
+    grid-template-columns: 42px 1fr auto;
+  }
+
+  .estado {
+    grid-column: 2 / -1;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 600px) {
+  .dialog-container {
+    width: 100%;
+    max-height: 92vh;
+  }
+
+  .contenido {
+    padding: 12px;
+  }
+
+  .resumen,
+  .pago-info,
+  .cheque-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pago-top {
+    grid-template-columns: 40px 1fr;
+  }
+
+  .pago-monto {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  .estado {
+    grid-column: 2;
+  }
+}

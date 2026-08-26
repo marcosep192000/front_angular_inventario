@@ -1,112 +1,904 @@
+<!-- =========================================================
+     REGISTRAR DETALLE DE FACTURA
+========================================================= -->
+
 <hr class="hr">
+
 <h4>Cargar Productos</h4>
-<!-- Additional Textarea -->
+
+
+<!-- =========================================================
+     BUSCAR PRODUCTO
+========================================================= -->
+
 <div class="col busqueda">
-    <div class="container__search">
-        <!-- Campo de entrada -->
-        <mat-form-field class="mat-form-field container_search">
-            <mat-label>Ingresa el código de barras</mat-label>
-            <input matInput maxlength="20" type="text" name="code" [(ngModel)]="code" (input)="onInputChange($event)" />
-        </mat-form-field>
-        <div class="container_product">
-            Para registrar un producto puedes hacer click
-            <a mat-button color="primary" (click)="createProduct($event)">Aqui.</a>
-        </div>
+
+  <div class="container__search">
+
+    <mat-form-field
+      appearance="outline"
+      class="container_search">
+
+      <mat-label>
+        Ingresa el código de barras
+      </mat-label>
+
+      <input
+        matInput
+        maxlength="20"
+        type="text"
+        name="code"
+        [(ngModel)]="code"
+        (input)="onInputChange($event)"
+        autocomplete="off">
+
+      <mat-icon matSuffix>
+        search
+      </mat-icon>
+
+    </mat-form-field>
+
+
+    <div class="container_product">
+
+      Para registrar un producto puedes hacer click
+
+      <button
+        mat-button
+        color="primary"
+        type="button"
+        (click)="createProduct($event)">
+
+        aquí
+
+      </button>
+
     </div>
+
+  </div>
+
 </div>
 
-<!-- Productos -->
-<div class="row">
-    <div class="col prod">
-        <div *ngIf="showForm">
-            <form [formGroup]="formProduct">
-                <div class="container__productos">
 
 
-                    @if (product) {
-                
-                
-                        <div class="productos__inputs">
+<!-- =========================================================
+     FORMULARIO DEL PRODUCTO
+========================================================= -->
 
-                        <mat-form-field class="input-producto">
-                            <mat-label>Producto</mat-label>
-                            <input matInput formControlName="name"/>
-                        </mat-form-field>
+<div
+  class="row"
+  *ngIf="showForm && product">
 
-                        <mat-form-field class="mat-form-field input-description">
-                            <mat-label>description</mat-label>
-                            <input matInput placeholder="Ex. Pizza" formControlName="description" />
-                        </mat-form-field>
+  <div class="col prod">
 
-                        <mat-form-field class="mat-form-field input">
-                            <mat-label>Stock Actual</mat-label>
-                            <input matInput formControlName="stock" />
-                        </mat-form-field>
+    <form
+      [formGroup]="formProduct"
+      class="producto-form">
 
-                        <mat-form-field class="mat-form-field input">
-                            <mat-label>Precio Costo Proveedor</mat-label>
-                            <input matInput formControlName="price"/>
-                        </mat-form-field>
 
-                        <mat-form-field class="mat-form-field input">
-                            <mat-label>Iva</mat-label>
-                            <input matInput formControlName="iva">
-                        </mat-form-field>
-                        <mat-form-field class="mat-form-field input">
-                            <mat-label>Catidad a Registrar</mat-label>
-                            <input matInput formControlName="quantity">
-                        </mat-form-field>
-<button mat-flat-button class="btn primary btn-guardar-producto" color="primary"
-                            (click)="addListProduct()">Agregar</button>
-                        <button mat-flat-button class="btn_cancelar btn" (click)="cancelarBtn()" color="warn">Cancelar</button>
-                        
-                    </div>
-                    }@else {
-                    <p>No hay un producto seleccionado.</p>
-                    }
-                </div>
+      <!-- ===================================================
+           DATOS PRINCIPALES
+      ==================================================== -->
 
-            </form>
+      <div class="container__productos">
+
+
+        <div class="productos__inputs">
+
+
+          <!-- PRODUCTO -->
+
+          <mat-form-field
+            appearance="outline"
+            class="input-producto">
+
+            <mat-label>
+              Producto
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="name">
+
+          </mat-form-field>
+
+
+          <!-- DESCRIPCIÓN -->
+
+          <mat-form-field
+            appearance="outline"
+            class="input-description">
+
+            <mat-label>
+              Descripción
+            </mat-label>
+
+            <input
+              matInput
+              formControlName="description">
+
+          </mat-form-field>
+
+
+          <!-- STOCK -->
+
+          <mat-form-field
+            appearance="outline"
+            class="input">
+
+            <mat-label>
+              Stock actual
+            </mat-label>
+
+            <input
+              matInput
+              type="number"
+              formControlName="stock">
+
+          </mat-form-field>
+
+
+          <!-- PRECIO LISTA -->
+
+          <mat-form-field
+            appearance="outline"
+            class="input">
+
+            <mat-label>
+              Precio lista proveedor
+            </mat-label>
+
+            <span matTextPrefix>
+              $
+            </span>
+
+            <input
+              matInput
+              type="number"
+              min="0"
+              formControlName="price">
+
+          </mat-form-field>
+
+
+          <!-- CANTIDAD -->
+
+          <mat-form-field
+            appearance="outline"
+            class="input">
+
+            <mat-label>
+              Cantidad a registrar
+            </mat-label>
+
+            <input
+              matInput
+              type="number"
+              min="1"
+              formControlName="quantity">
+
+          </mat-form-field>
+
+
+          <!-- IVA -->
+
+          <mat-form-field
+            appearance="outline"
+            class="input">
+
+            <mat-label>
+              Alícuota de IVA
+            </mat-label>
+
+            <mat-select formControlName="iva">
+
+              <mat-option
+                *ngFor="let opcion of opcionesIva"
+                [value]="opcion.porcentaje">
+
+                {{ opcion.etiqueta }}
+
+              </mat-option>
+
+            </mat-select>
+
+          </mat-form-field>
+
+
         </div>
+
+
+
+        <!-- =================================================
+             SECCIÓN DESCUENTOS
+        ================================================== -->
+
+        <div class="descuentos-section">
+
+
+          <div class="descuentos-header">
+
+            <div>
+
+              <h3>
+                🏷️ Descuentos del producto
+              </h3>
+
+              <p>
+                Los descuentos se aplican de forma sucesiva
+                según el orden indicado.
+              </p>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- =================================================
+               FORMULARIO NUEVO DESCUENTO
+          ================================================== -->
+
+          <div class="nuevo-descuento">
+
+
+            <!-- PORCENTAJE -->
+
+            <mat-form-field
+              appearance="outline"
+              class="descuento-porcentaje">
+
+              <mat-label>
+                Descuento
+              </mat-label>
+
+              <input
+                matInput
+                type="number"
+                min="0.01"
+                max="100"
+                step="0.01"
+                [(ngModel)]="nuevoDescuentoPorcentaje"
+                [ngModelOptions]="{standalone: true}"
+                placeholder="Ej. 10">
+
+              <span matTextSuffix>
+                %
+              </span>
+
+            </mat-form-field>
+
+
+
+            <!-- DESCRIPCIÓN -->
+
+            <mat-form-field
+              appearance="outline"
+              class="descuento-descripcion">
+
+              <mat-label>
+                Descripción
+              </mat-label>
+
+              <input
+                matInput
+                type="text"
+                [(ngModel)]="nuevoDescuentoDescripcion"
+                [ngModelOptions]="{standalone: true}"
+                placeholder="Ej. Descuento comercial">
+
+            </mat-form-field>
+
+
+
+            <!-- AGREGAR -->
+
+            <button
+              mat-raised-button
+              color="primary"
+              type="button"
+              (click)="agregarDescuento()">
+
+              <mat-icon>
+                add
+              </mat-icon>
+
+              Agregar descuento
+
+            </button>
+
+          </div>
+
+
+
+          <!-- =================================================
+               LISTA DE DESCUENTOS
+          ================================================== -->
+
+          <div
+            class="lista-descuentos"
+            *ngIf="descuentos.length > 0">
+
+
+            <div
+              class="descuento-item"
+              *ngFor="
+                let descuento of descuentos;
+                let i = index
+              ">
+
+
+              <!-- ORDEN -->
+
+              <div class="descuento-orden">
+
+                {{ descuento.orden }}
+
+              </div>
+
+
+              <!-- INFORMACIÓN -->
+
+              <div class="descuento-info">
+
+                <strong>
+
+                  {{ descuento.porcentaje }}%
+
+                </strong>
+
+                <span>
+
+                  {{ descuento.descripcion }}
+
+                </span>
+
+              </div>
+
+
+              <!-- ELIMINAR -->
+
+              <button
+                mat-icon-button
+                color="warn"
+                type="button"
+                matTooltip="Eliminar descuento"
+                (click)="eliminarDescuento(i)">
+
+                <mat-icon>
+                  delete
+                </mat-icon>
+
+              </button>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- =================================================
+               SIN DESCUENTOS
+          ================================================== -->
+
+          <div
+            class="sin-descuentos"
+            *ngIf="descuentos.length === 0">
+
+            <mat-icon>
+              sell
+            </mat-icon>
+
+            <span>
+              Este producto no tiene descuentos.
+            </span>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             RESUMEN DEL PRODUCTO
+        ================================================== -->
+
+        <div class="resumen-producto">
+
+
+          <!-- PRECIO LISTA -->
+
+          <div class="resumen-item">
+
+            <span>
+              Precio lista
+            </span>
+
+            <strong>
+
+              {{
+                formProduct.get('price')?.value
+                  | currency:'ARS'
+              }}
+
+            </strong>
+
+          </div>
+
+
+
+          <!-- DESCUENTOS -->
+
+          <div class="resumen-item descuento">
+
+            <span>
+              Descuentos
+            </span>
+
+            <strong>
+
+              -
+              {{
+                (
+                  (formProduct.get('price')?.value || 0)
+                  -
+                  (formProduct.get('precioNeto')?.value || 0)
+                )
+                * (formProduct.get('quantity')?.value || 0)
+                | currency:'ARS'
+              }}
+
+            </strong>
+
+          </div>
+
+
+
+          <!-- PRECIO NETO -->
+
+          <div class="resumen-item">
+
+            <span>
+              Precio neto unitario
+            </span>
+
+            <strong>
+
+              {{
+                formProduct.get('precioNeto')?.value
+                  | currency:'ARS'
+              }}
+
+            </strong>
+
+          </div>
+
+
+
+          <!-- IVA -->
+
+          <div class="resumen-item iva">
+
+            <span>
+              IVA
+            </span>
+
+            <strong>
+
+              {{
+                (
+                  (formProduct.get('precioTotal')?.value || 0)
+                  -
+                  (
+                    (formProduct.get('precioNeto')?.value || 0)
+                    *
+                    (formProduct.get('quantity')?.value || 0)
+                  )
+                )
+                | currency:'ARS'
+              }}
+
+            </strong>
+
+          </div>
+
+
+
+          <!-- TOTAL -->
+
+          <div class="resumen-item total">
+
+            <span>
+              Total producto
+            </span>
+
+            <strong>
+
+              {{
+                formProduct.get('precioTotal')?.value
+                  | currency:'ARS'
+              }}
+
+            </strong>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             STOCK FINAL
+        ================================================== -->
+
+        <div class="stock-resultante">
+
+          <mat-icon>
+            inventory_2
+          </mat-icon>
+
+          <span>
+            Stock después de registrar:
+          </span>
+
+          <strong>
+
+            {{
+              formProduct.get('totalStock')?.value
+            }}
+
+            unidades
+
+          </strong>
+
+        </div>
+
+
+
+        <!-- =================================================
+             ACCIONES
+        ================================================== -->
+
+        <div class="acciones-producto">
+
+
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            class="btn-guardar-producto"
+            (click)="addListProduct()">
+
+            <mat-icon>
+              add_shopping_cart
+            </mat-icon>
+
+            Agregar producto
+
+          </button>
+
+
+          <button
+            mat-stroked-button
+            color="warn"
+            type="button"
+            class="btn-cancelar-producto"
+            (click)="cancelarBtn()">
+
+            <mat-icon>
+              close
+            </mat-icon>
+
+            Cancelar
+
+          </button>
+
+        </div>
+
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     PRODUCTO NO ENCONTRADO / SIN SELECCIÓN
+========================================================= -->
+
+<div
+  class="producto-vacio"
+  *ngIf="!showForm && !product">
+
+  <mat-icon>
+    inventory_2
+  </mat-icon>
+
+  <p>
+    Busca un producto mediante su código de barras
+    para cargarlo en la factura.
+  </p>
+
+</div>
+
+
+
+<!-- =========================================================
+     LISTA DE PRODUCTOS
+========================================================= -->
+
+<div
+  class="row lista-productos"
+  *ngIf="products.length > 0">
+
+  <div class="col">
+
+
+    <div class="tabla-header">
+
+      <div>
+
+        <h3>
+          🛒 Productos de la factura
+        </h3>
+
+        <span>
+
+          {{ products.length }}
+
+          producto(s)
+
+        </span>
+
+      </div>
 
     </div>
 
-    <div class="row">
-        <div class="col">
-            <!-- Lista de productos -->
-            <div class="Container-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Nombre</th>
-                            <th>Precio</th>
-                            <th>Cantidad</th>
-                            <th>Stock Actual</th>
-                            <th>Stock Total</th>
-                            <th>IVA</th>
-                            <th>Precio Total</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let data of products">
-                            <td>{{ data.barCode }}</td>
-                            <td>{{ data.name }}</td> 
-                            <td>{{ data.price | currency }}</td>
-                            <td>{{ data.quantity }}</td>
-                            <td>{{ data.stock }}</td>
-                            <td>{{data.totalStock}}</td>
-                            <td>{{ data.iva }}</td>
-                            <td>{{data.precioTotal| currency}}</td>
-                            <td>
-                                <button mat-fab class="btn__delete" (click)="deleteProduct(data.barCode)"
-                                    aria-label="Eliminar producto">
-                                    <mat-icon class="icon-display">delete</mat-icon>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+
+
+    <div class="Container-table">
+
+      <table>
+
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Código
+            </th>
+
+            <th>
+              Producto
+            </th>
+
+            <th>
+              Precio lista
+            </th>
+
+            <th>
+              Descuentos
+            </th>
+
+            <th>
+              Precio neto
+            </th>
+
+            <th>
+              Cantidad
+            </th>
+
+            <th>
+              IVA
+            </th>
+
+            <th>
+              Total
+            </th>
+
+            <th>
+              Acciones
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+
+        <tbody>
+
+          <tr
+            *ngFor="
+              let data of products;
+              let i = index
+            ">
+
+
+            <!-- CÓDIGO -->
+
+            <td>
+
+              {{ data.barCode }}
+
+            </td>
+
+
+
+            <!-- PRODUCTO -->
+
+            <td>
+
+              <strong>
+                {{ data.name }}
+              </strong>
+
+              <small
+                *ngIf="data.description">
+
+                {{ data.description }}
+
+              </small>
+
+            </td>
+
+
+
+            <!-- PRECIO LISTA -->
+
+            <td>
+
+              {{
+                data.precioLista ?? data.price
+                  | currency:'ARS'
+              }}
+
+            </td>
+
+
+
+            <!-- DESCUENTOS -->
+
+            <td>
+
+              <div
+                class="tabla-descuentos"
+                *ngIf="
+                  data.descuentos &&
+                  data.descuentos.length > 0
+                ">
+
+                <span
+                  *ngFor="
+                    let descuento of data.descuentos
+                  "
+                  class="descuento-badge">
+
+                  {{ descuento.porcentaje }}%
+
+                </span>
+
+              </div>
+
+              <span
+                *ngIf="
+                  !data.descuentos ||
+                  data.descuentos.length === 0
+                "
+                class="sin-descuento-tabla">
+
+                Sin descuento
+
+              </span>
+
+            </td>
+
+
+
+            <!-- PRECIO NETO -->
+
+            <td>
+
+              {{
+                data.precioNeto ?? data.price
+                  | currency:'ARS'
+              }}
+
+            </td>
+
+
+
+            <!-- CANTIDAD -->
+
+            <td class="cantidad">
+
+              {{ data.quantity }}
+
+            </td>
+
+
+
+            <!-- IVA -->
+
+            <td>
+
+              {{ data.iva }}%
+
+            </td>
+
+
+
+            <!-- TOTAL -->
+
+            <td class="precio-total">
+
+              {{
+                data.precioTotal
+                  | currency:'ARS'
+              }}
+
+            </td>
+
+
+
+            <!-- ACCIONES -->
+
+            <td>
+
+              <button
+                mat-mini-fab
+                color="warn"
+                type="button"
+                matTooltip="Eliminar producto"
+                class="btn__delete"
+                (click)="deleteProduct(data.barCode)"
+                aria-label="Eliminar producto">
+
+                <mat-icon>
+                  delete
+                </mat-icon>
+
+              </button>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     SIN PRODUCTOS
+========================================================= -->
+
+<div
+  class="sin-productos"
+  *ngIf="products.length === 0">
+
+  <mat-icon>
+    shopping_cart
+  </mat-icon>
+
+  <h3>
+    No hay productos cargados
+  </h3>
+
+  <p>
+    Agregá al menos un producto para registrar la factura.
+  </p>
+
+</div>

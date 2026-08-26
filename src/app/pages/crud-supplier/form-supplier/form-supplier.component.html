@@ -1,87 +1,401 @@
-<form [formGroup]="formGroup">
+<form
+  [formGroup]="formGroup"
+  (ngSubmit)="modoEdicion ? update() : save()"
+>
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <div class="container__title">
+
+    <h2
+      class="title__color"
+      mat-dialog-title
+    >
+      {{ titulo }}
+    </h2>
+
+  </div>
 
 
-    <div class="container__title">
-     <h2 class="title__color"mat-dialog-title>{{ data.tipo === 'createSupplier' ?
-        'Registrar Proveedor' : 'Actualizar Proveedor' }}</h2>
+  <!-- =====================================================
+       CONTENIDO
+  ====================================================== -->
+
+  <mat-dialog-content>
+
+    <div
+      class="loading"
+      *ngIf="cargandoProveedor"
+    >
+
+      Cargando proveedor...
+
     </div>
 
 
-    <mat-dialog-content>
+    <div
+      class="container"
+      *ngIf="!cargandoProveedor"
+    >
 
-        <div class="container">
+      <!-- =================================================
+           COLUMNA 1
+      ================================================== -->
 
-            <div class="col-1">
-                <mat-form-field class="input" hintLabel="Máximo 80 caracteres">
-                    <mat-label>Proveedor</mat-label>
-                    <input matInput maxlength="80" formControlName="name" />
-                    <mat-hint align="end">{{
-                        formGroup.get('name')?.value?.length
-                        }}/80</mat-hint>
-                </mat-form-field>
-
-                <mat-form-field class="input" hintLabel="Máximo 30 caracteres">
-                    <mat-label>Direccion</mat-label>
-                    <input matInput maxlength="30" formControlName="address" />
-                    <mat-hint align="end">{{
-                        formGroup.get('address')?.value?.length
-                        }}/30</mat-hint>
-                </mat-form-field>
-
-            <mat-form-field class="input" hintLabel="Máximo 14 caracteres">
-                <mat-label>Telefono</mat-label>
-                <input matInput maxlength="14" formControlName="phone" (input)="onInputChange($event, 'phone')" type="text"
-                    pattern="[0-9]*" />
-                <mat-hint align="end">{{ formGroup.get('phone')?.value?.length || 0 }}/14</mat-hint>
-            </mat-form-field>
-            </div>
-
-            <!-- ************************************************************************************ -->
-
-            <div class="col-2">
-
-            <mat-form-field class="input" hintLabel="Máximo 12 caracteres">
-                <mat-label>Cuit</mat-label>
-                <input matInput maxlength="12" formControlName="cuit" (input)="onInputChange($event, 'cuit')" type="text"
-                    pattern="[0-9]*" />
-                <mat-hint align="end">{{ formGroup.get('cuit')?.value?.length || 0 }}/12</mat-hint>
-            </mat-form-field>
-
-                <!-- Email -->
-                <mat-form-field class="input">
-                    <mat-label>Email</mat-label>
-                    <input type="email" matInput [formControl]="emailFormControl" placeholder="Ex. pat@example.com">
-                    @if (emailFormControl.hasError('email') &&
-                    !emailFormControl.hasError('required')) {
-                    <mat-error>Por favor ingrese una direccion
-                        valida</mat-error>
-                    }
-                    @if (emailFormControl.hasError('required')) {
-                    <mat-error>Email es
-                        <strong>requerido</strong></mat-error>
-                    }
-                </mat-form-field>
+      <div class="col-1">
 
 
-<mat-form-field class="input" hintLabel="Máximo 20 caracteres">
-    <mat-label>Contacto</mat-label>
-    <input matInput maxlength="20" formControlName="contact" />
-    <mat-hint align="end">{{
-        formGroup.get('contact')?.value?.length
-        }}/15</mat-hint>
-</mat-form-field>
+        <!-- ===============================================
+             NOMBRE
+        ================================================ -->
+
+        <mat-form-field
+          class="input"
+          appearance="outline"
+        >
+
+          <mat-label>
+            Proveedor
+          </mat-label>
+
+          <input
+            matInput
+            maxlength="80"
+            formControlName="name"
+            [errorStateMatcher]="matcher"
+          >
+
+          <mat-hint align="end">
+
+            {{
+              formGroup.get('name')?.value?.length || 0
+            }}/80
+
+          </mat-hint>
+
+          <mat-error
+            *ngIf="
+              formGroup.get('name')?.hasError('required')
+            "
+          >
+
+            El nombre del proveedor es obligatorio.
+
+          </mat-error>
+
+          <mat-error
+            *ngIf="
+              formGroup.get('name')?.hasError('maxlength')
+            "
+          >
+
+            Máximo 80 caracteres.
+
+          </mat-error>
+
+        </mat-form-field>
 
 
-            </div>
-        </div>
-    </mat-dialog-content>
+        <!-- ===============================================
+             DIRECCIÓN
+        ================================================ -->
 
-    <mat-dialog-actions>
-        <div class="btn"></div>
-        <button mat-raised-button class="warn" (click)="cancel()">Cancelar</button>
-        <button mat-raised-button color="primary" (click)="save()"
-            *ngIf="data.tipo === 'createSupplier'">Guardar</button>
-        <button mat-raised-button color="primary" (click)="update()"
-            *ngIf="data.tipo !== 'createSupplier'">Modificar</button>
-    </mat-dialog-actions>
+        <mat-form-field
+          class="input"
+          appearance="outline"
+        >
+
+          <mat-label>
+            Dirección
+          </mat-label>
+
+          <input
+            matInput
+            maxlength="30"
+            formControlName="address"
+          >
+
+          <mat-hint align="end">
+
+            {{
+              formGroup.get('address')?.value?.length || 0
+            }}/30
+
+          </mat-hint>
+
+          <mat-error
+            *ngIf="
+              formGroup.get('address')?.hasError('maxlength')
+            "
+          >
+
+            Máximo 30 caracteres.
+
+          </mat-error>
+
+        </mat-form-field>
+
+
+        <!-- ===============================================
+             TELÉFONO
+        ================================================ -->
+
+        <mat-form-field
+          class="input"
+          appearance="outline"
+        >
+
+          <mat-label>
+            Teléfono
+          </mat-label>
+
+          <input
+            matInput
+            maxlength="14"
+            type="text"
+            formControlName="phone"
+            (input)="
+              onInputChange($event, 'phone')
+            "
+          >
+
+          <mat-hint align="end">
+
+            {{
+              formGroup.get('phone')?.value?.length || 0
+            }}/14
+
+          </mat-hint>
+
+          <mat-error
+            *ngIf="
+              formGroup.get('phone')?.hasError('required')
+            "
+          >
+
+            El teléfono es obligatorio.
+
+          </mat-error>
+
+          <mat-error
+            *ngIf="
+              formGroup.get('phone')?.hasError('pattern')
+            "
+          >
+
+            Solo se permiten números.
+
+          </mat-error>
+
+        </mat-form-field>
+
+
+      </div>
+
+
+      <!-- =================================================
+           COLUMNA 2
+      ================================================== -->
+
+      <div class="col-2">
+
+
+        <!-- ===============================================
+             CUIT
+        ================================================ -->
+
+        <mat-form-field
+          class="input"
+          appearance="outline"
+        >
+
+          <mat-label>
+            CUIT
+          </mat-label>
+
+          <input
+            matInput
+            maxlength="12"
+            type="text"
+            formControlName="cuit"
+            (input)="
+              onInputChange($event, 'cuit')
+            "
+          >
+
+          <mat-hint align="end">
+
+            {{
+              formGroup.get('cuit')?.value?.length || 0
+            }}/12
+
+          </mat-hint>
+
+          <mat-error
+            *ngIf="
+              formGroup.get('cuit')?.hasError('required')
+            "
+          >
+
+            El CUIT es obligatorio.
+
+          </mat-error>
+
+          <mat-error
+            *ngIf="
+              formGroup.get('cuit')?.hasError('pattern')
+            "
+          >
+
+            El CUIT solo puede contener números.
+
+          </mat-error>
+
+        </mat-form-field>
+
+
+        <!-- ===============================================
+             EMAIL
+        ================================================ -->
+
+        <mat-form-field
+          class="input"
+          appearance="outline"
+        >
+
+          <mat-label>
+            Email
+          </mat-label>
+
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            placeholder="proveedor@email.com"
+          >
+
+          <mat-error
+            *ngIf="
+              formGroup.get('email')?.hasError('required')
+            "
+          >
+
+            El email es obligatorio.
+
+          </mat-error>
+
+          <mat-error
+            *ngIf="
+              formGroup.get('email')?.hasError('email')
+            "
+          >
+
+            Ingresá una dirección de email válida.
+
+          </mat-error>
+
+        </mat-form-field>
+
+
+        <!-- ===============================================
+             CONTACTO
+        ================================================ -->
+
+        <mat-form-field
+          class="input"
+          appearance="outline"
+        >
+
+          <mat-label>
+            Contacto
+          </mat-label>
+
+          <input
+            matInput
+            maxlength="20"
+            formControlName="contact"
+          >
+
+          <mat-hint align="end">
+
+            {{
+              formGroup.get('contact')?.value?.length || 0
+            }}/20
+
+          </mat-hint>
+
+          <mat-error
+            *ngIf="
+              formGroup.get('contact')?.hasError('maxlength')
+            "
+          >
+
+            Máximo 20 caracteres.
+
+          </mat-error>
+
+        </mat-form-field>
+
+
+      </div>
+
+    </div>
+
+  </mat-dialog-content>
+
+
+  <!-- =====================================================
+       BOTONES
+  ====================================================== -->
+
+  <mat-dialog-actions
+    align="end"
+  >
+
+    <button
+      mat-raised-button
+      type="button"
+      class="warn"
+      (click)="cancel()"
+      [disabled]="loading"
+    >
+
+      Cancelar
+
+    </button>
+
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="
+        loading ||
+        cargandoProveedor
+      "
+    >
+
+      <span
+        *ngIf="!loading"
+      >
+        {{
+          modoEdicion
+            ? 'Modificar'
+            : 'Guardar'
+        }}
+      </span>
+
+
+      <span
+        *ngIf="loading"
+      >
+        Guardando...
+      </span>
+
+    </button>
+
+  </mat-dialog-actions>
+
 </form>

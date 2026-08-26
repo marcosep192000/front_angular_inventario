@@ -479,3 +479,20 @@ button[mat-raised-button]{
     }
 
 }
+.card-resumen.cheque {
+  border-left: 4px solid #795548;
+}
+
+.medio-pago {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.medio-cheque {
+  font-weight: 600;
+}
+
+.icono-cheque {
+  font-size: 16px;
+}

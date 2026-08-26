@@ -1,8 +1,6 @@
 <div
     class="layout"
-    [class.collapsed]="menuCollapsed"
-    (mouseenter)="expandMenu()"
-    (mouseleave)="collapseMenu()">
+    [class.collapsed]="menuCollapsed">
 
     <!-- ===========================
          SIDEBAR
@@ -16,7 +14,7 @@
 
                 <span class="menu-title">
 
-                    Menu
+               
 
                 </span>
 
@@ -40,32 +38,38 @@
 
         <mat-toolbar color="primary">
 
-            @if (isHandset$ | async) {
+            <button
+                mat-icon-button
+                type="button"
+                aria-label="Abrir o cerrar menú"
+                (click)="toggleMenu()">
 
-                <button
-                    mat-icon-button
-                    (click)="toggleMenu()">
+                <mat-icon>menu</mat-icon>
 
-                    <mat-icon>
-
-                        menu
-
-                    </mat-icon>
-
-                </button>
-
-            }
+            </button>
 
             <div class="container__barra">
 
-                <span class="barra__span">
+                <div class="barra__usuario">
 
-                </span>
+                    <mat-icon>account_circle</mat-icon>
+
+                    <div>
+
+                        <strong>{{ username || 'Usuario' }}</strong>
+
+                        <span>{{ roleLabel }}</span>
+
+                    </div>
+
+                </div>
 
                 <div class="barra__logout">
 
                     <button
                         mat-icon-button
+                        type="button"
+                        aria-label="Cerrar sesión"
                         (click)="logout()">
 
                         <app-icon

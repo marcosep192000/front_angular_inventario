@@ -1,86 +1,406 @@
- *{
-  z-index: 0;
- }
-.container__accions{
-    display: flex;
-    
-    
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+========================================================= */
+
+:host {
+  display: block;
+  width: 100%;
 }
- .tab_group{
-  z-index: -100;
-     /*
- }
+
+
+/* =========================================================
+   TABS
+========================================================= */
+
+.tab_group {
+  width: 100%;
+}
+
+
+/* =========================================================
+   CONTENEDOR GENERAL
+========================================================= */
 
 .contenedor-global {
-  margin: 10px;
+  margin: 12px;
   padding: 20px;
+
   background-color: #f9f9f9;
-  border-radius: 5px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
+
+  border-radius: 8px;
+
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.08);
+
+  box-sizing: border-box;
 }
-.contenedor-global h2 {
-  font-size: 1.5rem;
+
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.toolbar {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 20px;
+
+  flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   BUSCADOR
+========================================================= */
+
+.search-container {
+  flex: 1;
+
+  min-width: 280px;
+}
+
+
+.search-field {
+  width: 100%;
+
+  max-width: 500px;
+}
+
+
+/* =========================================================
+   BOTÓN NUEVO
+========================================================= */
+
+.actions-container {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+}
+
+
+.actions-container button {
+  min-height: 44px;
+}
+
+
+.actions-container mat-icon {
+  margin-right: 5px;
+}
+
+
+/* =========================================================
+   HEADER LISTADO
+========================================================= */
+
+.header-listado {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+}
+
+
+.header-listado h2 {
+  margin: 0;
+
+  font-size: 1.45rem;
+
   color: #4a4a4a;
-  margin-bottom: 2px;
 }
+
+
+.header-listado p {
+  margin: 5px 0 0;
+
+  color: #777;
+
+  font-size: 0.9rem;
+}
+
+
+/* =========================================================
+   SEPARADOR
+========================================================= */
 
 .contenedor-global hr {
   border: none;
-  border-top: 1px solid #ccc;
-  margin: 10px 0;
+
+  border-top:
+    1px solid #ddd;
+
+  margin:
+    14px 0 20px;
 }
+
+
+/* =========================================================
+   TABLA
+========================================================= */
 
 .table-container {
-  max-height: 200px; /* Ajusta esta altura según tus necesidades */
-  overflow-y: auto; /* Activa el scroll vertical si el contenido excede la altura */
-  border: 1px solid #ddd; /* Opcional: agrega un borde para delimitar la tabla */
-  padding: 10px; /* Opcional: agrega espacio alrededor de la tabla */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Opcional: para diseño */
-  border-radius: 5px; /* Opcional: bordes redondeados */
-  background-color: #fff; /* Opcional: fondo blanco para la tabla */
-}
+  width: 100%;
 
-/* Opcional: estiliza la tabla para ajustarse al contenedor */
-.table {
-  width: 100%; /* Asegura que la tabla ocupe todo el ancho del contenedor */
-  border-collapse: collapse; /* Elimina espacios entre celdas */
-}
-
-
-.container__serch{
-    display: flex; 
-     justify-content: space-between;
-    align-items: center;
-    margin: 10px 10px }
-.container__serch{
-    background-color: #532e926b;
-    border-radius:5px ;
-    align-items: center;
-}
-.search__input{
-    border-radius: 7px ;
-    width: 400px;
-    height: 30px ;
-}
-.btn__delete{
-    margin: 10px 10px;
-    background-color: #ff0000d9;
-    border-radius: 10px ;
-    width: 35px;
-    height:35px;
-    color:white;
-}
-.btn__update{
-    margin: 10px 10px;
-    background-color: #532e92e4;
-    border-radius: 10px ;
-    width: 35px;
-    height:35px;
-    color:white;
-}
-.table{
-      overflow-y: auto;
   overflow-x: auto;
+
+  overflow-y: auto;
+
+  max-height: 500px;
+
+  border:
+    1px solid #ddd;
+
+  border-radius: 8px;
+
+  background-color: white;
+
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
+
+.table {
+  width: 100%;
+
+  min-width: 900px;
+
+  border-collapse: collapse;
+}
+
+
+/* =========================================================
+   HEADER TABLA
+========================================================= */
+
+.table th {
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  background-color: #f3f3f3;
+}
+
+
+/* =========================================================
+   CELDAS
+========================================================= */
+
+.table td,
+.table th {
+  padding:
+    12px 14px;
+}
+
+
+.table td {
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   FILAS
+========================================================= */
+
+.table tr.mat-mdc-row:hover {
+  background-color: #fafafa;
+}
+
+
+/* =========================================================
+   ACCIONES
+========================================================= */
+
+.acciones-header {
+  text-align: center;
+}
+
+
+.container__accions {
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+/* =========================================================
+   BOTÓN EDITAR
+========================================================= */
+
+.btn__update {
+  width: 38px;
+
+  height: 38px;
+
+  background-color:
+    #532e92;
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+
+.btn__update:hover {
+  background-color:
+    #432276;
+}
+
+
+/* =========================================================
+   BOTÓN ELIMINAR
+========================================================= */
+
+.btn__delete {
+  width: 38px;
+
+  height: 38px;
+
+  background-color:
+    #e53935;
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+
+.btn__delete:hover {
+  background-color:
+    #c62828;
+}
+
+
+/* =========================================================
+   ESTADO LOADING
+========================================================= */
+
+.loading {
+  min-height: 200px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  color: #666;
+
+  font-size: 1rem;
+}
+
+
+.loading-icon {
+  animation:
+    spin 1s linear infinite;
+}
+
+
+@keyframes spin {
+
+  from {
+    transform:
+      rotate(0deg);
+  }
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+
+}
+
+
+/* =========================================================
+   SIN DATOS
+========================================================= */
+
+.no-data {
+  height: 180px;
+
+  text-align: center;
+
+  color: #777;
+
+  font-size: 1rem;
+}
+
+
+.no-data mat-icon {
+  display: block;
+
+  margin:
+    0 auto 8px;
+
+  font-size: 34px;
+
+  width: 34px;
+
+  height: 34px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+  .contenedor-global {
+    margin: 8px;
+
+    padding: 12px;
+  }
+
+
+  .toolbar {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+
+  .search-container {
+    width: 100%;
+  }
+
+
+  .search-field {
+    max-width: none;
+  }
+
+
+  .actions-container {
+    justify-content: stretch;
+  }
+
+
+  .actions-container button {
+    width: 100%;
+  }
+
+
+  .table-container {
+    max-height: 450px;
+  }
+
+}

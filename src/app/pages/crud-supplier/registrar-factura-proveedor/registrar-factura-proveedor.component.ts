@@ -1,295 +1,1276 @@
 import {
   ChangeDetectorRef,
   Component,
-  EventEmitter,
-  Input,
   OnInit,
-  Output,
-  Pipe,
-  ViewChild,
+  ViewChild
 } from '@angular/core';
-import { FormFacturaDatosProveedorComponent } from './form-factura-datos-proveedor/form-factura-datos-proveedor.component';
-import { RegistrarDetalleFacturaProveedorComponent } from './registrar-detalle-factura-proveedor/registrar-detalle-factura-proveedor.component';
-import { SupplierPaymentService } from '../../../services/supplier-payment.service';
-import { ToastrModule, ToastrService } from 'ngx-toastr';
+
 import { CommonModule } from '@angular/common';
-import { SpinnerComponent } from '../../../shared/spinner/spinner.component';
-import { Product } from '../../../interfaces/Product';
+
 import {
   MatDialog,
-  MatDialogModule,
-  MatDialogRef,
+  MatDialogModule
 } from '@angular/material/dialog';
-import { DialogRef } from '@angular/cdk/dialog';
-import { DialogGenericComponent } from '../../../shared/genericsComponents/dialog-generic/dialog-generic.component';
-import { subscribe } from 'node:diagnostics_channel';
-import { Router } from '@angular/router';
+
+import {
+  ToastrModule,
+  ToastrService
+} from 'ngx-toastr';
+
+import {
+  FormFacturaDatosProveedorComponent
+} from './form-factura-datos-proveedor/form-factura-datos-proveedor.component';
+
+import {
+  RegistrarDetalleFacturaProveedorComponent
+} from './registrar-detalle-factura-proveedor/registrar-detalle-factura-proveedor.component';
+
+import {
+  SupplierPaymentService
+} from '../../../services/supplier-payment.service';
+
+import {
+  SpinnerComponent
+} from '../../../shared/spinner/spinner.component';
+
+import {
+  DialogGenericComponent
+} from '../../../shared/genericsComponents/dialog-generic/dialog-generic.component';
+
+import {
+  ProductItemBuy
+} from '../../../interfaces/ProductItemBuy';
+
+import {
+  ImpuestosFacturaComponent,
+  ImpuestoFacturaProveedor
+} from './impuestos-factura/impuestos-factura.component';
+
 
 @Component({
   selector: 'app-registrar-factura-proveedor',
+
   standalone: true,
+
   imports: [
-    FormFacturaDatosProveedorComponent,
-    RegistrarDetalleFacturaProveedorComponent,
-    ToastrModule,
+
     CommonModule,
+
+    FormFacturaDatosProveedorComponent,
+
+    RegistrarDetalleFacturaProveedorComponent,
+
+    ImpuestosFacturaComponent,
+
+    ToastrModule,
+
     SpinnerComponent,
-    MatDialogModule,
+
+    MatDialogModule
+
   ],
-  templateUrl: './registrar-factura-proveedor.component.html',
-  styleUrl: './registrar-factura-proveedor.component.css',
+
+  templateUrl:
+    './registrar-factura-proveedor.component.html',
+
+  styleUrl:
+    './registrar-factura-proveedor.component.css'
 })
-export class RegistrarFacturaProveedorComponent implements OnInit {
-  @Output() facturaDatosChange = new EventEmitter(); // even
+export class RegistrarFacturaProveedorComponent
+  implements OnInit {
+
+
+  // =========================================================
+  // REFERENCIAS
+  // =========================================================
+
   @ViewChild('childRef')
-  datosProveedorComponent!: FormFacturaDatosProveedorComponent;
-  showForm: boolean = true;
-  showFormSuBtotal: boolean = false;
+  datosProveedorComponent!:
+    FormFacturaDatosProveedorComponent;
+
+
   @ViewChild('childRefDetalle')
-  datosDetallesProveedorComponent!: RegistrarDetalleFacturaProveedorComponent;
+  datosDetallesProveedorComponent!:
+    RegistrarDetalleFacturaProveedorComponent;
+
+
+  @ViewChild(ImpuestosFacturaComponent)
+  impuestosComponent?:
+    ImpuestosFacturaComponent;
+
+
+  // =========================================================
+  // DATOS PROVEEDOR
+  // =========================================================
+
+  datosProveedor: any = null;
+
+
+  // =========================================================
+  // PRODUCTOS
+  // =========================================================
+
+  productos:
+    ProductItemBuy[] = [];
+
+
+  // =========================================================
+  // IMPUESTOS
+  // =========================================================
+
+  impuestos:
+    ImpuestoFacturaProveedor[] = [];
+
+
+  impuestosTotal = 0;
+
+
+  // =========================================================
+  // REDONDEO
+  // =========================================================
+
+  redondeo = 0;
+
+
+  // =========================================================
+  // TOTALES
+  // =========================================================
+
+  subtotalFactura = 0;
+
+  totalIva = 0;
+
+  totalFactura = 0;
+
+
+  // =========================================================
+  // ESTADO
+  // =========================================================
+
+  showFormSubtotal = false;
+
+  guardando = false;
+
+
+  // =========================================================
+  // CONSTRUCTOR
+  // =========================================================
+
   constructor(
-    private router: Router,
-    private dialog: MatDialog,
-    private cdRef: ChangeDetectorRef,
-    private invoiceService: SupplierPaymentService,
-    private toast: ToastrService
+
+    private invoiceService:
+      SupplierPaymentService,
+
+    private toast:
+      ToastrService,
+
+    private dialog:
+      MatDialog,
+
+    private cdRef:
+      ChangeDetectorRef
+
   ) {}
 
+
+  // =========================================================
+  // INIT
+  // =========================================================
+
   ngOnInit(): void {
-    this.crearFactura();
+
+    // Los datos llegan desde los componentes hijos.
+
   }
 
-  datosHijo1: any = null;
-  datosHijo2: any = [];
 
-  totalFacturaSinIva: any = null;
-  totalIva : any = null;
-  subtotalFactura: any = null;
+  // =========================================================
+  // DATOS CABECERA
+  // =========================================================
 
-  datosHijo1Change(datos: any) {
-    this.datosHijo1 = datos;
+  datosHijo1Change(
+    datos: any
+  ): void {
+
+    this.datosProveedor =
+      datos;
+
     console.log(
-      'Datos recibidos del Hijo 1:',
-      JSON.stringify(this.datosHijo1, null, 2)
+      'Datos proveedor:',
+      this.datosProveedor
     );
+
   }
-  datosHijo2Change(datos: any) {
-    this.datosHijo2 = datos;
-    
+
+
+  // =========================================================
+  // PRODUCTOS
+  // =========================================================
+
+  datosHijo2Change(
+    productos: ProductItemBuy[]
+  ): void {
+
+    this.productos =
+      productos ?? [];
+
+
+    this.showFormSubtotal =
+      this.productos.length > 0;
+
+
+    this.calcularTotales();
+
+
     console.log(
-      'Datos recibidos del Hijo 2:',
-      JSON.stringify(this.datosHijo2, null, 2)
+      'Productos:',
+      this.productos
     );
 
-    if (this.datosHijo2.length == 0) {
-      this.subtotalFactura = 0; 
-      this.showFormSuBtotal = false;
-      // Si la lista está vacía, establecer subtotal en 0
-    } else {
-      this.showFormSuBtotal = true ;
-      this.subtotalFactura = this.subtotal();
-    this.totalFacturaSinIva =this.totaleslFacturaSinIva(); 
-    this.totalIva= this.calcularTotalIva();
-    
-    
 
-
-
-
-    }
-
-    this.cdRef.detectChanges(); // Forzar actualización de la vista
-  }
-
-
-
-
-
-  validarDatos(datos: any): boolean {
-    // Verifica si el objeto está vacío
-    if (!datos || Object.keys(datos).length === 0) return false;
-    // Verifica si los valores de cada propiedad son válidos
-    return Object.keys(datos).every((key) => {
-      const value = datos[key];
-      // Verifica si el valor es nulo, vacío o indefinido
-      if (value === null || value === undefined || value === '') {
-        return false;
-      }
-      // Agregar validación específica para campos como 'amount', 'invoiceNumber', etc.
-      if (key === 'amount' && typeof value !== 'number') {
-        return false;
-      }
-
-      return true;
-    });
-  }
- 
-
-   
-  crearFactura() {
-    if (!this.validarDatos(this.datosHijo1) || !Array.isArray(this.datosHijo2) || this.datosHijo2.length < 1) {
-        console.error('Datos de la factura inválidos o lista de productos vacía');
-       
-        return;
-    }
-    if (!this.validarDatos(this.datosHijo1) == null ) {
-      console.error('Cargar Datos de proveedor');
-     this.toast.info('Cargar Datos de proveedor');
-      return;
-  }
-    let factura, productos;
-    try {
-        factura = typeof this.datosHijo1 === 'string' ? JSON.parse(this.datosHijo1) : this.datosHijo1;
-        productos = typeof this.datosHijo2 === 'string' ? JSON.parse(this.datosHijo2) : this.datosHijo2;
-    } catch (error) {
-        console.error('Error al parsear los datos:', error);
-        this.toast.error('Error en los datos de la factura');
-        return;
-    }
-
-    factura.invoiceDetailsProviders = productos;
-    const subtotalActual = this.totaleslFacturaSinIva();
-    factura.ivaTotal = this.calcularTotalIva(); 
-    factura.montoTotal = this.subtotal();
-
-
-   
-    if (isNaN(factura.amount) || factura.amount <= 0 || factura.amount < subtotalActual) {
-        console.error('El monto total de la factura debe ser mayor o igual al subtotal:', subtotalActual);
-        this.toast.error('El monto total de la factura debe ser mayor o igual a $' + subtotalActual);
-        return;
-    }
-
-    console.log('Enviando factura:', JSON.stringify(factura, null, 2));
-    this.subtotalFactura = subtotalActual;
-    
-     console.log(factura); 
-
-    this.invoiceService.createPaymentSupplier(factura).subscribe({
-        next: (data) => {
-            console.log('Factura creada con éxito:', data);
-            this.toast.success('Factura creada con éxito!');
-            this.datosProveedorComponent.resetDatosProveedor();
-            this.datosDetallesProveedorComponent.resetForm();
-            this.datosDetallesProveedorComponent.resetListaProductos();
-            this.reloadComponent();  this.resetComponent();
-            this.subtotalFactura = 0;
-            this.totalIva = 0 ; 
-            this.totalFacturaSinIva = 0;
-            this.showForm = false;
-        },
-        error: (err) => {
-            const mensajeError = err.error?.message || 'Factura Ya Registrada en Sistema!';
-            console.error('Factura ya Registrada!', mensajeError);
-            this.toast.error(mensajeError);
-        },
-    });
-}
-
-  subtotal(): number {
-    // Verificar si datosHijo2 tiene elementos
-    if (this.datosHijo2.length > 0) {
-      return this.datosHijo2.reduce(
-        (total: number, item: { precioTotal: number }) =>
-          total + item.precioTotal,
-        0, 
-      );
-    } else {
-      // Si no hay datos en datosHijo2, retorna 0 o alguna lógica que prefieras
-      return 0;
-    }
-  }
-  //TOTAL IVA ----------------------------------------------------------------
-  calcularTotalIva(){
-      // Verificar si datosHijo2 tiene elementos
-      if (this.datosHijo2.length > 0) {
-        return this.datosHijo2.reduce(
-          (total: number, item: { iva: number ,price: number }) =>
-            total + (item.price * item.iva)/100,
-          0, 
-        );
-      } else {
-        // Si no hay datos en datosHijo2, retorna 0 o alguna lógica que prefieras
-        return 0;
-      }
-  }
-
-// TOTAL FACTURA ----------------------------------------------------------------
-totaleslFacturaSinIva(): number {
-  // Verificar si datosHijo2 tiene elementos
-  if (this.datosHijo2.length > 0) {
-    return this.datosHijo2.reduce(
-      (total: number, item: { price: number, quantity : number }) =>
-        total + item.price * item.quantity,
-      0, 
-    );
-  } else {
-    // Si no hay datos en datosHijo2, retorna 0 o alguna lógica que prefieras
-    return 0;
-  }
-}
-
-
-
-
-
-
-  reloadComponent() {
-    this.router
-      .navigateByUrl('/dashboard/supplier-list', { skipLocationChange: true })
-      .then(() => {
-        this.router.navigate([this.router.url]);
-      });
-  }
-  resetComponent() {
-    this.datosProveedorComponent.resetDatosProveedor();
-    this.datosDetallesProveedorComponent.resetForm();
-    this.datosDetallesProveedorComponent.resetListaProductos();
-    this.subtotalFactura = 0;
-    this.showForm = false;
-    this.subtotalFactura = 0;
-    this.totalIva = 0 ; 
-    this.totalFacturaSinIva = 0;
-    this.showForm = false;
-
-    // Forzar la actualización del componente
     this.cdRef.detectChanges();
+
   }
-  crearFacturaDialog() {
-    const dialogRef = this.dialog.open(DialogGenericComponent, {
-      disableClose: true,
-      autoFocus: true,
-      hasBackdrop: true,
-      closeOnNavigation: false,
-      data: {
-        component: '', // O cualquier otro componente relevante
-        data: `Crear Factura`, // Aquí pasas el mensaje
-        state: 'crear',
-        icon: '', // Ícono que quieres mostrar
-        message: `Vas a crear la factura para este proveedor Continuar? `,
-      },
-    });
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result === true) {
-        try {
 
-          if (this.validarDatos(this.datosHijo1) && this.datosHijo2Change.length > 0)  // Validar que los datos del proveedor y la lista de productos no estén vacíos
-            {
 
-              this.crearFactura();
+  // =========================================================
+  // IMPUESTOS
+  // =========================================================
 
-            } else {
-              this.toast.error('Debes completar los datos del proveedor y la lista de productos');
-            }
-        } catch (error) {
-          console.error('Error al parsear los datos:', error);
+  datosImpuestosChange(
+    impuestos: ImpuestoFacturaProveedor[]
+  ): void {
+
+    this.impuestos =
+      impuestos ?? [];
+
+
+    this.impuestosTotal =
+      this.impuestos.reduce(
+
+        (
+          total,
+          impuesto
+        ) =>
+
+          total +
+          (
+            Number(
+              impuesto.importe
+            ) || 0
+          ),
+
+        0
+
+      );
+
+
+    this.calcularTotales();
+
+
+    this.cdRef.detectChanges();
+
+  }
+
+
+  // =========================================================
+  // CALCULAR TOTALES
+  // =========================================================
+
+  private calcularTotales(): void {
+
+    this.subtotalFactura = 0;
+
+    this.totalIva = 0;
+
+
+    // =======================================================
+    // IMPUESTOS
+    // =======================================================
+
+    this.impuestosTotal =
+      this.impuestos.reduce(
+
+        (
+          total,
+          impuesto
+        ) =>
+
+          total +
+          (
+            Number(
+              impuesto.importe
+            ) || 0
+          ),
+
+        0
+
+      );
+
+
+    // =======================================================
+    // PRODUCTOS
+    // =======================================================
+
+    for (
+      const producto
+      of this.productos
+    ) {
+
+      const cantidad =
+        Number(
+          producto.quantity
+        ) || 0;
+
+
+      /*
+       * -----------------------------------------------------
+       * PRECIO
+       * -----------------------------------------------------
+       *
+       * Actualmente ProductItemBuy utiliza price.
+       *
+       * Si el hijo ya entrega el precio final después
+       * de descuentos, usamos ese valor.
+       *
+       * Si además entrega descuentos, intentamos
+       * calcularlos para evitar doble aplicación.
+       */
+
+      const precio =
+        this.obtenerPrecioBase(
+          producto
+        );
+
+
+      const subtotalLinea =
+        precio *
+        cantidad;
+
+
+      // =====================================================
+      // IVA
+      // =====================================================
+
+      const iva =
+        Number(
+          producto.iva
+        ) || 0;
+
+
+      const importeIva =
+        (
+          subtotalLinea *
+          iva
+        ) / 100;
+
+
+      // =====================================================
+      // ACUMULAR
+      // =====================================================
+
+      this.subtotalFactura +=
+        subtotalLinea;
+
+
+      this.totalIva +=
+        importeIva;
+
+    }
+
+
+    // =======================================================
+    // REDONDEAR
+    // =======================================================
+
+    this.subtotalFactura =
+      this.redondear(
+        this.subtotalFactura
+      );
+
+
+    this.totalIva =
+      this.redondear(
+        this.totalIva
+      );
+
+
+    this.impuestosTotal =
+      this.redondear(
+        this.impuestosTotal
+      );
+
+
+    // =======================================================
+    // TOTAL FINAL
+    // =======================================================
+
+    this.totalFactura =
+      this.redondear(
+
+        this.subtotalFactura +
+
+        this.totalIva +
+
+        this.impuestosTotal +
+
+        this.redondeo
+
+      );
+
+  }
+
+
+  // =========================================================
+  // OBTENER PRECIO
+  // =========================================================
+
+  private obtenerPrecioBase(
+    producto: ProductItemBuy
+  ): number {
+
+    const productoAny =
+      producto as any;
+
+
+    const precio =
+      Number(
+        productoAny.price
+      ) || 0;
+
+
+    /*
+     * -------------------------------------------------------
+     * DESCUENTOS
+     * -------------------------------------------------------
+     *
+     * Si el componente de detalle ya entrega price
+     * con descuentos aplicados, no volvemos a descontar.
+     *
+     * Por eso price sigue siendo la fuente principal.
+     *
+     * Los descuentos se conservan dentro del detalle
+     * que se envía al backend.
+     */
+
+    return precio;
+
+  }
+
+
+  // =========================================================
+  // REDONDEAR
+  // =========================================================
+
+  private redondear(
+    valor: number
+  ): number {
+
+    return Math.round(
+
+      (
+        Number(valor) +
+        Number.EPSILON
+      ) * 100
+
+    ) / 100;
+
+  }
+
+
+  // =========================================================
+  // VALIDAR PROVEEDOR
+  // =========================================================
+
+  private validarDatosProveedor(): boolean {
+
+    if (
+      !this.datosProveedor
+    ) {
+
+      this.toast.error(
+        'Debes completar los datos de la factura.'
+      );
+
+      return false;
+
+    }
+
+
+    if (
+
+      !this.datosProveedor.idInvoice ||
+
+      !this.datosProveedor.provider ||
+
+      !this.datosProveedor.tipoDeCuentaEnum
+
+    ) {
+
+      this.toast.error(
+        'Completa proveedor, comprobante y forma de pago.'
+      );
+
+      return false;
+
+    }
+
+
+    return true;
+
+  }
+
+
+  // =========================================================
+  // VALIDAR PRODUCTOS
+  // =========================================================
+
+  private validarProductos(): boolean {
+
+    if (
+      !this.productos ||
+      this.productos.length === 0
+    ) {
+
+      this.toast.error(
+        'Debes agregar al menos un producto a la factura.'
+      );
+
+      return false;
+
+    }
+
+
+    return true;
+
+  }
+
+
+  // =========================================================
+  // CREAR FACTURA - DIALOG
+  // =========================================================
+
+  crearFacturaDialog(): void {
+
+    if (
+      !this.validarDatosProveedor()
+    ) {
+
+      return;
+
+    }
+
+
+    if (
+      !this.validarProductos()
+    ) {
+
+      return;
+
+    }
+
+
+    this.calcularTotales();
+
+
+    this.dialog
+
+      .open(
+        DialogGenericComponent,
+        {
+
+          disableClose:
+            true,
+
+          autoFocus:
+            true,
+
+          hasBackdrop:
+            true,
+
+          closeOnNavigation:
+            false,
+
+          data: {
+
+            component:
+              '',
+
+            data:
+              'Crear Factura',
+
+            state:
+              'crear',
+
+            icon:
+              '',
+
+            message:
+
+              `Vas a registrar la factura por un total de ` +
+
+              `${this.totalFactura.toLocaleString(
+                'es-AR',
+                {
+                  style:
+                    'currency',
+
+                  currency:
+                    'ARS'
+                }
+              )}. ¿Continuar?`
+
           }
-        } 
-      else {
-        this.toast.error('Factura CANCELADA');
-        console.log('Cancelado');
-        
-      }
-    });
+
+        }
+
+      )
+
+      .afterClosed()
+
+      .subscribe(
+        resultado => {
+
+          if (
+            resultado === true
+          ) {
+
+            this.crearFactura();
+
+          }
+
+        }
+      );
+
   }
+
+
+  // =========================================================
+  // CREAR FACTURA
+  // =========================================================
+
+  private crearFactura(): void {
+
+    if (
+      this.guardando
+    ) {
+
+      return;
+
+    }
+
+
+    if (
+      !this.validarDatosProveedor()
+    ) {
+
+      return;
+
+    }
+
+
+    if (
+      !this.validarProductos()
+    ) {
+
+      return;
+
+    }
+
+
+    // =======================================================
+    // RECALCULAR
+    // =======================================================
+
+    this.calcularTotales();
+
+
+    if (
+      this.totalFactura <= 0
+    ) {
+
+      this.toast.error(
+        'El total de la factura debe ser mayor a cero.'
+      );
+
+      return;
+
+    }
+
+
+    // =======================================================
+    // CONSTRUIR DETALLES
+    // =======================================================
+
+    const detalles =
+      this.productos.map(
+        producto => {
+
+          const precio =
+            Number(
+              producto.price
+            ) || 0;
+
+
+          const cantidad =
+            Number(
+              producto.quantity
+            ) || 0;
+
+
+          const iva =
+            Number(
+              producto.iva
+            ) || 0;
+
+
+          const subtotal =
+            precio *
+            cantidad;
+
+
+          const importeIva =
+            (
+              subtotal *
+              iva
+            ) / 100;
+
+
+          const precioTotal =
+            subtotal +
+            importeIva;
+
+
+          return {
+
+            /*
+             * Conservamos todos los datos
+             * que ya entrega el componente hijo.
+             */
+
+            ...producto,
+
+
+            price:
+              precio,
+
+
+            quantity:
+              cantidad,
+
+
+            iva:
+              iva,
+
+
+            tipoIva:
+              producto.tipoIva ??
+              this.obtenerTipoIva(
+                iva
+              ),
+
+
+            totalStock:
+
+              (
+                Number(
+                  producto.stock
+                ) || 0
+              ) + cantidad,
+
+
+            precioTotal:
+
+              this.redondear(
+                precioTotal
+              )
+
+          };
+
+        }
+      );
+
+
+    // =======================================================
+    // IMPUESTOS
+    // =======================================================
+
+    const impuestosRequest =
+      this.impuestos.map(
+        impuesto => ({
+
+          tipo:
+            impuesto.tipo,
+
+          descripcion:
+            impuesto.descripcion,
+
+          porcentaje:
+            Number(
+              impuesto.porcentaje
+            ) || 0
+
+        })
+      );
+
+
+    // =======================================================
+    // FACTURA
+    // =======================================================
+
+    const factura = {
+
+      // -----------------------------------------------------
+      // CABECERA
+      // -----------------------------------------------------
+
+      idInvoice:
+        this.datosProveedor.idInvoice,
+
+
+      dateOfEntry:
+        this.formatearFecha(
+          this.datosProveedor.dateOfEntry
+        ),
+
+
+      dueDate:
+
+        this.datosProveedor.dueDate
+
+          ? this.formatearFecha(
+              this.datosProveedor.dueDate
+            )
+
+          : null,
+
+
+      payDay:
+        null,
+
+
+      provider:
+        Number(
+          this.datosProveedor.provider
+        ),
+
+
+      tipoDeCuentaEnum:
+        this.datosProveedor.tipoDeCuentaEnum,
+
+
+      payamentStatus:
+        false,
+
+
+      // -----------------------------------------------------
+      // TOTALES
+      // -----------------------------------------------------
+
+      subtotalNeto:
+        this.subtotalFactura,
+
+
+      ivaTotal:
+        this.totalIva,
+
+
+      totalCalculado:
+
+        this.redondear(
+
+          this.subtotalFactura +
+
+          this.totalIva +
+
+          this.impuestosTotal
+
+        ),
+
+
+      redondeo:
+        this.redondeo,
+
+
+      montoTotal:
+        this.totalFactura,
+
+
+      /*
+       * Compatibilidad con código anterior
+       */
+
+      amount:
+        this.subtotalFactura,
+
+
+      // -----------------------------------------------------
+      // IMPUESTOS
+      // -----------------------------------------------------
+
+      impuestos:
+        impuestosRequest,
+
+
+      // -----------------------------------------------------
+      // PRODUCTOS
+      // -----------------------------------------------------
+
+      invoiceDetailsProviders:
+        detalles
+
+    };
+
+
+    // =======================================================
+    // DEBUG
+    // =======================================================
+
+    console.log(
+      '======================================'
+    );
+
+
+    console.log(
+      'FACTURA A ENVIAR'
+    );
+
+
+    console.log(
+      JSON.stringify(
+        factura,
+        null,
+        2
+      )
+    );
+
+
+    console.log(
+      '======================================'
+    );
+
+
+    // =======================================================
+    // GUARDAR
+    // =======================================================
+
+    this.guardando =
+      true;
+
+
+    this.invoiceService
+
+      .createPaymentSupplier(
+        factura as any
+      )
+
+      .subscribe({
+
+        next:
+          respuesta => {
+
+            console.log(
+              'Factura creada:',
+              respuesta
+            );
+
+
+            this.toast.success(
+              'Factura registrada correctamente.'
+            );
+
+
+            this.resetFormulario();
+
+
+            this.guardando =
+              false;
+
+          },
+
+
+        error:
+          error => {
+
+            console.error(
+              'Error al registrar factura:',
+              error
+            );
+
+
+            this.guardando =
+              false;
+
+
+            const mensaje =
+
+              error?.error?.message ??
+
+              'No se pudo registrar la factura.';
+
+
+            this.toast.error(
+              mensaje
+            );
+
+          }
+
+      });
+
+  }
+
+
+  // =========================================================
+  // FORMATEAR FECHA
+  // =========================================================
+
+  private formatearFecha(
+    fecha: any
+  ): string | null {
+
+    if (
+      !fecha
+    ) {
+
+      return null;
+
+    }
+
+
+    if (
+      typeof fecha === 'string'
+    ) {
+
+      return fecha.includes('T')
+
+        ? fecha.split('T')[0]
+
+        : fecha;
+
+    }
+
+
+    if (
+      fecha instanceof Date
+    ) {
+
+      const year =
+        fecha.getFullYear();
+
+
+      const month =
+        String(
+          fecha.getMonth() + 1
+        ).padStart(
+          2,
+          '0'
+        );
+
+
+      const day =
+        String(
+          fecha.getDate()
+        ).padStart(
+          2,
+          '0'
+        );
+
+
+      return `${year}-${month}-${day}`;
+
+    }
+
+
+    return null;
+
+  }
+
+
+  // =========================================================
+  // RESET COMPLETO
+  // =========================================================
+
+  private resetFormulario(): void {
+
+    this.datosProveedor =
+      null;
+
+
+    this.productos =
+      [];
+
+
+    this.impuestos =
+      [];
+
+
+    this.subtotalFactura =
+      0;
+
+
+    this.totalIva =
+      0;
+
+
+    this.impuestosTotal =
+      0;
+
+
+    this.redondeo =
+      0;
+
+
+    this.totalFactura =
+      0;
+
+
+    this.showFormSubtotal =
+      false;
+
+
+    // =======================================================
+    // RESET IMPUESTOS
+    // =======================================================
+
+    if (
+      this.impuestosComponent
+    ) {
+
+      this.impuestosComponent.reset();
+
+    }
+
+
+    // =======================================================
+    // RESET CABECERA
+    // =======================================================
+
+    if (
+      this.datosProveedorComponent
+    ) {
+
+      this.datosProveedorComponent
+        .resetDatosProveedor();
+
+    }
+
+
+    // =======================================================
+    // RESET PRODUCTOS
+    // =======================================================
+
+    if (
+      this.datosDetallesProveedorComponent
+    ) {
+
+      this.datosDetallesProveedorComponent
+        .resetListaProductos();
+
+    }
+
+
+    this.cdRef.detectChanges();
+
+  }
+
+
+  // =========================================================
+  // LIMPIAR TOTAL
+  // =========================================================
+
+  limpiarTotal(
+    mostrar: boolean
+  ): void {
+
+    this.showFormSubtotal =
+      mostrar;
+
+
+    if (
+      !mostrar
+    ) {
+
+      this.subtotalFactura =
+        0;
+
+
+      this.totalIva =
+        0;
+
+
+      this.impuestosTotal =
+        0;
+
+
+      this.redondeo =
+        0;
+
+
+      this.totalFactura =
+        0;
+
+
+      this.impuestos =
+        [];
+
+
+      if (
+        this.impuestosComponent
+      ) {
+
+        this.impuestosComponent.reset();
+
+      }
+
+    }
+
+  }
+
+
+  // =========================================================
+  // OBTENER TIPO IVA
+  // =========================================================
+
+  private obtenerTipoIva(
+    porcentaje: number
+  ): string {
+
+    switch (
+      Number(porcentaje)
+    ) {
+
+      case 0:
+        return 'IVA_0';
+
+
+      case 2.5:
+        return 'IVA_2_5';
+
+
+      case 5:
+        return 'IVA_5';
+
+
+      case 10.5:
+        return 'IVA_10_5';
+
+
+      case 21:
+        return 'IVA_21';
+
+
+      case 27:
+        return 'IVA_27';
+
+
+      default:
+
+        throw new Error(
+          `Alícuota de IVA no válida: ${porcentaje}%`
+        );
+
+    }
+
+  }
+
 }

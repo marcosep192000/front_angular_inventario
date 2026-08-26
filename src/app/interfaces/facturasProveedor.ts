@@ -1,14 +1,27 @@
-export interface facturasProveedor {
+export interface FacturasProveedor {
+
   id: number;
+
   idInvoice: string;
+
   dueDate: string;
-  payDay?: any;
+
+  payDay: string | null;
+
   providerName: string;
+
   payamentStatus: boolean;
-tipoDeCuentaEnum: String;
+
+  tipoDeCuentaEnum: string | null;
+
   amount: number;
+
   saldoPendiente: number;
+
   montoTotal: number;
+
   pagoList: any[];
+
   dateOfEntry: string;
+
 }

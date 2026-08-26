@@ -1,233 +1,565 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ReactiveFormsModule, FormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import {
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+  MatNativeDateModule,
+} from '@angular/material/core';
+import {
+  MatDatepickerModule,
+} from '@angular/material/datepicker';
+import {
+  MatDialog,
+  MatDialogModule,
+} from '@angular/material/dialog';
+import {
+  MatFormFieldModule,
+} from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { ToastrModule, ToastrService } from 'ngx-toastr';
-import { FindSupplierComponent } from '../../find-supplier/find-supplier.component';
-import { PaymentTermsComponent } from '../../payment-terms/payment-terms.component';
-import { HttpClient } from '@angular/common/http';
-import { ProductService } from '../../../../services/product.service';
-import { SupplierPaymentService } from '../../../../services/supplier-payment.service';
-import { facturasProveedor } from '../../../../interfaces/facturasProveedor';
-import { Subscription } from 'rxjs';
-import { invoiceDetailsProviders } from '../../../../interfaces/buy-supplier';
-import { SupplierService } from '../../../../services/supplier.service';
-import { Supplier } from '../../../../interfaces/supplier';
-// Formato de fechas personalizado
+
+import {
+  ToastrModule,
+  ToastrService,
+} from 'ngx-toastr';
+
+import {
+  SupplierService,
+} from '../../../../services/supplier.service';
+
+import {
+  Supplier,
+} from '../../../../interfaces/supplier';
+
+import {
+  Subscription,
+} from 'rxjs';
+
+
+// ============================================================
+// FORMATO DE FECHAS
+// ============================================================
+
 const CUSTOM_DATE_FORMATS = {
+
   parse: {
     dateInput: 'DD/MM/YYYY',
   },
+
   display: {
+
     dateInput: 'DD/MM/YYYY',
+
     monthYearLabel: 'MMM YYYY',
+
     dateA11yLabel: 'LL',
+
     monthYearA11yLabel: 'MMMM YYYY',
   },
 };
+
+
 @Component({
   selector: 'app-form-factura-datos-proveedor',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatSelectModule,
-    ReactiveFormsModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogModule,
-    MatIconModule,
-    MatSlideToggleModule,
-    ToastrModule,
-    FindSupplierComponent,
-    PaymentTermsComponent,
-  ],
-  providers: [
-    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, // Configura el idioma de las fechas
-    { provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS }, // Usa el formato personalizado
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './form-factura-datos-proveedor.component.html',
-  styleUrl: './form-factura-datos-proveedor.component.css',
-})
-export class FormFacturaDatosProveedorComponent implements OnInit {
-  @Output() datosEmitidos = new EventEmitter<any>();
-  formInvoice!: FormGroup;
-  @Input() factura: any;
-  private subscription!: Subscription;
-  selectedPaymentTerm: string = '';
-  selectedSupplier: any;
-  suppliers: Supplier[] = [];
-  //COMBOS HIJOS
 
-  recibirIdMensajeFormaPago(mensaje: string) {
-    this.selectedPaymentTerm = mensaje;
-    // Actualiza el valor del campo 'paymentTerms' en el formulario cuando se recibe el código de la forma de pago
-    this.formInvoice.patchValue({
-      tipoDeCuentaEnum : mensaje, });
-    console.log(mensaje);
-  }
-  // COMBOS HIJOS
+  standalone: true,
+
+  imports: [
+
+    CommonModule,
+
+    MatFormFieldModule,
+
+    MatInputModule,
+
+    MatDatepickerModule,
+
+    MatNativeDateModule,
+
+    MatSelectModule,
+
+    ReactiveFormsModule,
+
+    FormsModule,
+
+    MatButtonModule,
+
+    MatDialogModule,
+
+    MatIconModule,
+
+    MatSlideToggleModule,
+
+    ToastrModule,
+  ],
+
+  providers: [
+
+    {
+      provide: MAT_DATE_LOCALE,
+      useValue: 'es-AR',
+    },
+
+    {
+      provide: MAT_DATE_FORMATS,
+      useValue: CUSTOM_DATE_FORMATS,
+    },
+  ],
+
+  changeDetection: ChangeDetectionStrategy.OnPush,
+
+  templateUrl:
+    './form-factura-datos-proveedor.component.html',
+
+  styleUrl:
+    './form-factura-datos-proveedor.component.css',
+})
+export class FormFacturaDatosProveedorComponent
+  implements OnInit, OnDestroy {
+
+
+  // ==========================================================
+  // OUTPUT
+  // ==========================================================
+
+  @Output()
+  datosEmitidos =
+    new EventEmitter<any>();
+
+
+  // ==========================================================
+  // INPUT
+  // ==========================================================
+
+  @Input()
+  factura: any;
+
+
+  // ==========================================================
+  // FORMULARIO
+  // ==========================================================
+
+  formInvoice!: FormGroup;
+
+
+  // ==========================================================
+  // DATOS
+  // ==========================================================
+
+  suppliers: Supplier[] = [];
+
+  paymentTermsList: string[] = [];
+
+  selectedPaymentTerm = '';
+
+  startDate =
+    new Date(1990, 0, 1);
+
+
+  private subscription?: Subscription;
+
+
+  // ==========================================================
+  // CONSTRUCTOR
+  // ==========================================================
+
   constructor(
-    private productService: ProductService,
+
     private fb: FormBuilder,
+
     private toastr: ToastrService,
+
     private dialog: MatDialog,
-    private supplierPamentService: SupplierPaymentService,
-    private supplierService : SupplierService,
+
+    private supplierService: SupplierService,
+
   ) {}
 
- 
-  
-getAllSuppliers() { // COMBO BOSQUEDA DE PROVEEDORES INICIO
-  this.supplierService.getAllSuppliers().subscribe((data) => {
-    this.suppliers = data;
-  });
-}// COMBO BUSQUEDA DE PROVEEDORES FIN----------------------------------------------------------------
 
-
-
-// BUSQUEDA FORMAS DE PAGO INICIO ------------------------------------------
-startDate = new Date(1990, 0, 1);
-paymentTermsList?: string[] = [];
-getAllPayments() {
-  this.supplierService.getPayMethod().subscribe((data) => {
-    this.paymentTermsList = data;
-    console.log(
-      this.paymentTermsList + 'dddddddddddddddddddddddddddddddddddddddddddddd'
-    );
-  });
-}
-// BUSQUEDA FORMA DE PAGO FIN ------------------------------------------------------
-  forms() {
-    // formulario para realizar la factura
-    this.formInvoice = this.fb.group({
-      idInvoice: ['', Validators.required],
-      dateOfEntry: ['', Validators.required],
-      dueDate: ['', ],
-      tipoDeCuentaEnum: [this.selectedPaymentTerm ?? ''], // Por defecto selecciona 'CONTADO'
-      provider: [this.selectedSupplier ,], // Asegura que el proveedor sea opcional hasta que se reciba el ID
-      amount: [0, Validators.required],
-      montoTotal: [0,],
-       invoiceDetailsProviders: [[]],
-       ivaTotal : [0, Validators.required],
-    });
-    this.formInvoice.get('invoiceDetailsProviders') ?.valueChanges.subscribe((details) => {
-        const total = details.reduce(
-          (sum: number, item: any) => sum + item.subTotal,
-          0
-        );
-        this.formInvoice.patchValue({ amount: total });
-      });
-      this.formInvoice.get('tipoDeCuentaEnum')?.valueChanges.subscribe((value) => {
-        this.selectedPaymentTerm = value;
-        this.checkPaymentTerm();
-      });
-      this.formInvoice.get('selectedSupplier')?.valueChanges.subscribe((value) => {
-        this.selectedSupplier = value ;
-       console.log(this.selectedSupplier); 
-  });
- this.formInvoice.patchValue({ provider: this.selectedSupplier});
- console.log(this.selectedSupplier); 
-}
-
-  checkPaymentTerm() {
-    if (this.selectedPaymentTerm === 'CONTADO') {
-      // Si el pago es contado
-      const today = new Date();
-      const formattedDate = today.toISOString().split('T')[0]; // Formato YYYY-MM-DD
-      this.formInvoice.patchValue({
-        dueDate: formattedDate, // Establecer dueDate con la fecha actual
-      });
-    } else {
-      // Si no es 'CTA_CTE', puedes dejar el campo dueDate vacío o asignar una fecha diferente
-      this.formInvoice.patchValue({
-        dueDate: '', // Dejar vacío si no es contado
-      });
-    }
-  }
-
+  // ==========================================================
+  // INIT
+  // ==========================================================
 
   ngOnInit(): void {
-    this.getAllPayments();
-    this.getAllSuppliers(); 
-    this.selectedPaymentTerm= "";
-    this.forms();
-    if (this.formInvoice) {
-      this.enviarDatosaRegistrarFactura();
-    }
+
+    this.crearFormulario();
+
+    this.cargarProveedores();
+
+    this.cargarFormasPago();
+
+    this.configurarCambios();
+
+    this.emitirDatos();
   }
 
-  enviarDatosaRegistrarFactura() {
-    if (this.formInvoice) {
-      this.subscription = this.formInvoice.valueChanges.subscribe(
-        (variables) => {
-          if (this.formInvoice.valid) {
-            this.datosEmitidos.emit(variables);
-        console.log(variables);
-          } else {
-            console.error('Formulario inválido');
-          }
+
+  // ==========================================================
+  // CREAR FORMULARIO
+  // ==========================================================
+
+  private crearFormulario(): void {
+
+    this.formInvoice =
+      this.fb.group({
+
+        idInvoice: [
+          '',
+          Validators.required,
+        ],
+
+        dateOfEntry: [
+          new Date(),
+          Validators.required,
+        ],
+
+        dueDate: [
+          null,
+        ],
+
+        tipoDeCuentaEnum: [
+          '',
+          Validators.required,
+        ],
+
+        provider: [
+          null,
+          Validators.required,
+        ],
+
+        amount: [
+          0,
+        ],
+
+        ivaTotal: [
+          0,
+        ],
+
+        montoTotal: [
+          0,
+        ],
+
+        invoiceDetailsProviders: [
+          [],
+        ],
+      });
+  }
+
+
+  // ==========================================================
+  // CARGAR PROVEEDORES
+  // ==========================================================
+
+  private cargarProveedores(): void {
+
+    this.supplierService
+      .getAllSuppliers()
+      .subscribe({
+
+        next: (data) => {
+
+          this.suppliers = data;
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Error al cargar proveedores:',
+            error
+          );
+
+          this.toastr.error(
+            'No se pudieron cargar los proveedores.'
+          );
+        },
+      });
+  }
+
+
+  // ==========================================================
+  // CARGAR FORMAS DE PAGO
+  // ==========================================================
+
+  private cargarFormasPago(): void {
+
+    this.supplierService
+      .getPayMethod()
+      .subscribe({
+
+        next: (data) => {
+
+          this.paymentTermsList =
+            data ?? [];
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Error al cargar formas de pago:',
+            error
+          );
+
+          this.toastr.error(
+            'No se pudieron cargar las formas de pago.'
+          );
+        },
+      });
+  }
+
+
+  // ==========================================================
+  // ESCUCHAR CAMBIOS
+  // ==========================================================
+
+  private configurarCambios(): void {
+
+    this.subscription =
+      this.formInvoice.valueChanges
+        .subscribe(() => {
+
+          this.actualizarCondicionPago();
+
+          this.emitirDatos();
+
+        });
+  }
+
+
+  // ==========================================================
+  // CONDICIÓN DE PAGO
+  // ==========================================================
+
+  private actualizarCondicionPago(): void {
+
+    const condicion =
+      this.formInvoice
+        .get('tipoDeCuentaEnum')
+        ?.value;
+
+
+    this.selectedPaymentTerm =
+      condicion ?? '';
+
+
+    // --------------------------------------------------------
+    // CONTADO
+    // --------------------------------------------------------
+
+    if (condicion === 'CONTADO') {
+
+      const hoy =
+        new Date();
+
+
+      this.formInvoice.patchValue(
+        {
+          dueDate: hoy,
+        },
+        {
+          emitEvent: false,
         }
       );
-    } else {
-      console.error('Formulario no inicializado');
+
+      return;
+    }
+
+
+    // --------------------------------------------------------
+    // CUENTA CORRIENTE
+    // --------------------------------------------------------
+
+    if (condicion === 'CTA_CTE') {
+
+      this.formInvoice.patchValue(
+        {
+          dueDate: null,
+        },
+        {
+          emitEvent: false,
+        }
+      );
     }
   }
 
-  ngOnDestroy() {
-    if (this.subscription) {
-      this.subscription.unsubscribe(); // Cancelamos la suscripción al destruir el componente
-    }
-  }
-  //para eliminar hasta ahora codigo inesesario
-  saveInvoiceSupplier(): void {
-    if (this.formInvoice.invalid) {
-      let errorMessage = 'Por favor, completa todos los campos obligatorios.';
-      for (const controlName in this.formInvoice.controls) {
-        const control = this.formInvoice.controls[controlName];
-        if (control.invalid) {
-          if (control.errors?.['required']) {
-            errorMessage = `El campo ${controlName} es obligatorio.`;
-          } else if (control.errors?.['minlength']) {
-            errorMessage = `El campo ${controlName} debe tener al menos ${control.errors['minlength'].requiredLength} caracteres.`;
-          } else if (control.errors?.['maxlength']) {
-            errorMessage = `El campo ${controlName} no puede tener más de ${control.errors['maxlength'].requiredLength} caracteres.`;
-          }
-          break;
-        }
-      }
-      this.toastr.error(errorMessage);
+
+  // ==========================================================
+  // EMITIR DATOS
+  // ==========================================================
+
+  private emitirDatos(): void {
+
+    if (!this.formInvoice) {
       return;
     }
+
+
+    const datos =
+      this.formInvoice.getRawValue();
+
+
+    this.datosEmitidos.emit(datos);
   }
-  resetDatosProveedor() {
-    this.selectedPaymentTerm = ''; // Reiniciar la forma de pago
-    this.formInvoice.reset({
-      idInvoice: '',
-      dateOfEntry: '',
-      dueDate: '',
-      provider: null, // Asegurar que el proveedor no tenga valor
-      tipoDeCuentaEnum: '', // Asegurar que la forma de pago se resetee
-      amount: 0,
-      invoiceDetailsProviders: [], // Resetear detalles
+
+
+  // ==========================================================
+  // RECIBIR FORMA DE PAGO DESDE COMPONENTE HIJO
+  // ==========================================================
+
+  recibirIdMensajeFormaPago(
+    mensaje: string
+  ): void {
+
+    this.formInvoice.patchValue({
+
+      tipoDeCuentaEnum:
+        mensaje,
+
     });
-    // Verifica si recibirIdMensaje se ejecuta automáticamente y lo bloquea
-    
-    this.checkPaymentTerm(); // Asegurar que dueDate no se quede fijo en una opción
   }
-  onPaymentTermChange(selected: string): void {
-    this.selectedPaymentTerm = selected;
+
+
+  // ==========================================================
+  // CAMBIO MANUAL DE FORMA DE PAGO
+  // ==========================================================
+
+  onPaymentTermChange(
+    selected: string
+  ): void {
+
+    this.formInvoice.patchValue({
+
+      tipoDeCuentaEnum:
+        selected,
+
+    });
+  }
+
+
+  // ==========================================================
+  // VALIDAR
+  // ==========================================================
+
+  validarFormulario(): boolean {
+
+    if (this.formInvoice.invalid) {
+
+      this.formInvoice.markAllAsTouched();
+
+      this.toastr.error(
+        'Completa los datos obligatorios de la factura.'
+      );
+
+      return false;
+    }
+
+
+    const proveedor =
+      this.formInvoice
+        .get('provider')
+        ?.value;
+
+
+    if (!proveedor) {
+
+      this.toastr.error(
+        'Debes seleccionar un proveedor.'
+      );
+
+      return false;
+    }
+
+
+    const condicion =
+      this.formInvoice
+        .get('tipoDeCuentaEnum')
+        ?.value;
+
+
+    if (!condicion) {
+
+      this.toastr.error(
+        'Debes seleccionar una forma de pago.'
+      );
+
+      return false;
+    }
+
+
+    return true;
+  }
+
+
+  // ==========================================================
+  // GUARDAR DATOS
+  // ==========================================================
+
+  saveInvoiceSupplier(): boolean {
+
+    return this.validarFormulario();
+  }
+
+
+  // ==========================================================
+  // RESET
+  // ==========================================================
+
+  resetDatosProveedor(): void {
+
+    this.formInvoice.reset({
+
+      idInvoice: '',
+
+      dateOfEntry:
+        new Date(),
+
+      dueDate: null,
+
+      provider: null,
+
+      tipoDeCuentaEnum: '',
+
+      amount: 0,
+
+      ivaTotal: 0,
+
+      montoTotal: 0,
+
+      invoiceDetailsProviders: [],
+    });
+
+
+    this.selectedPaymentTerm = '';
+
+    this.emitirDatos();
+  }
+
+
+  // ==========================================================
+  // DESTRUIR
+  // ==========================================================
+
+  ngOnDestroy(): void {
+
+    this.subscription?.unsubscribe();
   }
 }

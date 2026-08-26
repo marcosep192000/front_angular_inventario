@@ -1,4 +1,150 @@
-.custom-form-field{
-   
-    padding-right: 10px;
+/* =========================================================
+   CONTENEDOR
+========================================================= */
+
+.find-supplier-container {
+  width: 100%;
+}
+
+
+/* =========================================================
+   CAMPO
+========================================================= */
+
+.supplier-field {
+  width: 100%;
+}
+
+
+/* =========================================================
+   OPCIÓN PROVEEDOR
+========================================================= */
+
+.supplier-option {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+
+  padding: 4px 0;
+}
+
+
+.supplier-option strong {
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: #222;
+}
+
+
+.supplier-option span {
+  font-size: 12px;
+
+  color: #777;
+}
+
+
+/* =========================================================
+   PROVEEDOR SELECCIONADO
+========================================================= */
+
+.supplier-selected {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 10px;
+
+  padding: 12px 15px;
+
+  border-radius: 10px;
+
+  background: #f3eafa;
+
+  border: 1px solid #d7bce8;
+}
+
+
+/* =========================================================
+   ICONO
+========================================================= */
+
+.supplier-selected-icon {
+  width: 38px;
+
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #673ab7;
+
+  color: white;
+
+  font-size: 18px;
+}
+
+
+/* =========================================================
+   INFORMACIÓN
+========================================================= */
+
+.supplier-selected-info {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+
+.supplier-selected-info span {
+  font-size: 11px;
+
+  color: #777;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.4px;
+}
+
+
+.supplier-selected-info strong {
+  font-size: 15px;
+
+  color: #333;
+}
+
+
+.supplier-selected-info small {
+  font-size: 12px;
+
+  color: #666;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .supplier-selected {
+    padding: 10px;
+  }
+
+  .supplier-selected-info strong {
+    font-size: 14px;
+  }
+
 }

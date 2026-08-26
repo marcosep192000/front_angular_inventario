@@ -1,20 +1,1020 @@
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+========================================================= */
 
-
-.parent {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    gap: 8px;
+.pay-supplier-container {
+  width: 100%;
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  background: #f5f6fa;
+  min-height: 100%;
 }
-    
-.div1 {
-    grid-column: span 5 / span 5;
-    text-align: left;
-    margin:0px 0 0 0;
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.pay-supplier-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 22px 26px;
+  margin-bottom: 18px;
+
+  border-radius: 16px;
+
+  background: linear-gradient(
+    135deg,
+    #4b0082,
+    #673ab7
+  );
+
+  color: white;
+
+  box-shadow:
+    0 5px 18px rgba(0, 0, 0, 0.16);
 }
 
-.div2 {
-    grid-column: span 5 / span 5;
-    grid-row: span 4 / span 4;
-    grid-row-start: 2;
+.pay-supplier-header h2 {
+  margin: 0;
+
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.pay-supplier-header p {
+  margin: 6px 0 0;
+
+  font-size: 14px;
+
+  opacity: 0.9;
+}
+
+.pay-supplier-header button {
+  color: white;
+}
+
+
+/* =========================================================
+   PROVEEDOR SELECCIONADO
+========================================================= */
+
+.proveedor-header-card {
+  display: flex;
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 22px;
+
+  margin-bottom: 18px;
+
+  background: white;
+
+  border-radius: 16px;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================================================
+   AVATAR
+========================================================= */
+
+.proveedor-avatar {
+  width: 70px;
+  height: 70px;
+
+  min-width: 70px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 16px;
+
+  background: linear-gradient(
+    135deg,
+    #673ab7,
+    #4b0082
+  );
+
+  color: white;
+}
+
+.proveedor-avatar mat-icon {
+  font-size: 38px;
+  width: 38px;
+  height: 38px;
+}
+
+
+/* =========================================================
+   DATOS PROVEEDOR
+========================================================= */
+
+.proveedor-datos {
+  flex: 1;
+  min-width: 0;
+}
+
+.proveedor-nombre span {
+  display: block;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  color: #777;
+
+  letter-spacing: 0.7px;
+}
+
+.proveedor-nombre h2 {
+  margin: 3px 0 15px;
+
+  font-size: 24px;
+
+  color: #222;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   INFO PROVEEDOR
+========================================================= */
+
+.proveedor-info {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 20px;
+}
+
+.dato-proveedor {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.dato-proveedor mat-icon {
+  color: #673ab7;
+
+  font-size: 20px;
+
+  width: 20px;
+  height: 20px;
+}
+
+.dato-proveedor span {
+  display: block;
+
+  font-size: 11px;
+
+  color: #777;
+}
+
+.dato-proveedor strong {
+  display: block;
+
+  font-size: 13px;
+
+  color: #333;
+}
+
+
+/* =========================================================
+   ID PROVEEDOR
+========================================================= */
+
+.proveedor-id {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 65px;
+
+  padding: 12px;
+
+  border-radius: 12px;
+
+  background: #f3f0fa;
+}
+
+.proveedor-id span {
+  font-size: 11px;
+
+  color: #777;
+}
+
+.proveedor-id strong {
+  font-size: 18px;
+
+  color: #673ab7;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.pay-supplier-card {
+  background: white;
+
+  border-radius: 16px;
+
+  padding: 22px;
+
+  margin-bottom: 18px;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.07);
+}
+
+
+/* =========================================================
+   RESUMEN
+========================================================= */
+
+.resumen-title {
+  display: flex;
+
+  justify-content: space-between;
+
+  margin-bottom: 18px;
+}
+
+.resumen-title h3 {
+  margin: 0;
+
+  font-size: 19px;
+
+  color: #333;
+}
+
+.resumen-title span {
+  display: block;
+
+  margin-top: 4px;
+
+  font-size: 13px;
+
+  color: #777;
+}
+
+.resumen-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 15px;
+}
+
+.resumen-card {
+  padding: 18px;
+
+  border-radius: 12px;
+
+  background: #f7f7fa;
+
+  border: 1px solid #e5e5ef;
+}
+
+.resumen-card span {
+  display: block;
+
+  font-size: 12px;
+
+  color: #777;
+
+  margin-bottom: 7px;
+}
+
+.resumen-card strong {
+  font-size: 20px;
+
+  color: #333;
+}
+
+.resumen-card.pagado {
+  background: #eef8f0;
+
+  border-color: #c8e6c9;
+}
+
+.resumen-card.pagado strong {
+  color: #2e7d32;
+}
+
+.resumen-card.pendiente {
+  background: #fff7e8;
+
+  border-color: #ffe0a3;
+}
+
+.resumen-card.pendiente strong {
+  color: #e65100;
+}
+
+.resumen-card.cheques {
+  background: #eef5ff;
+
+  border-color: #c5d9ff;
+}
+
+.resumen-card.cheques strong {
+  color: #1565c0;
+}
+
+
+/* =========================================================
+   TABS
+========================================================= */
+
+.tab-label {
+  margin-left: 7px;
+}
+
+.tab-count {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 20px;
+
+  height: 20px;
+
+  margin-left: 7px;
+
+  padding: 0 5px;
+
+  border-radius: 10px;
+
+  background: #673ab7;
+
+  color: white;
+
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+.tab-content {
+  padding: 22px 5px;
+}
+
+
+/* =========================================================
+   HEADER SECCIÓN
+========================================================= */
+
+.section-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 18px;
+}
+
+.section-header h3 {
+  margin: 0;
+
+  font-size: 19px;
+
+  color: #333;
+}
+
+.section-header span {
+  display: block;
+
+  margin-top: 4px;
+
+  font-size: 13px;
+
+  color: #777;
+}
+
+.section-header button mat-icon {
+  margin-right: 5px;
+}
+
+
+/* =========================================================
+   TABLAS
+========================================================= */
+
+.tabla-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+
+  border-radius: 12px;
+
+  border: 1px solid #e2e4ea;
+
+  background: white;
+}
+
+table {
+  width: 100%;
+
+  border-collapse: collapse;
+}
+
+th {
+  padding: 14px;
+
+  background: #f5f5f8;
+
+  color: #555;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  text-align: left;
+
+  white-space: nowrap;
+}
+
+td {
+  padding: 14px;
+
+  border-top: 1px solid #eeeeee;
+
+  color: #444;
+
+  font-size: 13px;
+
+  white-space: nowrap;
+}
+
+tr:hover td {
+  background: #faf9fd;
+}
+
+
+/* =========================================================
+   TABLA FACTURAS
+========================================================= */
+
+.tabla-facturas td:first-child {
+  color: #673ab7;
+}
+
+
+/* =========================================================
+   TABLA CHEQUES
+========================================================= */
+
+.tabla-cheques td:first-child {
+  color: #1565c0;
+}
+
+.acciones-cheques-header {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   SALDO TABLA
+========================================================= */
+
+.saldo-tabla {
+  color: #e65100;
+}
+
+
+/* =========================================================
+   ACCIONES TABLA
+========================================================= */
+
+.acciones-tabla {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+}
+
+.acciones-tabla button {
+  white-space: nowrap;
+}
+
+.acciones-tabla mat-icon {
+  margin-right: 4px;
+}
+
+
+/* =========================================================
+   ESTADOS
+========================================================= */
+
+.estado {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 5px 11px;
+
+  border-radius: 20px;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.estado-pagada {
+  background: #e8f5e9;
+
+  color: #2e7d32;
+}
+
+.estado-pendiente {
+  background: #fff3e0;
+
+  color: #ef6c00;
+}
+
+.estado-parcial {
+  background: #e3f2fd;
+
+  color: #1565c0;
+}
+
+.estado-vencida {
+  background: #ffebee;
+
+  color: #c62828;
+}
+
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+.badge {
+  display: inline-flex;
+
+  padding: 5px 10px;
+
+  border-radius: 15px;
+
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+.badge-cuenta {
+  background: #ede7f6;
+
+  color: #5e35b1;
+}
+
+
+/* =========================================================
+   CUENTA CORRIENTE
+========================================================= */
+
+.cuenta-resumen {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 15px;
+
+  margin-bottom: 25px;
+}
+
+.cuenta-card {
+  padding: 20px;
+
+  border-radius: 12px;
+
+  background: #f7f7fa;
+
+  border: 1px solid #e5e5ef;
+}
+
+.cuenta-card span {
+  display: block;
+
+  font-size: 12px;
+
+  color: #777;
+
+  margin-bottom: 7px;
+}
+
+.cuenta-card strong {
+  font-size: 21px;
+
+  color: #333;
+}
+
+.cuenta-card.pagado {
+  background: #eef8f0;
+
+  border-color: #c8e6c9;
+}
+
+.cuenta-card.pagado strong {
+  color: #2e7d32;
+}
+
+.cuenta-card.saldo {
+  background: #fff7e8;
+
+  border-color: #ffe0a3;
+}
+
+.cuenta-card.saldo strong {
+  color: #e65100;
+}
+
+
+/* =========================================================
+   SUBSECCIÓN
+========================================================= */
+
+.subsection {
+  margin-top: 20px;
+}
+
+.subsection-header {
+  margin-bottom: 12px;
+}
+
+.subsection-header h3 {
+  margin: 0;
+
+  font-size: 17px;
+
+  color: #333;
+}
+
+.subsection-header span {
+  font-size: 12px;
+
+  color: #777;
+}
+
+
+/* =========================================================
+   FORMULARIO PAGO
+========================================================= */
+
+.formulario-pago-card {
+  margin-top: 20px;
+}
+
+.formulario-pago {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.form-row {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 18px;
+
+  width: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+
+/* =========================================================
+   CHEQUE
+========================================================= */
+
+.cheque-container {
+  padding: 20px;
+
+  border-radius: 14px;
+
+  background: #f8f9fc;
+
+  border: 1px solid #dfe3eb;
+
+  animation: aparecer 0.2s ease;
+}
+
+.cheque-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 18px;
+}
+
+.cheque-header mat-icon {
+  color: #1565c0;
+}
+
+.cheque-header h3 {
+  margin: 0;
+
+  font-size: 17px;
+
+  color: #333;
+}
+
+.cheque-header span {
+  display: block;
+
+  margin-top: 3px;
+
+  font-size: 12px;
+
+  color: #777;
+}
+
+
+/* =========================================================
+   ACCIONES
+========================================================= */
+
+.acciones {
+  display: flex;
+
+  justify-content: flex-end;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 20px;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #e5e5e5;
+}
+
+.btn-cancelar {
+  min-width: 120px;
+}
+
+.btn-pagar {
+  min-width: 180px;
+
+  min-height: 44px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.procesando {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  padding: 35px;
+
+  color: #666;
+}
+
+
+/* =========================================================
+   MENSAJES
+========================================================= */
+
+.mensaje-error {
+  padding: 15px;
+
+  margin: 15px 0;
+
+  border-radius: 10px;
+
+  background: #ffebee;
+
+  color: #c62828;
+
+  border: 1px solid #ef9a9a;
+}
+
+.mensaje-info {
+  padding: 15px;
+
+  margin-top: 18px;
+
+  border-radius: 10px;
+
+  background: #e8f5e9;
+
+  color: #2e7d32;
+
+  border: 1px solid #a5d6a7;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-state {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 55px 20px;
+
+  text-align: center;
+
+  color: #777;
+}
+
+.empty-state mat-icon {
+  width: 48px;
+
+  height: 48px;
+
+  font-size: 48px;
+
+  margin-bottom: 10px;
+
+  color: #aaa;
+}
+
+.empty-state h3 {
+  margin: 5px 0;
+
+  color: #444;
+}
+
+.empty-state p {
+  margin: 5px 0;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   ANIMACIÓN
+========================================================= */
+
+@keyframes aparecer {
+
+  from {
+    opacity: 0;
+
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+  .resumen-grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .proveedor-header-card {
+    align-items: flex-start;
+  }
+
+}
+
+
+@media (max-width: 750px) {
+
+  .pay-supplier-container {
+    padding: 10px;
+  }
+
+  .proveedor-header-card {
+    flex-direction: column;
+  }
+
+  .proveedor-info {
+    flex-direction: column;
+
+    gap: 12px;
+  }
+
+  .proveedor-id {
+    align-self: flex-start;
+  }
+
+  .resumen-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cuenta-resumen {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .section-header {
+    align-items: flex-start;
+
+    gap: 12px;
+  }
+
+}
+
+
+@media (max-width: 500px) {
+
+  .pay-supplier-header {
+    padding: 18px;
+  }
+
+  .pay-supplier-header h2 {
+    font-size: 20px;
+  }
+
+  .pay-supplier-card {
+    padding: 15px;
+  }
+
+  .proveedor-header-card {
+    padding: 16px;
+  }
+
+  .proveedor-nombre h2 {
+    font-size: 20px;
+  }
+
+  .acciones {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .btn-cancelar,
+  .btn-pagar {
+    width: 100%;
+  }
+
 }

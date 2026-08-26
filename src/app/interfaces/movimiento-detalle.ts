@@ -1,43 +1,60 @@
 export interface MovimientoDetalle {
 
-  id:number;
+  id: number;
 
-  numeroComprobante:string;
+  numeroComprobante: string;
 
-  fechaHora:string;
+  fechaHora: string;
 
-  tipo:string;
+  tipo: string;
 
-  categoriaMovimiento:string;
+  categoriaMovimiento: string;
 
-  monto:number;
+  monto: number;
 
-  medioPago:string;
+  medioPago: string;
 
-  observacion:string;
+  observacion: string;
 
-  referenciaPago:string;
+  referenciaPago: string;
 
-  descripcion?:string;
+  descripcion?: string;
 
-  proveedorId?:number;
+  proveedorId?: number;
 
-  proveedorNombre?:string;
+  proveedorNombre?: string;
 
-  numeroFactura?:string;
+  numeroFactura?: string;
 
-  empleadoId?:number;
+  empleadoId?: number;
 
-  empleadoNombre?:string;
+  empleadoNombre?: string;
 
-  tipoSueldo?:string;
+  tipoSueldo?: string;
 
-  fechaPago?:string;
+  fechaPago?: string;
 
-  mesCorrespondiente?:number;
+  mesCorrespondiente?: number;
 
-  anioCorrespondiente?:number;
+  anioCorrespondiente?: number;
 
-  estado?:string;
+  estado?: string;
+
+
+  // =========================================================
+  // DATOS DEL CHEQUE
+  // =========================================================
+
+  numeroCheque?: string;
+
+  bancoCheque?: string;
+
+  titularCheque?: string;
+
+  fechaEmisionCheque?: string;
+
+  fechaCobroCheque?: string;
+
+  estadoCheque?: string;
 
 }

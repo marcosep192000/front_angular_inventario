@@ -1,0 +1,164 @@
+<div class="confirm-container">
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <div class="confirm-header">
+
+    <div class="document-icon">
+
+      <mat-icon>
+        {{ obtenerIcono() }}
+      </mat-icon>
+
+    </div>
+
+    <div>
+
+      <h2>
+        {{ data.nombreDocumento }}
+      </h2>
+
+      <p>
+        Confirmar generación del documento
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       CONTENIDO
+  ====================================================== -->
+
+  <mat-dialog-content>
+
+    <div class="mensaje">
+
+      <mat-icon>
+        info
+      </mat-icon>
+
+      <span>
+        {{ data.mensaje }}
+      </span>
+
+    </div>
+
+
+    <!-- ===================================================
+         INFORMACIÓN
+    ==================================================== -->
+
+    <div class="datos-documento">
+
+      <div class="dato">
+
+        <span>
+          Cliente
+        </span>
+
+        <strong>
+          {{ data.cliente }}
+        </strong>
+
+      </div>
+
+
+      <div class="dato">
+
+        <span>
+          Productos
+        </span>
+
+        <strong>
+          {{ data.cantidadProductos }}
+        </strong>
+
+      </div>
+
+
+      <div class="dato total">
+
+        <span>
+          Total
+        </span>
+
+        <strong>
+          {{ data.total | currency:'ARS' }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <!-- ===================================================
+         ADVERTENCIA
+    ==================================================== -->
+
+    <div class="advertencia">
+
+      <mat-icon>
+        warning
+      </mat-icon>
+
+      <div>
+
+        <strong>
+          ¿Desea continuar?
+        </strong>
+
+        <p>
+          El documento será registrado en el sistema.
+          Esta acción no se realizará hasta que confirme.
+        </p>
+
+      </div>
+
+    </div>
+
+  </mat-dialog-content>
+
+
+  <!-- =====================================================
+       ACCIONES
+  ====================================================== -->
+
+  <mat-dialog-actions>
+
+    <button
+      mat-stroked-button
+      type="button"
+      class="btn-cancelar"
+      (click)="cancelar()">
+
+      <mat-icon>
+        close
+      </mat-icon>
+
+      Cancelar
+
+    </button>
+
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="button"
+      class="btn-confirmar"
+      (click)="confirmar()">
+
+      <mat-icon>
+        check
+      </mat-icon>
+
+      Generar documento
+
+    </button>
+
+  </mat-dialog-actions>
+
+</div>

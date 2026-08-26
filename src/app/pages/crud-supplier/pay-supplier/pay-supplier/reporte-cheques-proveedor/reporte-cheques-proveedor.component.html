@@ -1,0 +1,76 @@
+<div class="dialogo-reporte">
+  <header class="encabezado">
+    <div>
+      <h2>Reporte de cheques</h2>
+      <p>{{ data.proveedorNombre }}</p>
+    </div>
+
+    <div class="acciones">
+      <button mat-icon-button type="button" matTooltip="Actualizar reporte" (click)="cargarReporte()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button type="button" matTooltip="Imprimir reporte actual" (click)="imprimir()">
+        <mat-icon>print</mat-icon>
+      </button>
+      <button mat-icon-button type="button" aria-label="Cerrar" (click)="cerrar()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </header>
+
+  <div class="cargando" *ngIf="cargando">
+    <mat-spinner diameter="42"></mat-spinner>
+    <span>Generando reporte de cheques...</span>
+  </div>
+
+  <div class="error" *ngIf="!cargando && error">
+    <mat-icon>error_outline</mat-icon>
+    <p>No se pudo cargar el reporte.</p>
+    <button mat-stroked-button type="button" (click)="cargarReporte()">Reintentar</button>
+  </div>
+
+  <mat-tab-group *ngIf="!cargando && !error" (selectedIndexChange)="cambiarEstado($event)">
+    <mat-tab label="Pendientes ({{ pendientes.length }})"></mat-tab>
+    <mat-tab label="Cobrados ({{ cobrados.length }})"></mat-tab>
+    <mat-tab label="Rechazados ({{ rechazados.length }})"></mat-tab>
+  </mat-tab-group>
+
+  <section *ngIf="!cargando && !error" class="contenido-reporte">
+    <div class="titulo-tabla">
+      <h3>Cheques {{ tituloEstado.toLowerCase() }}</h3>
+      <span>{{ chequesActuales.length }} registro(s)</span>
+    </div>
+
+    <div class="sin-datos" *ngIf="chequesActuales.length === 0">
+      <mat-icon>receipt_long</mat-icon>
+      <p>No hay cheques {{ tituloEstado.toLowerCase() }}.</p>
+    </div>
+
+    <div class="tabla-contenedor" *ngIf="chequesActuales.length > 0">
+      <table mat-table [dataSource]="chequesPagina">
+        <ng-container matColumnDef="numero"><th mat-header-cell *matHeaderCellDef>Nº cheque</th><td mat-cell *matCellDef="let cheque">{{ cheque.numeroCheque }}</td></ng-container>
+        <ng-container matColumnDef="banco"><th mat-header-cell *matHeaderCellDef>Banco</th><td mat-cell *matCellDef="let cheque">{{ cheque.banco || '-' }}</td></ng-container>
+        <ng-container matColumnDef="titular"><th mat-header-cell *matHeaderCellDef>Titular</th><td mat-cell *matCellDef="let cheque">{{ cheque.titularCheque || '-' }}</td></ng-container>
+        <ng-container matColumnDef="monto"><th mat-header-cell *matHeaderCellDef>Monto</th><td mat-cell *matCellDef="let cheque">{{ cheque.monto | currency:'ARS':'symbol':'1.2-2' }}</td></ng-container>
+        <ng-container matColumnDef="emision"><th mat-header-cell *matHeaderCellDef>Emisión</th><td mat-cell *matCellDef="let cheque">{{ cheque.fechaEmision | date:'dd/MM/yyyy' }}</td></ng-container>
+        <ng-container matColumnDef="cobro"><th mat-header-cell *matHeaderCellDef>Cobro</th><td mat-cell *matCellDef="let cheque">{{ cheque.fechaCobro | date:'dd/MM/yyyy' }}</td></ng-container>
+        <ng-container matColumnDef="estado"><th mat-header-cell *matHeaderCellDef>Estado</th><td mat-cell *matCellDef="let cheque"><span class="estado">{{ cheque.estado }}</span></td></ng-container>
+        <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnas"></tr>
+      </table>
+    </div>
+
+    <mat-paginator
+      *ngIf="chequesActuales.length > 0"
+      [length]="chequesActuales.length"
+      [pageIndex]="pagina"
+      [pageSize]="tamanioPagina"
+      [pageSizeOptions]="[5, 10, 25, 50]"
+      (page)="cambiarPagina($event)">
+    </mat-paginator>
+  </section>
+
+  <footer>
+    <button mat-stroked-button type="button" (click)="cerrar()">Cerrar</button>
+  </footer>
+</div>

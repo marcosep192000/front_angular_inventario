@@ -19,7 +19,17 @@ import {
   MatDialogModule
 } from '@angular/material/dialog';
 
-import { Subject, of } from 'rxjs';
+import { MatOption } from '@angular/material/core';
+import {
+  MatFormField,
+  MatLabel
+} from '@angular/material/form-field';
+import { MatSelect } from '@angular/material/select';
+
+import {
+  Subject,
+  of
+} from 'rxjs';
 
 import {
   debounceTime,
@@ -29,11 +39,11 @@ import {
 } from 'rxjs/operators';
 
 import { ToastrService } from 'ngx-toastr';
+
 import jsPDF from 'jspdf';
 
 import { ProductService } from '../../../services/product.service';
 import { ProductItemSale } from '../../../interfaces/ProductItemSale';
-
 import { Client } from '../../../interfaces/Client';
 
 import { CommonSaleService } from '../../../services/common-sale.service';
@@ -41,12 +51,25 @@ import { CtaCteService } from '../../../services/cta-cte.service';
 import { ClientService } from '../../../services/client.service';
 
 import { TotalSaleComponent } from '../total-sale/total-sale.component';
-import { registrarDeudaCtaCteCliente } from '../../../interfaces/registrarDeudaCtaCteCliente';
+
+import {
+  registrarDeudaCtaCteCliente
+} from '../../../interfaces/registrarDeudaCtaCteCliente';
+
 import { SaleCommon } from '../../../interfaces/sale-common';
 
-import { SearchClientByDniComponent } from '../../crud-client/search-client-by-dni/search-client-by-dni.component';
+import {
+  SearchClientByDniComponent
+} from '../../crud-client/search-client-by-dni/search-client-by-dni.component';
 
 import { IconComponent } from '../../../shared/dasboard/icon/icon.component';
+
+
+
+import {
+  ConfirmDocumentComponent,
+  ConfirmDocumentData
+} from '../confirm-document/confirm-document.component';
 
 
 @Component({
@@ -57,13 +80,21 @@ import { IconComponent } from '../../../shared/dasboard/icon/icon.component';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    IconComponent
+
+    IconComponent,
+
+    MatOption,
+    MatFormField,
+    MatLabel,
+    MatSelect
   ],
 
   templateUrl: './new-sale.component.html',
+
   styleUrl: './new-sale.component.css'
 })
 export class NewSaleComponent implements OnInit {
@@ -80,7 +111,18 @@ export class NewSaleComponent implements OnInit {
 
 
   // =====================================================
-  // PRODUCTOS DE LA VENTA
+  // DOCUMENTO
+  // =====================================================
+
+  tipoDocumento: string = 'FACTURA_C';
+
+  condicionVenta: string = 'CONTADO';
+
+  medioPago: string | null = 'EFECTIVO';
+
+
+  // =====================================================
+  // PRODUCTOS
   // =====================================================
 
   products = new Array<ProductItemSale>();
@@ -93,7 +135,7 @@ export class NewSaleComponent implements OnInit {
 
 
   // =====================================================
-  // BUSCADOR DE PRODUCTOS
+  // BUSCADOR
   // =====================================================
 
   private busquedaProducto$ =
@@ -109,7 +151,7 @@ export class NewSaleComponent implements OnInit {
 
 
   // =====================================================
-  // INPUT DEL BUSCADOR
+  // INPUT BUSCADOR
   // =====================================================
 
   @ViewChild('buscadorProducto')
@@ -130,6 +172,7 @@ export class NewSaleComponent implements OnInit {
   // =====================================================
 
   constructor(
+
     fb: FormBuilder,
 
     private productService: ProductService,
@@ -165,6 +208,7 @@ export class NewSaleComponent implements OnInit {
   private inicializarBuscador(): void {
 
     this.busquedaProducto$
+
       .pipe(
 
         debounceTime(300),
@@ -173,7 +217,8 @@ export class NewSaleComponent implements OnInit {
 
         switchMap((query: string) => {
 
-          const texto = query.trim();
+          const texto =
+            query.trim();
 
 
           // =============================================
@@ -199,13 +244,13 @@ export class NewSaleComponent implements OnInit {
 
           this.buscandoProductos = true;
 
-
           return this.productService
+
             .searchForSale(texto)
 
             .pipe(
 
-              catchError((error) => {
+              catchError((error: any) => {
 
                 console.error(
                   'Error buscando productos:',
@@ -234,9 +279,11 @@ export class NewSaleComponent implements OnInit {
         this.mostrarResultados =
           productos.length > 0;
 
-        this.buscandoProductos = false;
+        this.buscandoProductos =
+          false;
 
-        this.indiceSeleccionado = -1;
+        this.indiceSeleccionado =
+          -1;
 
       });
 
@@ -247,9 +294,7 @@ export class NewSaleComponent implements OnInit {
   // CAMBIO DEL INPUT
   // =====================================================
 
-  buscarProductos(
-    texto: string
-  ): void {
+  buscarProductos(texto: string): void {
 
     this.busquedaProducto$.next(texto);
 
@@ -257,7 +302,7 @@ export class NewSaleComponent implements OnInit {
 
 
   // =====================================================
-  // TECLADO DEL BUSCADOR
+  // TECLADO BUSCADOR
   // =====================================================
 
   manejarTeclado(
@@ -292,8 +337,9 @@ export class NewSaleComponent implements OnInit {
       const query =
         this.code.trim();
 
+
       // =============================================
-      // SI TODAVÍA ESTÁ BUSCANDO
+      // SI ESTÁ BUSCANDO
       // =============================================
 
       if (this.buscandoProductos) {
@@ -301,6 +347,7 @@ export class NewSaleComponent implements OnInit {
         return;
 
       }
+
 
       // =============================================
       // SI HAY RESULTADOS
@@ -329,6 +376,7 @@ export class NewSaleComponent implements OnInit {
         return;
 
       }
+
 
       // =============================================
       // SIN RESULTADOS
@@ -395,7 +443,9 @@ export class NewSaleComponent implements OnInit {
 
       event.preventDefault();
 
-      if (this.indiceSeleccionado > 0) {
+      if (
+        this.indiceSeleccionado > 0
+      ) {
 
         this.indiceSeleccionado--;
 
@@ -421,9 +471,7 @@ export class NewSaleComponent implements OnInit {
     producto: ProductItemSale
   ): void {
 
-    this.agregarProducto(
-      producto
-    );
+    this.agregarProducto(producto);
 
     this.code = '';
 
@@ -450,7 +498,7 @@ export class NewSaleComponent implements OnInit {
 
 
   // =====================================================
-  // AGREGAR PRODUCTO A LA VENTA
+  // AGREGAR PRODUCTO
   // =====================================================
 
   private agregarProducto(
@@ -458,7 +506,7 @@ export class NewSaleComponent implements OnInit {
   ): void {
 
     // =============================================
-    // CONTROL DE STOCK
+    // CONTROL STOCK
     // =============================================
 
     if (data.stock <= 0) {
@@ -473,18 +521,18 @@ export class NewSaleComponent implements OnInit {
 
 
     // =============================================
-    // BUSCAR SI YA EXISTE
+    // BUSCAR EXISTENTE
     // =============================================
 
     const existingProduct =
       this.products.find(
-        product =>
+        (product) =>
           product.id === data.id
       );
 
 
     // =============================================
-    // PRODUCTO YA EXISTE
+    // PRODUCTO EXISTENTE
     // =============================================
 
     if (existingProduct) {
@@ -525,7 +573,7 @@ export class NewSaleComponent implements OnInit {
 
 
   // =====================================================
-  // BUSQUEDA MANUAL
+  // BÚSQUEDA MANUAL
   // =====================================================
 
   onSubmit(): void {
@@ -533,14 +581,16 @@ export class NewSaleComponent implements OnInit {
     const query =
       this.code.trim();
 
+
     if (!query) {
 
       return;
 
     }
 
+
     // =============================================
-    // SI YA TENEMOS RESULTADOS
+    // SI YA HAY RESULTADOS
     // =============================================
 
     if (
@@ -570,22 +620,17 @@ export class NewSaleComponent implements OnInit {
 
     // =============================================
     // BÚSQUEDA MANUAL
-    //
-    // IMPORTANTE:
-    // Ya NO utilizamos findByCode.
-    //
-    // Nombre, código y barcode utilizan
-    // el mismo endpoint search-for-sale.
     // =============================================
 
     this.buscandoProductos = true;
 
     this.productService
+
       .searchForSale(query)
 
       .pipe(
 
-        catchError((error) => {
+        catchError((error: any) => {
 
           console.error(
             'Error buscando producto:',
@@ -607,6 +652,7 @@ export class NewSaleComponent implements OnInit {
       .subscribe((productos) => {
 
         this.buscandoProductos = false;
+
 
         // =============================================
         // NO ENCONTRADO
@@ -637,20 +683,20 @@ export class NewSaleComponent implements OnInit {
         this.productosEncontrados =
           productos;
 
-        this.mostrarResultados = true;
+        this.mostrarResultados =
+          true;
 
-        this.indiceSeleccionado = 0;
+        this.indiceSeleccionado =
+          0;
 
 
         // =============================================
-        // SI HAY UN ÚNICO RESULTADO
-        //
-        // Lo agregamos directamente.
-        // Esto hace que escribir un código exacto
-        // sea rapidísimo.
+        // UN ÚNICO RESULTADO
         // =============================================
 
-        if (productos.length === 1) {
+        if (
+          productos.length === 1
+        ) {
 
           this.seleccionarProducto(
             productos[0]
@@ -667,13 +713,11 @@ export class NewSaleComponent implements OnInit {
   // ELIMINAR PRODUCTO
   // =====================================================
 
-  deleteProduct(
-    id: number
-  ): void {
+  deleteProduct(id: number): void {
 
     this.products =
       this.products.filter(
-        product =>
+        (product) =>
           product.id !== id
       );
 
@@ -687,10 +731,12 @@ export class NewSaleComponent implements OnInit {
   getTotalQuantity(): number {
 
     return this.products.reduce(
+
       (total, product) =>
         total + product.quantity,
 
       0
+
     );
 
   }
@@ -703,12 +749,14 @@ export class NewSaleComponent implements OnInit {
   getTotalPrice(): number {
 
     return this.products.reduce(
+
       (total, product) =>
         total +
         product.salePrice *
         product.quantity,
 
       0
+
     );
 
   }
@@ -758,10 +806,51 @@ export class NewSaleComponent implements OnInit {
 
 
   // =====================================================
-  // NUEVA VENTA
+  // DOCUMENTOS SIN COBRO
+  // =====================================================
+
+  private esDocumentoSinCobro(): boolean {
+
+    return (
+
+      this.tipoDocumento ===
+      'PRESUPUESTO' ||
+
+      this.tipoDocumento ===
+      'REMITO' ||
+
+      this.tipoDocumento ===
+      'NOTA_CREDITO_A' ||
+
+      this.tipoDocumento ===
+      'NOTA_CREDITO_B' ||
+
+      this.tipoDocumento ===
+      'NOTA_CREDITO_C' ||
+
+      this.tipoDocumento ===
+      'NOTA_DEBITO_A' ||
+
+      this.tipoDocumento ===
+      'NOTA_DEBITO_B' ||
+
+      this.tipoDocumento ===
+      'NOTA_DEBITO_C'
+
+    );
+
+  }
+
+
+  // =====================================================
+  // NUEVA VENTA / NUEVO DOCUMENTO
   // =====================================================
 
   async newSale(): Promise<void> {
+
+    // =============================================
+    // VALIDAR PRODUCTOS
+    // =============================================
 
     if (
       this.products.length === 0
@@ -776,6 +865,10 @@ export class NewSaleComponent implements OnInit {
     }
 
 
+    // =============================================
+    // VALIDAR CLIENTE
+    // =============================================
+
     if (!this.selectedClient) {
 
       this.toastr.warning(
@@ -786,6 +879,36 @@ export class NewSaleComponent implements OnInit {
 
     }
 
+
+    // =============================================
+    // DOCUMENTOS SIN COBRO
+    // =============================================
+    //
+    // PRESUPUESTO
+    // REMITO
+    // NOTA CRÉDITO
+    // NOTA DÉBITO
+    //
+    // IMPORTANTE:
+    // NO SE GUARDA TODAVÍA.
+    //
+    // Primero mostramos confirmación.
+    // =============================================
+
+    if (
+      this.esDocumentoSinCobro()
+    ) {
+
+      this.confirmarGeneracionDocumento();
+
+      return;
+
+    }
+
+
+    // =============================================
+    // DOCUMENTOS QUE REQUIEREN COBRO
+    // =============================================
 
     const dialogRef =
       this.dialog.open(
@@ -802,7 +925,8 @@ export class NewSaleComponent implements OnInit {
 
           data: {
 
-            tipo: '',
+            tipoDocumento:
+              this.tipoDocumento,
 
             client:
               this.selectedClient.id,
@@ -821,6 +945,10 @@ export class NewSaleComponent implements OnInit {
       .subscribe(
         async (result) => {
 
+          // =============================================
+          // CANCELÓ
+          // =============================================
+
           if (
             !result ||
             !result.tipoCuenta
@@ -830,10 +958,6 @@ export class NewSaleComponent implements OnInit {
               'La venta no fue completada.'
             );
 
-            this.products = [];
-
-            this.code = '';
-
             return;
 
           }
@@ -842,35 +966,57 @@ export class NewSaleComponent implements OnInit {
           const formaDePago =
             result.paymentMethod;
 
+
           const tipoCuenta =
             result.tipoCuenta;
+
 
           const total =
             result.totalPrice;
 
+
           const idClient =
-            result.idCliente;
+            result.idCliente ??
+            this.selectedClient.id;
 
 
           try {
 
+            // =========================================
+            // CONTADO
+            // =========================================
+
             if (
-              tipoCuenta === 'CONTADO'
+              tipoCuenta ===
+              'CONTADO'
             ) {
 
               const sale =
                 this.buildSaleCommon(
+
                   tipoCuenta,
+
                   null,
+
                   formaDePago
+
                 );
+
 
               this.saveCommonSale(
                 sale
               );
 
-            } else if (
-              tipoCuenta === 'CTA_CTE'
+            }
+
+
+            // =========================================
+            // CUENTA CORRIENTE
+            // =========================================
+
+            else if (
+              tipoCuenta ===
+              'CTA_CTE'
             ) {
 
               const idCtaCte =
@@ -881,15 +1027,22 @@ export class NewSaleComponent implements OnInit {
 
               const sale =
                 this.buildSaleCommon(
+
                   tipoCuenta,
+
                   idCtaCte,
-                  formaDePago
+
+                  null
+
                 );
 
 
               this.saveCtaCteSale(
+
                 idClient,
+
                 total
+
               );
 
 
@@ -901,8 +1054,13 @@ export class NewSaleComponent implements OnInit {
 
           } catch (error) {
 
+            console.error(
+              'Error al procesar el documento:',
+              error
+            );
+
             this.toastr.error(
-              'Error al procesar la venta.'
+              'Error al procesar el documento.'
             );
 
           }
@@ -914,12 +1072,184 @@ export class NewSaleComponent implements OnInit {
 
 
   // =====================================================
+  // CONFIRMAR DOCUMENTO
+  // =====================================================
+
+  private confirmarGeneracionDocumento(): void {
+
+    const data:
+      ConfirmDocumentData = {
+
+      tipoDocumento:
+        this.tipoDocumento,
+
+      nombreDocumento:
+        this.getNombreDocumento(),
+
+      cliente:
+        this.obtenerNombreCliente(),
+
+      cantidadProductos:
+        this.getTotalQuantity(),
+
+      total:
+        this.getTotalPrice(),
+
+      mensaje:
+        this.obtenerMensajeConfirmacion()
+
+    };
+
+
+    const dialogRef =
+      this.dialog.open(
+        ConfirmDocumentComponent,
+        {
+
+          width: '620px',
+
+          maxWidth: '95vw',
+
+          disableClose: true,
+
+          autoFocus: false,
+
+          hasBackdrop: true,
+
+          closeOnNavigation: false,
+
+          data
+
+        }
+      );
+
+
+    dialogRef
+      .afterClosed()
+      .subscribe(
+        (confirmado: boolean) => {
+
+          // =========================================
+          // CANCELÓ
+          // =========================================
+
+          if (!confirmado) {
+
+            console.log(
+              'Generación de documento cancelada.'
+            );
+
+            return;
+
+          }
+
+
+          // =========================================
+          // CONFIRMÓ
+          // =========================================
+          //
+          // RECIÉN ACÁ SE CONSTRUYE
+          // Y SE GUARDA EL DOCUMENTO.
+          // =========================================
+
+          const sale =
+            this.buildSaleCommon(
+
+              'CONTADO',
+
+              null,
+
+              this.medioPago
+
+            );
+
+
+          console.log(
+            '=========================================='
+          );
+
+          console.log(
+            'CONFIRMACIÓN ACEPTADA'
+          );
+
+          console.log(
+            'GENERANDO DOCUMENTO:',
+            this.tipoDocumento
+          );
+
+          console.log(
+            '=========================================='
+          );
+
+
+          this.saveCommonSale(
+            sale
+          );
+
+        }
+      );
+
+  }
+
+
+  // =====================================================
+  // MENSAJE DE CONFIRMACIÓN
+  // =====================================================
+
+  private obtenerMensajeConfirmacion(): string {
+
+    switch (this.tipoDocumento) {
+
+      case 'PRESUPUESTO':
+
+        return (
+          'El presupuesto no afectará la caja ni descontará stock.'
+        );
+
+
+      case 'REMITO':
+
+        return (
+          'El remito registrará la salida de los productos y descontará el stock correspondiente.'
+        );
+
+
+      case 'NOTA_CREDITO_A':
+      case 'NOTA_CREDITO_B':
+      case 'NOTA_CREDITO_C':
+
+        return (
+          'La nota de crédito será registrada y se aplicarán las operaciones correspondientes al documento.'
+        );
+
+
+      case 'NOTA_DEBITO_A':
+      case 'NOTA_DEBITO_B':
+      case 'NOTA_DEBITO_C':
+
+        return (
+          'La nota de débito será registrada y se aplicarán las operaciones correspondientes al documento.'
+        );
+
+
+      default:
+
+        return (
+          'El documento será registrado en el sistema.'
+        );
+
+    }
+
+  }
+
+
+  // =====================================================
   // CUENTA CORRIENTE
   // =====================================================
 
   buscarCuentaIdCorrienteCliente(
     id: number
-  ): Promise<any> {
+  ): Promise<number | null> {
 
     return new Promise(
       (resolve, reject) => {
@@ -931,7 +1261,8 @@ export class NewSaleComponent implements OnInit {
             next: (data) => {
 
               const idCuenta =
-                data.cuentaCorriente?.id;
+                data.cuentaCorriente?.id ??
+                null;
 
               console.log(
                 '✅ ID cuenta corriente:',
@@ -942,7 +1273,12 @@ export class NewSaleComponent implements OnInit {
 
             },
 
-            error: (err) => {
+            error: (err: any) => {
+
+              console.error(
+                'Error obteniendo cuenta corriente:',
+                err
+              );
 
               reject(err);
 
@@ -961,7 +1297,7 @@ export class NewSaleComponent implements OnInit {
   // =====================================================
 
   saveCtaCteSale(
-    tipoDeCuenta: any,
+    idCliente: number,
     precioTotal: number
   ): void {
 
@@ -978,7 +1314,7 @@ export class NewSaleComponent implements OnInit {
 
     this.ctaCteService
       .updateCtaCte(
-        tipoDeCuenta,
+        idCliente,
         payload
       )
       .subscribe({
@@ -992,7 +1328,7 @@ export class NewSaleComponent implements OnInit {
 
         },
 
-        error: (error) => {
+        error: (error: any) => {
 
           console.error(
             'Error al actualizar:',
@@ -1021,7 +1357,7 @@ export class NewSaleComponent implements OnInit {
     doc.setFontSize(18);
 
     doc.text(
-      'Factura de Venta',
+      this.getNombreDocumento(),
       14,
       20
     );
@@ -1042,7 +1378,7 @@ export class NewSaleComponent implements OnInit {
     );
 
     doc.text(
-      `Número de ticket: ${saleCommon.numero}`,
+      `Número de comprobante: ${saleCommon.numero}`,
       14,
       50
     );
@@ -1058,6 +1394,7 @@ export class NewSaleComponent implements OnInit {
 
 
     doc.setFontSize(10);
+
 
     doc.text(
       'Descripción',
@@ -1136,16 +1473,88 @@ export class NewSaleComponent implements OnInit {
 
 
     doc.text(
-      `Total: $${saleCommon.subTotal.toFixed(2)}`,
+      `Total: $${saleCommon.total.toFixed(2)}`,
       14,
       yPosition
     );
 
 
     doc.save(
-      `Factura_${saleCommon.numero}.pdf`
+      `${this.getNombreDocumento()}_${saleCommon.numero}.pdf`
     );
 
+  }
+
+
+  // =====================================================
+  // NOMBRE DOCUMENTO
+  // =====================================================
+
+  private getNombreDocumento(): string {
+
+    switch (this.tipoDocumento) {
+
+      case 'FACTURA_A':
+        return 'Factura A';
+
+      case 'FACTURA_B':
+        return 'Factura B';
+
+      case 'FACTURA_C':
+        return 'Factura C';
+
+      case 'PRESUPUESTO':
+        return 'Presupuesto';
+
+      case 'REMITO':
+        return 'Remito';
+
+      case 'NOTA_CREDITO_A':
+        return 'Nota de Crédito A';
+
+      case 'NOTA_CREDITO_B':
+        return 'Nota de Crédito B';
+
+      case 'NOTA_CREDITO_C':
+        return 'Nota de Crédito C';
+
+      case 'NOTA_DEBITO_A':
+        return 'Nota de Débito A';
+
+      case 'NOTA_DEBITO_B':
+        return 'Nota de Débito B';
+
+      case 'NOTA_DEBITO_C':
+        return 'Nota de Débito C';
+
+      default:
+        return 'Comprobante';
+
+    }
+
+  }
+
+
+  // =====================================================
+  // NORMALIZAR MEDIO DE PAGO
+  // =====================================================
+
+  private normalizarMedioPago(
+    medioPago: string | null | undefined
+  ): NonNullable<SaleCommon['medioPago']> {
+    switch (medioPago) {
+      case 'EFECTIVO':
+      case 'TRANSFERENCIA':
+      case 'MERCADO_PAGO':
+      case 'TARJETA':
+      case 'TARJETA_CREDITO':
+      case 'TARJETA_DEBITO':
+      case 'CHEQUE':
+      case 'OTRO':
+        return medioPago;
+      default:
+        return 'EFECTIVO';
+    }
   }
 
 
@@ -1154,37 +1563,111 @@ export class NewSaleComponent implements OnInit {
   // =====================================================
 
   buildSaleCommon(
-    tipo: string,
-    ctaCte: any,
-    paymentMethod?: string
+
+    tipoCuenta: string,
+
+    ctaCte: number | null,
+
+    paymentMethod?: string | null
+
   ): SaleCommon {
+
+    // =============================================
+    // CONDICIÓN DE VENTA
+    // =============================================
+
+    const condicionVenta =
+      tipoCuenta === 'CTA_CTE'
+        ? 'CTA_CTE'
+        : 'CONTADO';
+
+
+    // =============================================
+    // MEDIO DE PAGO
+    // =============================================
+
+    const medioPago: SaleCommon['medioPago'] =
+      condicionVenta === 'CONTADO'
+        ? this.normalizarMedioPago(paymentMethod ?? this.medioPago)
+        : null;
+
+
+    // =============================================
+    // CONSTRUIR DOCUMENTO
+    // =============================================
 
     const sale: SaleCommon = {
 
-      tipo: 'FACTURA',
+      // ===========================================
+      // TIPO DOCUMENTO
+      // ===========================================
 
-      stateTicket:
-        tipo === 'CTA_CTE'
-          ? false
-          : true,
+      tipoDocumento:
+        this.tipoDocumento,
 
-      ctaCte:
-        ctaCte,
 
-      saleCondition:
-        tipo,
+      // ===========================================
+      // CLIENTE
+      // ===========================================
 
       client:
         this.selectedClient.id,
 
+
+      // ===========================================
+      // CUENTA CORRIENTE
+      // ===========================================
+
+      ctaCte:
+        ctaCte,
+
+
+      // ===========================================
+      // CONDICIÓN
+      // ===========================================
+
+      condicionVenta:
+        condicionVenta,
+
+
+      // ===========================================
+      // MEDIO DE PAGO
+      // ===========================================
+
+      medioPago:
+        medioPago,
+
+
+      // ===========================================
+      // NÚMERO
+      // ===========================================
+      //
+      // Actualmente conservamos la generación
+      // temporal que ya tenía el componente.
+      //
+      // Más adelante podemos pasar completamente
+      // la numeración al backend.
+      // ===========================================
+
       numero:
-        Math.floor(
-          Math.random() *
-          1000000
+        String(
+          Math.floor(
+            Math.random() * 1000000
+          )
         ),
+
+
+      // ===========================================
+      // OBSERVACIÓN
+      // ===========================================
 
       observation:
         'Observación de la venta',
+
+
+      // ===========================================
+      // IMPORTES
+      // ===========================================
 
       subTotal:
         this.getTotalPrice(),
@@ -1192,8 +1675,10 @@ export class NewSaleComponent implements OnInit {
       total:
         this.getTotalPrice(),
 
-      paymentMethod:
-        paymentMethod || null,
+
+      // ===========================================
+      // DETALLES
+      // ===========================================
 
       ticketDetails:
 
@@ -1204,7 +1689,7 @@ export class NewSaleComponent implements OnInit {
               product.quantity,
 
             price:
-              product.salePrice,
+              product.price,
 
             idProduct:
               product.id,
@@ -1219,7 +1704,7 @@ export class NewSaleComponent implements OnInit {
               product.salePrice,
 
             marca:
-              String(product.marca),
+              product.marca?.marca ?? '',
 
             iva:
               product.iva,
@@ -1235,7 +1720,19 @@ export class NewSaleComponent implements OnInit {
 
 
     console.log(
+      '=========================================='
+    );
+
+    console.log(
+      'DOCUMENTO A ENVIAR'
+    );
+
+    console.log(
       sale
+    );
+
+    console.log(
+      '=========================================='
     );
 
 
@@ -1245,16 +1742,14 @@ export class NewSaleComponent implements OnInit {
 
 
   // =====================================================
-  // GUARDAR VENTA
+  // GUARDAR DOCUMENTO
   // =====================================================
 
   saveCommonSale(
     saleCommon: SaleCommon
   ): void {
 
-    if (
-      !this.selectedClient
-    ) {
+    if (!this.selectedClient) {
 
       this.toastr.error(
         'Debe seleccionar un cliente.'
@@ -1265,58 +1760,466 @@ export class NewSaleComponent implements OnInit {
     }
 
 
+    console.log(
+      '=========================================='
+    );
+
+    console.log(
+      'GUARDANDO DOCUMENTO'
+    );
+
+    console.log(
+      '=========================================='
+    );
+
+    console.log(
+      'Tipo documento:',
+      this.tipoDocumento
+    );
+
+    console.log(
+      'Número:',
+      saleCommon.numero
+    );
+
+    console.log(
+      'Cliente:',
+      saleCommon.client
+    );
+
+    console.log(
+      'Condición:',
+      saleCommon.condicionVenta
+    );
+
+    console.log(
+      'Medio pago:',
+      saleCommon.medioPago
+    );
+
+    console.log(
+      'Total:',
+      saleCommon.total
+    );
+
+    console.log(
+      '=========================================='
+    );
+
+
     this.commonSale
       .saveCommon(saleCommon)
       .subscribe({
 
-        next: () => {
+        // =============================================
+        // ÉXITO
+        // =============================================
 
-          this.toastr.success(
-            'Venta guardada con éxito'
+        next: (response: any) => {
+
+          console.log(
+            '=========================================='
+          );
+
+          console.log(
+            'DOCUMENTO GENERADO CORRECTAMENTE'
+          );
+
+          console.log(
+            '=========================================='
+          );
+
+          console.log(
+            'Respuesta backend:',
+            response
           );
 
 
-          const confirmPrint =
-            window.confirm(
-              '¿Desea imprimir el ticket?'
+          // =============================================
+          // NÚMERO BACKEND
+          // =============================================
+
+          const numeroGenerado =
+            response?.numero ??
+            response?.number ??
+            response?.numeroComprobante ??
+            saleCommon.numero;
+
+
+          // =============================================
+          // ESTADO
+          // =============================================
+
+          const estadoGenerado =
+            response?.estado ??
+            response?.state ??
+            this.obtenerEstadoDocumento();
+
+          const numeroFinal =
+            response?.numero ??
+            response?.number ??
+            response?.numeroComprobante ??
+            saleCommon.numero;
+
+          const estadoFinal =
+            response?.estado ??
+            response?.state ??
+            this.obtenerEstadoDocumento();
+
+          console.log('==========================================');
+          console.log('DOCUMENTO GENERADO CORRECTAMENTE');
+          console.log('Tipo:', this.getNombreDocumento());
+          console.log('Número:', numeroFinal);
+          console.log('Estado:', estadoFinal);
+          console.log('==========================================');
+
+          this.toastr.success(
+            `${this.getNombreDocumento()} N° ${numeroFinal} generado correctamente.`
+          );
+
+          // =============================================
+          // GENERAR PDF
+          // =============================================
+          // El documento ya fue guardado correctamente
+          // en el backend. Recién ahora generamos el PDF.
+          // Usamos saleCommon porque contiene exactamente
+          // los productos y totales que fueron enviados.
+          // =============================================
+
+          try {
+
+            this.generatePDF(saleCommon);
+
+          } catch (pdfError: any) {
+
+            console.error(
+              'Error generando PDF:',
+              pdfError
             );
 
-
-          if (confirmPrint) {
-
-            this.printTicket(
-              saleCommon
-            );
-
-          } else {
-
-            this.generatePDF(
-              saleCommon
+            this.toastr.warning(
+              'El documento fue guardado, pero no se pudo generar el PDF.'
             );
 
           }
 
+          // =============================================
+          // LIMPIAR FORMULARIO
+          // =============================================
 
-          this.products = [];
+          this.limpiarVenta();
 
-          this.code = '';
 
-        },
+          // =============================================
+          // ERROR
+        // =============================================
 
-        error: (error) => {
+        error: (error: any) => {
 
           console.error(
-            'Error guardando venta:',
+            '=========================================='
+          );
+
+          console.error(
+            'ERROR GUARDANDO DOCUMENTO'
+          );
+
+          console.error(
             error
           );
 
+          console.error(
+            '=========================================='
+          );
+
+
+          const mensaje =
+            error?.error?.message ??
+            error?.error?.error ??
+            'Hubo un error al guardar el documento.';
+
+
           this.toastr.error(
-            'Hubo un error al guardar la venta'
+            mensaje
           );
 
         }
-
+}
       });
+
+  }
+
+
+  // =====================================================
+  // NOMBRE CLIENTE
+  // =====================================================
+
+  private obtenerNombreCliente(): string {
+
+    if (!this.selectedClient) {
+
+      return 'Consumidor Final';
+
+    }
+
+
+    const nombre =
+      this.selectedClient.name ??
+      '';
+
+
+    const apellido =
+      this.selectedClient.lastName ??
+      '';
+
+
+    const nombreCompleto =
+      `${nombre} ${apellido}`.trim();
+
+
+    return (
+      nombreCompleto ||
+      'Consumidor Final'
+    );
+
+  }
+
+
+  // =====================================================
+  // ESTADO DOCUMENTO
+  // =====================================================
+
+  private obtenerEstadoDocumento(): string {
+
+    switch (this.tipoDocumento) {
+
+      case 'PRESUPUESTO':
+
+        return 'BORRADOR';
+
+
+      case 'REMITO':
+
+        return 'EMITIDO';
+
+
+      case 'NOTA_CREDITO_A':
+      case 'NOTA_CREDITO_B':
+      case 'NOTA_CREDITO_C':
+
+        return 'EMITIDO';
+
+
+      case 'NOTA_DEBITO_A':
+      case 'NOTA_DEBITO_B':
+      case 'NOTA_DEBITO_C':
+
+        return 'EMITIDO';
+
+
+      case 'FACTURA_A':
+      case 'FACTURA_B':
+      case 'FACTURA_C':
+
+        return 'PAGADO';
+
+
+      default:
+
+        return 'EMITIDO';
+
+    }
+
+  }
+
+
+  // =====================================================
+  // MENSAJE DOCUMENTO
+  // =====================================================
+
+  private obtenerMensajeDocumento(): string {
+
+    switch (this.tipoDocumento) {
+
+      case 'PRESUPUESTO':
+
+        return (
+          'El presupuesto fue generado. No afecta caja ni stock.'
+        );
+
+
+      case 'REMITO':
+
+        return (
+          'El remito fue generado correctamente.'
+        );
+
+
+      case 'NOTA_CREDITO_A':
+      case 'NOTA_CREDITO_B':
+      case 'NOTA_CREDITO_C':
+
+        return (
+          'La nota de crédito fue generada correctamente.'
+        );
+
+
+      case 'NOTA_DEBITO_A':
+      case 'NOTA_DEBITO_B':
+      case 'NOTA_DEBITO_C':
+
+        return (
+          'La nota de débito fue generada correctamente.'
+        );
+
+
+      case 'FACTURA_A':
+      case 'FACTURA_B':
+      case 'FACTURA_C':
+
+        return (
+          'La factura fue generada y procesada correctamente.'
+        );
+
+
+      default:
+
+        return (
+          'El documento fue generado correctamente.'
+        );
+
+    }
+
+  }
+
+
+  // =====================================================
+  // ¿ACTUALIZA CAJA?
+  // =====================================================
+
+  private documentoActualizaCaja():
+    boolean | undefined {
+
+    switch (this.tipoDocumento) {
+
+      case 'FACTURA_A':
+      case 'FACTURA_B':
+      case 'FACTURA_C':
+
+        return true;
+
+
+      case 'PRESUPUESTO':
+      case 'REMITO':
+      case 'NOTA_CREDITO_A':
+      case 'NOTA_CREDITO_B':
+      case 'NOTA_CREDITO_C':
+      case 'NOTA_DEBITO_A':
+      case 'NOTA_DEBITO_B':
+      case 'NOTA_DEBITO_C':
+
+        return undefined;
+
+
+      default:
+
+        return undefined;
+
+    }
+
+  }
+
+
+  // =====================================================
+  // ¿ACTUALIZA STOCK?
+  // =====================================================
+
+  private documentoActualizaStock():
+    boolean | undefined {
+
+    switch (this.tipoDocumento) {
+
+      // =============================================
+      // PRESUPUESTO
+      // =============================================
+
+      case 'PRESUPUESTO':
+
+        return false;
+
+
+      // =============================================
+      // REMITO
+      // =============================================
+
+      case 'REMITO':
+
+        return true;
+
+
+      // =============================================
+      // NOTA CRÉDITO
+      // =============================================
+
+      case 'NOTA_CREDITO_A':
+      case 'NOTA_CREDITO_B':
+      case 'NOTA_CREDITO_C':
+
+        return true;
+
+
+      // =============================================
+      // NOTA DÉBITO
+      // =============================================
+
+      case 'NOTA_DEBITO_A':
+      case 'NOTA_DEBITO_B':
+      case 'NOTA_DEBITO_C':
+
+        return true;
+
+
+      // =============================================
+      // FACTURAS
+      // =============================================
+
+      case 'FACTURA_A':
+      case 'FACTURA_B':
+      case 'FACTURA_C':
+
+        return true;
+
+
+      default:
+
+        return undefined;
+
+    }
+
+  }
+
+
+  // =====================================================
+  // LIMPIAR VENTA
+  // =====================================================
+
+  private limpiarVenta(): void {
+
+    this.products = [];
+
+    this.code = '';
+
+    this.productosEncontrados = [];
+
+    this.mostrarResultados = false;
+
+    this.indiceSeleccionado = -1;
+
+    this.saleCommon = undefined;
+
+    this.selectedClient = undefined;
+
+    this.buscandoProductos = false;
 
   }
 
@@ -1331,6 +2234,7 @@ export class NewSaleComponent implements OnInit {
   ): void {
 
     const styles = `
+
       <style>
 
         @page {
@@ -1418,6 +2322,7 @@ export class NewSaleComponent implements OnInit {
         }
 
       </style>
+
     `;
 
 
@@ -1429,13 +2334,21 @@ export class NewSaleComponent implements OnInit {
 
           <tr>
 
-            <th>Producto</th>
+            <th>
+              Producto
+            </th>
 
-            <th>Cant</th>
+            <th>
+              Cant
+            </th>
 
-            <th>Precio</th>
+            <th>
+              Precio
+            </th>
 
-            <th>SubTotal</th>
+            <th>
+              SubTotal
+            </th>
 
           </tr>
 
@@ -1443,35 +2356,37 @@ export class NewSaleComponent implements OnInit {
 
         <tbody>
 
-          ${
-            saleCommon.ticketDetails
-              .map(
-                d => `
+          ${saleCommon.ticketDetails
 
-                  <tr>
+            .map(
 
-                    <td>
-                      ${d.productName}
-                    </td>
+              (d) => `
 
-                    <td>
-                      ${d.amount}
-                    </td>
+                <tr>
 
-                    <td>
-                      $${d.price.toFixed(2)}
-                    </td>
+                  <td>
+                    ${d.productName}
+                  </td>
 
-                    <td>
-                      $${d.subTotal.toFixed(2)}
-                    </td>
+                  <td>
+                    ${d.amount}
+                  </td>
 
-                  </tr>
+                  <td>
+                    $${d.price.toFixed(2)}
+                  </td>
 
-                `
-              )
-              .join('')
-          }
+                  <td>
+                    $${d.subTotal.toFixed(2)}
+                  </td>
+
+                </tr>
+
+              `
+
+            )
+
+            .join('')}
 
         </tbody>
 
@@ -1491,11 +2406,16 @@ export class NewSaleComponent implements OnInit {
         </head>
 
         <body
+
           onload="
+
             window.print();
+
             window.onafterprint =
               () => window.close();
+
           "
+
         >
 
           <div class="ticket-pagina">
@@ -1508,6 +2428,7 @@ export class NewSaleComponent implements OnInit {
               BON-BINI
             </h2>
 
+
             <p
               style="
                 text-align: center;
@@ -1515,6 +2436,7 @@ export class NewSaleComponent implements OnInit {
             >
               CUIT 27-29625726-0
             </p>
+
 
             <p
               style="
@@ -1524,7 +2446,17 @@ export class NewSaleComponent implements OnInit {
               COMPROBANTE NO VALIDO COMO FACTURA X
             </p>
 
+
             <hr>
+
+
+            <p>
+
+              Documento:
+              ${this.getNombreDocumento()}
+
+            </p>
+
 
             <p>
 
@@ -1533,12 +2465,14 @@ export class NewSaleComponent implements OnInit {
 
             </p>
 
+
             <p>
 
               Cliente:
               ${this.selectedClient?.name}
 
             </p>
+
 
             <p>
 
@@ -1547,11 +2481,15 @@ export class NewSaleComponent implements OnInit {
 
             </p>
 
+
             <hr>
+
 
             ${itemsHTML}
 
+
             <hr>
+
 
             <div class="row">
 
@@ -1560,12 +2498,14 @@ export class NewSaleComponent implements OnInit {
               </strong>
 
               <strong>
-                $${saleCommon.total?.toFixed(2)}
+                $${saleCommon.total.toFixed(2)}
               </strong>
 
             </div>
 
+
             <hr>
+
 
             <p
               style="
@@ -1574,6 +2514,7 @@ export class NewSaleComponent implements OnInit {
             >
               ¡Gracias por su compra!
             </p>
+
 
           </div>
 
@@ -1654,6 +2595,102 @@ export class NewSaleComponent implements OnInit {
     this.deleteProduct(
       product.id
     );
+
+  }
+
+
+  // =====================================================
+  // TEXTO BOTÓN
+  // =====================================================
+
+  get textoAccionDocumento(): string {
+
+    switch (this.tipoDocumento) {
+
+      case 'FACTURA_A':
+      case 'FACTURA_B':
+      case 'FACTURA_C':
+
+        return 'Cobrar venta';
+
+
+      case 'PRESUPUESTO':
+
+        return 'Generar presupuesto';
+
+
+      case 'REMITO':
+
+        return 'Generar remito';
+
+
+      case 'NOTA_CREDITO_A':
+      case 'NOTA_CREDITO_B':
+      case 'NOTA_CREDITO_C':
+
+        return 'Generar nota de crédito';
+
+
+      case 'NOTA_DEBITO_A':
+      case 'NOTA_DEBITO_B':
+      case 'NOTA_DEBITO_C':
+
+        return 'Generar nota de débito';
+
+
+      default:
+
+        return 'Generar documento';
+
+    }
+
+  }
+
+
+  // =====================================================
+  // ICONO BOTÓN
+  // =====================================================
+
+  get iconoAccionDocumento(): string {
+
+    switch (this.tipoDocumento) {
+
+      case 'FACTURA_A':
+      case 'FACTURA_B':
+      case 'FACTURA_C':
+
+        return 'payments';
+
+
+      case 'PRESUPUESTO':
+
+        return 'request_quote';
+
+
+      case 'REMITO':
+
+        return 'local_shipping';
+
+
+      case 'NOTA_CREDITO_A':
+      case 'NOTA_CREDITO_B':
+      case 'NOTA_CREDITO_C':
+
+        return 'assignment_return';
+
+
+      case 'NOTA_DEBITO_A':
+      case 'NOTA_DEBITO_B':
+      case 'NOTA_DEBITO_C':
+
+        return 'request_quote';
+
+
+      default:
+
+        return 'description';
+
+    }
 
   }
 

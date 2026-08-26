@@ -1,0 +1,288 @@
+<div class="impuestos-container">
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <div class="impuestos-header">
+
+    <div>
+
+      <h3>
+
+        <mat-icon>
+          receipt_long
+        </mat-icon>
+
+        Impuestos adicionales
+
+      </h3>
+
+      <p>
+        Ingresá IIBB, percepciones, retenciones
+        u otros impuestos de la factura.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       FORMULARIO
+  ====================================================== -->
+
+  <div class="form-impuesto">
+
+    <mat-form-field
+      appearance="outline"
+      class="campo-tipo">
+
+      <mat-label>
+        Tipo de impuesto
+      </mat-label>
+
+      <mat-select
+        [(ngModel)]="nuevoTipo">
+
+        <mat-option
+          *ngFor="
+            let tipo of tiposImpuesto
+          "
+          [value]="tipo.value">
+
+          {{ tipo.label }}
+
+        </mat-option>
+
+      </mat-select>
+
+    </mat-form-field>
+
+
+    <mat-form-field
+      appearance="outline"
+      class="campo-descripcion">
+
+      <mat-label>
+        Descripción
+      </mat-label>
+
+      <input
+        matInput
+        [(ngModel)]="nuevoDescripcion"
+        placeholder="Ej. IIBB Chaco">
+
+    </mat-form-field>
+
+
+    <mat-form-field
+      appearance="outline"
+      class="campo-porcentaje">
+
+      <mat-label>
+        Porcentaje
+      </mat-label>
+
+      <input
+        matInput
+        type="number"
+        min="0"
+        max="100"
+        step="0.01"
+        [(ngModel)]="nuevoPorcentaje">
+
+      <span matSuffix>
+        %
+      </span>
+
+    </mat-form-field>
+
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="button"
+      class="btn-agregar"
+      [disabled]="
+        !nuevoTipo ||
+        !nuevoPorcentaje ||
+        nuevoPorcentaje <= 0 ||
+        nuevoPorcentaje > 100
+      "
+      (click)="agregarImpuesto()">
+
+      <mat-icon>
+        add
+      </mat-icon>
+
+      Agregar
+
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       SIN IMPUESTOS
+  ====================================================== -->
+
+  <div
+    class="sin-impuestos"
+    *ngIf="impuestos.length === 0">
+
+    <mat-icon>
+      receipt
+    </mat-icon>
+
+    <div>
+
+      <strong>
+        No hay impuestos adicionales
+      </strong>
+
+      <span>
+        Si la factura no posee IIBB,
+        percepciones u otros impuestos,
+        podés continuar sin agregar ninguno.
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       LISTADO
+  ====================================================== -->
+
+  <div
+    class="tabla-impuestos"
+    *ngIf="impuestos.length > 0">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Impuesto
+          </th>
+
+          <th>
+            Descripción
+          </th>
+
+          <th>
+            Base imponible
+          </th>
+
+          <th>
+            %
+          </th>
+
+          <th>
+            Importe
+          </th>
+
+          <th>
+            Acción
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr
+          *ngFor="
+            let impuesto of impuestos;
+            let i = index
+          ">
+
+          <td>
+
+            <strong>
+              {{ impuesto.tipo }}
+            </strong>
+
+          </td>
+
+          <td>
+
+            {{ impuesto.descripcion }}
+
+          </td>
+
+          <td>
+
+            {{
+              impuesto.baseImponible
+                | currency:'ARS'
+            }}
+
+          </td>
+
+          <td>
+
+            {{ impuesto.porcentaje }}%
+
+          </td>
+
+          <td class="importe">
+
+            {{
+              impuesto.importe
+                | currency:'ARS'
+            }}
+
+          </td>
+
+          <td>
+
+            <button
+              mat-icon-button
+              color="warn"
+              type="button"
+              matTooltip="Eliminar impuesto"
+              (click)="eliminarImpuesto(i)">
+
+              <mat-icon>
+                delete
+              </mat-icon>
+
+            </button>
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+
+    <!-- ===================================================
+         TOTAL
+    ==================================================== -->
+
+    <div class="total-impuestos">
+
+      <span>
+        Total impuestos adicionales
+      </span>
+
+      <strong>
+        {{
+          totalImpuestos
+            | currency:'ARS'
+        }}
+      </strong>
+
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,284 @@
+<div class="dialog-container">
+
+  <header class="dialog-header">
+
+    <div class="header-title">
+
+      <div class="header-icon">
+        <mat-icon>payments</mat-icon>
+      </div>
+
+      <div>
+        <h2>Historial de pagos</h2>
+
+        <p>
+          Factura:
+          <strong>{{ obtenerNumeroFactura() }}</strong>
+        </p>
+      </div>
+
+    </div>
+
+    <button
+      mat-icon-button
+      type="button"
+      (click)="cerrar()"
+      aria-label="Cerrar">
+
+      <mat-icon>close</mat-icon>
+
+    </button>
+
+  </header>
+
+
+  <div class="loading-container" *ngIf="cargando">
+
+    <mat-spinner diameter="46"></mat-spinner>
+
+    <p>Cargando historial de pagos...</p>
+
+  </div>
+
+
+  <main class="contenido" *ngIf="!cargando && !error">
+
+    <section class="resumen">
+
+      <div class="resumen-card total">
+        <span>Total factura</span>
+        <strong>
+          {{ totalFactura | currency:'ARS':'symbol':'1.2-2' }}
+        </strong>
+      </div>
+
+      <div class="resumen-card pagado">
+        <span>Total pagado</span>
+        <strong>
+          {{ totalPagado | currency:'ARS':'symbol':'1.2-2' }}
+        </strong>
+      </div>
+
+      <div class="resumen-card saldo">
+        <span>Saldo pendiente</span>
+        <strong>
+          {{ saldo | currency:'ARS':'symbol':'1.2-2' }}
+        </strong>
+      </div>
+
+      <div class="resumen-card cantidad">
+        <span>Cantidad de pagos</span>
+        <strong>{{ cantidadPagos }}</strong>
+      </div>
+
+    </section>
+
+
+    <section class="historial">
+
+      <div class="section-header">
+
+        <h3>Detalle de pagos</h3>
+
+        <span>
+          Cada registro corresponde a un pago de esta factura.
+        </span>
+
+      </div>
+
+
+      <div class="sin-pagos" *ngIf="pagos.length === 0">
+
+        <mat-icon>payments</mat-icon>
+
+        <h3>No hay pagos registrados</h3>
+
+        <p>
+          Esta factura todavía no tiene pagos asociados.
+        </p>
+
+      </div>
+
+
+      <div class="pagos-lista" *ngIf="pagos.length > 0">
+
+        <article
+          class="pago-card"
+          *ngFor="let pago of pagos; let i = index">
+
+          <div class="pago-top">
+
+            <div class="pago-numero">
+              #{{ i + 1 }}
+            </div>
+
+            <div class="pago-medio">
+
+              <div class="medio-icon">
+                <mat-icon>
+                  {{ iconoMedioPago(pago.medioPago) }}
+                </mat-icon>
+              </div>
+
+              <div>
+                <strong>
+                  {{ nombreMedioPago(pago.medioPago) }}
+                </strong>
+
+                <span>
+                  {{ pago.fecha | date:'dd/MM/yyyy' }}
+                </span>
+              </div>
+
+            </div>
+
+            <div class="pago-monto">
+
+              <strong>
+                {{ pago.monto | currency:'ARS':'symbol':'1.2-2' }}
+              </strong>
+
+            </div>
+
+            <span
+              class="estado"
+              [ngClass]="claseEstado(pago.estado)">
+
+              {{ pago.estado || 'SIN ESTADO' }}
+
+            </span>
+
+          </div>
+
+
+          <div class="pago-info">
+
+            <div>
+              <span>Tipo de pago</span>
+              <strong>{{ pago.tipoPago || '-' }}</strong>
+            </div>
+
+            <div>
+              <span>Aplicado</span>
+              <strong>{{ pago.aplicado ? 'Sí' : 'No' }}</strong>
+            </div>
+
+            <div>
+              <span>Pagado</span>
+              <strong>{{ pago.pagado ? 'Sí' : 'No' }}</strong>
+            </div>
+
+          </div>
+
+
+          <div class="cheque" *ngIf="pago.cheque">
+
+            <div class="cheque-title">
+
+              <mat-icon>receipt_long</mat-icon>
+
+              <strong>Datos del cheque</strong>
+
+            </div>
+
+            <div class="cheque-grid">
+
+              <div>
+                <span>Número</span>
+                <strong>
+                  {{ pago.cheque.numeroCheque || '-' }}
+                </strong>
+              </div>
+
+              <div>
+                <span>Banco</span>
+                <strong>
+                  {{ pago.cheque.banco || '-' }}
+                </strong>
+              </div>
+
+              <div>
+                <span>Titular</span>
+                <strong>
+                  {{ pago.cheque.titularCheque || '-' }}
+                </strong>
+              </div>
+
+              <div>
+                <span>Quién entregó</span>
+                <strong>
+                  {{ pago.cheque.quienEntrego || '-' }}
+                </strong>
+              </div>
+
+              <div>
+                <span>Fecha emisión</span>
+                <strong>
+                  {{ pago.cheque.fechaEmision | date:'dd/MM/yyyy' }}
+                </strong>
+              </div>
+
+              <div>
+                <span>Fecha cobro</span>
+                <strong>
+                  {{ pago.cheque.fechaCobro | date:'dd/MM/yyyy' }}
+                </strong>
+              </div>
+
+              <div>
+                <span>Estado cheque</span>
+                <strong>
+                  {{ pago.cheque.estado || '-' }}
+                </strong>
+              </div>
+
+            </div>
+
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <div class="error-container" *ngIf="!cargando && error">
+
+    <mat-icon>error_outline</mat-icon>
+
+    <h3>No se pudo cargar el historial</h3>
+
+    <p>
+      Ocurrió un problema al obtener los pagos de la factura.
+    </p>
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="button"
+      (click)="cerrar()">
+
+      Cerrar
+
+    </button>
+
+  </div>
+
+
+  <footer class="dialog-footer">
+
+    <button
+      mat-stroked-button
+      type="button"
+      (click)="cerrar()">
+
+      Cerrar
+
+    </button>
+
+  </footer>
+
+</div>

@@ -32,8 +32,8 @@
 
             <th>
               {{ data.tipo === 'INGRESO'
-                  ? 'Forma de Pago'
-                  : 'Categoría' }}
+              ? 'Forma de Pago'
+              : 'Categoría' }}
             </th>
 
             <th>Monto</th>
@@ -64,7 +64,14 @@
 
             <td>
 
-              <span *ngIf="data.tipo==='INGRESO'">
+              <span *ngIf="data.tipo === 'INGRESO'" class="medio-pago"
+                [class.medio-cheque]="item.medioPago === 'CHEQUE'">
+
+                <span *ngIf="item.medioPago === 'CHEQUE'" class="icono-cheque">
+
+                  🧾
+
+                </span>
 
                 {{ item.medioPago }}
 
@@ -86,15 +93,7 @@
 
             <td>
 
-              <button
-
-                mat-icon-button
-
-                color="primary"
-
-                matTooltip="Ver detalle"
-
-                (click)="getDetalleVenta(item)">
+              <button mat-icon-button color="primary" matTooltip="Ver detalle" (click)="getDetalleVenta(item)">
 
                 <mat-icon>
 
@@ -114,71 +113,82 @@
 
     </div>
 
-  <div class="cards-resumen">
+    <div class="cards-resumen">
 
-  <div class="card-resumen contado">
-    <div class="icono">💵</div>
-    <div class="titulo-card">Contado</div>
-    <div class="valor">
-      {{ totalContado | currency:'ARS' }}
+      <div class="card-resumen contado">
+        <div class="icono">💵</div>
+        <div class="titulo-card">Contado</div>
+        <div class="valor">
+          {{ totalContado | currency:'ARS' }}
+        </div>
+      </div>
+
+      <div class="card-resumen transferencia">
+        <div class="icono">💳</div>
+        <div class="titulo-card">Transferencia</div>
+        <div class="valor">
+          {{ totalTransferencia | currency:'ARS' }}
+        </div>
+      </div>
+
+      <div class="card-resumen mercado">
+        <div class="icono">📱</div>
+        <div class="titulo-card">Mercado Pago</div>
+        <div class="valor">
+          {{ totalMercadoPago | currency:'ARS' }}
+        </div>
+      </div>
+
+      <div class="card-resumen cta">
+        <div class="icono">📒</div>
+        <div class="titulo-card">Cuenta Corriente</div>
+        <div class="valor">
+          {{ totalCtaCte | currency:'ARS' }}
+        </div>
+      </div>
+      <div class="card-resumen cheque">
+
+        <div class="icono">
+          🧾
+        </div>
+
+        <div class="titulo-card">
+          Cheques
+        </div>
+
+        <div class="valor">
+
+          {{ totalCheque | currency:'ARS' }}
+
+        </div>
+
+      </div>
+
     </div>
-  </div>
 
-  <div class="card-resumen transferencia">
-    <div class="icono">💳</div>
-    <div class="titulo-card">Transferencia</div>
-    <div class="valor">
-      {{ totalTransferencia | currency:'ARS' }}
+    <div class="card-total">
+
+      <div class="texto-total">
+
+        {{ data.tipo === 'INGRESO'
+        ? '🟢 TOTAL INGRESOS'
+        : '🔴 TOTAL EGRESOS' }}
+
+      </div>
+
+      <div class="valor-total">
+
+        {{ totalGeneral | currency:'ARS' }}
+
+      </div>
+
     </div>
-  </div>
-
-  <div class="card-resumen mercado">
-    <div class="icono">📱</div>
-    <div class="titulo-card">Mercado Pago</div>
-    <div class="valor">
-      {{ totalMercadoPago | currency:'ARS' }}
-    </div>
-  </div>
-
-  <div class="card-resumen cta">
-    <div class="icono">📒</div>
-    <div class="titulo-card">Cuenta Corriente</div>
-    <div class="valor">
-      {{ totalCtaCte | currency:'ARS' }}
-    </div>
-  </div>
-
-</div>
-
-<div class="card-total">
-
-  <div class="texto-total">
-
-    {{ data.tipo === 'INGRESO'
-      ? '🟢 TOTAL INGRESOS'
-      : '🔴 TOTAL EGRESOS' }}
-
-  </div>
-
-  <div class="valor-total">
-
-    {{ totalGeneral | currency:'ARS' }}
-
-  </div>
-
-</div>
 
   </div>
 
   <div class="acciones">
 
-    <button
-
-      mat-raised-button
-
-      color="primary"
-
-      (click)="cerrarDialog()">
+    <button mat-raised-button color="primary" (click)="cerrarDialog()">
 
       Cerrar
 

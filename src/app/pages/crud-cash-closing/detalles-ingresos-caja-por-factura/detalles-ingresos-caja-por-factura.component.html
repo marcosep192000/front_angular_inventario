@@ -1,268 +1,496 @@
 <div class="loading" *ngIf="cargando">
 
-    <mat-spinner diameter="50"></mat-spinner>
+  <mat-spinner diameter="50"></mat-spinner>
 
 </div>
 
-<!-- ============================
-            VENTA
-============================= -->
+
+<!-- =========================================================
+     VENTA
+========================================================== -->
 
 <div *ngIf="!cargando && esVenta" class="ticket-container">
 
-    <div class="ticket-title">
+  <div class="ticket-title">
 
-        Factura N° {{ticket!.numero}}
+    Factura N° {{ ticket!.numero }}
 
-    </div>
+  </div>
 
-    <div class="ticket-subtitle">
 
-        Detalle completo de la venta
+  <div class="ticket-subtitle">
 
-    </div>
+    Detalle completo de la venta
 
-    <div class="info-grid">
+  </div>
 
-        <div class="info-card">
 
-            <strong>Condición de venta</strong>
+  <!-- =======================================================
+       INFORMACIÓN DE LA VENTA
+  ======================================================== -->
 
-            {{ticket!.saleCondition}}
+  <div class="info-grid">
 
-        </div>
 
-        <div class="info-card">
+    <div class="info-card">
 
-            <strong>Forma de pago</strong>
+      <strong>
+        Condición de venta
+      </strong>
 
-            {{ticket!.paymentMethod}}
-
-        </div>
-
-        <div class="info-card">
-
-            <strong>Subtotal</strong>
-
-            {{ticket!.subTotal | currency:'ARS'}}
-
-        </div>
-
-        <div class="info-card">
-
-            <strong>Total</strong>
-
-            {{ticket!.total | currency:'ARS'}}
-
-        </div>
+      {{ ticket!.condicionVenta }}
 
     </div>
 
-    <div class="table-container">
 
-        <table>
+    <div class="info-card">
 
-            <thead>
+      <strong>
+        Forma de pago
+      </strong>
 
-            <tr>
-
-                <th>Producto</th>
-
-                <th>Cantidad</th>
-
-                <th>Precio</th>
-
-                <th>Subtotal</th>
-
-            </tr>
-
-            </thead>
-
-            <tbody>
-
-            <tr *ngFor="let p of ticket!.ticketDetails">
-
-                <td>{{p.productName}}</td>
-
-                <td>{{p.amount}}</td>
-
-                <td>{{p.salePrice | currency:'ARS'}}</td>
-
-                <td>{{p.subTotal | currency:'ARS'}}</td>
-
-            </tr>
-
-            </tbody>
-
-        </table>
+      {{ ticket!.medioPago || 'No especificado' }}
 
     </div>
 
-    <div class="total-box">
 
-        <div class="total-card">
+    <div class="info-card">
 
-            <h3>Total de la Venta</h3>
+      <strong>
+        Subtotal
+      </strong>
 
-            <h2>{{ticket!.total | currency:'ARS'}}</h2>
-
-        </div>
+      {{ ticket!.subTotal | currency:'ARS' }}
 
     </div>
+
+
+    <div class="info-card">
+
+      <strong>
+        Total
+      </strong>
+
+      {{ ticket!.total | currency:'ARS' }}
+
+    </div>
+
+  </div>
+
+
+  <!-- =======================================================
+       PRODUCTOS
+  ======================================================== -->
+
+  <div class="table-container">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Producto
+          </th>
+
+          <th>
+            Cantidad
+          </th>
+
+          <th>
+            Precio
+          </th>
+
+          <th>
+            Subtotal
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        <tr *ngFor="let p of ticket!.ticketDetails">
+
+          <td>
+            {{ p.productName }}
+          </td>
+
+          <td>
+            {{ p.amount }}
+          </td>
+
+          <td>
+            {{ p.salePrice | currency:'ARS' }}
+          </td>
+
+          <td>
+            {{ p.subTotal | currency:'ARS' }}
+          </td>
+
+        </tr>
+
+
+        <tr *ngIf="
+            !ticket!.ticketDetails ||
+            ticket!.ticketDetails.length === 0
+          ">
+
+          <td colspan="4" style="text-align: center;">
+
+            No hay productos en esta venta.
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- =======================================================
+       TOTAL
+  ======================================================== -->
+
+  <div class="total-box">
+
+    <div class="total-card">
+
+      <h3>
+        Total de la Venta
+      </h3>
+
+      <h2>
+        {{ ticket!.total | currency:'ARS' }}
+      </h2>
+
+    </div>
+
+  </div>
 
 </div>
 
-<!-- ============================
-        OTROS MOVIMIENTOS
-============================= -->
+
+<!-- =========================================================
+     OTROS MOVIMIENTOS
+========================================================== -->
 
 <div *ngIf="!cargando && esMovimiento" class="ticket-container">
 
-    <div class="ticket-title">
+  <div class="ticket-title">
 
-        {{movimiento!.categoriaMovimiento}}
+    {{ movimiento!.categoriaMovimiento }}
+
+  </div>
+
+
+  <div class="ticket-subtitle">
+
+    Detalle del movimiento
+
+  </div>
+
+
+  <div class="info-grid">
+
+
+    <div class="info-card">
+
+      <strong>
+        Comprobante
+      </strong>
+
+      {{ movimiento!.numeroComprobante }}
 
     </div>
 
-    <div class="ticket-subtitle">
 
-        Detalle del movimiento
+    <div class="info-card">
+
+      <strong>
+        Fecha
+      </strong>
+
+      {{ movimiento!.fechaHora | date:'short' }}
 
     </div>
 
-    <div class="info-grid">
 
-        <div class="info-card">
+    <div class="info-card">
 
-            <strong>Comprobante</strong>
+      <strong>
+        Monto
+      </strong>
 
-            {{movimiento!.numeroComprobante}}
+      {{ movimiento!.monto | currency:'ARS' }}
 
-        </div>
+    </div>
 
-        <div class="info-card">
 
-            <strong>Fecha</strong>
+    <div class="info-card">
 
-            {{movimiento!.fechaHora | date:'short'}}
+      <strong>
+        Forma de pago
+      </strong>
 
-        </div>
+      {{ movimiento!.medioPago }}
 
-        <div class="info-card">
+    </div>
 
-            <strong>Monto</strong>
 
-            {{movimiento!.monto | currency:'ARS'}}
 
-        </div>
+<!-- =======================================================
+     DATOS DEL CHEQUE
+======================================================== -->
 
-        <div class="info-card">
+<ng-container
+  *ngIf="
+    movimiento!.medioPago === 'CHEQUE'
+  "
+>
 
-            <strong>Forma de pago</strong>
+  <div
+    class="info-card"
+    *ngIf="movimiento!.numeroCheque"
+  >
 
-            {{movimiento!.medioPago}}
+    <strong>
+      Número de cheque
+    </strong>
 
-        </div>
+    {{ movimiento!.numeroCheque }}
 
-        <div class="info-card" *ngIf="movimiento!.proveedorNombre">
+  </div>
 
-            <strong>Proveedor</strong>
 
-            {{movimiento!.proveedorNombre}}
+  <div
+    class="info-card"
+    *ngIf="movimiento!.bancoCheque"
+  >
 
-        </div>
+    <strong>
+      Banco
+    </strong>
 
-        <div class="info-card" *ngIf="movimiento!.numeroFactura">
+    {{ movimiento!.bancoCheque }}
 
-            <strong>Factura proveedor</strong>
+  </div>
 
-            {{movimiento!.numeroFactura}}
 
-        </div>
+  <div
+    class="info-card"
+    *ngIf="movimiento!.titularCheque"
+  >
 
-        <div class="info-card" *ngIf="movimiento!.empleadoNombre">
+    <strong>
+      Titular
+    </strong>
 
-            <strong>Empleado</strong>
+    {{ movimiento!.titularCheque }}
 
-            {{movimiento!.empleadoNombre}}
+  </div>
 
-        </div>
 
-        <div class="info-card" *ngIf="movimiento!.tipoSueldo">
+  <div
+    class="info-card"
+    *ngIf="movimiento!.fechaEmisionCheque"
+  >
 
-            <strong>Tipo sueldo</strong>
+    <strong>
+      Fecha de emisión
+    </strong>
 
-            {{movimiento!.tipoSueldo}}
+    {{
+      movimiento!.fechaEmisionCheque
+        | date:'dd/MM/yyyy'
+    }}
 
-        </div>
+  </div>
 
-        <div class="info-card" *ngIf="movimiento!.mesCorrespondiente">
 
-            <strong>Mes</strong>
+  <div
+    class="info-card"
+    *ngIf="movimiento!.fechaCobroCheque"
+  >
 
-            {{movimiento!.mesCorrespondiente}}
+    <strong>
+      Fecha de cobro
+    </strong>
 
-        </div>
+    {{
+      movimiento!.fechaCobroCheque
+        | date:'dd/MM/yyyy'
+    }}
 
-        <div class="info-card" *ngIf="movimiento!.anioCorrespondiente">
+  </div>
 
-            <strong>Año</strong>
 
-            {{movimiento!.anioCorrespondiente}}
+  <div
+    class="info-card"
+    *ngIf="movimiento!.estadoCheque"
+  >
 
-        </div>
+    <strong>
+      Estado del cheque
+    </strong>
 
-        <div class="info-card" *ngIf="movimiento!.estado">
+    <span class="estado-cheque-detalle">
 
-            <strong>Estado</strong>
+      {{ movimiento!.estadoCheque }}
 
-            {{movimiento!.estado}}
+    </span>
 
-        </div>
+  </div>
 
-      <div class="info-card" *ngIf="movimiento!.descripcion">
+</ng-container>
 
-    <strong>Descripción</strong>
 
-    {{ movimiento!.descripcion }}
+
+
+
+
+
+
+    <div class="info-card" *ngIf="movimiento!.proveedorNombre">
+
+      <strong>
+        Proveedor
+      </strong>
+
+      {{ movimiento!.proveedorNombre }}
+
+    </div>
+
+
+    <div class="info-card" *ngIf="movimiento!.numeroFactura">
+
+      <strong>
+        Factura proveedor
+      </strong>
+
+      {{ movimiento!.numeroFactura }}
+
+    </div>
+
+
+    <div class="info-card" *ngIf="movimiento!.empleadoNombre">
+
+      <strong>
+        Empleado
+      </strong>
+
+      {{ movimiento!.empleadoNombre }}
+
+    </div>
+
+
+    <div class="info-card" *ngIf="movimiento!.tipoSueldo">
+
+      <strong>
+        Tipo sueldo
+      </strong>
+
+      {{ movimiento!.tipoSueldo }}
+
+    </div>
+
+
+    <div class="info-card" *ngIf="movimiento!.mesCorrespondiente">
+
+      <strong>
+        Mes
+      </strong>
+
+      {{ movimiento!.mesCorrespondiente }}
+
+    </div>
+
+
+    <div class="info-card" *ngIf="movimiento!.anioCorrespondiente">
+
+      <strong>
+        Año
+      </strong>
+
+      {{ movimiento!.anioCorrespondiente }}
+
+    </div>
+
+
+    <div class="info-card" *ngIf="movimiento!.estado">
+
+      <strong>
+        Estado
+      </strong>
+
+      {{ movimiento!.estado }}
+
+    </div>
+
+
+    <div class="info-card" *ngIf="movimiento!.descripcion">
+
+      <strong>
+        Descripción
+      </strong>
+
+      {{ movimiento!.descripcion }}
+
+    </div>
+
+
+    <div class="info-card" *ngIf="movimiento!.referenciaPago">
+
+      <strong>
+        Referencia
+      </strong>
+
+      {{ movimiento!.referenciaPago }}
+
+    </div>
+
+  </div>
+
+
+  <!-- =======================================================
+       TOTAL MOVIMIENTO
+  ======================================================== -->
+
+  <div class="total-box">
+
+    <div class="total-card">
+
+      <h3>
+        Total del Movimiento
+      </h3>
+
+      <h2>
+        {{ movimiento!.monto | currency:'ARS' }}
+      </h2>
+
+    </div>
+
+  </div>
 
 </div>
 
 
-
-        <div class="info-card" *ngIf="movimiento!.referenciaPago">
-
-            <strong>Referencia</strong>
-
-            {{movimiento!.referenciaPago}}
-
-        </div>
-
-    </div>
-
-    <div class="total-box">
-
-        <div class="total-card">
-
-            <h3>Total del Movimiento</h3>
-
-            <h2>{{movimiento!.monto | currency:'ARS'}}</h2>
-
-        </div>
-
-    </div>
-
-</div>
+<!-- =========================================================
+     ACCIONES
+========================================================== -->
 
 <div class="actions">
 
-    <button
-        mat-raised-button
-        color="primary"
-        (click)="cerrar()">
+  <button mat-raised-button color="primary" type="button" (click)="cerrar()">
 
-        Cerrar
+    Cerrar
 
-    </button>
+  </button>
 
 </div>

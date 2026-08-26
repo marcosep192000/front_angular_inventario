@@ -43,7 +43,7 @@ import { DetallesIngresosCajaPorFacturaComponent } from './../detalles-ingresos-
 export class DetallesIngresosCajaComponent implements OnInit {
 
   movimientos: detalleCajaTipoContado[] = [];
-
+totalCheque = 0;
   totalContado = 0;
   totalTransferencia = 0;
   totalMercadoPago = 0;
@@ -91,46 +91,67 @@ export class DetallesIngresosCajaComponent implements OnInit {
 
 }
 
-  calcularTotales(): void {
+calcularTotales(): void {
 
-    this.totalContado = 0;
-    this.totalTransferencia = 0;
-    this.totalMercadoPago = 0;
-    this.totalCtaCte = 0;
+  this.totalContado = 0;
+  this.totalTransferencia = 0;
+  this.totalMercadoPago = 0;
+  this.totalCtaCte = 0;
+  this.totalCheque = 0;
 
-    this.movimientos.forEach(mov => {
+  this.movimientos.forEach(mov => {
 
-      const medio = (mov.medioPago || '').toUpperCase();
+    const medio =
+      (mov.medioPago || '').toUpperCase();
 
-      switch (medio) {
+    switch (medio) {
 
-        case 'EFECTIVO':
-          this.totalContado += mov.monto;
-          break;
+      case 'EFECTIVO':
 
-        case 'TRANSFERENCIA':
-          this.totalTransferencia += mov.monto;
-          break;
+        this.totalContado += mov.monto;
 
-        case 'MERCADO_PAGO':
-          this.totalMercadoPago += mov.monto;
-          break;
+        break;
 
-        case 'CTA_CTE':
-          this.totalCtaCte += mov.monto;
-          break;
 
-      }
+      case 'TRANSFERENCIA':
 
-    });
+        this.totalTransferencia += mov.monto;
 
-    this.totalGeneral =
-      this.totalContado +
-      this.totalTransferencia +
-      this.totalMercadoPago +
-      this.totalCtaCte;
+        break;
 
-  }
+
+      case 'MERCADO_PAGO':
+
+        this.totalMercadoPago += mov.monto;
+
+        break;
+
+
+      case 'CTA_CTE':
+
+        this.totalCtaCte += mov.monto;
+
+        break;
+
+
+      case 'CHEQUE':
+
+        this.totalCheque += mov.monto;
+
+        break;
+
+    }
+
+  });
+
+
+  this.totalGeneral =
+    this.totalContado +
+    this.totalTransferencia +
+    this.totalMercadoPago +
+    this.totalCtaCte +
+    this.totalCheque;
+}
 
   get titulo(): string {
     return this.data.tipo === 'INGRESO'

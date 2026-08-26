@@ -1,0 +1,284 @@
+/* =========================================================
+   CONTENEDOR
+========================================================= */
+
+.confirm-container {
+  width: 100%;
+  min-width: 520px;
+  background: #ffffff;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.confirm-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  padding: 22px 26px;
+
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+
+/* =========================================================
+   ICONO
+========================================================= */
+
+.document-icon {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: #e8f0fe;
+  color: #1976d2;
+}
+
+.document-icon mat-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+
+/* =========================================================
+   TITULO
+========================================================= */
+
+.confirm-header h2 {
+  margin: 0;
+
+  font-size: 21px;
+  font-weight: 700;
+
+  color: #1f2937;
+}
+
+.confirm-header p {
+  margin: 4px 0 0;
+
+  font-size: 13px;
+
+  color: #6b7280;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+mat-dialog-content {
+  padding: 24px 26px !important;
+}
+
+
+/* =========================================================
+   MENSAJE
+========================================================= */
+
+.mensaje {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 14px 16px;
+
+  border-radius: 12px;
+
+  background: #f1f5f9;
+
+  color: #334155;
+
+  font-size: 14px;
+}
+
+.mensaje mat-icon {
+  color: #1976d2;
+}
+
+
+/* =========================================================
+   DATOS
+========================================================= */
+
+.datos-documento {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 12px;
+
+  margin-top: 20px;
+}
+
+
+/* =========================================================
+   DATO
+========================================================= */
+
+.dato {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  padding: 14px;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+}
+
+.dato span {
+  font-size: 12px;
+
+  color: #6b7280;
+}
+
+.dato strong {
+  font-size: 15px;
+
+  color: #1f2937;
+}
+
+
+/* =========================================================
+   TOTAL
+========================================================= */
+
+.dato.total {
+  grid-column: 1 / -1;
+
+  background: #f8fafc;
+}
+
+.dato.total strong {
+  font-size: 24px;
+  font-weight: 800;
+
+  color: #1976d2;
+}
+
+
+/* =========================================================
+   ADVERTENCIA
+========================================================= */
+
+.advertencia {
+  display: flex;
+  gap: 12px;
+
+  margin-top: 20px;
+
+  padding: 15px;
+
+  border-radius: 12px;
+
+  background: #fff8e1;
+
+  border: 1px solid #ffe082;
+
+  color: #5f4300;
+}
+
+.advertencia mat-icon {
+  color: #f59e0b;
+
+  flex-shrink: 0;
+}
+
+.advertencia strong {
+  display: block;
+
+  font-size: 14px;
+}
+
+.advertencia p {
+  margin: 5px 0 0;
+
+  font-size: 13px;
+
+  line-height: 1.45;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+mat-dialog-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 12px;
+
+  padding: 18px 26px !important;
+
+  border-top: 1px solid #e5e7eb;
+
+  background: #f8fafc;
+}
+
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+button {
+  min-height: 42px;
+
+  border-radius: 10px !important;
+
+  font-weight: 600;
+}
+
+.btn-cancelar {
+  min-width: 120px;
+}
+
+.btn-confirmar {
+  min-width: 190px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .confirm-container {
+    min-width: auto;
+  }
+
+  .datos-documento {
+    grid-template-columns: 1fr;
+  }
+
+  .dato.total {
+    grid-column: auto;
+  }
+
+  mat-dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  mat-dialog-actions button {
+    width: 100%;
+  }
+
+}

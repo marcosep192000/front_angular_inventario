@@ -82,16 +82,45 @@
     align-items:center;
 }
 
-.barra__span{
+.barra__usuario{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin-left:auto;
     color:#fff;
-    font-size:18px;
+}
+
+.barra__usuario mat-icon{
+    width:34px;
+    height:34px;
+    font-size:34px;
+}
+
+.barra__usuario div{
+    display:flex;
+    flex-direction:column;
+    line-height:1.15;
+}
+
+.barra__usuario strong{
+    font-size:14px;
     font-weight:600;
+}
+
+.barra__usuario span{
+    margin-top:3px;
+    font-size:11px;
+    opacity:.82;
 }
 
 .barra__logout button{
     border:none;
     background:transparent;
     cursor:pointer;
+}
+
+.barra__logout{
+    margin-left:12px;
 }
 
 /* =====================================================
