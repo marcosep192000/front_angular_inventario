@@ -56,6 +56,9 @@ export class FormProductComponent implements OnInit {
 
   protected readonly value = signal('');
   calculatedSalePrice: number = 0;
+  precioVentaManual = false;
+  editarPrecioVenta = false;
+  gananciaCalculada = 0;
 
   protected onInput(event: Event) {
     this.value.set((event.target as HTMLInputElement).value);
@@ -123,15 +126,15 @@ export class FormProductComponent implements OnInit {
             salePrice: datos.salePrice,
             productUsefulness: datos.productUsefulness,
           });
+          this.calculatedSalePrice = Number(datos.salePrice || 0);
+          this.precioVentaManual = true;
         });
     }
 
-    this.formGroup.valueChanges.subscribe((values) => {
-      this.calculateSalePrice(
-        values.price,
-        values.productUsefulness,
-        values.stateIva
-      );
+    ['price', 'productUsefulness', 'stateIva'].forEach((controlName) => {
+      this.formGroup.get(controlName)?.valueChanges.subscribe(() => {
+        if (!this.precioVentaManual) this.calcularPrecioAutomatico();
+      });
     });
   }
 
@@ -255,7 +258,51 @@ export class FormProductComponent implements OnInit {
     }
 
     this.calculatedSalePrice = finalPrice;
+    this.gananciaCalculada = finalPrice - (stateIva ? priceValue * 1.21 : priceValue);
     this.formGroup.patchValue({ salePrice: finalPrice }, { emitEvent: false});
+  }
+
+  calcularPrecioAutomatico(): void {
+    this.precioVentaManual = false;
+    this.editarPrecioVenta = false;
+    this.calculateSalePrice(
+      this.formGroup.get('price')?.value,
+      this.formGroup.get('productUsefulness')?.value,
+      this.formGroup.get('stateIva')?.value,
+    );
+  }
+
+  habilitarEdicionPrecio(): void {
+    this.editarPrecioVenta = true;
+    this.precioVentaManual = true;
+  }
+
+  onPrecioVentaManual(event: Event): void {
+    if (!this.editarPrecioVenta) return;
+    const precioFinal = Number((event.target as HTMLInputElement).value);
+    const costo = Number(this.formGroup.get('price')?.value || 0);
+    const incluyeIva = Boolean(this.formGroup.get('stateIva')?.value);
+    const costoBase = incluyeIva ? costo * 1.21 : costo;
+    if (!Number.isFinite(precioFinal) || costoBase <= 0) return;
+
+    this.precioVentaManual = true;
+    this.calculatedSalePrice = precioFinal;
+    this.gananciaCalculada = precioFinal - costoBase;
+    const utilidad = ((precioFinal - costoBase) / costoBase) * 100;
+    this.formGroup.get('productUsefulness')?.setValue(Number(utilidad.toFixed(2)), { emitEvent: false });
+  }
+
+  redondearPrecioVenta(): void {
+    const precioActual = Number(this.formGroup.get('salePrice')?.value ?? this.calculatedSalePrice);
+    if (!Number.isFinite(precioActual) || precioActual <= 0) {
+      this.toastr.warning('Primero ingresá costo y utilidad para calcular el precio.');
+      return;
+    }
+    const redondeado = Math.round(precioActual);
+    this.precioVentaManual = true;
+    this.editarPrecioVenta = true;
+    this.calculatedSalePrice = redondeado;
+    this.formGroup.get('salePrice')?.setValue(redondeado);
   }
 
   onInputChange(event: Event, controlName: string): void {

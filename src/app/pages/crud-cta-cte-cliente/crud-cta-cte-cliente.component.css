@@ -1,9 +1,1 @@
-.title__color{
-    color: white;
-}
-.container-fluid{
-    padding-left: 15px;
-    display: flex;
-    text-align: center;
-    align-items: center;
-}
+.container__title { width: min(430px, 84vw); padding: 24px; display: grid; gap: 18px; border-radius:18px; background:linear-gradient(145deg,#fff,#f5f3ff); }.title__color { margin: 0; display: flex; gap: 10px; align-items: center; color: #1e293b; }.title__color mat-icon{color:#6d4bc3}.container__title p { margin: 8px 0 0; color: #64748b; line-height:1.45 }.input { width: 100%; }.btn { display: flex; justify-content: flex-end; gap: 10px; padding: 0; }

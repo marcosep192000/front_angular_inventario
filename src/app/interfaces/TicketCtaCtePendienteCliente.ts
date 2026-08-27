@@ -4,5 +4,6 @@ export interface TicketCtaCtePendienteCliente {
 	ctaCte: number;
 	tipo: string;
 	total: number;
-	fechaEmision: Date;  
+	saldoPendiente: number;
+	fechaEmision: string;
 }

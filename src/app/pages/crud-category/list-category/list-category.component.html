@@ -1,81 +1,19 @@
-<ng-template #noData>
-    <p>No hay categorías disponibles.</p>
-</ng-template>
-
-
-
-<div class="container__serch">
-    <div class="container__serch">
-        <input class="search__input" placeholder="Ingresa la categoria a buscar" type="text" ngModel=""
-            (keyup)="applyFilter($event)" value="text">
-    </div>
-    <!--   
-     <div class="actions__btn">
-         <button class="actions__btn  btn__search">Buscar</button>
-     </div> -->
-
-    <div class="actions__btn">
-        <button class="actions__btn  btn__new" (click)="createCategory()">agregar</button>
-
-    </div>
-
-
-
-
-
-</div>
-
-<div class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" class="table">
-
-        <!-- Position Column -->
-        <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef> CODIGO</th>
-            <td mat-cell *matCellDef="let element"> {{element.id }} </td>
-        </ng-container>
-
-        <ng-container matColumnDef="nameCategory">
-            <th mat-header-cell *matHeaderCellDef> DESCRIPCION</th>
-            <td mat-cell *matCellDef="let element"> {{element.nameCategory}}</td>
-        </ng-container>
-        
-        <!-- Name Column -->
-        <ng-container matColumnDef="descriptionCategory">
-            <th mat-header-cell *matHeaderCellDef> DETALLE </th>
-            <td mat-cell *matCellDef="let element"> {{element.descriptionCategory}}</td>
-        </ng-container>
-
-        <!-- Name Column -->
-        <ng-container matColumnDef="Opciones">
-            <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
-            <td mat-cell *matCellDef="let element">
-
-                <div class="container__accions">
-                    <div class="example-button-row">
-                        <button mat-fab class="btn__update" (click)="updateCategory(element.id)"
-                            aria-label="Example icon button with a delete icon">
-                            <app-icon [iconSrc]="'assets/icons/task.png'" [size]="'20px'"></app-icon>
-                        </button>
-                    </div>
-
-                    <!-- <div class="example-button-row">
-                        <button mat-fab class="btn__delete" (click)="deleteCategory(element.id)" aria-label="Example icon button with a delete icon">
-                            <app-icon [iconSrc]="'assets/icons/delete.png'" [size]="'20px'"></app-icon>
-                        </button>
-                    </div> -->
-                </div>
-
-            </td>
-        </ng-container>
-        <!-- Name Column -->
-
-
-
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-
-    <mat-paginator [pageSizeOptions]="[5,8]" showFirstLastButtons aria-label="Select page of periodic elements">
-    </mat-paginator>
-</div>
+<section class="categorias-page">
+  <header class="categorias-header">
+    <div class="titulo-seccion"><div class="titulo-icono"><mat-icon>category</mat-icon></div><div><p class="eyebrow">CONFIGURACIÓN DE INVENTARIO</p><h1>Categorías</h1><span>Organizá tu catálogo para encontrar cada producto más rápido.</span></div></div>
+    <button mat-raised-button color="primary" type="button" class="btn-nuevo" (click)="createCategory()"><mat-icon>add</mat-icon>Nueva categoría</button>
+  </header>
+  <section class="panel-categorias">
+    <div class="barra-herramientas"><mat-form-field appearance="outline" class="buscador"><mat-icon matPrefix>search</mat-icon><mat-label>Buscar categoría</mat-label><input matInput type="search" placeholder="Nombre o descripción" (input)="applyFilter($event)"></mat-form-field></div>
+    <div class="resumen-lista"><mat-icon>folder_open</mat-icon>{{ dataSource.filteredData.length }} categoría(s) disponibles</div>
+    <div class="tabla-contenedor"><table mat-table [dataSource]="dataSource" class="tabla-categorias">
+      <ng-container matColumnDef="id"><th mat-header-cell *matHeaderCellDef>ID</th><td mat-cell *matCellDef="let e"><span class="codigo">#{{ e.id }}</span></td></ng-container>
+      <ng-container matColumnDef="nameCategory"><th mat-header-cell *matHeaderCellDef>Categoría</th><td mat-cell *matCellDef="let e"><div class="categoria-nombre"><span>{{ e.nameCategory?.charAt(0) || '?' }}</span><strong>{{ e.nameCategory }}</strong></div></td></ng-container>
+      <ng-container matColumnDef="descriptionCategory"><th mat-header-cell *matHeaderCellDef>Descripción</th><td mat-cell *matCellDef="let e">{{ e.descriptionCategory || 'Sin descripción' }}</td></ng-container>
+      <ng-container matColumnDef="Opciones"><th mat-header-cell *matHeaderCellDef>Acciones</th><td mat-cell *matCellDef="let e"><button mat-icon-button type="button" class="accion-editar" matTooltip="Editar categoría" (click)="updateCategory(e.id)"><mat-icon>edit</mat-icon></button></td></ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr><tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr class="mat-row sin-resultados" *matNoDataRow><td class="mat-cell" [attr.colspan]="displayedColumns.length"><mat-icon>search_off</mat-icon>No encontramos categorías para esa búsqueda.</td></tr>
+    </table></div>
+    <mat-paginator [pageSizeOptions]="[5, 8, 10, 25]" showFirstLastButtons aria-label="Paginación de categorías"></mat-paginator>
+  </section>
+</section>

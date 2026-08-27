@@ -34,6 +34,8 @@ export interface Marca {
   marca: string;
 }
 
+import { PagoTicketRequest, PagoTicketResponse } from './pago-ticket';
+
 
 export interface SaleCommon {
 
@@ -83,7 +85,9 @@ export interface SaleCommon {
   // MEDIO DE PAGO
   // =========================================================
 
-medioPago: string | null;
+medioPago?: string | null;
+
+  pagos?: PagoTicketRequest[];
 
 
   // =========================================================
@@ -122,5 +126,9 @@ medioPago: string | null;
   totalCost?: number;
 
   totalProfit?: number;
+
+  saldoPendiente?: number;
+
+  pagosRegistrados?: PagoTicketResponse[];
 
 }

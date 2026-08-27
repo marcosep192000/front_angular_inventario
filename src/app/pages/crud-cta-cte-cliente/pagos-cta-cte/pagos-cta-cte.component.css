@@ -1,87 +1,9 @@
-.pagos-container {
-    padding: 30px;
-    border-radius: 12px;
-    background: #ffffff;
-    margin: 16px;
-    width: auto;
-  }
-  
-  .styled-table {
-    width: 100%;
-    margin-top: 26px;
-    overflow-x: auto; /* permite scroll horizontal si es necesario */
-    table-layout: auto; /* permite que las columnas se ajusten al contenido */
-  }
-  
-  .mat-header-cell, .mat-cell {
-    padding: 20px;
-    font-size: 14px;
-    white-space: nowrap; /* evita que los textos se corten */
-    text-overflow: ellipsis; /* agrega "..." si el contenido es muy largo */
-    overflow: hidden;
-    max-width: 300px; /* ajustá según necesidad */
-  }
-  
-  .clickable-row:hover {
-    background-color: #f5f5f5;
-    cursor: pointer;
-  }
-  
-  .total-footer {
-    margin-top: 16px;
-    padding: 12px;
-    background: #e3f2fd;
-    color: #0d47a1;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 16px;
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .btn-footer {
-    margin-top: 20px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-  }
-  
+.dialogo-cobro { padding: 8px; min-width: min(980px, 86vw); color: var(--text-color, #263238); }
+.encabezado, .section-title, .acciones { display: flex; align-items: center; gap: 16px; }.encabezado { justify-content: space-between; padding: 12px 12px 20px; border-bottom: 1px solid rgba(0,0,0,.09); }.encabezado h2, .section-title h3, .historial h3 { margin: 0; }.encabezado p:not(.eyebrow), .section-title p { margin: 4px 0 0; color: #64748b; }.eyebrow { margin: 0 0 4px; color: var(--primary-color, #1976d2); font-size: .76rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+.tabla-wrapper { overflow: auto; max-height: 310px; }.tabla-facturas { width: 100%; min-width: 760px; }.saldo { color: #047857; font-weight: 700; }.aplicar-control { display: flex; align-items: center; min-width: 190px; }.aplicar-control input { width: 105px; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; }
+.pagos-section { margin-top: 22px; padding: 18px; background: rgba(25,118,210,.045); border-radius: 10px; }.section-title { justify-content: space-between; margin-bottom: 12px; }.pago-fila { display: grid; grid-template-columns: 1fr 1fr 1.35fr auto; gap: 12px; align-items: center; }.pago-fila mat-form-field { width: 100%; }.observacion { width: 100%; margin-top: 16px; }
+.resumen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 2px; }.resumen div { padding: 12px 14px; border-radius: 8px; background: #f1f5f9; display: flex; justify-content: space-between; gap: 8px; }.resumen span { color: #64748b; }.resumen strong { white-space: nowrap; }.cuadrado { background: #dcfce7 !important; color: #166534; }.descuadrado { background: #fff7ed !important; color: #c2410c; }.acciones { margin-top: 20px; }.spacer { flex: 1; }.sin-datos { padding: 20px; text-align: center; color: #64748b; }
+.historial { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,.09); }.historial article { display: grid; grid-template-columns: 1fr auto auto; gap: 18px; padding: 12px 0; border-bottom: 1px solid #e2e8f0; }.historial article div { display: grid; gap: 3px; }.historial span, .historial small { color: #64748b; }
+@media (max-width: 720px) { .dialogo-cobro { min-width: 0; width: calc(100vw - 42px); }.pago-fila { grid-template-columns: 1fr 1fr; }.pago-fila .referencia { grid-column: span 2; }.resumen { grid-template-columns: 1fr; }.historial article { grid-template-columns: 1fr auto; }.historial small { grid-column: span 2; } }
 
-.container__pago {
-  padding: 30px;
-  border-radius: 12px;
-  background: #ffffff;
-  margin: 16px;
-  width: auto;
-}
-
-.styled-table {
-  width: 100%;
-  margin-top: 26px;
-  overflow-x: auto;
-  table-layout: auto;
-  border-collapse: collapse;
-}
-
-.styled-table th, .styled-table td {
-  padding: 20px;
-  font-size: 14px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: 300px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.styled-table thead {
-  background-color: #f5f5f5;
-}
-
-.btn-footer {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-  
+.dialogo-cobro{padding:10px;background:linear-gradient(145deg,#fff 30%,#f7f9ff);border-radius:18px}.encabezado{padding:14px 14px 22px;border-bottom-color:#e6eaf2}.encabezado h2{font-size:1.6rem;color:#29334d}.tabla-wrapper{margin:18px 4px 0;border:1px solid #e7ebf2;border-radius:12px}.tabla-facturas th{background:#f5f7fc;color:#68748b;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.tabla-facturas tr.mat-mdc-row:hover{background:#fbfcff}.aplicar-control input:focus{outline:0;border-color:#635bca;box-shadow:0 0 0 3px rgba(99,91,202,.12)}.pagos-section{padding:20px;background:linear-gradient(135deg,rgba(99,91,202,.09),rgba(72,187,120,.06));border:1px solid rgba(99,91,202,.12);border-radius:14px}.resumen div{padding:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}.acciones button{border-radius:9px}.historial{background:#fbfcff;padding:16px;border-radius:12px}

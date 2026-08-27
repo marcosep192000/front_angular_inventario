@@ -691,7 +691,7 @@
 
 
           <p>
-            Cliente registrado
+            {{ selectedClient.cuit === '0' ? 'Consumidor Final · CUIT 0' : 'CUIT: ' + (selectedClient.cuit || '-') }}
           </p>
 
         </div>
@@ -714,7 +714,7 @@
           </h3>
 
           <p>
-            No hay cliente seleccionado.
+            Cargando cliente por defecto...
           </p>
 
         </div>

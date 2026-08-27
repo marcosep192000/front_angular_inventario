@@ -1,116 +1,27 @@
-<form [formGroup]="formGroup">
-  <div class="container">
-    <div class="container__title">
-      <h2 class="title__color" mat-dialog-title>
-        <app-icon [iconSrc]="'assets/icons/point_of_sale.png'" [size]="'50px'"></app-icon>
-        Cobrar
-      </h2>
-      <div class="btn-sale">
-        <strong>{{ data.totalPrice | currency }}</strong>
-      </div>
-    </div>
+<section class="cobro-dialogo">
+  <header>
+    <div><p>COBRO DE VENTA</p><h2>Medios de pago</h2></div>
+    <div class="total-venta"><span>Total</span><strong>{{ totalVenta | currency:'ARS':'symbol':'1.2-2' }}</strong></div>
+  </header>
 
-    <mat-dialog-content>
-      <mat-tab-group dynamicHeight (selectedTabChange)="onTabChange($event)">
-        <div class="container_form">
-          <!------------------- TAB CONTADO ------------------->
-          <mat-tab label="Contado">
-            <mat-radio-group
-              formControlName="paymentMethod"
-              class="radio__group"
-              aria-label="Forma de pago"
-            >
-              <mat-radio-button value="EFECTIVO">Efectivo</mat-radio-button>
-              <mat-radio-button value="TRANSFERENCIA">Transferencia</mat-radio-button>
-              <mat-radio-button value="MERCADO_PAGO">Mercado Pago</mat-radio-button>
-            </mat-radio-group>
+  <main>
+    <div class="pagos-titulo"><div><h3>Pagos recibidos</h3><span>Podés combinar distintos medios de pago.</span></div><button mat-stroked-button type="button" (click)="agregarPago()"><mat-icon>add</mat-icon>Agregar pago</button></div>
 
-            <!-- SOLO mostrar input si es EFECTIVO -->
-            <ng-container *ngIf="formGroup.get('paymentMethod')?.value === 'EFECTIVO'">
-              <div class="example-small-box mat-elevation-z4">
-                <!-- input de ingreso de dinero -->
-                <div class="form__SalesAmount">
-                  <mat-form-field class="input" hintLabel="Máximo 12 caracteres">
-                    <mat-label>Ingrese El Pago.</mat-label>
-                    <input
-                      matInput
-                      maxlength="12"
-                      formControlName="price"
-                      (input)="onInputChange($event, 'price')"
-                      type="text"
-                      pattern="^\\d*\\.?\\d*$"
-                    />
-                    <mat-hint align="end">
-                      {{ formGroup.get('price')?.value?.toString().length || 0 }}/12
-                    </mat-hint>
-                    <mat-error *ngIf="formGroup.get('price')?.hasError('pattern')">
-                      Solo se permiten números y un punto decimal.
-                    </mat-error>
-                  </mat-form-field>
-                </div>
+    <article class="pago-fila" *ngFor="let pago of pagos; let i = index">
+      <span class="numero-pago">{{ i + 1 }}</span>
+      <mat-form-field appearance="outline"><mat-label>Medio de pago</mat-label><mat-select [(ngModel)]="pago.medioPago" [ngModelOptions]="{standalone: true}"><mat-option *ngFor="let medio of mediosPago" [value]="medio.valor">{{ medio.etiqueta }}</mat-option></mat-select></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Monto</mat-label><span matTextPrefix>$&nbsp;</span><input matInput type="number" min="0.01" step="0.01" [(ngModel)]="pago.monto" [ngModelOptions]="{standalone: true}"></mat-form-field>
+      <mat-form-field appearance="outline" *ngIf="requiereReferencia(pago.medioPago)"><mat-label>Referencia</mat-label><input matInput maxlength="120" placeholder="Nº de operación, cupón o cheque" [(ngModel)]="pago.referencia" [ngModelOptions]="{standalone: true}"></mat-form-field>
+      <div class="sin-referencia" *ngIf="!requiereReferencia(pago.medioPago)">Sin referencia requerida</div>
+      <button mat-icon-button type="button" class="eliminar-pago" matTooltip="Quitar pago" (click)="eliminarPago(i)"><mat-icon>delete_outline</mat-icon></button>
+    </article>
 
-                <!-- Mostrar la diferencia y el vuelto -->
-                <div *ngIf="difference > 0">
-                  <p>Diferencia por abonar: {{ difference | currency }}</p>
-                </div>
-                <div class="form__vuelto" *ngIf="change > 0">
-                  <p>Vuelto: {{ change | currency }}</p>
-                </div>
-              </div>
-            </ng-container>
+    <section class="totales">
+      <div><span>Total ingresado</span><strong>{{ totalIngresado | currency:'ARS':'symbol':'1.2-2' }}</strong></div>
+      <div [class.correcto]="restante === 0" [class.pendiente]="restante > 0" [class.excedido]="restante < 0"><span>{{ restante < 0 ? 'Excedente' : 'Restante' }}</span><strong>{{ (restante < 0 ? -restante : restante) | currency:'ARS':'symbol':'1.2-2' }}</strong></div>
+    </section>
+    <p class="aviso" *ngIf="!puedeConfirmar"><mat-icon>info</mat-icon>La suma de los pagos debe coincidir con el total para confirmar.</p>
+  </main>
 
-            <!-- Mensaje si es TRANSFERENCIA -->
-            <ng-container *ngIf="formGroup.get('paymentMethod')?.value === 'TRANSFERENCIA'">
-              <div class="example-small-box mat-elevation-z4">
-                <p><strong>Forma de pago:</strong> Transferencia</p>
-                <p><strong>Alias / CBU:</strong> MIEMPRESA.NACION / 0110123456789012345678</p>
-                <p>Por favor, confirmar la operación antes de guardar.</p>
-                <!-- Más adelante aquí podés agregar inputs de comprobante -->
-              </div>
-            </ng-container>
-
-            <!-- Mensaje si es MERCADO PAGO -->
-            <ng-container *ngIf="formGroup.get('paymentMethod')?.value === 'MERCADO_PAGO'">
-              <div class="example-small-box mat-elevation-z4">
-                <p><strong>Forma de pago:</strong> Mercado Pago</p>
-                <p>Escanee el QR o confirme el pago desde la app.</p>
-                <!-- Más adelante podés agregar inputs para ID de operación -->
-              </div>
-            </ng-container>
-          </mat-tab>
-
-          <!------------------- TAB CTA CTE ------------------->
-          <mat-tab label="Pago Cta. Cte.">
-            <div class="example-large-box mat-elevation-z4">
-              <app-form-nueva-venta-cta-cte [datoIdCliente]="mensajeIdClienteHijo"></app-form-nueva-venta-cta-cte>
-            </div>
-          </mat-tab>
-        </div>
-      </mat-tab-group>
-    </mat-dialog-content>
-
-    <!------------------- ACCIONES ------------------->
-    <mat-dialog-actions>
-      <div class="btn">
-        <button mat-raised-button color="warn" (click)="cancel()">Cancelar</button>
-
-        <ng-container *ngIf="tipoDeCuenta === 'CONTADO'; else mostrarGuardar">
-          <button
-            mat-raised-button
-            color="primary"
-            *ngIf="shouldShowGuardar()"
-            (click)="save(tipoDeCuenta)"
-          >
-            Guardar
-          </button>
-        </ng-container>
-
-        <ng-template #mostrarGuardar>
-          <button mat-raised-button color="primary" (click)="save(tipoDeCuenta)">
-            Guardar
-          </button>
-        </ng-template>
-      </div>
-    </mat-dialog-actions>
-  </div>
-</form>
+  <footer><button mat-stroked-button type="button" (click)="cancelar()">Cancelar</button><button mat-raised-button color="primary" type="button" [disabled]="!puedeConfirmar" (click)="confirmar()"><mat-icon>check</mat-icon>Confirmar venta</button></footer>
+</section>

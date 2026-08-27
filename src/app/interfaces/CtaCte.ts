@@ -1,11 +1,11 @@
 
 
 export interface CtaCte {
-  id:number; 
-  client: number;
+  id?: number;
+  client?: number;
+  /** Crédito disponible actualmente para seguir comprando. */
   saldo: number;
-  montoMaximoDeCtaCte:number;
-  estado : boolean; 
-  fechaUltimaActualizacion: Date; 
-
+  montoMaximoDeCtaCte: number;
+  estado?: boolean;
+  fechaUltimaActualizacion?: string | Date;
 }

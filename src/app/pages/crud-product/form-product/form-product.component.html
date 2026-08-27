@@ -40,7 +40,7 @@
                         </mat-select>
                     </mat-form-field>
                     <button type="button" class="btn__marca" (click)="createSupplier()">
-                        <app-icon [iconSrc]="'assets/icons/task.png'"  [size]="'30px'"></app-icon> 
+                        <mat-icon>add_business</mat-icon>
                     </button>
 
                 </div>
@@ -83,8 +83,8 @@
 
     <mat-form-field class="input" hintLabel="Máximo 5 caracteres">
         <mat-label>Utilidad/Ganacia</mat-label>
-        <input matInput maxlength="5" formControlName="productUsefulness" (input)="onInputChange($event, 'productUsefulness')" type="text"
-            pattern="[0-9]*" />
+        <input matInput maxlength="7" formControlName="productUsefulness" (input)="onInputChange($event, 'productUsefulness')" type="text"
+            pattern="^\d*\.?\d*$" />
         <mat-hint align="end">{{ formGroup.get('productUsefulness')?.value?.length }}/5</mat-hint>
     </mat-form-field>
 
@@ -108,8 +108,7 @@
                         </mat-select>
                     </mat-form-field>
                     <button type="button" class="btn__marca" (click)="createMarca()">
-
-                        <app-icon [iconSrc]="'assets/icons/task.png'"  [size]="'30px'"></app-icon> 
+                        <mat-icon>add_circle</mat-icon>
 
                     </button>
 
@@ -131,10 +130,20 @@
                
                
                 <!-- PRECIO VENTA -->
-<mat-form-field class="input">
-    <mat-label>Precio de Venta</mat-label>
-    <input matInput formControlName="salePrice" type="text" [value]="formattedSalePrice" readonly />
-</mat-form-field>
+                <section class="precio-venta-box" [class.manual]="precioVentaManual">
+                    <div class="precio-venta-titulo"><div><span>Precio de venta</span><small>{{ editarPrecioVenta ? 'Edición manual: utilidad actualizada' : 'Calculado automáticamente y protegido' }}</small></div><mat-icon>{{ editarPrecioVenta ? 'edit' : 'lock' }}</mat-icon></div>
+                    <mat-form-field class="input" appearance="outline">
+                        <mat-label>Precio final</mat-label>
+                        <span matTextPrefix>$&nbsp;</span>
+                        <input matInput formControlName="salePrice" type="number" min="0" step="0.01" [readonly]="!editarPrecioVenta" (input)="onPrecioVentaManual($event)" />
+                    </mat-form-field>
+                    <div class="ganancia-info"><span>Ganancia</span><strong>{{ gananciaCalculada | currency:'ARS' }}</strong><span>Utilidad: {{ formGroup.get('productUsefulness')?.value || 0 }}%</span></div>
+                    <div class="precio-venta-acciones">
+                        <button mat-button type="button" (click)="habilitarEdicionPrecio()"><mat-icon>edit</mat-icon> Editar precio</button>
+                        <button mat-button type="button" (click)="calcularPrecioAutomatico()"><mat-icon>restart_alt</mat-icon> Automático</button>
+                        <button mat-button type="button" (click)="redondearPrecioVenta()"><mat-icon>roundabout_right</mat-icon> Redondear</button>
+                    </div>
+                </section>
 
 
 
@@ -150,7 +159,7 @@
                     </mat-select>
                 </mat-form-field>
                 <button type="button" class="btn__marca" (click)="createCategoria()">
-                    <app-icon [iconSrc]="'assets/icons/task.png'"  [size]="'30px'"></app-icon> 
+                    <mat-icon>create_new_folder</mat-icon>
                 </button>
                 </div>
             </div><!-- FIN DE COL 2 -->

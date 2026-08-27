@@ -16,6 +16,8 @@ import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
 import { DialogGenericComponent } from '../../../shared/genericsComponents/dialog-generic/dialog-generic.component';
 import { CrudCtaCteClienteComponent } from '../../crud-cta-cte-cliente/crud-cta-cte-cliente.component';
 import { FormCtaCteClienteComponent } from '../../form-cta-cte-cliente/form-cta-cte-cliente.component';
+import { CtaCteService } from '../../../services/cta-cte.service';
+import { AlertaCuentaCorriente } from '../../../interfaces/historial-cuenta-corriente';
 
 @Component({
   selector: 'app-list-client',
@@ -56,7 +58,9 @@ export class ListClientComponent implements OnInit {
     'Opciones',
   ];
   dataSource = new MatTableDataSource<Client>(this.clients);
-  constructor(public clientService: ClientService, public dialog: MatDialog) {}
+  alertas: AlertaCuentaCorriente[] = [];
+  mostrarAlertas = false;
+  constructor(public clientService: ClientService, public dialog: MatDialog, private ctaCteService: CtaCteService) {}
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator; // Añadimos el paginador al datasource
@@ -64,6 +68,52 @@ export class ListClientComponent implements OnInit {
   
   ngOnInit(): void {
     this.getClients();
+    this.cargarAlertas();
+  }
+  cargarAlertas(): void {
+    this.ctaCteService.obtenerAlertas().subscribe({ next: (alertas) => this.alertas = alertas, error: () => this.alertas = [] });
+  }
+  descargarReporteAlertas(): void {
+    this.ctaCteService.descargarAlertasPdf().subscribe((archivo) => {
+      const url = URL.createObjectURL(archivo); const enlace = document.createElement('a');
+      enlace.href = url; enlace.download = 'reporte-cuentas-vencidas.pdf'; enlace.click(); URL.revokeObjectURL(url);
+    });
+  }
+  aplicarMora(alerta: AlertaCuentaCorriente): void {
+    const valor = window.prompt(`Aplicar mora a ${alerta.comprobante}. Ingresá el porcentaje (0,01 a 100):`, '10');
+    if (valor === null) return;
+    const porcentaje = Number(valor.replace(',', '.'));
+    if (!Number.isFinite(porcentaje) || porcentaje < 0.01 || porcentaje > 100) {
+      window.alert('El porcentaje debe estar entre 0,01 y 100.');
+      return;
+    }
+    this.ctaCteService.obtenerHistorialCuenta(alerta.clienteId).subscribe({
+      next: (historial) => {
+        const yaTieneMora = historial.movimientos.some((movimiento) =>
+          movimiento.tipo === 'MORA' && movimiento.comprobante === alerta.comprobante
+        );
+        const advertencia = yaTieneMora
+          ? `Esta factura ya tiene una mora registrada. Se agregará otro recargo del ${porcentaje}% sobre el saldo pendiente actual.`
+          : `Se incrementará la deuda de ${alerta.cliente} aplicando una mora del ${porcentaje}% sobre ${alerta.comprobante}.`;
+        this.dialog.open(DialogGenericComponent, {
+          disableClose: true,
+          data: {
+            component: 'aplicarMora',
+            data: yaTieneMora ? 'Atención: factura con mora previa' : 'Confirmar aplicación de mora',
+            state: 'Aplicar mora',
+            icon: 'warning',
+            message: `${advertencia} Esta acción aumenta la deuda.`,
+          },
+        }).afterClosed().subscribe((confirmado) => {
+          if (!confirmado) return;
+          this.ctaCteService.aplicarMora(alerta.clienteId, alerta.facturaId, porcentaje).subscribe({
+            next: () => this.refrescarModulo(),
+            error: (error) => window.alert(error?.error?.error || 'No se pudo aplicar la mora.'),
+          });
+        });
+      },
+      error: () => window.alert('No se pudo verificar el historial de la factura antes de aplicar la mora.'),
+    });
   }
   getClients(): void {
     this.clientService.getClients().subscribe((client) => {
@@ -72,6 +122,10 @@ export class ListClientComponent implements OnInit {
       );
       this.dataSource.data = filteredProducts;
     });
+  }
+  refrescarModulo(): void {
+    this.getClients();
+    this.cargarAlertas();
   }
   /* filtros para la busqueda */
   applyFilter(event: Event) {
@@ -92,7 +146,7 @@ export class ListClientComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe(() => {
-      this.getClients();
+      this.refrescarModulo();
     });
   }
   ctaCteClient(id: number) {
@@ -107,7 +161,7 @@ export class ListClientComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe(() => {
-      this.getClients();
+      this.refrescarModulo();
     });
   }
 
@@ -123,7 +177,7 @@ export class ListClientComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe(() => {
-      this.getClients();
+      this.refrescarModulo();
     });
   }
   
@@ -139,13 +193,13 @@ export class ListClientComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe(() => {
-      this.getClients();
+      this.refrescarModulo();
     });
   }
   deleteCliento(id: number) {
     console.log(id);
     this.clientService.delete(id).subscribe(() => {
-      this.getClients();
+      this.refrescarModulo();
     });
   }
   deleteClient(id: number): void {
@@ -166,7 +220,7 @@ export class ListClientComponent implements OnInit {
         if (result == true) {
           this.clientService.delete(id).subscribe((result) => {
             console.log(result);
-            this.getClients();
+            this.refrescarModulo();
           });
         } else {
           // no se ha borrado el Cliente

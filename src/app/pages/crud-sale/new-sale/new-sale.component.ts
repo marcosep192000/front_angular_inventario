@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   ElementRef,
+  HostListener,
   OnInit,
   ViewChild
 } from '@angular/core';
@@ -41,6 +42,8 @@ import {
 import { ToastrService } from 'ngx-toastr';
 
 import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { CompanyDocumentConfig } from '../../../config/company-document.config';
 
 import { ProductService } from '../../../services/product.service';
 import { ProductItemSale } from '../../../interfaces/ProductItemSale';
@@ -57,6 +60,7 @@ import {
 } from '../../../interfaces/registrarDeudaCtaCteCliente';
 
 import { SaleCommon } from '../../../interfaces/sale-common';
+import { PagoTicketRequest } from '../../../interfaces/pago-ticket';
 
 import {
   SearchClientByDniComponent
@@ -197,7 +201,29 @@ export class NewSaleComponent implements OnInit {
   ngOnInit(): void {
 
     this.inicializarBuscador();
+    this.seleccionarConsumidorFinal();
 
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  manejarAtajos(event: KeyboardEvent): void {
+    if (event.repeat || this.dialog.openDialogs.length > 0) return;
+    if (event.key === 'F2') {
+      event.preventDefault();
+      this.getClient();
+      return;
+    }
+    if (event.key === 'F4') {
+      event.preventDefault();
+      void this.newSale();
+    }
+  }
+
+  private seleccionarConsumidorFinal(): void {
+    this.clienteService.getClientByDni('0').subscribe({
+      next: (cliente) => this.selectedClient = cliente,
+      error: () => this.toastr.warning('No se encontró el cliente Consumidor Final (CUIT 0).'),
+    });
   }
 
 
@@ -949,10 +975,7 @@ export class NewSaleComponent implements OnInit {
           // CANCELÓ
           // =============================================
 
-          if (
-            !result ||
-            !result.tipoCuenta
-          ) {
+          if (!result?.pagos?.length) {
 
             this.toastr.warning(
               'La venta no fue completada.'
@@ -963,94 +986,34 @@ export class NewSaleComponent implements OnInit {
           }
 
 
-          const formaDePago =
-            result.paymentMethod;
-
-
-          const tipoCuenta =
-            result.tipoCuenta;
-
-
-          const total =
-            result.totalPrice;
-
-
-          const idClient =
-            result.idCliente ??
-            this.selectedClient.id;
+          const pagos = result.pagos as PagoTicketRequest[];
+          const usaCuentaCorriente = pagos.some(
+            pago => pago.medioPago === 'CUENTA_CORRIENTE'
+          );
+          const soloCuentaCorriente = pagos.every(
+            pago => pago.medioPago === 'CUENTA_CORRIENTE'
+          );
 
 
           try {
 
-            // =========================================
-            // CONTADO
-            // =========================================
+            const idCtaCte = usaCuentaCorriente
+              ? await this.buscarCuentaIdCorrienteCliente(this.selectedClient.id)
+              : null;
 
-            if (
-              tipoCuenta ===
-              'CONTADO'
-            ) {
-
-              const sale =
-                this.buildSaleCommon(
-
-                  tipoCuenta,
-
-                  null,
-
-                  formaDePago
-
-                );
-
-
-              this.saveCommonSale(
-                sale
-              );
-
+            if (usaCuentaCorriente && !idCtaCte) {
+              this.toastr.error('El cliente seleccionado no posee una cuenta corriente válida.');
+              return;
             }
 
+            const sale = this.buildSaleCommon(
+              soloCuentaCorriente ? 'CTA_CTE' : 'CONTADO',
+              idCtaCte,
+              null,
+              pagos,
+            );
 
-            // =========================================
-            // CUENTA CORRIENTE
-            // =========================================
-
-            else if (
-              tipoCuenta ===
-              'CTA_CTE'
-            ) {
-
-              const idCtaCte =
-                await this.buscarCuentaIdCorrienteCliente(
-                  idClient
-                );
-
-
-              const sale =
-                this.buildSaleCommon(
-
-                  tipoCuenta,
-
-                  idCtaCte,
-
-                  null
-
-                );
-
-
-              this.saveCtaCteSale(
-
-                idClient,
-
-                total
-
-              );
-
-
-              this.saveCommonSale(
-                sale
-              );
-
-            }
+            this.saveCommonSale(sale);
 
           } catch (error) {
 
@@ -1350,6 +1313,9 @@ export class NewSaleComponent implements OnInit {
     saleCommon: SaleCommon
   ): void {
 
+    void this.generarPdfProfesional(saleCommon);
+    return;
+
     const doc =
       new jsPDF();
 
@@ -1485,6 +1451,113 @@ export class NewSaleComponent implements OnInit {
 
   }
 
+  private async generarPdfProfesional(saleCommon: SaleCommon): Promise<void> {
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const ancho = doc.internal.pageSize.getWidth();
+    const alto = doc.internal.pageSize.getHeight();
+    const nombreDocumento = this.getNombreDocumento();
+    const fecha = new Date(saleCommon.fechaEmision || new Date());
+    const moneda = (valor: number) => `$ ${Number(valor || 0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    doc.setFillColor(64, 46, 114);
+    doc.rect(0, 0, ancho, 42, 'F');
+
+    const logo = await this.obtenerLogoPdf();
+    if (logo) doc.addImage(logo, 'PNG', 14, 9, 25, 25);
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.text(CompanyDocumentConfig.tradeName, logo ? 43 : 14, 18);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.text(`CUIT ${CompanyDocumentConfig.cuit} · Comprobante interno`, logo ? 43 : 14, 25);
+    doc.text(CompanyDocumentConfig.contactLine || 'Sistema de gestión comercial', logo ? 43 : 14, 30);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.text(nombreDocumento.toUpperCase(), ancho - 14, 17, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text(`Nº ${saleCommon.numero || 'S/N'}`, ancho - 14, 24, { align: 'right' });
+    doc.text(fecha.toLocaleDateString('es-AR'), ancho - 14, 30, { align: 'right' });
+
+    doc.setTextColor(39, 45, 58);
+    doc.setDrawColor(225, 228, 235);
+    doc.roundedRect(14, 50, ancho - 28, 27, 2, 2, 'S');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(112, 120, 135);
+    doc.text('CLIENTE', 18, 57);
+    doc.text('CONDICIÓN DE VENTA', 118, 57);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(39, 45, 58);
+    doc.setFontSize(10);
+    doc.text(this.obtenerNombreCliente(), 18, 64);
+    doc.setFontSize(8.5);
+    doc.text(`CUIT/DNI: ${this.selectedClient?.cuit || '0'} · ${this.selectedClient?.address || 'Consumidor Final'}`, 18, 70);
+    doc.setFontSize(10);
+    doc.text(saleCommon.condicionVenta === 'CTA_CTE' ? 'CUENTA CORRIENTE' : 'CONTADO', 118, 64);
+    doc.setFontSize(8.5);
+    doc.text(`Emisión: ${fecha.toLocaleString('es-AR')}`, 118, 70);
+
+    autoTable(doc, {
+      startY: 85,
+      head: [['DESCRIPCIÓN', 'CÓDIGO', 'CANT.', 'PRECIO UNIT.', 'IMPORTE']],
+      body: saleCommon.ticketDetails.map((item) => [
+        item.productName || 'Producto', item.barCode || '-', String(item.amount),
+        moneda(item.salePrice), moneda(item.salePrice * item.amount),
+      ]),
+      theme: 'plain',
+      margin: { left: 14, right: 14 },
+      styles: { font: 'helvetica', fontSize: 8.5, cellPadding: 3, textColor: [49, 56, 70] },
+      headStyles: { fillColor: [64, 46, 114], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'left' },
+      columnStyles: { 2: { halign: 'center' }, 3: { halign: 'right' }, 4: { halign: 'right' } },
+      alternateRowStyles: { fillColor: [248, 247, 251] },
+    });
+
+    const finTabla = (doc as any).lastAutoTable.finalY + 8;
+    const yTotal = Math.min(finTabla, alto - 52);
+    doc.setFillColor(246, 244, 251);
+    doc.roundedRect(112, yTotal, 84, 30, 2, 2, 'F');
+    doc.setTextColor(94, 85, 111);
+    doc.setFontSize(9);
+    doc.text('SUBTOTAL', 118, yTotal + 9);
+    doc.text(moneda(saleCommon.subTotal), 190, yTotal + 9, { align: 'right' });
+    doc.setDrawColor(215, 210, 225);
+    doc.line(118, yTotal + 13, 190, yTotal + 13);
+    doc.setTextColor(64, 46, 114);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.text('TOTAL', 118, yTotal + 23);
+    doc.text(moneda(saleCommon.total), 190, yTotal + 23, { align: 'right' });
+
+    const paginas = doc.getNumberOfPages();
+    for (let pagina = 1; pagina <= paginas; pagina++) {
+      doc.setPage(pagina);
+      doc.setDrawColor(225, 228, 235);
+      doc.line(14, alto - 17, ancho - 14, alto - 17);
+      doc.setTextColor(120, 125, 135);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+      doc.text(`${CompanyDocumentConfig.footerText} · Documento generado por el sistema`, 14, alto - 11);
+      doc.text(`Página ${pagina} de ${paginas}`, ancho - 14, alto - 11, { align: 'right' });
+    }
+
+    doc.save(`${nombreDocumento.replace(/\s+/g, '-').toLowerCase()}-${saleCommon.numero || 'sin-numero'}.pdf`);
+  }
+
+  private obtenerLogoPdf(): Promise<string | null> {
+    return fetch(CompanyDocumentConfig.logoUrl)
+      .then((respuesta) => respuesta.blob())
+      .then((blob) => new Promise<string>((resolve, reject) => {
+        const lector = new FileReader();
+        lector.onloadend = () => resolve(String(lector.result));
+        lector.onerror = () => reject();
+        lector.readAsDataURL(blob);
+      }))
+      .catch(() => null);
+  }
+
 
   // =====================================================
   // NOMBRE DOCUMENTO
@@ -1546,6 +1619,8 @@ export class NewSaleComponent implements OnInit {
       case 'EFECTIVO':
       case 'TRANSFERENCIA':
       case 'MERCADO_PAGO':
+      case 'DEBITO':
+      case 'CREDITO':
       case 'TARJETA':
       case 'TARJETA_CREDITO':
       case 'TARJETA_DEBITO':
@@ -1568,7 +1643,9 @@ export class NewSaleComponent implements OnInit {
 
     ctaCte: number | null,
 
-    paymentMethod?: string | null
+    paymentMethod?: string | null,
+
+    pagos?: PagoTicketRequest[],
 
   ): SaleCommon {
 
@@ -1587,9 +1664,13 @@ export class NewSaleComponent implements OnInit {
     // =============================================
 
     const medioPago: SaleCommon['medioPago'] =
-      condicionVenta === 'CONTADO'
-        ? this.normalizarMedioPago(paymentMethod ?? this.medioPago)
-        : null;
+      pagos && pagos.length !== 1
+        ? null
+        : condicionVenta === 'CONTADO'
+          ? this.normalizarMedioPago(
+              pagos?.[0]?.medioPago ?? paymentMethod ?? this.medioPago
+            )
+          : null;
 
 
     // =============================================
@@ -1634,8 +1715,11 @@ export class NewSaleComponent implements OnInit {
       // MEDIO DE PAGO
       // ===========================================
 
-      medioPago:
-        medioPago,
+      ...(pagos && pagos.length > 1 ? {} : { medioPago }),
+
+
+      pagos:
+        pagos,
 
 
       // ===========================================
@@ -2218,6 +2302,7 @@ export class NewSaleComponent implements OnInit {
     this.saleCommon = undefined;
 
     this.selectedClient = undefined;
+    this.seleccionarConsumidorFinal();
 
     this.buscandoProductos = false;
 
@@ -2425,7 +2510,7 @@ export class NewSaleComponent implements OnInit {
                 text-align: center;
               "
             >
-              BON-BINI
+              ${CompanyDocumentConfig.tradeName}
             </h2>
 
 
@@ -2434,7 +2519,7 @@ export class NewSaleComponent implements OnInit {
                 text-align: center;
               "
             >
-              CUIT 27-29625726-0
+              CUIT ${CompanyDocumentConfig.cuit}
             </p>
 
 

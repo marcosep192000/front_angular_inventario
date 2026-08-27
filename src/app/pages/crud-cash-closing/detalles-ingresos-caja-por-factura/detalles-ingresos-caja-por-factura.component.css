@@ -3,22 +3,45 @@
 }
 
 .ticket-container {
-  padding: 20px;
-  min-width: 850px;
+  padding: 24px;
+  min-width: min(850px, 88vw);
+  background: #fcfbfe;
 }
 
-.ticket-title {
-  text-align: center;
+.ticket-encabezado {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: -24px -24px 24px;
+  padding: 22px 24px;
+  color: #fff;
+  background: linear-gradient(135deg, #4b2788, #7d57bc);
+}
+
+.ticket-icono {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(255,255,255,.16);
   font-size: 24px;
+}
+
+.eyebrow { display: block; margin-bottom: 4px; font-size: 10px; font-weight: 800; letter-spacing: 1.4px; opacity: .78; }
+
+.ticket-title {
+  text-align: left;
+  font-size: 23px;
   font-weight: 600;
-  color: #673ab7;
+  color: #fff;
   margin-bottom: 5px;
 }
 
 .ticket-subtitle {
-  text-align: center;
-  color: #757575;
-  margin-bottom: 25px;
+  text-align: left;
+  color: rgba(255,255,255,.84);
+  margin: 0;
 }
 
 .info-grid {
@@ -34,9 +57,10 @@
 
   border-left: 5px solid #673ab7;
 
-  background: #f8f8f8;
+  background: #fff;
 
-  border-radius: 8px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(58,39,76,.05);
 
 }
 
@@ -52,6 +76,24 @@
 
 }
 
+.pagos-ticket {
+  grid-column: span 2;
+}
+
+.pago-ticket {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #ece7f3;
+}
+
+.pago-ticket small {
+  grid-column: 1 / -1;
+  color: #756c80;
+}
+
 .table-container {
 
   border-radius: 10px;
@@ -61,6 +103,18 @@
   box-shadow: 0 3px 10px rgba(0,0,0,.08);
 
 }
+
+.productos-seccion {
+  margin-top: 8px;
+  padding: 18px;
+  border: 1px solid #ebe5f2;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.seccion-titulo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.seccion-titulo h3 { margin: 0; color: #38284b; font-size: 17px; }
+.seccion-titulo span { padding: 5px 9px; border-radius: 12px; color: #603aa0; background: #f0eaf9; font-size: 12px; font-weight: 700; }
 
 table {
 
@@ -162,6 +216,15 @@ tbody tr:hover{
 
   justify-content:flex-end;
 
+}
+
+@media (max-width: 650px) {
+  .ticket-container { min-width: 0; padding: 16px; }
+  .ticket-encabezado { margin: -16px -16px 18px; padding: 18px 16px; }
+  .info-grid { grid-template-columns: 1fr; }
+  .pagos-ticket { grid-column: span 1; }
+  .productos-seccion { padding: 12px; overflow-x: auto; }
+  .total-card { width: 100%; }
 }
 
 .loading{

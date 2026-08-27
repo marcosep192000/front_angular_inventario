@@ -1,179 +1,126 @@
-import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ToastrModule, ToastrService } from 'ngx-toastr';
-import { FormProductComponent } from '../../crud-product/form-product/form-product.component';
 import { CommonModule } from '@angular/common';
+import { Component, Inject, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatError, MatFormFieldModule } from '@angular/material/form-field';
-import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
-import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
-import { FormNuevaVentaCtaCteComponent } from "../form-nueva-venta-cta-cte/form-nueva-venta-cta-cte.component";
-import { MatRadioModule } from '@angular/material/radio';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ToastrService } from 'ngx-toastr';
+
+import { MedioPago, PagoTicketRequest } from '../../../interfaces/pago-ticket';
+
+interface TotalSaleData {
+  client: number;
+  totalPrice: number;
+  tipoDocumento: string;
+}
+
 @Component({
   selector: 'app-total-sale',
   standalone: true,
   imports: [
-    MatRadioModule,
-    MatTabsModule,
-    ToastrModule,
-    MatInputModule,
     CommonModule,
-    MatIconModule,
-    MatDialogModule,
+    FormsModule,
     MatButtonModule,
-    FormsModule,
-    MatSelectModule,
-    ReactiveFormsModule,
-    MatSlideToggleModule,
-    FormsModule,
+    MatDialogModule,
     MatFormFieldModule,
-    MatError,
-    ReactiveFormsModule,
-    IconComponent,
-    FormNuevaVentaCtaCteComponent
-],
+    MatIconModule,
+    MatInputModule,
+    MatSelectModule,
+    MatTooltipModule,
+  ],
   templateUrl: './total-sale.component.html',
   styleUrl: './total-sale.component.css',
 })
 export class TotalSaleComponent implements OnInit {
-  formGroup!: FormGroup;
-  amountPaid: number = 0; // El monto que el cliente paga (se actualizará en el formulario)
-  formaDePagoContado:string ="";
-      
-  change: number = 0; // El vuelto
-  difference: number = 0; // La diferencia que el cliente tiene que abonar
-  tipoDeCuenta: string =  ''; 
-  mensajeIdClienteHijo:string =this.data.client;
-  ngOnInit(): void {
-    this.tipoDeCuenta = 'CONTADO'
-    this.amountPaid = 0;
-    this.cdRef.detectChanges();
+  readonly mediosPago: { valor: MedioPago; etiqueta: string }[] = [
+    { valor: 'EFECTIVO', etiqueta: 'Efectivo' },
+    { valor: 'TRANSFERENCIA', etiqueta: 'Transferencia' },
+    { valor: 'DEBITO', etiqueta: 'Tarjeta de débito' },
+    { valor: 'CREDITO', etiqueta: 'Tarjeta de crédito' },
+    { valor: 'MERCADO_PAGO', etiqueta: 'Mercado Pago' },
+    { valor: 'CHEQUE', etiqueta: 'Cheque' },
+    { valor: 'CUENTA_CORRIENTE', etiqueta: 'Cuenta corriente' },
+    { valor: 'OTRO', etiqueta: 'Otro' },
+  ];
 
-  }
-  // CONSTRUCTOR -------------------
+  pagos: PagoTicketRequest[] = [];
+
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    public dialogRef: MatDialogRef<FormProductComponent>,
-    public dialog: MatDialog,
-    private fb: FormBuilder,
-    private toastr: ToastrService,
-    private cdRef: ChangeDetectorRef
-  ) {
-    this.formGroup = this.fb.group({
-  price: [
-    '',
-    [Validators.required, Validators.pattern('^\\d*\\.?\\d*$')],
-  ],
-  paymentMethod: ['EFECTIVO', Validators.required] // 👈 por defecto efectivo
-});
+    @Inject(MAT_DIALOG_DATA) public readonly data: TotalSaleData,
+    private readonly dialogRef: MatDialogRef<TotalSaleComponent>,
+    private readonly toastr: ToastrService,
+  ) {}
+
+  ngOnInit(): void {
+    this.pagos = [{ medioPago: 'EFECTIVO', monto: this.totalVenta, referencia: null }];
   }
-  //---------------------------------
-  cancel() {
+
+  get totalVenta(): number {
+    return this.redondear(Number(this.data.totalPrice) || 0);
+  }
+
+  get totalIngresado(): number {
+    return this.redondear(this.pagos.reduce((total, pago) => total + (Number(pago.monto) || 0), 0));
+  }
+
+  get restante(): number {
+    return this.redondear(this.totalVenta - this.totalIngresado);
+  }
+
+  get puedeConfirmar(): boolean {
+    return this.pagos.length > 0 &&
+      this.pagos.every(pago => Number(pago.monto) > 0) &&
+      Math.abs(this.restante) < 0.01;
+  }
+
+  agregarPago(): void {
+    this.pagos = [
+      ...this.pagos,
+      { medioPago: 'EFECTIVO', monto: Math.max(0, this.restante), referencia: null },
+    ];
+  }
+
+  eliminarPago(index: number): void {
+    if (this.pagos.length <= 1) {
+      this.toastr.info('Debe quedar al menos un medio de pago.');
+      return;
+    }
+
+    this.pagos = this.pagos.filter((_, currentIndex) => currentIndex !== index);
+  }
+
+  requiereReferencia(medio: MedioPago): boolean {
+    return ['TRANSFERENCIA', 'DEBITO', 'CREDITO', 'MERCADO_PAGO', 'CHEQUE'].includes(medio);
+  }
+
+  confirmar(): void {
+    if (!this.puedeConfirmar) {
+      this.toastr.error('La suma de los pagos debe coincidir exactamente con el total de la venta.');
+      return;
+    }
+
+    const pagos = this.pagos.map(pago => ({
+      medioPago: pago.medioPago,
+      monto: this.redondear(Number(pago.monto)),
+      referencia: pago.referencia?.trim() || null,
+    }));
+
+    this.dialogRef.close({ pagos, totalPrice: this.totalVenta });
+  }
+
+  cancelar(): void {
     this.dialogRef.close();
   }
 
-  //GUARDA DEPENDIENDO EL TIPO DE CUENTA DEL CLIENTE 
-  save(tipoCuenta : string ) {
-   if (tipoCuenta == 'CONTADO'){
-     this.saveCuntaContado(); 
-   }else{
-    this.saveCtaCorriente(); 
-   }
+  private redondear(valor: number): number {
+    return Math.round((valor + Number.EPSILON) * 100) / 100;
   }
-  //ver carga de elementos 
-  saveCuntaContado(){
-  if (this.difference > 0) {
-    this.toastr.error('Aún hay un saldo pendiente por abonar.');
-    return;
-  }
-  const saleData = {
-    amountPaid: this.amountPaid,
-    paymentMethod: this.formGroup.get('paymentMethod')?.value, // 👈 guardamos EFECTIVO o TRANSFERENCIA 
-    change: this.change,
-    tipoCuenta: 'CONTADO',
-    difference: this.difference,
-    totalPrice: this.data.totalPrice,
-  };
-console.log('Método de pago:', this.formGroup.get('paymentMethod')?.value);
-  this.dialogRef.close(saleData);
-}
-  saveCtaCorriente(){
-    const saleData = {
-      amountPaid: this.amountPaid,
-      change: this.change,
-    ctaCte: 1 ,// idCuentaCorriete: ,
-      tipoCuenta:'CTA_CTE', // saleCondition
-      totalPrice: this.data.totalPrice,
-      idCliente : this.data.client, 
-    };
-    // Emitir los datos de la venta al componente principal (NewSaleComponent)
-      this.dialogRef.close(saleData);
-    }
-
-  onInputChange(event: Event, controlName: string): void {
-    const input = event.target as HTMLInputElement;
-    // Filtra todos los caracteres no numéricos, excepto el punto decimal
-    const filteredValue = input.value.replace(/[^0-9.]/g, '');
-    // Limita la longitud a 12 caracteres
-    const finalValue = filteredValue.slice(0, 12);
-    const control = this.formGroup.get(controlName);
-    if (control) {
-      control.setValue(finalValue, { emitEvent: false });
-      // Actualiza el monto pagado (esto es lo que se va a utilizar para calcular el vuelto)
-      this.amountPaid = parseFloat(finalValue) || 0; // Si el valor no es válido, se toma 0
-      this.calculateDifference();
-      // Recalcula la diferencia y el vuelto
-    }
-  }
-
-  calculateChange() {
-    this.change = -this.data.totalSale;
-    this.difference = Math.abs(this.change); // Se toma el valor absoluto para mostrar el vuelto en positivo
-  }
-
-  calculateDifference() {
-    // Si el monto pagado es mayor o igual al total, calculamos el vuelto
-    if (this.amountPaid >= this.data.totalPrice) {
-      this.change = this.amountPaid - this.data.totalPrice;
-      this.difference = 0;
-    } else {
-      // Si el monto pagado es menor, calculamos la diferencia que falta por pagar
-      this.difference = this.data.totalPrice - this.amountPaid;
-      this.change = 0;
-    }
-  }
-  
-  onTabChange(event : MatTabChangeEvent):void { 
-    //CAMBIAMOS LAS SOLAPAS DEPENDIENDO EL TIPO DE CUENTA 
-    switch (event.index){
-      case 0: 
-      this.tipoDeCuenta = 'CONTADO'
-      break; 
-      case 1 : this.tipoDeCuenta = 'MIXTO' 
-      break; 
-      case 2: this.tipoDeCuenta= 'CTA_CTE'
-      break; 
-    }
-  }
-shouldShowGuardar(): boolean {
-  const metodo = this.formGroup.get('paymentMethod')?.value;
-
-  if (metodo === 'EFECTIVO') {
-    return this.amountPaid !== null &&
-           this.data?.totalPrice !== undefined &&
-           this.amountPaid >= this.data.totalPrice;
-  }
-
-  // Para TRANSFERENCIA y MERCADO_PAGO no se valida el monto
-  if (metodo === 'TRANSFERENCIA' || metodo === 'MERCADO_PAGO') {
-    return true;
-  }
-
-  return false;
-}
 }

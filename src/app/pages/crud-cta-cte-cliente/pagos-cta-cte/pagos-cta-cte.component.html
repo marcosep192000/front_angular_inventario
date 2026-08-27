@@ -1,95 +1,27 @@
-<mat-tab-group>
-  <mat-tab label="Pagar Factura" [disabled]="tabsDisabled.pagarFactura">
-    <mat-card class="pagos-container mat-elevation-z4">
-      <h2>Facturas Pendientes</h2>
-      <mat-table [dataSource]="dataSource" class="styled-table" multiTemplateDataRows>
-        <ng-container matColumnDef="select">
-          <mat-header-cell *matHeaderCellDef>
-            <mat-checkbox (change)="toggleAllRows($event)" [checked]="isAllSelected()"
-              [indeterminate]="selection.hasValue() && !isAllSelected()">
-            </mat-checkbox>
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            <mat-checkbox (click)="$event.stopPropagation()" (change)="toggleRow(row)"
-              [checked]="selection.isSelected(row)">
-            </mat-checkbox>
-          </mat-cell>
-        </ng-container>
-        <ng-container matColumnDef="fecha">
-          <mat-header-cell *matHeaderCellDef>Fecha</mat-header-cell>
-          <mat-cell *matCellDef="let element">{{element.fechaEmision | date}}</mat-cell>
-        </ng-container>
-        <ng-container matColumnDef="tipo">
-          <mat-header-cell *matHeaderCellDef>Tipo</mat-header-cell>
-          <mat-cell *matCellDef="let element">{{element.tipo}}</mat-cell>
-        </ng-container>
-        
-        <ng-container matColumnDef="total">
-          <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
-          <mat-cell *matCellDef="let element">{{element.total | currency:'ARS'}}</mat-cell>
-        </ng-container>
-        <mat-header-row *matHeaderRowDef="displayedColumnsWithSelect"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumnsWithSelect;" (click)="toggleRow(row)"
-          class="clickable-row"></mat-row>
-      </mat-table>
-      <div class="total-footer">
-        <span>Total seleccionado:</span>
-        <span class="monto">{{ getTotalSeleccionado() | currency:'ARS' }}</span>
-      </div>
-      <div class="btn-footer">
-        <button mat-raised-button color="primary" (click)="realizarPagoEnCtaCte()" [disabled]="selection.isEmpty()">
-          Realizar Pago
-        </button>
-        <button mat-button color="warn" (click)="cancel()">Cancelar</button>
-      </div>
-    </mat-card>
-  </mat-tab>
-
-
-  <!-- PAGO PARCIAL COMIENZO -->
-  <mat-tab label="Pago parcial Cta Cte">
-  <mat-card class="pagos-container mat-elevation-z4">
-   
-   
-    <h2>Pago parcial en cuenta corriente</h2>
-   
-   
-    <form [formGroup]="pagoForm" (ngSubmit)="realizarPago()" style="margin-top: 16px;">
-       <mat-form-field floatLabel="always">
-    <mat-label>Monto a Pagar</mat-label>
-    <input matInput type="number" class="example-right-align"  id="monto" formControlName="monto"   required [max]="saldoCtaCte"  placeholder="Ej. 50000" />
-  </mat-form-field>
-<div *ngIf="resultadoPago && resultadoPago.length > 0">
-      <h3>Detalle del pago aplicado:</h3>
-      <table class="styled-table">
-        <thead>
-          <tr>
-            <th>Comprobante</th>
-            <th>Pagado</th>
-            <th>Saldo restante</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let pago of resultadoPago">
-            <td>#{{ pago.comprobanteId}}</td>
-            <td>{{ pago.pagado | currency: 'ARS' }}</td>
-            <td>{{ pago.saldoRestante | currency: 'ARS' }}</td>
-          </tr>
-        </tbody>
-      </table>
+<section class="dialogo-cobro">
+  <header class="encabezado"><div><p class="eyebrow">Cuenta corriente</p><h2>Registrar cobro</h2><p>Aplicá el importe a una o más facturas pendientes.</p></div><button mat-icon-button aria-label="Cerrar" (click)="cerrar()"><mat-icon>close</mat-icon></button></header>
+  <div class="tabla-wrapper">
+    <table mat-table [dataSource]="facturas" class="tabla-facturas">
+      <ng-container matColumnDef="fecha"><th mat-header-cell *matHeaderCellDef>Fecha</th><td mat-cell *matCellDef="let f">{{ f.fechaEmision | date:'dd/MM/yyyy' }}</td></ng-container>
+      <ng-container matColumnDef="tipo"><th mat-header-cell *matHeaderCellDef>Comprobante</th><td mat-cell *matCellDef="let f">{{ f.tipo }}</td></ng-container>
+      <ng-container matColumnDef="total"><th mat-header-cell *matHeaderCellDef>Total</th><td mat-cell *matCellDef="let f">{{ f.total | currency:'ARS' }}</td></ng-container>
+      <ng-container matColumnDef="saldo"><th mat-header-cell *matHeaderCellDef>Saldo pendiente</th><td mat-cell *matCellDef="let f" class="saldo">{{ f.saldoPendiente | currency:'ARS' }}</td></ng-container>
+      <ng-container matColumnDef="aplicar"><th mat-header-cell *matHeaderCellDef>Aplicar ahora</th><td mat-cell *matCellDef="let f"><div class="aplicar-control"><input type="number" min="0" [max]="f.saldoPendiente" step="0.01" [ngModel]="montosAplicados[f.id] || null" (ngModelChange)="actualizarAplicacion(f, $event)" [attr.aria-label]="'Monto para factura ' + f.id"><button mat-button type="button" (click)="aplicarSaldoCompleto(f)">Saldo</button></div></td></ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr><tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+    <p *ngIf="!cargando && !facturas.length" class="sin-datos">No hay facturas pendientes para este cliente.</p>
+  </div>
+  <section class="pagos-section">
+    <div class="section-title"><div><h3>Medios de cobro</h3><p>Podés combinar varios medios de pago.</p></div><button mat-stroked-button type="button" (click)="agregarPago()"><mat-icon>add</mat-icon> Agregar medio</button></div>
+    <div class="pago-fila" *ngFor="let pago of pagos; let i = index">
+      <mat-form-field appearance="outline"><mat-label>Medio</mat-label><mat-select [(ngModel)]="pago.medioPago"><mat-option *ngFor="let medio of mediosPago" [value]="medio.value">{{ medio.label }}</mat-option></mat-select></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Monto</mat-label><input matInput type="number" min="0.01" step="0.01" [(ngModel)]="pago.monto"></mat-form-field>
+      <mat-form-field appearance="outline" class="referencia"><mat-label>Referencia {{ requiereReferencia(pago.medioPago) ? '(opcional)' : '' }}</mat-label><input matInput [(ngModel)]="pago.referencia"></mat-form-field>
+      <button mat-icon-button color="warn" type="button" [disabled]="pagos.length === 1" (click)="eliminarPago(i)" aria-label="Eliminar medio"><mat-icon>delete_outline</mat-icon></button>
     </div>
-
-      <div class="btn-footer">
- @if (resultadoPago && resultadoPago.length > 0) {
-<button mat-button color="warn" type="button" (click)="cancel()">Salir</button>
- }
- @else {
-   <button mat-raised-button color="primary" type="submit" [disabled]="pagoForm.invalid || pagoForm.value.monto > saldoCtaCte">Realizar pago</button>
-   <button mat-button color="warn" type="button" (click)="cancel()">Cancelar</button>
- }
-       
-      </div>
-    </form>
-  </mat-card>
-</mat-tab>
-</mat-tab-group>
+  </section>
+  <mat-form-field appearance="outline" class="observacion"><mat-label>Observación</mat-label><textarea matInput rows="2" [(ngModel)]="observacion" placeholder="Opcional"></textarea></mat-form-field>
+  <div class="resumen"><div><span>Total aplicado</span><strong>{{ totalAplicado | currency:'ARS' }}</strong></div><div><span>Total cobrado</span><strong>{{ totalPagos | currency:'ARS' }}</strong></div><div [class.cuadrado]="importesCuadrados" [class.descuadrado]="!importesCuadrados"><span>Diferencia</span><strong>{{ diferencia | currency:'ARS' }}</strong></div></div>
+  <div class="acciones"><button mat-button type="button" (click)="verHistorial()"><mat-icon>history</mat-icon> {{ mostrandoHistorial ? 'Ocultar historial' : 'Ver historial' }}</button><span class="spacer"></span><button mat-button type="button" (click)="cerrar()">Cancelar</button><button mat-raised-button color="primary" type="button" [disabled]="!puedeConfirmar" (click)="confirmarCobro()">{{ cargando ? 'Guardando...' : 'Confirmar cobro' }}</button></div>
+  <section *ngIf="mostrandoHistorial" class="historial"><h3>Historial de cobros</h3><article *ngFor="let cobro of historial"><div><strong>{{ cobro.numeroComprobante }}</strong><span>{{ cobro.fechaHora | date:'dd/MM/yyyy HH:mm' }}</span></div><strong>{{ cobro.total | currency:'ARS' }}</strong><small>{{ cobro.aplicaciones.length }} factura(s) afectada(s)</small></article><p *ngIf="!historial.length" class="sin-datos">No hay cobros registrados.</p></section>
+</section>

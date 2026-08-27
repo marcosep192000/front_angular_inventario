@@ -1,86 +1,58 @@
-<!-- Buscador y botón -->
-<div class="container__search-bar">
-    <div class="search__wrapper">
-      <input class="search__input" placeholder="Ingresa la categoria a buscar" type="text" ngModel=""
-        (keyup)="applyFilter($event)" value="text">
+<section class="clientes-page">
+  <header class="clientes-header">
+    <div class="titulo-seccion">
+      <div class="titulo-icono"><mat-icon>groups</mat-icon></div>
+      <div>
+        <p class="eyebrow">GESTIÓN COMERCIAL</p>
+        <h1>Clientes</h1>
+        <span>Consultá y administrá la información de tus clientes.</span>
+      </div>
     </div>
-    <div>
-      <button class="btn__new" (click)="createClient()">Nuevo Cliente</button>
+    <div class="cabecera-acciones"><button mat-stroked-button type="button" class="btn-alertas" (click)="mostrarAlertas = !mostrarAlertas"><mat-icon>notifications_active</mat-icon> Alertas ({{ alertas.length }})</button><button mat-raised-button color="primary" type="button" class="btn-nuevo" (click)="createClient()">
+      <mat-icon>person_add</mat-icon> Nuevo cliente
+    </button></div>
+  </header>
+  <section *ngIf="mostrarAlertas" class="panel-alertas"><header class="alertas-cabecera"><div><p class="eyebrow">GESTIÓN DE RIESGO</p><h2><mat-icon>warning_amber</mat-icon> Deudas atrasadas</h2><span>Facturas con 30 días o más de atraso.</span></div><div class="alertas-acciones"><button mat-button type="button" (click)="cargarAlertas()"><mat-icon>refresh</mat-icon> Actualizar</button><button mat-button type="button" (click)="descargarReporteAlertas()"><mat-icon>picture_as_pdf</mat-icon> PDF</button></div></header><p *ngIf="!alertas.length" class="sin-alertas"><mat-icon>verified</mat-icon> No hay deudas atrasadas.</p><article *ngFor="let alerta of alertas" [class]="'riesgo-' + alerta.riesgo.toLowerCase()"><div class="alerta-cliente"><strong>{{ alerta.cliente }}</strong><span>{{ alerta.comprobante }} · Vence {{ alerta.fechaVencimiento | date:'dd/MM/yyyy' }}</span></div><span class="riesgo-badge">{{ alerta.riesgo }}</span><div class="alerta-saldo"><strong>{{ alerta.saldoPendiente | currency:'ARS' }}</strong><small>{{ alerta.aviso }}</small></div><button *ngIf="alerta.diasVencida >= 30 && alerta.saldoPendiente > 0" mat-stroked-button type="button" class="btn-mora" (click)="aplicarMora(alerta)"><mat-icon>add_alert</mat-icon> Aplicar mora</button></article></section>
+
+  <section class="panel-clientes">
+    <div class="barra-herramientas">
+      <mat-form-field appearance="outline" class="buscador">
+        <mat-icon matPrefix>search</mat-icon>
+        <mat-label>Buscar cliente</mat-label>
+        <input matInput type="search" placeholder="Nombre, DNI, teléfono o email" (input)="applyFilter($event)">
+      </mat-form-field>
     </div>
-  </div>
-  
-  <!-- Tabla con scroll horizontal -->
-  <div class="table__wrapper mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" class="mat-table">
-  
-      <!-- Columnas -->
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>Codigo</th>
-        <td mat-cell *matCellDef="let element"> {{element.id}}</td>
-      </ng-container>
-  
-      <ng-container matColumnDef="dni">
-        <th mat-header-cell *matHeaderCellDef>Dni</th>
-        <td mat-cell *matCellDef="let element"> {{element.cuit}}</td>
-      </ng-container>
-  
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Nombre/s</th>
-        <td mat-cell *matCellDef="let element"> {{element.name}}</td>
-      </ng-container>
-  
-      <ng-container matColumnDef="lastName">
-        <th mat-header-cell *matHeaderCellDef>Apellido/s</th>
-        <td mat-cell *matCellDef="let element"> {{element.lastName}}</td>
-      </ng-container>
-  
-      <ng-container matColumnDef="address">
-        <th mat-header-cell *matHeaderCellDef>Dirección</th>
-        <td mat-cell *matCellDef="let element"> {{element.address}}</td>
-      </ng-container>
-  
-      <ng-container matColumnDef="tel">
-        <th mat-header-cell *matHeaderCellDef>Teléfono</th>
-        <td mat-cell *matCellDef="let element"> {{element.tel}}</td>
-      </ng-container>
-  
-      <ng-container matColumnDef="email">
-        <th mat-header-cell *matHeaderCellDef>Email</th>
-        <td mat-cell *matCellDef="let element"> {{element.email}}</td>
-      </ng-container>
-  
-      <ng-container matColumnDef="Opciones">
-        <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
-        <td mat-cell *matCellDef="let element">
-          <div class="container__accions">
-            @if(element.cuentaCorriente !== null ){
-              <button mat-fab class="btn__ctaCte" (click)="ctaCteClient(element.id)" matTooltip="Cuenta Corriente Activa">
-                <app-icon [iconSrc]="'assets/icons/ctaCte.png'" [size]="'20px'"></app-icon>
-              </button>
+
+    <div class="resumen-lista">
+      <span><mat-icon>group</mat-icon>{{ dataSource.filteredData.length }} cliente(s) activos</span>
+    </div>
+
+    <div class="tabla-contenedor">
+      <table mat-table [dataSource]="dataSource" class="tabla-clientes">
+        <ng-container matColumnDef="id"><th mat-header-cell *matHeaderCellDef>ID</th><td mat-cell *matCellDef="let e"><span class="codigo">#{{ e.id }}</span></td></ng-container>
+        <ng-container matColumnDef="dni"><th mat-header-cell *matHeaderCellDef>DNI / CUIT</th><td mat-cell *matCellDef="let e">{{ e.cuit || '-' }}</td></ng-container>
+        <ng-container matColumnDef="name"><th mat-header-cell *matHeaderCellDef>Cliente</th><td mat-cell *matCellDef="let e"><div class="cliente-nombre"><span>{{ e.name?.charAt(0) || '?' }}</span><strong>{{ e.name }}</strong></div></td></ng-container>
+        <ng-container matColumnDef="lastName"><th mat-header-cell *matHeaderCellDef>Apellido</th><td mat-cell *matCellDef="let e">{{ e.lastName || '-' }}</td></ng-container>
+        <ng-container matColumnDef="address"><th mat-header-cell *matHeaderCellDef>Dirección</th><td mat-cell *matCellDef="let e">{{ e.address || '-' }}</td></ng-container>
+        <ng-container matColumnDef="tel"><th mat-header-cell *matHeaderCellDef>Teléfono</th><td mat-cell *matCellDef="let e">{{ e.tel || '-' }}</td></ng-container>
+        <ng-container matColumnDef="email"><th mat-header-cell *matHeaderCellDef>Email</th><td mat-cell *matCellDef="let e">{{ e.email || '-' }}</td></ng-container>
+        <ng-container matColumnDef="Opciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let e"><div class="acciones-fila">
+            @if (e.cuentaCorriente) {
+              <button mat-icon-button type="button" class="accion-cuenta" matTooltip="Ver cuenta corriente" (click)="ctaCteClient(e.id)"><mat-icon>account_balance_wallet</mat-icon></button>
             } @else {
-              <button mat-fab class="btn__ctaCte" (click)="altaCtaCteClient(element.id)" matTooltip="Crear Cuenta Corriente">
-                <app-icon [iconSrc]="'assets/icons/ctaCte2.png'" [size]="'20px'"></app-icon>
-              </button>
+              <button mat-icon-button type="button" class="accion-cuenta" matTooltip="Crear cuenta corriente" (click)="altaCtaCteClient(e.id)"><mat-icon>add_card</mat-icon></button>
             }
-  
-            <button mat-fab class="btn__update" (click)="updateClient(element.id)" matTooltip="Actualizar Info">
-              <app-icon [iconSrc]="'assets/icons/task.png'" [size]="'20px'"></app-icon>
-            </button>
-  
-            <button mat-fab class="btn__delete" (click)="deleteClient(element.id)" matTooltip="Eliminar Usuario">
-              <app-icon [iconSrc]="'assets/icons/delete.png'" [size]="'20px'"></app-icon>
-            </button>
-          </div>
-        </td>
-      </ng-container>
-  
-      <!-- Filas -->
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-  
-    <!-- Paginador -->
-    <mat-paginator [pageSizeOptions]="[5, 8]" showFirstLastButtons aria-label="Select page of periodic elements">
-    </mat-paginator>
-  </div>
-  
+            <button mat-icon-button type="button" class="accion-editar" matTooltip="Editar cliente" (click)="updateClient(e.id)"><mat-icon>edit</mat-icon></button>
+            <button mat-icon-button type="button" class="accion-eliminar" matTooltip="Eliminar cliente" (click)="deleteClient(e.id)"><mat-icon>delete_outline</mat-icon></button>
+          </div></td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr class="mat-row sin-resultados" *matNoDataRow><td class="mat-cell" [attr.colspan]="displayedColumns.length"><mat-icon>person_search</mat-icon>No encontramos clientes para esa búsqueda.</td></tr>
+      </table>
+    </div>
+    <mat-paginator [pageSizeOptions]="[5, 8, 10, 25]" showFirstLastButtons aria-label="Paginación de clientes"></mat-paginator>
+  </section>
+</section>

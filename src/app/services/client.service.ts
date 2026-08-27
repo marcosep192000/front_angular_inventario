@@ -5,6 +5,14 @@ import { Observable } from 'rxjs';
 import { Client } from '../interfaces/Client';
 import { CtaCte } from '../interfaces/CtaCte';
 
+export interface LimiteCuentaCorrienteResponse {
+  cuentaCorrienteId: number;
+  clienteId: number;
+  limite: number;
+  deudaActual: number;
+  saldoDisponible: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -44,10 +52,17 @@ export class ClientService {
     return this.http.delete(`${this.baseUrl}customer/delete-supplier/${id}`);
   }
 
-  guardarCuentaCorriente(idClient: number, cuenta: CtaCte) {
+  guardarCuentaCorriente(idClient: number, cuenta: Pick<CtaCte, 'montoMaximoDeCtaCte'>) {
     return this.http.post(
       `${this.baseUrl}customer/${idClient}/cuenta-corriente`,
       cuenta
+    );
+  }
+
+  actualizarLimiteCuentaCorriente(clienteId: number, nuevoLimite: number): Observable<LimiteCuentaCorrienteResponse> {
+    return this.http.put<LimiteCuentaCorrienteResponse>(
+      `${this.baseUrl}customer/${clienteId}/cuenta-corriente/limite`,
+      { nuevoLimite }
     );
   }
 }

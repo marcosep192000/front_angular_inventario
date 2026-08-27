@@ -30,6 +30,8 @@
 
             <th>Comprobante</th>
 
+            <th>Tipo de comprobante</th>
+
             <th>
               {{ data.tipo === 'INGRESO'
               ? 'Forma de Pago'
@@ -59,6 +61,12 @@
             <td>
 
               {{ item.numeroComprobante }}
+
+            </td>
+
+            <td>
+
+              {{ item.categoriaMovimiento || item.tipo || 'Sin especificar' }}
 
             </td>
 

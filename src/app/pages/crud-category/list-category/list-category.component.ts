@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormCategoryComponent } from '../form-category/form-category/form-category.component';
 import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { DialogGenericService } from '../../../services/dialog-generic.service';
 import { Observable } from 'rxjs';
@@ -33,6 +34,7 @@ import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
     MatButtonModule,
     MatDialogModule,
     MatInputModule,
+    MatTooltipModule,
     CommonModule, // Agrega CommonModule aquí
     HttpClientModule // Asegúrate de importar HttpClientModule si estás haciendo solicitudes HTTP
     ,

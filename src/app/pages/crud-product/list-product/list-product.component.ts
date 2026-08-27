@@ -218,8 +218,30 @@ const dialogRef = this.dialog.open(BuscarProductoPorProveedorComponent, {
   }
 
 onSearchChange(value: string): void {
-  this.searchSubject.next(value);
+  this.filterValue = value;
+  this.searchSubject.next(value.trim());
 }
+
+claseStock(producto: Product): string {
+  if (producto.stock <= 0) {
+    return 'sin-stock';
+  }
+
+  if (producto.stock <= producto.stockMin) {
+    return 'stock-bajo';
+  }
+
+  return 'stock-ok';
+}
+
+iconoStock(producto: Product): string {
+  return producto.stock <= producto.stockMin ? 'warning_amber' : 'check_circle';
+}
+
+textoStock(producto: Product): string {
+  return producto.stock > 0 ? `${producto.stock} unidades` : 'Sin stock';
+}
+
 filterValue: string = '';
 
 onFilter(event: Event): void {

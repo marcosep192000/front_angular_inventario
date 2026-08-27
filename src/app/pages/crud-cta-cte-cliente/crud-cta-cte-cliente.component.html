@@ -1,31 +1,17 @@
-<form [formGroup]="formGroup">
-
-
-<div class="container__title">
-    <h2 class="title__color" mat-dialog-title>
-        <app-icon [iconSrc]="'assets/icons/point_of_sale.png'" [size]="'50px'"></app-icon>Alta Cuenta Corriente
-    </h2>
-    <div class="btn-sale">
-        <strong></strong>
-    </div>
-</div>
- <div class = "container-fluid">
-    <mat-form-field class="input" hintLabel="Máximo 12 caracteres">
-        <mat-label>Saldo Inicial</mat-label>
-        <input matInput maxlength="12" formControlName="montoMaximoDeCtaCte" (input)="onInputChange($event,'saldo')" type="text"
-            pattern="^\d*\.?\d*$" />
-        <mat-hint align="end">
-        {{ formGroup.get('cuentaCorriente.saldo')?.value | currency: 'ARS': 'symbol' : '1.0-2' }}
-        </mat-hint>
-        <mat-error *ngIf="formGroup.get('cuentaCorriente.saldo')?.hasError('pattern')">
-            Solo se permiten números y un punto decimal.
-        </mat-error>
-    </mat-form-field>
-    </div>
-    <mat-dialog-actions>
-        <div class="btn"></div> 
-      <button mat-raised-button class="warn" (click)="cancel()">Cancelar</button>
-      <button mat-raised-button color="primary" (click)="save(data.altaClient)">Guardar</button>
-    </mat-dialog-actions>  
-
-</form>
+<section class="container__title" [formGroup]="formGroup">
+  <div>
+    <h2 class="title__color" mat-dialog-title><mat-icon>account_balance_wallet</mat-icon> Crear cuenta corriente</h2>
+    <p>Definí el límite de crédito disponible para este cliente.</p>
+  </div>
+  <mat-form-field class="input" appearance="outline">
+    <mat-label>Límite de crédito</mat-label>
+    <input matInput type="number" min="0" step="0.01" formControlName="montoMaximoDeCtaCte" placeholder="0,00">
+    <span matTextPrefix>$&nbsp;</span>
+    <mat-error *ngIf="formGroup.controls.montoMaximoDeCtaCte.hasError('required')">Ingresá un límite de crédito.</mat-error>
+    <mat-error *ngIf="formGroup.controls.montoMaximoDeCtaCte.hasError('min')">El límite no puede ser negativo.</mat-error>
+  </mat-form-field>
+  <div mat-dialog-actions class="btn">
+    <button mat-button type="button" (click)="cancelar()">Cancelar</button>
+    <button mat-raised-button color="primary" type="button" [disabled]="guardando" (click)="guardar()">{{ guardando ? 'Guardando...' : 'Crear cuenta' }}</button>
+  </div>
+</section>

@@ -84,7 +84,9 @@ totalCheque = 0;
     data: {
       id: item.id,
       categoriaMovimiento: item.categoriaMovimiento,
-      numeroComprobante: item.numeroComprobante
+      numeroComprobante: item.numeroComprobante,
+      tipo: item.tipo,
+      descripcion: item.descripcion,
     }
 
   });
@@ -123,6 +125,14 @@ calcularTotales(): void {
       case 'MERCADO_PAGO':
 
         this.totalMercadoPago += mov.monto;
+
+        break;
+
+      case 'DEBITO':
+      case 'CREDITO':
+      case 'OTRO':
+
+        this.totalTransferencia += mov.monto;
 
         break;
 

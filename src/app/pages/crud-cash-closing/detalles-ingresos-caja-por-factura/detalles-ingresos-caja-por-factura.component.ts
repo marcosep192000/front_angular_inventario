@@ -52,7 +52,10 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
 
   ngOnInit(): void {
 
-    if (this.data.categoriaMovimiento === 'VENTA') {
+    if (
+      String(this.data.categoriaMovimiento ?? '').toUpperCase() === 'VENTA' ||
+      this.data.numeroComprobante
+    ) {
 
       this.cargarVenta();
 
@@ -86,7 +89,9 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
             err
           );
 
-          this.cargando = false;
+          // Si el movimiento no corresponde a un ticket, mantenemos el
+          // comportamiento anterior y cargamos su detalle de caja.
+          this.cargarMovimiento();
 
         }
 
@@ -136,6 +141,10 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
 
     return this.movimiento != null;
 
+  }
+
+  get detallesVenta() {
+    return this.ticket?.ticketDetails ?? [];
   }
 
 
