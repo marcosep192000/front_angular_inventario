@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 import { Observable } from 'rxjs';
 import { filter, map, shareReplay } from 'rxjs/operators';
@@ -37,7 +37,7 @@ export class NavigationComponent implements OnInit {
     private breakpointObserver = inject(BreakpointObserver);
 
     isHandset$: Observable<boolean> = this.breakpointObserver
-        .observe(Breakpoints.Handset)
+        .observe('(max-width: 991px)')
         .pipe(
             map(result => result.matches),
             shareReplay(1)
@@ -45,13 +45,13 @@ export class NavigationComponent implements OnInit {
 
     username: string = '';
     roles: string[] = [];
-    isHandset = false;
+    isHandset = typeof window !== 'undefined' && window.matchMedia('(max-width: 991px)').matches;
     fotoUsuarioSrc: string | null = null;
 
     /**
      * Menú expandido o contraído.
      */
-    menuCollapsed = false;
+    menuCollapsed = typeof window !== 'undefined' && window.matchMedia('(max-width: 991px)').matches;
 
     constructor(
         private tokenService: TokenService,

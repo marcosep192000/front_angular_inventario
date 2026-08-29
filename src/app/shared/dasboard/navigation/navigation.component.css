@@ -221,6 +221,12 @@
         padding:0 8px;
     }
 
+    .menu-toggle{
+        flex:0 0 48px;
+        width:48px;
+        height:48px;
+    }
+
     .router-content{
         padding:10px;
     }

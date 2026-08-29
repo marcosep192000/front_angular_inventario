@@ -49,8 +49,10 @@
 
             <button
                 mat-icon-button
+                class="menu-toggle"
                 type="button"
-                aria-label="Abrir o cerrar menú"
+                [attr.aria-label]="menuCollapsed ? 'Abrir menú' : 'Cerrar menú'"
+                [attr.aria-expanded]="!menuCollapsed"
                 (click)="toggleMenu()">
 
                 <mat-icon>menu</mat-icon>
