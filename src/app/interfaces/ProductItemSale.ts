@@ -13,6 +13,7 @@ export interface ProductItemSale {
   stock: number;
   stockMin: number;
   iva: number;
+  tipoIva?: import('./tipo-iva').TipoIva;
   salePrice: number;
   marca: Marca;
   quantity: number;

@@ -1,24 +1,20 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { environments } from '../../../environments/environments.prod';
+import { TokenService } from '../../services/token.service';
 
 // Interceptor que agrega el token al encabezado Authorization si está presente pero no si es distinto 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  // Si la URL contiene "Acceso", no agregar el token
-  if (req.url.indexOf('Acceso') > 0) {
+  const tokenService = inject(TokenService);
+  const esApiPropia = req.url.startsWith(environments.baseURL);
+  const esAcceso = /\/acceso(?:\/|$)|\/login(?:\/|$)|\/auth(?:\/|$)/i.test(req.url);
+  if (!esApiPropia || esAcceso) return next(req);
+
+  if (!tokenService.isTokenValid()) {
+    tokenService.logOut();
     return next(req);
   }
 
-  // Obtener el token del almacenamiento local
-     const token = localStorage.getItem('token');
-  // Si el token está presente, agregarlo a la cabecera Authorization
-  if (token) {
-    const clonedRequest = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return next(clonedRequest);
-  } else {
-    // Si no hay token, continuar sin modificar la solicitud
-    return next(req);
-  }
+  const token = tokenService.getToken();
+  return next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));
 };

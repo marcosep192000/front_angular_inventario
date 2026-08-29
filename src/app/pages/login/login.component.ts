@@ -52,8 +52,8 @@ export class LoginComponent {
 
     this.accesoService.login(objeto).subscribe({
       next: (data) => {
-        if (data.token) {
-          this.tokenService.setToken(data.token);
+        if (data.accessToken) {
+          this.tokenService.setToken(data.accessToken);
           this.tokenService.setAuthorities(data.authorities);
           this.tokenService.setUserName(data.username);
           this.route.navigate(['/dashboard']);

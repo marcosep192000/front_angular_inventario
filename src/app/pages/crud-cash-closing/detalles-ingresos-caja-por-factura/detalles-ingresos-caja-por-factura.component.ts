@@ -10,9 +10,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { TicketService } from '../../../services/ticket.service';
 import { MovimientoCajaService } from '../../../services/movimiento-caja.service';
+import { ClientService } from '../../../services/client.service';
 
 import { SaleCommon } from '../../../interfaces/sale-common';
 import { MovimientoDetalle } from '../../../interfaces/movimiento-detalle';
+import { Client } from '../../../interfaces/Client';
 
 @Component({
   selector: 'app-detalles-ingresos-caja-por-factura',
@@ -31,6 +33,7 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
   cargando = true;
 
   ticket?: SaleCommon;
+  cliente?: Client;
 
   movimiento?: MovimientoDetalle;
 
@@ -43,6 +46,7 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
     private ticketService: TicketService,
 
     private movimientoService: MovimientoCajaService,
+    private clientService: ClientService,
 
     private dialogRef:
       MatDialogRef<DetallesIngresosCajaPorFacturaComponent>
@@ -77,7 +81,8 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
         next: resp => {
 
           this.ticket = resp;
-
+          this.cliente = resp.cliente;
+          if (!this.cliente && resp.client) this.clientService.obtenerClientePorId(resp.client).subscribe({ next: cliente => this.cliente = cliente });
           this.cargando = false;
 
         },

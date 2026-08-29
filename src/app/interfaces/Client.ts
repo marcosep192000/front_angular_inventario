@@ -12,6 +12,7 @@ export interface Client {
 	time?: any;
 	status: boolean;
 	cuentaCorriente?: CtaCte;	
+	condicionIva?: 'RESPONSABLE_INSCRIPTO' | 'MONOTRIBUTISTA' | 'EXENTO' | 'CONSUMIDOR_FINAL' | 'NO_ALCANZADO' | 'NO_CATEGORIZADO';
 }
 
 

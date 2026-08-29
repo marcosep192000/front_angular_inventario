@@ -465,7 +465,7 @@ verPagosFactura(
   private calcularTotalesFacturas(): void {
     this.totalFacturado = this.facturas.reduce(
       (total: number, factura: FacturasProveedor) =>
-        total + this.obtenerNumero(factura.montoTotal),
+        total + this.obtenerTotalFactura(factura),
 
       0,
     );
@@ -473,7 +473,7 @@ verPagosFactura(
     this.totalPagado = this.facturas.reduce(
       (total: number, factura: FacturasProveedor) => {
         const pagado =
-          this.obtenerNumero(factura.montoTotal) -
+          this.obtenerTotalFactura(factura) -
           this.obtenerSaldoFactura(factura);
 
         return total + Math.max(0, pagado);
@@ -672,6 +672,8 @@ verPagosFactura(
       maxHeight: '90vh',
 
       autoFocus: false,
+
+      panelClass: 'detalle-factura-dialog',
 
       data: {
         factura,
@@ -1132,6 +1134,10 @@ obtenerTotalFactura(
     return 0;
   }
 
+  if ('montoTotalDecimal' in factura && factura.montoTotalDecimal != null) {
+    return Number(factura.montoTotalDecimal) || 0;
+  }
+
   if ('montoTotal' in factura) {
     return Number(factura.montoTotal) || 0;
   }
@@ -1294,7 +1300,7 @@ obtenerNumeroFactura(
     }
 
     const total = this.obtenerNumero(
-      factura.montoTotal ?? factura.total ?? factura.amount,
+      factura.montoTotalDecimal ?? factura.montoTotal ?? factura.total ?? factura.amount,
     );
 
     const pagado = this.obtenerNumero(factura.totalPagado);
@@ -1324,7 +1330,7 @@ obtenerNumeroFactura(
     const saldo = this.obtenerSaldoFactura(factura);
 
     const total = this.obtenerNumero(
-      factura?.montoTotal ?? factura?.total ?? factura?.amount,
+      factura?.montoTotalDecimal ?? factura?.montoTotal ?? factura?.total ?? factura?.amount,
     );
 
     if (saldo <= 0) {

@@ -483,6 +483,15 @@ button[mat-raised-button]{
   border-left: 4px solid #795548;
 }
 
+/* Cheques: tarjeta completa, sin heredar el formato incompleto de otros medios. */
+.cards-resumen .card-resumen.cheque{border:1px solid #decbb9;border-left:4px solid #8a5a3b;background:linear-gradient(135deg,#fffdfa,#f8f0e9)}
+.cards-resumen .card-resumen.cheque .icono{background:#8a5a3b;color:#fff;box-shadow:0 5px 11px rgba(138,90,59,.22)}
+.cards-resumen .card-resumen.cheque .titulo-card{color:#75533d;font-weight:700}.cards-resumen .card-resumen.cheque .valor{color:#5b3925}
+
+/* El diálogo muestra todos los medios de pago sin recortar el último. */
+.detalle-caja-container{width:94vw;max-width:1400px;max-height:none;overflow:visible}.contenido{overflow:visible}.tabla-wrapper{flex:none;max-height:none;overflow:visible}.cards-resumen{padding-bottom:2px}
+@media(max-width:700px){.detalle-caja-container{width:98vw;max-height:none}.tabla-wrapper{max-height:none}}
+
 .medio-pago {
   display: inline-flex;
   align-items: center;
@@ -496,3 +505,10 @@ button[mat-raised-button]{
 .icono-cheque {
   font-size: 16px;
 }
+
+/* Lenguaje visual compartido con Caja y ventas facturadas. */
+.detalle-caja-container{border:1px solid #e6dff0;border-radius:16px;box-shadow:0 20px 48px rgba(52,33,82,.18);background:#fcfbfe}.modal-header{padding:20px 24px!important;color:#fff!important;background:linear-gradient(135deg,#39216d,#7955bb)!important}.modal-header .titulo{color:#fff}.modal-header .btn-cerrar{color:#fff}.contenido{padding:20px 24px;background:#fcfbfe}.subtitulo{padding:11px 13px;border-left:4px solid #7955bb;border-radius:8px;background:#f3effa;color:#48306e;font-size:.9rem}.tabla-wrapper{border-color:#e5ddec;border-radius:11px;box-shadow:0 4px 12px rgba(57,33,109,.05)}.tabla-detalles thead{background:#f1ecf8;color:#54358a}.tabla-detalles tbody tr:hover{background:#f8f4ff}.tabla-detalles td{border-bottom-color:#eee8f4}.cards-resumen{grid-template-columns:repeat(5,1fr)}.card-resumen{border-color:#e5ddec;background:#fff}.card-total{background:linear-gradient(135deg,#39216d,#7955bb);box-shadow:0 10px 20px rgba(57,33,109,.2)}.acciones{background:#fff;border-top-color:#e9e2f1}@media(max-width:1100px){.cards-resumen{grid-template-columns:repeat(2,1fr)}}
+
+.ventas-dia{margin-bottom:18px;padding:16px;border:1px solid #ded5ee;border-radius:12px;background:linear-gradient(135deg,#fbf9ff,#f6f2ff)}
+.ventas-header,.ventas-header>div{display:flex;align-items:center;gap:10px}.ventas-header{justify-content:space-between}.ventas-header mat-icon{color:#522e92}.ventas-header h3{margin:0;color:#39216d;font-size:1rem}.ventas-header span,.ventas-header small{font-size:.76rem;color:#756b85}.contador-ventas{padding:5px 9px;border-radius:99px;background:#e8dffc;color:#522e92;font-weight:700;font-size:.75rem!important}.metricas-ventas{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.metricas-ventas article{padding:11px;border-radius:9px;background:#fff;border:1px solid #e7e0f2}.metricas-ventas span{display:block;color:#71677f;font-size:.75rem}.metricas-ventas strong{display:block;margin-top:4px;color:#38215d;font-size:1rem}.tabla-ventas{max-height:195px;overflow:auto;border:1px solid #ded5ee;border-radius:9px;background:#fff}.tabla-ventas table{width:100%;border-collapse:collapse}.tabla-ventas th{padding:9px;background:#63409c;color:#fff;font-size:.72rem;text-align:left}.tabla-ventas td{padding:8px;border-bottom:1px solid #eee9f5;font-size:.8rem}.tabla-ventas small{display:block;color:#7b7289;margin-top:2px}.sin-ventas{margin:14px 0 0;color:#756b85;font-size:.82rem}.otros-ingresos{margin:0;padding:12px 14px;background:#faf8ff;color:#522e92;font-size:.88rem}
+@media(max-width:700px){.metricas-ventas{grid-template-columns:1fr}.ventas-header{align-items:flex-start}.tabla-ventas{overflow:auto}.tabla-ventas table{min-width:700px}}

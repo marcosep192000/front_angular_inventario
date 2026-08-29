@@ -67,6 +67,7 @@
                     <mat-error *ngIf="emailFormControl.hasError('required')">Email es
                         <strong>requerido</strong></mat-error>
                 </mat-form-field>
+                <mat-form-field class="input"><mat-label>Condición IVA</mat-label><mat-select formControlName="condicionIva"><mat-option value="RESPONSABLE_INSCRIPTO">Responsable inscripto</mat-option><mat-option value="MONOTRIBUTISTA">Monotributista</mat-option><mat-option value="EXENTO">Exento</mat-option><mat-option value="CONSUMIDOR_FINAL">Consumidor final</mat-option><mat-option value="NO_ALCANZADO">No alcanzado</mat-option><mat-option value="NO_CATEGORIZADO">No categorizado</mat-option></mat-select></mat-form-field>
             </div><!-- FIN COLUMNA 2 -->
 
         </div> <!-- FIN CONTAINER-COL -->

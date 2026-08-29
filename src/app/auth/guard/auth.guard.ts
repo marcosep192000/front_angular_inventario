@@ -1,6 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { TokenService } from '../../services/token.service';
 
 // Función para validar si el token es un JWT válido
 export const isValidJwt = (token: string): boolean => {
@@ -10,10 +11,10 @@ export const isValidJwt = (token: string): boolean => {
 
 // Guard que verifica si el usuario está autenticado
 export const authGuard: CanActivateFn = (route, state) => {
-  const token = localStorage.getItem('token');
   const router = inject(Router);
+  const tokenService = inject(TokenService);
 
-  if (!token || !isValidJwt(token)) {
+  if (!tokenService.isTokenValid()) {
     router.navigate(['/login']); // Redirige al login si el token no es válido
     return false;
   }

@@ -30,7 +30,8 @@ import { SupplierService } from '../../../services/supplier.service';
 import { Supplier } from '../../../interfaces/supplier';
 import { IconComponent } from "../../../shared/dasboard/icon/icon.component";
 import { FormCategoryComponent } from '../../crud-category/form-category/form-category/form-category.component';
- 
+import { TipoIva, TIPOS_IVA, resolverTipoIva } from '../../../interfaces/tipo-iva';
+
 
 
 @Component({
@@ -59,6 +60,7 @@ export class FormProductComponent implements OnInit {
   precioVentaManual = false;
   editarPrecioVenta = false;
   gananciaCalculada = 0;
+  readonly tiposIva = TIPOS_IVA;
 
   protected onInput(event: Event) {
     this.value.set((event.target as HTMLInputElement).value);
@@ -94,9 +96,8 @@ export class FormProductComponent implements OnInit {
       ],
       stock: ['', Validators.required],
       stockMin: ['', Validators.required],
-      stateIva: [false, Validators.required],
       status: [true],
-      iva: [''],
+      tipoIva: ['IVA_21' as TipoIva, Validators.required],
       salePrice: [null, Validators.required],
       productUsefulness: ['', Validators.required],
     });
@@ -119,8 +120,7 @@ export class FormProductComponent implements OnInit {
             barCode: datos.barCode,
             name: datos.name,
             price: datos.price,
-            stateIva: datos.stateIva,
-            iva: datos.stateIva ? 0:21,
+            tipoIva: resolverTipoIva(datos),
             stock: datos.stock,
             stockMin: datos.stockMin,
             salePrice: datos.salePrice,
@@ -131,7 +131,7 @@ export class FormProductComponent implements OnInit {
         });
     }
 
-    ['price', 'productUsefulness', 'stateIva'].forEach((controlName) => {
+    ['price', 'productUsefulness', 'tipoIva'].forEach((controlName) => {
       this.formGroup.get(controlName)?.valueChanges.subscribe(() => {
         if (!this.precioVentaManual) this.calcularPrecioAutomatico();
       });
@@ -237,7 +237,7 @@ export class FormProductComponent implements OnInit {
   calculateSalePrice(
     price: number,
     productUsefulness: number,
-    stateIva: boolean
+    tipoIva: TipoIva
   ): void {
     let finalPrice: number;
     // Asegúrate de que `price` y `productUsefulness` sean números
@@ -249,16 +249,11 @@ export class FormProductComponent implements OnInit {
       return;
     }
 
-    if (stateIva === false) {
-      finalPrice = (priceValue * usefulnessValue) / 100 + priceValue;
-    } else {
-      // Con IVA 
-      const priceWithIva = priceValue * 1.21;
-      finalPrice = priceWithIva +  (priceWithIva   * usefulnessValue) / 100;
-    }
+    const priceWithIva = priceValue * (1 + this.obtenerPorcentajeIva(tipoIva) / 100);
+    finalPrice = priceWithIva + (priceWithIva * usefulnessValue) / 100;
 
     this.calculatedSalePrice = finalPrice;
-    this.gananciaCalculada = finalPrice - (stateIva ? priceValue * 1.21 : priceValue);
+    this.gananciaCalculada = finalPrice - priceWithIva;
     this.formGroup.patchValue({ salePrice: finalPrice }, { emitEvent: false});
   }
 
@@ -268,7 +263,7 @@ export class FormProductComponent implements OnInit {
     this.calculateSalePrice(
       this.formGroup.get('price')?.value,
       this.formGroup.get('productUsefulness')?.value,
-      this.formGroup.get('stateIva')?.value,
+      this.formGroup.get('tipoIva')?.value,
     );
   }
 
@@ -281,8 +276,7 @@ export class FormProductComponent implements OnInit {
     if (!this.editarPrecioVenta) return;
     const precioFinal = Number((event.target as HTMLInputElement).value);
     const costo = Number(this.formGroup.get('price')?.value || 0);
-    const incluyeIva = Boolean(this.formGroup.get('stateIva')?.value);
-    const costoBase = incluyeIva ? costo * 1.21 : costo;
+    const costoBase = costo * (1 + this.obtenerPorcentajeIva(this.formGroup.get('tipoIva')?.value) / 100);
     if (!Number.isFinite(precioFinal) || costoBase <= 0) return;
 
     this.precioVentaManual = true;
@@ -291,6 +285,8 @@ export class FormProductComponent implements OnInit {
     const utilidad = ((precioFinal - costoBase) / costoBase) * 100;
     this.formGroup.get('productUsefulness')?.setValue(Number(utilidad.toFixed(2)), { emitEvent: false });
   }
+
+  private obtenerPorcentajeIva(tipoIva: TipoIva): number { return this.tiposIva.find(tipo => tipo.value === tipoIva)?.porcentaje ?? 21; }
 
   redondearPrecioVenta(): void {
     const precioActual = Number(this.formGroup.get('salePrice')?.value ?? this.calculatedSalePrice);

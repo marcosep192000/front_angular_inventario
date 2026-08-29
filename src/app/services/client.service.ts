@@ -31,12 +31,12 @@ export class ClientService {
     return this.http.post(`${this.baseUrl}customer/create`, client);
   }
   // Get client by ID
-  getClientById(id: number): Observable<Client> {
-    return this.http.get<Client>(`${this.baseUrl}customer/find/${id}`);
+  obtenerClientePorId(clienteId: number): Observable<Client> {
+    return this.http.get<Client>(`${this.baseUrl}customer/find/${clienteId}`);
   }
 
-  getClientByDni(id: string): Observable<Client> {
-    return this.http.get<Client>(`${this.baseUrl}customer/get-by-name/${id}`);
+  getClientByCuit(cuit: string): Observable<Client> {
+    return this.http.get<Client>(`${this.baseUrl}customer/get-by-name/${encodeURIComponent(cuit)}`);
   }
 
   // Update client by ID

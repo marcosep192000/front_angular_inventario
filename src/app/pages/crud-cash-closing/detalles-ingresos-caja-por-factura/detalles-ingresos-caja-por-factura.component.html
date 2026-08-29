@@ -56,6 +56,21 @@
 
     </div>
 
+    <div class="info-card">
+      <strong>Cliente</strong>
+      {{ cliente ? (cliente.name + ' ' + (cliente.lastName || '')) : 'Cargando cliente…' }}
+    </div>
+
+    <div class="info-card" *ngIf="cliente">
+      <strong>CUIT / Documento</strong>
+      {{ cliente.cuit || 'No informado' }}
+    </div>
+
+    <div class="info-card" *ngIf="cliente?.address || cliente?.tel">
+      <strong>Contacto</strong>
+      {{ cliente?.address || '-' }} <span *ngIf="cliente?.tel"> · {{ cliente?.tel }}</span>
+    </div>
+
 
     <div class="info-card" *ngIf="!ticket!.pagos || ticket!.pagos.length === 0">
 

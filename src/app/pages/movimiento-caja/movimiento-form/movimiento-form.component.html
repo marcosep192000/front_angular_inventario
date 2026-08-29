@@ -3,8 +3,8 @@
       HEADER
   ===========================-->
   <div class="header-form">
-    <h2>💼 Registrar Movimiento de Caja</h2>
-    <p>Complete la información del movimiento.</p>
+    <div class="header-icon"> <mat-icon>swap_horiz</mat-icon> </div>
+    <div><span>CAJA</span><h2>Registrar movimiento</h2><p>Ingresá el movimiento y su medio de pago.</p></div>
   </div>
 
   <!--==========================
@@ -12,12 +12,13 @@
   ===========================-->
 
   <form class="modern-form" [formGroup]="movimientoForm" (ngSubmit)="guardar()">
+    <section class="form-section"><div class="section-title"><mat-icon>tune</mat-icon><div><strong>Clasificación</strong><span>Definí qué operación se registrará.</span></div></div><div class="form-grid">
     <!--==========================
         TIPO
     ===========================-->
 
     <div class="form-group">
-      <label>🧾 Tipo de movimiento</label>
+      <label>Tipo de movimiento</label>
 
       <select formControlName="tipo" (change)="onTipoChange()">
         <option value="">Seleccionar</option>
@@ -33,7 +34,7 @@
     ===========================-->
 
     <div class="form-group fade" *ngIf="categoriaOptions.length">
-      <label>📂 Categoría</label>
+      <label>Categoría</label>
 
       <select
         formControlName="categoriaMovimiento"
@@ -45,22 +46,19 @@
           {{ categoria }}
         </option>
       </select>
-    </div>
+    </div></div></section>
 
     <!--==========================
         MONTO
     ===========================-->
 
-    <div
-      class="form-group fade"
-      *ngIf="movimientoForm.get('categoriaMovimiento')?.value"
-    >
-      <label>💲 Monto</label>
+    <section class="form-section fade" *ngIf="movimientoForm.get('categoriaMovimiento')?.value"><div class="section-title"><mat-icon>payments</mat-icon><div><strong>Importe y pago</strong><span>Indicá el monto y cómo ingresa o egresa.</span></div></div><div class="form-grid"><div class="form-group">
+      <label>Monto</label>
 
       <div class="money-input">
         <span class="money-symbol">$</span>
 
-        <input type="number" formControlName="monto" placeholder="0.00" />
+        <input type="number" min="0.01" step="0.01" inputmode="decimal" data-money formControlName="monto" placeholder="0.00" />
       </div>
     </div>
 
@@ -68,11 +66,8 @@
         FORMA DE PAGO
     ===========================-->
 
-    <div
-      class="form-group fade"
-      *ngIf="movimientoForm.get('categoriaMovimiento')?.value"
-    >
-      <label>💳 Forma de pago</label>
+    <div class="form-group">
+      <label>Forma de pago</label>
 
       <select formControlName="medioPago">
         <option value="">Seleccionar</option>
@@ -86,12 +81,13 @@
         <option value="CUENTA_CORRIENTE">📒 Cuenta Corriente</option>
         <option value="OTRO">📌 Otro</option>
       </select>
-    </div>
+    </div></div></section>
 
     <!--==========================
         DETALLE GASTO
     ===========================-->
 
+    <section class="form-section detalles" *ngIf="movimientoForm.get('categoriaMovimiento')?.value"><div class="section-title"><mat-icon>subject</mat-icon><div><strong>Información adicional</strong><span>Solo se muestran los datos que requiere la categoría.</span></div></div><div class="form-grid">
     <div
       class="form-group fade"
       *ngIf="movimientoForm.get('categoriaMovimiento')?.value === 'GASTO_MENOR'"
@@ -202,14 +198,15 @@
           />
         </div>
       </div>
-    </ng-container>
+    </ng-container></div></section>
 
     <!--==========================
         BOTON
     ===========================-->
 
     <div class="footer-form">
-      <button type="submit" class="btn-guardar">💾 Guardar Movimiento</button>
+      <button type="button" class="btn-cancelar" (click)="cancelar()">Cancelar</button>
+      <button type="submit" class="btn-guardar"><mat-icon>save</mat-icon> Guardar movimiento</button>
     </div>
   </form>
 </div>

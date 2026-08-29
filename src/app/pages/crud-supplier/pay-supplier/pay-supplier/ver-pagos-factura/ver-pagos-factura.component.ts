@@ -103,6 +103,7 @@ export class VerPagosFacturaComponent implements OnInit {
 
   get totalFactura(): number {
     return Number(
+      this.factura?.montoTotalDecimal ??
       this.factura?.total ??
       this.factura?.montoTotal ??
       0

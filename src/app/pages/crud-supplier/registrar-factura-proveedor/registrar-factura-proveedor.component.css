@@ -1,13 +1,84 @@
 .parent-container {
-    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 1.5rem 1.5rem;
 }
 
 .container__totalSale {
-    width: 23%;
-    background-color: #532e92e4;
-    border-radius: 5px;
-    padding: 5px;
+    width: min(100%, 430px);
+    background: linear-gradient(145deg, #41216f, #6437a8);
+    border: 1px solid rgba(255, 255, 255, .2);
+    border-radius: 14px;
+    padding: 1rem 1.15rem;
     color: white;
     text-align: left;
-    display: inline-block; /* Permite que respete el text-align del padre */
+    box-shadow: 0 10px 28px rgba(56, 27, 100, .22);
+}
+
+.total-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .38rem 0;
+    font-size: .92rem;
+}
+
+.total-line span {
+    color: rgba(255, 255, 255, .8);
+}
+
+.total-line strong {
+    white-space: nowrap;
+}
+
+.total-calculado {
+    margin-top: .35rem;
+    border-top: 1px solid rgba(255, 255, 255, .18);
+    padding-top: .8rem;
+}
+
+.ajuste-linea {
+    font-size: .84rem;
+}
+
+.text-danger {
+    color: #ffd4d9;
+}
+
+.text-success {
+    color: #bdf6d2;
+}
+
+.total-final {
+    margin: .45rem -1.15rem .85rem;
+    padding: .8rem 1.15rem;
+    background: rgba(255, 255, 255, .12);
+    font-size: 1.06rem;
+}
+
+.btn-crear-factura {
+    width: 100%;
+    border: 0;
+    border-radius: 9px;
+    padding: .72rem 1rem;
+    font-weight: 700;
+    color: #41216f;
+    background: #fff;
+    cursor: pointer;
+}
+
+.btn-crear-factura:disabled {
+    cursor: not-allowed;
+    opacity: .65;
+}
+
+@media (max-width: 640px) {
+    .parent-container {
+        padding: .75rem;
+    }
+
+    .container__totalSale {
+        width: 100%;
+    }
 }

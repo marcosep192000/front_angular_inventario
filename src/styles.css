@@ -98,8 +98,8 @@ color: white;
 }
 
 .table-container {
-  max-height: 200px; /* Ajusta esta altura según tus necesidades */
-  overflow-y: auto; /* Activa el scroll vertical si el contenido excede la altura */
+  max-height: none;
+  overflow: visible;
   border: 1px solid #ddd; /* Opcional: agrega un borde para delimitar la tabla */
   padding: 10px; /* Opcional: agrega espacio alrededor de la tabla */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Opcional: para diseño */
@@ -111,5 +111,74 @@ color: white;
 .table {
   width: 100%; /* Asegura que la tabla ocupe todo el ancho del contenedor */
   border-collapse: collapse; /* Elimina espacios entre celdas */
+}
+
+/*
+  Tablas extensas: a partir de siete filas se conserva visible el encabezado
+  y el listado usa scroll interno. Las listas de hasta seis registros siguen
+  mostrando todo su contenido sin barras de desplazamiento.
+*/
+.table-container:has(tbody > tr:nth-child(7)),
+.tabla-wrapper:has(tbody > tr:nth-child(7)),
+.Container-table:has(tbody > tr:nth-child(7)) {
+  max-height: 390px !important;
+  overflow: auto !important;
+  overscroll-behavior: contain;
+}
+
+.table-container:has(tbody > tr:nth-child(7)) thead th,
+.tabla-wrapper:has(tbody > tr:nth-child(7)) thead th,
+.Container-table:has(tbody > tr:nth-child(7)) thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Acciones de listas: patrón visual unificado (tomado del módulo Clientes). */
+.acciones-fila,
+.acciones-tabla,
+.acciones-lista {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.accion-editar,
+.accion-eliminar,
+.accion-ver,
+.accion-cuenta,
+.accion-actualizar,
+.accion-imprimir,
+.accion-cerrar,
+.accion-foto,
+.accion-estado {
+  border-radius: 10px !important;
+  transition: transform .16s ease, filter .16s ease, background .16s ease !important;
+}
+
+.accion-editar { color: #5c3a9b !important; background: #f0ebf9 !important; }
+.accion-eliminar { color: #bd3140 !important; background: #fdecef !important; }
+.accion-ver { color: #2f6597 !important; background: #e8f2fb !important; }
+.accion-cuenta { color: #26744b !important; background: #e7f5ed !important; }
+.accion-pagar { color: #26744b !important; background: #e7f5ed !important; }
+.accion-actualizar { color: #785017 !important; background: #fff4dd !important; }
+.accion-imprimir { color: #4d5c73 !important; background: #edf1f6 !important; }
+.accion-cerrar { color: #7b657d !important; background: #f4f0f5 !important; }
+.accion-foto { color: #8b5a1d !important; background: #fff1dc !important; }
+.accion-estado { color: #176d71 !important; background: #e3f7f6 !important; }
+
+.accion-editar:hover,
+.accion-eliminar:hover,
+.accion-ver:hover,
+.accion-cuenta:hover,
+.accion-pagar:hover,
+.accion-actualizar:hover,
+.accion-imprimir:hover,
+.accion-cerrar:hover,
+.accion-foto:hover,
+.accion-estado:hover {
+  filter: brightness(.96);
+  transform: translateY(-2px);
 }
 

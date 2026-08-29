@@ -45,7 +45,7 @@ constructor(private clientService:ClientService,
   }
 
 consultarCliente(id: Client){
-  this.clientService.getClientById(this.datoIdCliente).subscribe((data) =>{
+  this.clientService.obtenerClientePorId(this.datoIdCliente).subscribe((data) =>{
  this.cliente = data })
 }
 

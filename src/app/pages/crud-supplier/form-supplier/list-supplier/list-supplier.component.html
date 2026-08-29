@@ -57,6 +57,7 @@
           <button
             mat-raised-button
             color="primary"
+            class="btn-nuevo"
             type="button"
             (click)="createSupplier()">
 
@@ -338,16 +339,13 @@
                 ================================================== -->
 
                 <button
-                  mat-mini-fab
-                  class="btn__update"
+                  mat-icon-button
+                  class="accion-editar"
                   type="button"
                   matTooltip="Editar proveedor"
                   (click)="updateSupplier(element.id)">
 
-                  <app-icon
-                    [iconSrc]="'assets/icons/task.png'"
-                    [size]="'18px'">
-                  </app-icon>
+                  <mat-icon>edit</mat-icon>
 
                 </button>
 
@@ -357,17 +355,14 @@
                 ================================================== -->
 
                 <button
-                  mat-mini-fab
-                  class="btn__delete"
+                  mat-icon-button
+                  class="accion-eliminar"
                   type="button"
                   matTooltip="Eliminar proveedor"
                   [disabled]="deleting"
                   (click)="deleteSupplier(element)">
 
-                  <app-icon
-                    [iconSrc]="'assets/icons/delete.png'"
-                    [size]="'18px'">
-                  </app-icon>
+                  <mat-icon>delete_outline</mat-icon>
 
                 </button>
 
@@ -377,8 +372,8 @@
                 ================================================== -->
 
                 <button
-                  mat-raised-button
-                  color="primary"
+                  mat-icon-button
+                  class="accion-pagar"
                   type="button"
                   matTooltip="Pagos del proveedor"
                   (click)="pagarProveedor(element)">
@@ -386,8 +381,6 @@
                   <mat-icon>
                     payments
                   </mat-icon>
-
-                  Pagar
 
                 </button>
 

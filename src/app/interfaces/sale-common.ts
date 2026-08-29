@@ -1,3 +1,5 @@
+import { Client } from './Client';
+
 export interface TicketDetail {
 
   id?: number;
@@ -59,7 +61,7 @@ export interface SaleCommon {
     | 'NOTA_DEBITO_C'
     | string;
 
-  numero: string;
+  numero?: string;
 
 
   // =========================================================
@@ -67,6 +69,7 @@ export interface SaleCommon {
   // =========================================================
 
   client: number;
+  cliente?: Client;
 
   ctaCte: number | null;
 
@@ -104,6 +107,11 @@ medioPago?: string | null;
   subTotal: number;
 
   total: number;
+  netoGravado?: number;
+  ivaTotal?: number;
+  importeExento?: number;
+  importeNoGravado?: number;
+  desgloseIva?: unknown[];
 
 
   // =========================================================

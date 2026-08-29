@@ -1,0 +1,149 @@
+<section class="nomina">
+  <header>
+    <div>
+      <p>RECURSOS HUMANOS</p>
+      <h1>Empleados y nómina</h1>
+      <span>Adelantos, liquidaciones y pagos desde caja.</span>
+    </div>
+    <button mat-raised-button color="primary" (click)="nuevo()">
+      <mat-icon>person_add</mat-icon> Nuevo empleado
+    </button>
+  </header>
+  <mat-tab-group
+    ><mat-tab label="Empleados"
+      ><div class="grid">
+        <aside class="lista">
+          <article
+            *ngFor="let e of empleados"
+            [class.activo]="seleccionado?.id === e.id"
+            (click)="seleccionar(e)"
+          >
+            <div class="avatar">{{ e.nombre[0] }}</div>
+            <div>
+              <strong>{{ e.nombre }} {{ e.apellido }}</strong
+              ><span
+                >{{ e.puesto || "Sin puesto" }} · {{ e.frecuenciaPago }}</span
+              >
+            </div>
+            <button
+              mat-icon-button
+              class="accion-editar"
+              matTooltip="Editar empleado"
+              (click)="$event.stopPropagation(); editar(e)"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+          </article>
+        </aside>
+        <main class="panel">
+          <h2>{{ editando ? "Editar empleado" : "Alta de empleado" }}</h2>
+          <div class="form">
+            <input [(ngModel)]="form.nombre" placeholder="Nombre" /><input
+              [(ngModel)]="form.apellido"
+              placeholder="Apellido"
+            /><input [(ngModel)]="form.dni" placeholder="DNI" /><input
+              type="number"
+              min="0.01"
+              step="0.01"
+              inputmode="decimal"
+              [(ngModel)]="form.sueldo"
+              placeholder="Sueldo mensual"
+            /><input [(ngModel)]="form.puesto" placeholder="Puesto" /><input
+              type="date"
+              [(ngModel)]="form.fechaIngreso"
+            /><select [(ngModel)]="form.frecuenciaPago">
+              <option value="SEMANAL">Semanal</option>
+              <option value="QUINCENAL">Quincenal</option>
+              <option value="MENSUAL">Mensual</option></select
+            ><select [(ngModel)]="form.clienteId">
+              <option [ngValue]="null">Sin cliente vinculado</option>
+              <option *ngFor="let c of clientes" [ngValue]="c.id">
+                {{ c.name }} {{ c.lastName }} · {{ c.cuit }}
+              </option>
+            </select>
+          </div>
+          <button mat-raised-button color="primary" (click)="guardar()">
+            Guardar empleado
+          </button>
+        </main>
+      </div></mat-tab
+    ><mat-tab label="Nómina" [disabled]="!seleccionado"
+      ><section class="panel" *ngIf="seleccionado">
+        <h2>{{ seleccionado.nombre }} {{ seleccionado.apellido }}</h2>
+        <div class="alerta" [class.deuda]="estado?.tieneDeuda">
+          {{ estado?.aviso || "Consultando cuenta cliente…" }}
+        </div>
+        <div class="acciones">
+          <div>
+            <h3>Adelanto</h3>
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              inputmode="decimal"
+              [(ngModel)]="adelanto.monto"
+              placeholder="Monto"
+            /><select [(ngModel)]="adelanto.medioPago">
+              <option *ngFor="let m of medios">{{ m }}</option></select
+            ><button mat-button (click)="registrarAdelanto()">
+              Registrar adelanto
+            </button>
+          </div>
+          <div>
+            <h3>Nueva liquidación</h3>
+            <input type="date" [(ngModel)]="periodo.desde" /><input
+              type="date"
+              [(ngModel)]="periodo.hasta"
+            /><button mat-button (click)="liquidar()">Crear liquidación</button>
+          </div>
+        </div>
+        <article class="liquidacion" *ngFor="let l of liquidaciones">
+          <div>
+            <strong
+              >{{ l.periodoDesde | date }} — {{ l.periodoHasta | date }}</strong
+            ><span
+              >Bruto {{ l.sueldoBruto | currency: "ARS" }} · Adelantos
+              {{ l.totalAdelantos | currency: "ARS" }}</span
+            >
+          </div>
+          <b>{{ l.netoAPagar | currency: "ARS" }}</b
+          ><em [class.pagada]="l.estado === 'PAGADA'">{{ l.estado }}</em
+          ><button
+            *ngIf="l.estado === 'PENDIENTE'"
+            mat-button
+            (click)="pagar(l)"
+          >
+            Pagar
+          </button>
+        </article>
+        <div class="pagos">
+          <h3>Medios para pagar</h3>
+          <div *ngFor="let p of pagos">
+            <select [(ngModel)]="p.medioPago">
+              <option *ngFor="let m of medios">{{ m }}</option></select
+            ><input type="number" min="0.01" step="0.01" inputmode="decimal" [(ngModel)]="p.monto" placeholder="0.00" /><input
+              [(ngModel)]="p.referencia"
+              placeholder="Referencia"
+            />
+          </div>
+          <button
+            mat-button
+            (click)="pagos.push({ medioPago: 'EFECTIVO', monto: 0 })"
+          >
+            + Agregar medio</button
+          ><strong>Total: {{ totalPagos() | currency: "ARS" }}</strong>
+        </div>
+      </section></mat-tab
+    ><mat-tab label="Reportes"
+      ><section class="panel reporte">
+        <h2>Reporte de nómina</h2>
+        <input type="date" [(ngModel)]="reporte.desde" /><input
+          type="date"
+          [(ngModel)]="reporte.hasta"
+        /><button mat-raised-button color="primary" (click)="descargar()">
+          <mat-icon>picture_as_pdf</mat-icon> Descargar PDF
+        </button>
+      </section></mat-tab
+    ></mat-tab-group
+  >
+</section>

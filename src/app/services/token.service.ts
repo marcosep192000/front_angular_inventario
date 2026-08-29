@@ -14,6 +14,7 @@ export class TokenService {
   loggedIn = new BehaviorSubject<Boolean>(false);
   roles: string[] = [];
   private helper: JwtHelperService | null = null; // Manejo seguro para SSR
+  private accessToken: string | null = null;
 
   constructor(private router: Router) {
     if (this.isBrowser()) {
@@ -26,7 +27,6 @@ export class TokenService {
   private isBrowser(): boolean {
     const isBrowser =
       typeof window !== 'undefined' && window.localStorage !== undefined;
-    console.log('isBrowser:', isBrowser); // Log para depuración
     return isBrowser;
   }
 
@@ -55,17 +55,14 @@ export class TokenService {
 
   public setToken(token: string): void {
     if (this.isBrowser()) {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.setItem(TOKEN_KEY, token);
-      this.initializeTokenData();
+      this.limpiarSesionLocal();
+      this.accessToken = token;
+      this.loggedIn.next(this.isTokenValid());
     }
   }
 
   public getToken(): string {
-    if (this.isBrowser()) {
-      return localStorage.getItem(TOKEN_KEY) || '';
-    }
-    return '';
+    return this.accessToken || '';
   }
 
   public setUserName(username: string): void {
@@ -82,6 +79,19 @@ export class TokenService {
     return '';
   }
 
+  public isTokenValid(): boolean {
+    const token = this.getToken();
+    return !!token && !!this.helper && token.split('.').length === 3 && !this.helper.isTokenExpired(token);
+  }
+
+  /** Identificador del usuario autenticado, cuando el backend lo incluye en el JWT. */
+  public getUserId(): number | null {
+    const decodedToken = this.decodeToken();
+    const value = decodedToken?.['userId'] ?? decodedToken?.['usuarioId'] ?? decodedToken?.['id'];
+    const id = Number(value);
+    return Number.isFinite(id) && id > 0 ? id : null;
+  }
+
   public setAuthorities(authorities: string[]): void {
     if (this.isBrowser()) {
       localStorage.removeItem(AUTHORITIES_KEY);
@@ -92,16 +102,18 @@ export class TokenService {
   public getAuthorities(): string[] {
     if (this.isBrowser()) {
       const roles = localStorage.getItem(AUTHORITIES_KEY);
-      return roles ? JSON.parse(roles) : [];
+      try {
+        return roles ? JSON.parse(roles) : [];
+      } catch {
+        return [];
+      }
     }
     return [];
   }
 
   public logOut(): void {
     if (this.isBrowser()) {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(USERNAME_KEY);
-      localStorage.removeItem(AUTHORITIES_KEY);
+      this.limpiarSesionLocal();
       this.loggedIn.next(false);
       this.router.navigateByUrl('/login');
     }
@@ -110,13 +122,19 @@ export class TokenService {
   private checkToken(): void {
     if (this.isBrowser() && this.helper) {
       const token = this.getToken();
-      const isExpired = this.helper.isTokenExpired(token);
-      if (isExpired) {
-        this.logOut();
-      } else {
-        this.loggedIn.next(true);
-      }
+      if (!this.isTokenValid()) this.logOut();
+      else this.loggedIn.next(true);
     }
+  }
+
+  private limpiarSesionLocal(): void {
+    this.accessToken = null;
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USERNAME_KEY);
+    localStorage.removeItem(AUTHORITIES_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(USERNAME_KEY);
+    sessionStorage.removeItem(AUTHORITIES_KEY);
   }
 
   get isLogged(): Observable<Boolean> {

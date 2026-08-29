@@ -68,7 +68,7 @@ formaPagoOptions = [
     this.movimientoForm = this.fb.group({
       tipo: ['', Validators.required],
       categoriaMovimiento: ['', Validators.required],
-      monto: [null, [Validators.required, Validators.min(1)]],
+      monto: [null, [Validators.required, Validators.min(0.01)]],
       descripcion: [''],
 
 medioPago: [null ],
@@ -96,13 +96,6 @@ medioPago: [null ],
     if (tipo === 'EGRESO') {
       this.categoriaOptions = [
         'GASTO_MENOR',
-
-        'PROVEEDOR',
-
-        'PAGO_SUELDO',
-
-        'ADELANTO',
-
         'AJUSTE_NEGATIVO',
       ];
     } else if (tipo === 'INGRESO') {
@@ -136,6 +129,8 @@ medioPago: [null ],
       proveedorId: null,
     });
   }
+
+  cancelar(): void { this.dialogRef.close(); }
 
   guardar(): void {
     if (this.movimientoForm.invalid) {
@@ -189,13 +184,6 @@ medioPago: [null ],
   delete movimiento.descripcion;
 }
 
-    console.log('=================================');
-    console.log('OBJETO A ENVIAR');
-    console.log(movimiento);
-    console.log(JSON.stringify(movimiento, null, 2));
-    console.log('=================================');
-console.log('OBJETO A ENVIAR');
-console.log(JSON.stringify(movimiento, null, 2))
     this.movimientoService.create(movimiento).subscribe({
       next: () => {
         this.toastr.success('Movimiento registrado correctamente');

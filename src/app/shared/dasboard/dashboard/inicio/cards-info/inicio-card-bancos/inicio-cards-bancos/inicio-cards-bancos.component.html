@@ -1,47 +1,31 @@
-<div class="bank-card">
-
-    <div class="bank-header">
-
-        <mat-icon>account_balance</mat-icon>
-
-        <span>Formas de Pago</span>
-
+<button class="ranking-card" type="button" (click)="abrirRanking()" aria-label="Abrir reporte de productos más vendidos">
+  <div class="ranking-header">
+    <div class="ranking-title">
+      <span class="icon-wrap"><mat-icon>emoji_events</mat-icon></span>
+      <div>
+        <span class="eyebrow">Ranking comercial</span>
+        <strong>Top 10 más vendidos</strong>
+      </div>
     </div>
+    <mat-icon class="go-icon">arrow_forward</mat-icon>
+  </div>
 
-    <div class="payment-list">
+  <div *ngIf="cargando" class="ranking-state">Cargando productos…</div>
 
-        <div class="payment-item">
+  <div *ngIf="!cargando && !productos.length" class="ranking-state">
+    Aún no hay ventas para armar el ranking.
+  </div>
 
-            <span>Efectivo</span>
+  <ol *ngIf="!cargando && productos.length" class="ranking-list">
+    <li *ngFor="let producto of productos; let i = index">
+      <span class="position" [class.top-three]="i < 3">{{ i + 1 }}</span>
+      <span class="product-info">
+        <strong>{{ nombre(producto) }}</strong>
+        <small>{{ estrellas(i) }}</small>
+      </span>
+      <span class="units">{{ cantidad(producto) | number:'1.0-0':'es-AR' }} u.</span>
+    </li>
+  </ol>
 
-            <strong>$ 0</strong>
-
-        </div>
-
-        <div class="payment-item">
-
-            <span>Transferencias</span>
-
-            <strong>$ 0</strong>
-
-        </div>
-
-        <div class="payment-item">
-
-            <span>Mercado Pago</span>
-
-            <strong>$ 0</strong>
-
-        </div>
-
-        <div class="payment-item">
-
-            <span>Cuenta Corriente</span>
-
-            <strong>$ 0</strong>
-
-        </div>
-
-    </div>
-
-</div>
+  <span class="ranking-link">Ver ranking completo <mat-icon>north_east</mat-icon></span>
+</button>

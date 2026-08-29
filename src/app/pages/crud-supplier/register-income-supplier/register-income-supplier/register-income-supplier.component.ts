@@ -130,7 +130,7 @@ export class RegisterIncomeSupplierComponent implements OnInit {
       payDay: [''],
       provider: [this.idProveedorRecibido ?? '', Validators.required], // Asegura que el proveedor sea opcional hasta que se reciba el ID
       paymentStatus: [false],
-      amount: [0],
+      amount: [0, [Validators.required, Validators.min(0.01)]],
       invoiceDetailsProviders: [[]],
     });
 

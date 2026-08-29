@@ -5,6 +5,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { IconComponent } from "../icon/icon.component";
 import { TokenService } from '../../../services/token.service';
+import { AdministracionService } from '../../../services/administracion.service';
+import { UiRefreshService } from '../../../services/ui-refresh.service';
 
 @Component({
     selector: 'app-vertical-menu',
@@ -27,9 +29,12 @@ export class VerticalMenuComponent implements OnInit {
     roles!: any;
 
     activeMenu: string | null = null;
+    logoSrc: string | null = null;
 
     constructor(
-        private tokenService: TokenService
+        private tokenService: TokenService,
+        private administracionService: AdministracionService,
+        private uiRefresh: UiRefreshService
     ) { }
 
     ngOnInit(): void {
@@ -39,6 +44,8 @@ export class VerticalMenuComponent implements OnInit {
 
         console.log('Usuario:', this.username);
         console.log('Roles:', this.roles);
+        this.cargarLogo();
+        this.uiRefresh.logoActualizado$.subscribe(() => this.cargarLogo());
 
     }
 
@@ -69,6 +76,17 @@ export class VerticalMenuComponent implements OnInit {
 
         return this.activeMenu === menu;
 
+    }
+
+    private cargarLogo(): void {
+        this.administracionService.obtenerLogo().subscribe({
+            next: blob => this.logoSrc = URL.createObjectURL(blob),
+            error: () => this.logoSrc = null
+        });
+    }
+
+    get esAdmin(): boolean {
+        return this.roles?.some((rol: string) => rol === 'ADMIN' || rol === 'ROLE_ADMIN');
     }
 
 }

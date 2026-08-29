@@ -1,6 +1,7 @@
 import { Category } from "./Category";
 import { Marca } from "./marca";
 import { Supplier } from "./supplier";
+import { TipoIva } from './tipo-iva';
 
 export interface Product {
   id?: number;
@@ -12,6 +13,7 @@ export interface Product {
   stock: number;
   iva: number;
   stateIva: boolean;
+  tipoIva?: TipoIva;
   stockMin: number;
   image: string;
   expiration: number;

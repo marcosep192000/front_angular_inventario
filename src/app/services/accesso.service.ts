@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environments } from '../../environments/environments.prod';
-import { Observable } from 'rxjs';
+import { finalize, Observable } from 'rxjs';
  
 import { Usuario } from '../interfaces/Usuario';
 import { Login } from '../interfaces/Login';
@@ -19,6 +19,14 @@ export class AccessoService {
   }
 
   login(objeto: Login): Observable<ResponseAcceso> {
-    return this.http.post<ResponseAcceso>(`${this.baseUrl}auth/login`, objeto);
+    return this.http.post<ResponseAcceso>(`${this.baseUrl}auth/login`, objeto, { withCredentials: true });
+  }
+
+  refresh(): Observable<ResponseAcceso> {
+    return this.http.post<ResponseAcceso>(`${this.baseUrl}auth/refresh`, {}, { withCredentials: true });
+  }
+
+  logout(): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}auth/logout`, {}, { withCredentials: true });
   }
 }

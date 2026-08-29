@@ -126,13 +126,6 @@ export class RegistrarFacturaProveedorComponent
 
 
   // =========================================================
-  // REDONDEO
-  // =========================================================
-
-  redondeo = 0;
-
-
-  // =========================================================
   // TOTALES
   // =========================================================
 
@@ -141,6 +134,43 @@ export class RegistrarFacturaProveedorComponent
   totalIva = 0;
 
   totalFactura = 0;
+
+
+  get totalCalculado(): number {
+
+    return this.redondear(
+      this.subtotalFactura +
+      this.totalIva +
+      this.impuestosTotal
+    );
+
+  }
+
+
+  get totalFacturaFisica(): number | null {
+
+    const monto = Number(
+      this.datosProveedor?.montoTotal
+    );
+
+    return Number.isFinite(monto) && monto >= 0
+      ? monto
+      : null;
+
+  }
+
+
+  get ajusteRedondeo(): number {
+
+    if (this.totalFacturaFisica === null) {
+      return 0;
+    }
+
+    return this.redondear(
+      this.totalFacturaFisica - this.totalCalculado
+    );
+
+  }
 
 
   // =========================================================
@@ -406,17 +436,7 @@ export class RegistrarFacturaProveedorComponent
     // =======================================================
 
     this.totalFactura =
-      this.redondear(
-
-        this.subtotalFactura +
-
-        this.totalIva +
-
-        this.impuestosTotal +
-
-        this.redondeo
-
-      );
+      this.totalCalculado;
 
   }
 
@@ -573,6 +593,24 @@ export class RegistrarFacturaProveedorComponent
     this.calcularTotales();
 
 
+    const totalFacturaFisica =
+      this.totalFacturaFisica;
+
+
+    if (
+      totalFacturaFisica === null ||
+      totalFacturaFisica <= 0
+    ) {
+
+      this.toast.error(
+        'Indicá el total impreso en la factura física.'
+      );
+
+      return;
+
+    }
+
+
     this.dialog
 
       .open(
@@ -609,7 +647,7 @@ export class RegistrarFacturaProveedorComponent
 
               `Vas a registrar la factura por un total de ` +
 
-              `${this.totalFactura.toLocaleString(
+              `${totalFacturaFisica.toLocaleString(
                 'es-AR',
                 {
                   style:
@@ -686,7 +724,8 @@ export class RegistrarFacturaProveedorComponent
 
 
     if (
-      this.totalFactura <= 0
+      this.totalFacturaFisica === null ||
+      this.totalFacturaFisica <= 0
     ) {
 
       this.toast.error(
@@ -876,24 +915,17 @@ export class RegistrarFacturaProveedorComponent
 
 
       totalCalculado:
-
-        this.redondear(
-
-          this.subtotalFactura +
-
-          this.totalIva +
-
-          this.impuestosTotal
-
-        ),
-
-
-      redondeo:
-        this.redondeo,
+        this.totalCalculado,
 
 
       montoTotal:
-        this.totalFactura,
+        this.totalFacturaFisica,
+
+
+      observacionRedondeo:
+        this.ajusteRedondeo !== 0
+          ? this.datosProveedor.observacionRedondeo?.trim() || null
+          : null,
 
 
       /*
@@ -1116,10 +1148,6 @@ export class RegistrarFacturaProveedorComponent
       0;
 
 
-    this.redondeo =
-      0;
-
-
     this.totalFactura =
       0;
 
@@ -1199,10 +1227,6 @@ export class RegistrarFacturaProveedorComponent
 
 
       this.impuestosTotal =
-        0;
-
-
-      this.redondeo =
         0;
 
 

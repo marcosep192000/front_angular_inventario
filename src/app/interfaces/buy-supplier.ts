@@ -39,9 +39,11 @@ export interface BuySupplier {
 
   totalCalculado?: number;
 
-  redondeo?: number;
-
   montoTotal?: number;
+
+  montoTotalDecimal?: number;
+
+  observacionRedondeo?: string | null;
 
   impuestos: ImpuestoFacturaProveedor[];
 }

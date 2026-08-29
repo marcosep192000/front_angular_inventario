@@ -52,7 +52,11 @@
 
                 <div class="barra__usuario">
 
-                    <mat-icon>account_circle</mat-icon>
+                    @if (fotoUsuarioSrc) {
+                        <img class="foto-usuario" [src]="fotoUsuarioSrc" alt="Foto de usuario">
+                    } @else {
+                        <mat-icon>account_circle</mat-icon>
+                    }
 
                     <div>
 

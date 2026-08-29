@@ -37,92 +37,35 @@
     <div class="container__totalSale">
 
       <div class="total-line">
-
-        <span>
-          Subtotal:
-        </span>
-
-        <strong>
-          {{ subtotalFactura | currency:'ARS' }}
-        </strong>
-
+        <span>Subtotal neto:</span>
+        <strong>{{ subtotalFactura | currency:'ARS' }}</strong>
       </div>
 
+      <div class="total-line">
+        <span>IVA:</span>
+        <strong>{{ totalIva | currency:'ARS' }}</strong>
+      </div>
 
-    <div class="total-line">
+      <div class="total-line">
+        <span>Impuestos adicionales:</span>
+        <strong>{{ impuestosTotal | currency:'ARS' }}</strong>
+      </div>
 
-  <span>
-    Subtotal:
-  </span>
+      <div class="total-line total-calculado">
+        <span>Total calculado:</span>
+        <strong>{{ totalCalculado | currency:'ARS' }}</strong>
+      </div>
 
-  <strong>
-    {{
-      subtotalFactura
-        | currency:'ARS'
-    }}
-  </strong>
-
-</div>
-
-
-<div class="total-line">
-
-  <span>
-    IVA:
-  </span>
-
-  <strong>
-    {{
-      totalIva
-        | currency:'ARS'
-    }}
-  </strong>
-
-</div>
-
-
-<div class="total-line">
-
-  <span>
-    Impuestos adicionales:
-  </span>
-
-  <strong>
-    {{
-      impuestosTotal
-        | currency:'ARS'
-    }}
-  </strong>
-
-</div>
-
-
-<div class="total-line total-final">
-
-  <span>
-    TOTAL:
-  </span>
-
-  <strong>
-    {{
-      totalFactura
-        | currency:'ARS'
-    }}
-  </strong>
-
-</div>
-
+      <div class="total-line ajuste-linea">
+        <span>Ajuste de redondeo:</span>
+        <strong [class.text-danger]="ajusteRedondeo < 0" [class.text-success]="ajusteRedondeo > 0">
+          {{ ajusteRedondeo | currency:'ARS' }}
+        </strong>
+      </div>
 
       <div class="total-line total-final">
-
-        <span>
-          TOTAL:
-        </span>
-
-        <strong>
-          {{ totalFactura | currency:'ARS' }}
-        </strong>
-
+        <span>TOTAL FACTURA:</span>
+        <strong>{{ (totalFacturaFisica ?? 0) | currency:'ARS' }}</strong>
       </div>
 
 

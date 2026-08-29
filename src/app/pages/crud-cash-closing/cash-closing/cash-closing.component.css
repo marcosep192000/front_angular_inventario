@@ -428,6 +428,15 @@
   background: #1e88e5;
 }
 
+.card-info.ventas { cursor:pointer; background:linear-gradient(135deg,#fbf9ff,#f4efff); border-color:#d9ccef; }
+.card-info.ventas:hover { border-color:#7b52ba; }
+.card-info.ventas .icono { background:#7955bb; }
+.card-info.ventas strong { color:#56338b; font-size:15px; }
+@media(min-width:1101px){.resumen-caja{grid-template-columns:repeat(5,minmax(0,1fr))}.card-info{padding:14px 12px}.card-info .icono{width:43px;height:43px}.contenido-card strong{font-size:16px}}
+
+/* Estilo unificado de Caja: superficies claras y acentos violeta. */
+.cash-closing-container{background:linear-gradient(180deg,#faf8fd 0,#f5f2f9 100%)}.page-header{color:#fff;border:0;background:linear-gradient(135deg,#39216d,#7955bb);box-shadow:0 10px 25px rgba(57,33,109,.15)}.page-header h1,.page-header p{color:#fff}.page-header p{opacity:.8}.header-icon{background:rgba(255,255,255,.15)}.caja-actual,.historial{border-color:#e8e1f1;box-shadow:0 8px 22px rgba(58,38,84,.06)}.card-info{border-color:#e9e2f2;background:#fff}.card-info.apertura{background:#fbfaff}.saldo-barra{background:linear-gradient(135deg,#f8f4ff,#eee6fa);border-color:#dfd2ef}.historial-header{background:#fcfbfe}
+
 
 /* ==========================================================
    CONTENIDO TARJETAS

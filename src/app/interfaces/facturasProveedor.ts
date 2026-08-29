@@ -20,6 +20,20 @@ export interface FacturasProveedor {
 
   montoTotal: number;
 
+  montoTotalDecimal?: number;
+
+  subtotalNeto?: number;
+
+  ivaTotal?: number;
+
+  impuestosTotal?: number;
+
+  totalCalculado?: number;
+
+  redondeo?: number;
+
+  observacionRedondeo?: string | null;
+
   pagoList: any[];
 
   dateOfEntry: string;

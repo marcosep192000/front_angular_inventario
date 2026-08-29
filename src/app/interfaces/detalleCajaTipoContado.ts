@@ -6,4 +6,5 @@ id:number;
 	descripcion?: any;
 	numeroComprobante?: any;
 	medioPago ?: any;categoriaMovimiento: string;
+	referenciaPago?: string;
 }

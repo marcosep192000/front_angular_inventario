@@ -17,10 +17,14 @@ export class TicketService {
 
   getByNumero(numero: string): Observable<SaleCommon> {
     return this.http.get<any>(
-      `${this.baseUrl}ticket/numero/${numero}`
+      `${this.baseUrl}ticket/numero/${encodeURIComponent(numero)}`
     ).pipe(
       map(response => this.normalizarTicket(response)),
     );
+  }
+
+  obtenerTipoDocumentoSugerido(clienteId: number): Observable<'FACTURA_A' | 'FACTURA_B' | 'FACTURA_C'> {
+    return this.http.get<'FACTURA_A' | 'FACTURA_B' | 'FACTURA_C'>(`${this.baseUrl}ticket/tipo-documento-sugerido/${clienteId}`);
   }
 
   private normalizarTicket(response: any): SaleCommon {
@@ -43,6 +47,7 @@ export class TicketService {
 
     return {
       ...ticket,
+      cliente: ticket?.cliente ?? response?.cliente,
       ticketDetails: detalles.map((detalle: any) => ({
         ...detalle,
         productName: detalle.productName ?? detalle.nombreProducto ?? detalle.product?.name ?? detalle.producto?.name ?? detalle.producto?.nombre ?? 'Producto sin nombre',

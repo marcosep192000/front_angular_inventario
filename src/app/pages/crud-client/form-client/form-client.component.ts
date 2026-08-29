@@ -98,20 +98,22 @@ throw new Error('Method not implemented.');
       tel: ['', [Validators.required, Validators.maxLength(14), Validators.pattern('[0-9]*')]],
       lastName: ['', [Validators.required, Validators.maxLength(20)]],
       address: ['', [Validators.required, Validators.maxLength(40)]],
-      email: this.emailFormControl
+      email: this.emailFormControl,
+      condicionIva: ['CONSUMIDOR_FINAL']
     });
   }
 
   ngOnInit(): void {
     if (this.data.updateClient != null) {
-      this.clientService.getClientById(this.data.updateClient).subscribe((datos: any) => {
+      this.clientService.obtenerClientePorId(this.data.updateClient).subscribe((datos: any) => {
         this.formGroup.patchValue({
           name: datos.name,
           lastName: datos.lastName,
           cuit: datos.cuit,
           address: datos.address,
           tel: datos.tel,
-          email: datos.email
+          email: datos.email,
+          condicionIva: datos.condicionIva || 'CONSUMIDOR_FINAL'
         });
       });
     }
@@ -181,7 +183,7 @@ throw new Error('Method not implemented.');
   }
 
   existeCliente(cuit: string): Observable<boolean> {
-    return this.clientService.getClientByDni(cuit).pipe(
+    return this.clientService.getClientByCuit(cuit).pipe(
       map((client) => !!client),
       catchError((error) => {
         console.error('Error al buscar el cliente por CUIT:', error);

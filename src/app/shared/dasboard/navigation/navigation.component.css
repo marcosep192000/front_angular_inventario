@@ -96,6 +96,14 @@
     font-size:34px;
 }
 
+.foto-usuario{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid rgba(255,255,255,.65);
+}
+
 .barra__usuario div{
     display:flex;
     flex-direction:column;

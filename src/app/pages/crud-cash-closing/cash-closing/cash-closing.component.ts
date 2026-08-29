@@ -17,6 +17,7 @@ import { CajaService } from '../../../services/caja.service';
 import { Caja } from '../../../interfaces/Caja';
 
 import { DetallesIngresosCajaComponent } from '../detalles-ingresos-caja/detalles-ingresos-caja.component';
+import { DetallesVentasCajaComponent } from '../detalles-ventas-caja/detalles-ventas-caja.component';
 
 import { MovimientoFormComponent } from '../../movimiento-caja/movimiento-form/movimiento-form.component';
 
@@ -350,13 +351,24 @@ export class CashClosingComponent implements OnInit {
 
       autoFocus: true,
 
-      width: '80vw',
+      width: '94vw',
 
-      maxWidth: '1200px',
+      maxWidth: '1400px',
+
+      maxHeight: 'none',
 
       data: {
         tipo: 'INGRESO',
       },
+    });
+  }
+
+  mostrarVentasFacturadas(): void {
+    this.dialog.open(DetallesVentasCajaComponent, {
+      disableClose: true,
+      autoFocus: true,
+      width: '1000px',
+      maxWidth: '96vw'
     });
   }
 
@@ -370,9 +382,11 @@ export class CashClosingComponent implements OnInit {
 
       autoFocus: true,
 
-      width: '80vw',
+      width: '94vw',
 
-      maxWidth: '1200px',
+      maxWidth: '1400px',
+
+      maxHeight: 'none',
 
       data: {
         tipo: 'EGRESO',

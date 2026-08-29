@@ -44,6 +44,9 @@ import { ToastrService } from 'ngx-toastr';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { CompanyDocumentConfig } from '../../../config/company-document.config';
+import { TicketService } from '../../../services/ticket.service';
+import { AdministracionService } from '../../../services/administracion.service';
+import { CondicionIvaEmpresa } from '../../../interfaces/administracion';
 
 import { ProductService } from '../../../services/product.service';
 import { ProductItemSale } from '../../../interfaces/ProductItemSale';
@@ -119,6 +122,7 @@ export class NewSaleComponent implements OnInit {
   // =====================================================
 
   tipoDocumento: string = 'FACTURA_C';
+  private condicionIvaEmisor: CondicionIvaEmpresa = 'RESPONSABLE_INSCRIPTO';
 
   condicionVenta: string = 'CONTADO';
 
@@ -189,7 +193,9 @@ export class NewSaleComponent implements OnInit {
 
     private ctaCteService: CtaCteService,
 
-    private clienteService: ClientService
+    private clienteService: ClientService,
+    private ticketService: TicketService,
+    private administracionService: AdministracionService,
 
   ) {}
 
@@ -202,6 +208,7 @@ export class NewSaleComponent implements OnInit {
 
     this.inicializarBuscador();
     this.seleccionarConsumidorFinal();
+    this.cargarCondicionIvaEmisor();
 
   }
 
@@ -220,9 +227,35 @@ export class NewSaleComponent implements OnInit {
   }
 
   private seleccionarConsumidorFinal(): void {
-    this.clienteService.getClientByDni('0').subscribe({
-      next: (cliente) => this.selectedClient = cliente,
+    this.clienteService.getClientByCuit('0').subscribe({
+      next: (cliente) => { this.selectedClient = cliente; this.actualizarTipoFactura(cliente); },
       error: () => this.toastr.warning('No se encontró el cliente Consumidor Final (CUIT 0).'),
+    });
+  }
+
+  private cargarCondicionIvaEmisor(): void {
+    this.administracionService.obtenerEmpresa().subscribe({
+      next: empresa => {
+        this.condicionIvaEmisor = empresa.condicionIva || 'RESPONSABLE_INSCRIPTO';
+        if (this.selectedClient) this.actualizarTipoFactura(this.selectedClient);
+      }
+    });
+  }
+
+  /** Regla fiscal local; el backend conserva la validación final. */
+  private actualizarTipoFactura(cliente: Client): void {
+    if (this.condicionIvaEmisor === 'MONOTRIBUTISTA' || this.condicionIvaEmisor === 'EXENTO') {
+      this.tipoDocumento = 'FACTURA_C';
+      return;
+    }
+
+    this.tipoDocumento = ['RESPONSABLE_INSCRIPTO', 'MONOTRIBUTISTA'].includes(cliente.condicionIva || '')
+      ? 'FACTURA_A'
+      : 'FACTURA_B';
+
+    this.ticketService.obtenerTipoDocumentoSugerido(cliente.id).subscribe({
+      next: tipo => this.tipoDocumento = tipo,
+      error: () => { /* La regla local ya asignó un tipo válido. */ }
     });
   }
 
@@ -823,6 +856,7 @@ export class NewSaleComponent implements OnInit {
 
           this.selectedClient =
             result;
+          this.actualizarTipoFactura(result);
 
         }
 
@@ -1218,7 +1252,7 @@ export class NewSaleComponent implements OnInit {
       (resolve, reject) => {
 
         this.clienteService
-          .getClientById(id)
+          .obtenerClientePorId(id)
           .subscribe({
 
             next: (data) => {
@@ -1726,19 +1760,10 @@ export class NewSaleComponent implements OnInit {
       // NÚMERO
       // ===========================================
       //
-      // Actualmente conservamos la generación
-      // temporal que ya tenía el componente.
-      //
-      // Más adelante podemos pasar completamente
-      // la numeración al backend.
+      // La numeración consecutiva la asigna el backend.
       // ===========================================
 
-      numero:
-        String(
-          Math.floor(
-            Math.random() * 1000000
-          )
-        ),
+      numero: '',
 
 
       // ===========================================
@@ -1891,8 +1916,14 @@ export class NewSaleComponent implements OnInit {
     );
 
 
+    const { numero: _numeroLocal, ...ventaSinNumero } = saleCommon;
+    const requestVenta = {
+      ...ventaSinNumero,
+      ticketDetails: saleCommon.ticketDetails.map(({ idProduct, amount }) => ({ idProduct, amount })),
+    };
+
     this.commonSale
-      .saveCommon(saleCommon)
+      .saveCommon(requestVenta as SaleCommon)
       .subscribe({
 
         // =============================================
@@ -1927,7 +1958,7 @@ export class NewSaleComponent implements OnInit {
             response?.numero ??
             response?.number ??
             response?.numeroComprobante ??
-            saleCommon.numero;
+            'Sin número asignado';
 
 
           // =============================================
@@ -1943,7 +1974,7 @@ export class NewSaleComponent implements OnInit {
             response?.numero ??
             response?.number ??
             response?.numeroComprobante ??
-            saleCommon.numero;
+            numeroGenerado;
 
           const estadoFinal =
             response?.estado ??
@@ -1972,7 +2003,7 @@ export class NewSaleComponent implements OnInit {
 
           try {
 
-            this.generatePDF(saleCommon);
+            this.generatePDF({ ...saleCommon, numero: numeroFinal });
 
           } catch (pdfError: any) {
 

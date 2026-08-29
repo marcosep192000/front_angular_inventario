@@ -14,6 +14,8 @@ import { VerticalMenuComponent } from '../vertical-menu/vertical-menu.component'
 import { IconComponent } from '../icon/icon.component';
 
 import { TokenService } from '../../../services/token.service';
+import { AdministracionService } from '../../../services/administracion.service';
+import { UiRefreshService } from '../../../services/ui-refresh.service';
 
 @Component({
     selector: 'app-navigation',
@@ -44,6 +46,7 @@ export class NavigationComponent implements OnInit {
     username: string = '';
     roles: string[] = [];
     isHandset = false;
+    fotoUsuarioSrc: string | null = null;
 
     /**
      * Menú expandido o contraído.
@@ -52,13 +55,17 @@ export class NavigationComponent implements OnInit {
 
     constructor(
         private tokenService: TokenService,
-        private router: Router
+        private router: Router,
+        private administracionService: AdministracionService,
+        private uiRefresh: UiRefreshService
     ) { }
 
     ngOnInit(): void {
 
         this.username = this.tokenService.getUserName();
         this.roles = this.tokenService.getAuthorities();
+        this.cargarFotoUsuario();
+        this.uiRefresh.fotoUsuarioActualizada$.subscribe(() => this.cargarFotoUsuario());
 
         this.isHandset$
             .subscribe(isHandset => {
@@ -71,6 +78,7 @@ export class NavigationComponent implements OnInit {
                 filter((event): event is NavigationEnd => event instanceof NavigationEnd)
             )
             .subscribe(() => {
+                if (this.router.url === '/dashboard') this.uiRefresh.actualizarDashboard();
                 if (this.isHandset) {
                     this.menuCollapsed = true;
                 }
@@ -93,6 +101,15 @@ export class NavigationComponent implements OnInit {
             .map(role => role.replace(/^ROLE_/, '').replace(/_/g, ' ').toLowerCase())
             .map(role => role.charAt(0).toUpperCase() + role.slice(1))
             .join(' · ');
+    }
+
+    private cargarFotoUsuario(): void {
+        const usuarioId = this.tokenService.getUserId();
+        if (!usuarioId) return;
+        this.administracionService.obtenerFotoUsuario(usuarioId).subscribe({
+            next: blob => this.fotoUsuarioSrc = URL.createObjectURL(blob),
+            error: () => this.fotoUsuarioSrc = null
+        });
     }
 
     logout(): void {

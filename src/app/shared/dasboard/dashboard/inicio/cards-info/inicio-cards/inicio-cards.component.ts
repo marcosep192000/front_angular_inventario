@@ -13,6 +13,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
+import { UiRefreshService } from '../../../../../../services/ui-refresh.service';
 @Component({
   selector: 'app-inicio-cards',
   standalone: true,
@@ -36,24 +37,28 @@ export class InicioCardsComponent implements OnInit, OnDestroy {
   data_cards: dataDashboard | undefined;
   data_general: dashboardInfoGeneral | undefined;
   private subscription: Subscription = new Subscription();
-  constructor(private dashboardService: DashboardService) {}
+  constructor(private dashboardService: DashboardService, private uiRefresh: UiRefreshService) {}
   ngOnInit(): void {
     this.getProductosMasVendidos();
     this.getDashboardInfoGeneral();
+    this.subscription.add(this.uiRefresh.dashboardActualizado$.subscribe(() => {
+      this.getProductosMasVendidos();
+      this.getDashboardInfoGeneral();
+    }));
   }
   getProductosMasVendidos(): void {
-    this.subscription = this.dashboardService.getDashboardData().subscribe({
+    this.subscription.add(this.dashboardService.getDashboardData().subscribe({
       next: (data) => {
         this.data_cards= data;
         console.log(this.data_cards);
       },
       error: (err) =>
         console.error('Error al obtener los datos del dashboard', err),
-    });
+    }));
   }
 
   getDashboardInfoGeneral(): void {
-    this.subscription = this.dashboardService.getDashboardInfoGeneral().subscribe({
+    this.subscription.add(this.dashboardService.getDashboardInfoGeneral().subscribe({
       next: (data) => {
 
         this.data_general = data;
@@ -61,7 +66,7 @@ export class InicioCardsComponent implements OnInit, OnDestroy {
       },
       error: (err) =>
         console.error('Error al obtener los datos del dashboard general', err),
-    });
+    }));
   }
 
 

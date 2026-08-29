@@ -1455,6 +1455,71 @@ export class RegistrarDetalleFacturaProveedorComponent
 
   }
 
+
+  // =========================================================
+  // ACTUALIZAR CANTIDAD EN LISTA
+  // =========================================================
+
+  actualizarCantidad(
+    index: number,
+    valor: number | string
+  ): void {
+
+    const cantidad = Number(valor);
+
+    if (
+      !Number.isFinite(cantidad) ||
+      cantidad < 1 ||
+      index < 0 ||
+      index >= this.products.length
+    ) {
+
+      return;
+
+    }
+
+    const producto = this.products[index];
+    const precioNeto = Number(producto.price) || 0;
+    const iva = Number(producto.iva) || 0;
+    const subtotalNeto = this.redondear(precioNeto * cantidad);
+    const importeIva = this.redondear((subtotalNeto * iva) / 100);
+
+    this.products = this.products.map((item, itemIndex) =>
+      itemIndex === index
+        ? {
+            ...item,
+            quantity: cantidad,
+            totalStock: (Number(item.stock) || 0) + cantidad,
+            subtotalNeto,
+            importeIva,
+            precioTotal: this.redondear(subtotalNeto + importeIva)
+          }
+        : item
+    );
+
+    this.actualizarEstadoLista();
+
+  }
+
+
+  cambiarCantidad(
+    index: number,
+    variacion: number
+  ): void {
+
+    const producto = this.products[index];
+
+    if (!producto) {
+      return;
+    }
+
+    this.actualizarCantidad(
+      index,
+      Math.max(1, (Number(producto.quantity) || 1) + variacion)
+    );
+
+  }
+
   private esAlicuotaValida(porcentaje: number): boolean {
     return this.opcionesIva.some(
       opcion => opcion.porcentaje === porcentaje

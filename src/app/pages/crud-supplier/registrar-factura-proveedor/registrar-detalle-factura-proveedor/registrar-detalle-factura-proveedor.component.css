@@ -749,6 +749,51 @@ h4 {
   font-weight: 600;
 }
 
+.control-cantidad {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid #ded5ef;
+  border-radius: 9px;
+  background: #f8f5fd;
+}
+
+.control-cantidad button {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  color: #61359e;
+}
+
+.control-cantidad button:disabled {
+  color: #bcb4ca;
+}
+
+.control-cantidad mat-icon {
+  width: 17px;
+  height: 17px;
+  font-size: 17px;
+}
+
+.control-cantidad input {
+  width: 48px;
+  min-width: 40px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #302247;
+  font-weight: 700;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+.control-cantidad input::-webkit-outer-spin-button,
+.control-cantidad input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
 
 /* =========================================================
    PRECIO TOTAL

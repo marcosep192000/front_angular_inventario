@@ -694,7 +694,76 @@ tr:hover td {
 ========================================================= */
 
 .formulario-pago-card {
-  margin-top: 20px;
+  margin-top: 24px;
+  padding: 0;
+  overflow: hidden;
+  border-color: #ddd4eb;
+  background: #fbfaff;
+  box-shadow: 0 12px 30px rgba(61, 34, 105, .12);
+}
+
+.formulario-pago-card .section-header {
+  margin: 0;
+  padding: 20px 24px;
+  color: #fff;
+  background: linear-gradient(135deg, #44206f, #7043ae);
+}
+
+.formulario-pago-card .section-header h3,
+.formulario-pago-card .section-header span {
+  color: inherit;
+}
+
+.formulario-pago-card .section-header span {
+  opacity: .82;
+}
+
+.formulario-pago-card .section-header button {
+  color: #fff;
+  background: rgba(255, 255, 255, .12);
+}
+
+.formulario-pago-card .factura-info {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 24px 0;
+}
+
+.formulario-pago-card .factura-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 13px 15px;
+  border: 1px solid #e3dced;
+  border-radius: 11px;
+  background: #fff;
+}
+
+.formulario-pago-card .factura-item span {
+  color: #766d84;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.formulario-pago-card .factura-item strong {
+  overflow: hidden;
+  color: #312047;
+  font-size: .95rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.formulario-pago-card .factura-item.saldo {
+  border-color: #b9dfc5;
+  background: #eefaf1;
+}
+
+.formulario-pago-card .factura-item.saldo strong {
+  color: #23733c;
 }
 
 .formulario-pago {
@@ -703,6 +772,8 @@ tr:hover td {
   flex-direction: column;
 
   gap: 18px;
+  padding: 24px;
+  background: #fff;
 }
 
 .form-row {
@@ -734,9 +805,9 @@ mat-form-field {
 
   border-radius: 14px;
 
-  background: #f8f9fc;
+  background: linear-gradient(135deg, #f6f3fb, #fafdff);
 
-  border: 1px solid #dfe3eb;
+  border: 1px solid #ddd4ed;
 
   animation: aparecer 0.2s ease;
 }
@@ -752,7 +823,13 @@ mat-form-field {
 }
 
 .cheque-header mat-icon {
-  color: #1565c0;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 10px;
+  color: #fff;
+  background: #61359e;
 }
 
 .cheque-header h3 {
@@ -804,6 +881,14 @@ mat-form-field {
   min-height: 44px;
 
   font-weight: 600;
+  box-shadow: 0 5px 12px rgba(89, 50, 153, .24);
+}
+
+::ng-deep .detalle-factura-dialog .mat-mdc-dialog-surface {
+  border: 1px solid #dcd3ea;
+  border-radius: 16px;
+  background: #f6f3fb;
+  box-shadow: 0 20px 48px rgba(39, 18, 71, .28);
 }
 
 
@@ -975,6 +1060,10 @@ mat-form-field {
     grid-template-columns: 1fr;
   }
 
+  .formulario-pago-card .factura-info {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .section-header {
     align-items: flex-start;
 
@@ -996,6 +1085,16 @@ mat-form-field {
 
   .pay-supplier-card {
     padding: 15px;
+  }
+
+  .formulario-pago-card .section-header,
+  .formulario-pago {
+    padding: 16px;
+  }
+
+  .formulario-pago-card .factura-info {
+    margin: 16px 16px 0;
+    grid-template-columns: 1fr;
   }
 
   .proveedor-header-card {

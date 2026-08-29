@@ -131,6 +131,56 @@
 
 
     <!-- =====================================================
+         TOTAL DE LA FACTURA FÍSICA
+    ====================================================== -->
+
+    <mat-form-field class="input-comp">
+
+      <mat-label>
+        Total de la factura física
+      </mat-label>
+
+      <input
+        matInput
+        type="number"
+        min="0"
+        step="0.01"
+        formControlName="montoTotal">
+
+      <span matTextPrefix>$&nbsp;</span>
+
+      <mat-error
+        *ngIf="
+          formInvoice.get('montoTotal')?.hasError('required') ||
+          formInvoice.get('montoTotal')?.hasError('min')
+        ">
+
+        Indicá un total válido de la factura física.
+
+      </mat-error>
+
+    </mat-form-field>
+
+
+    <mat-form-field class="input-comp">
+
+      <mat-label>
+        Observación del ajuste
+      </mat-label>
+
+      <input
+        matInput
+        maxlength="255"
+        formControlName="observacionRedondeo">
+
+      <mat-hint>
+        Opcional. Se guarda junto al ajuste de redondeo.
+      </mat-hint>
+
+    </mat-form-field>
+
+
+    <!-- =====================================================
          VENCIMIENTO
     ====================================================== -->
 

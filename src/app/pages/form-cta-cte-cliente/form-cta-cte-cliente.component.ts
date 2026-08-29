@@ -55,7 +55,7 @@ historialCuenta: HistorialCuentaCorriente | null = null;
 cargandoHistorial = false;
 idCliente : any = this.data.updateClient; 
 buscarClientePorId(idCliente :number){
-this.clientService.getClientById(idCliente).subscribe(dataCliente => {
+this.clientService.obtenerClientePorId(idCliente).subscribe(dataCliente => {
   this.cliente = dataCliente ; 
 })
 }

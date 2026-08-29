@@ -256,7 +256,15 @@ export class FormFacturaDatosProveedorComponent
         ],
 
         montoTotal: [
-          0,
+          null,
+          [
+            Validators.required,
+            Validators.min(0),
+          ],
+        ],
+
+        observacionRedondeo: [
+          'Ajuste para coincidir con la factura física',
         ],
 
         invoiceDetailsProviders: [
@@ -543,6 +551,9 @@ export class FormFacturaDatosProveedorComponent
       ivaTotal: 0,
 
       montoTotal: 0,
+
+      observacionRedondeo:
+        'Ajuste para coincidir con la factura física',
 
       invoiceDetailsProviders: [],
     });

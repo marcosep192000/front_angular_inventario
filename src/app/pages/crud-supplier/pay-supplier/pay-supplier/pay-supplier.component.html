@@ -542,7 +542,7 @@
 
                   <!-- VER -->
 
-                  <button mat-icon-button type="button" matTooltip="Ver detalle" (click)="verDetalleFactura(factura)">
+                  <button mat-icon-button type="button" class="accion-ver" matTooltip="Ver detalle" (click)="verDetalleFactura(factura)">
 
                     <mat-icon>
                       visibility
@@ -951,7 +951,7 @@
 
                   <td>
 
-                    <button mat-icon-button type="button" matTooltip="Ver detalle" (click)="verDetalleFactura(factura)">
+                    <button mat-icon-button type="button" class="accion-ver" matTooltip="Ver detalle" (click)="verDetalleFactura(factura)">
 
                       <mat-icon>
                         visibility
@@ -1577,7 +1577,7 @@
             Monto
           </mat-label>
 
-          <input matInput type="number" min="0.01" step="0.01" formControlName="monto">
+          <input matInput type="number" min="0.01" step="0.01" data-money formControlName="monto">
 
           <span matTextPrefix>
             $

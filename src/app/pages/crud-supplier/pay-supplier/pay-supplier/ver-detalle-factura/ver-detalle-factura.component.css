@@ -1,7 +1,7 @@
 .detalle-factura-container {
   width: 100%;
   max-width: 950px;
-  background: #ffffff;
+  background: #f6f3fb;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -43,6 +43,7 @@
 
 .contenido {
   padding: 20px;
+  background: linear-gradient(180deg, #f6f3fb, #fcfbfe);
 }
 
 
@@ -246,9 +247,10 @@
 .tabla-wrapper {
   overflow-x: auto;
 
-  border: 1px solid #ddd;
+  border: 1px solid #ded5ec;
 
   border-radius: 9px;
+  background: #fff;
 }
 
 
@@ -478,7 +480,7 @@ tfoot {
 
   border-top: 1px solid #eee;
 
-  background: #fafafa;
+  background: #eee9f7;
 }
 
 

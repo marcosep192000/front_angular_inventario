@@ -156,6 +156,9 @@
               matInput
               type="number"
               min="0"
+              step="0.01"
+              inputmode="decimal"
+              data-money
               formControlName="price">
 
           </mat-form-field>
@@ -817,7 +820,40 @@
 
             <td class="cantidad">
 
-              {{ data.quantity }}
+              <div class="control-cantidad">
+
+                <button
+                  mat-icon-button
+                  type="button"
+                  matTooltip="Restar una unidad"
+                  [disabled]="data.quantity <= 1"
+                  (click)="cambiarCantidad(i, -1)"
+                  aria-label="Restar una unidad">
+
+                  <mat-icon>remove</mat-icon>
+
+                </button>
+
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  [ngModel]="data.quantity"
+                  (ngModelChange)="actualizarCantidad(i, $event)"
+                  [attr.aria-label]="'Cantidad de ' + data.name">
+
+                <button
+                  mat-icon-button
+                  type="button"
+                  matTooltip="Sumar una unidad"
+                  (click)="cambiarCantidad(i, 1)"
+                  aria-label="Sumar una unidad">
+
+                  <mat-icon>add</mat-icon>
+
+                </button>
+
+              </div>
 
             </td>
 

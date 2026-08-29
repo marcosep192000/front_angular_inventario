@@ -44,13 +44,13 @@ export class SearchClientByDniComponent implements OnInit {
   ) {}
   ngOnInit(): void {
     this.formGroup = this.fb.group({
-      dni: ['0', Validators.required],
+      cuit: ['0', Validators.required],
     });
   }
 
-  getClientByDni() {
+  buscarPorCuit() {
     if (this.formGroup.valid) {
-      this.clientService.getClientByDni(this.formGroup.value.dni).subscribe(
+      this.clientService.getClientByCuit(this.formGroup.value.cuit).subscribe(
         (data: Client) => {
           console.log(data);
           this.dialogRef.close(data); // Cierra el diálogo y pasa los datos del cliente
@@ -59,13 +59,11 @@ export class SearchClientByDniComponent implements OnInit {
         (error) => {
           
           console.error('Error fetching client:', error);
-          this.toastr.error(
-            'No se pudo encontrar el cliente. Intenta nuevamente.'
-          );
+          this.toastr.error(error.status === 404 ? 'Cliente no encontrado' : 'No se pudo consultar el cliente.');
         }
       );
     } else {
-      this.toastr.warning('Por favor, ingresa un DNI válido.');
+      this.toastr.warning('Por favor, ingresá un CUIT válido.');
     }
   }
   close() {
