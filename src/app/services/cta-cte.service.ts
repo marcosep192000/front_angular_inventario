@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CtaCte } from '../interfaces/CtaCte';
 import { HttpClient } from '@angular/common/http';
-import { environments } from '../../environments/environments.prod';
+import { environments } from '../../environments/environments';
 import { registrarDeudaCtaCteCliente } from '../interfaces/registrarDeudaCtaCteCliente';
 import { Observable } from 'rxjs';
 import { TicketCtaCtePendienteCliente } from '../interfaces/TicketCtaCtePendienteCliente';

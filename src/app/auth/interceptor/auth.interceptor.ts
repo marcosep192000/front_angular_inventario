@@ -1,6 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { environments } from '../../../environments/environments.prod';
+import { environments } from '../../../environments/environments';
 import { TokenService } from '../../services/token.service';
 
 // Interceptor que agrega el token al encabezado Authorization si está presente pero no si es distinto 

@@ -1,7 +1,83 @@
+/* Material Icons empaquetados localmente para instalaciones LAN sin Internet. */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('/assets/fonts/material-icons.woff2') format('woff2');
+}
 
-html, body { height: 100%;
- }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('/assets/fonts/material-symbols-outlined.woff2') format('woff2');
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+html, body { height: 100%; }
+
+html {
+  box-sizing: border-box;
+  -webkit-text-size-adjust: 100%;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  overflow-x: hidden;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+img, svg, canvas, video {
+  max-width: 100%;
+}
+
+button, input, select, textarea {
+  max-width: 100%;
+  font: inherit;
+}
+
+/* Los componentes Angular deben poder encogerse dentro de grids y flexbox. */
+app-root, router-outlet, mat-form-field, .mat-mdc-form-field {
+  min-width: 0;
+}
 
 
 .title__color{
@@ -113,6 +189,39 @@ color: white;
   border-collapse: collapse; /* Elimina espacios entre celdas */
 }
 
+/* Una tabla extensa conserva sus columnas y se desplaza dentro de su panel,
+   nunca ensancha toda la aplicación. */
+.table-container,
+.tabla-wrapper,
+.tabla-contenedor,
+.Container-table {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-inline: contain;
+}
+
+table {
+  max-width: 100%;
+}
+
+/* Los overlays de Material no pueden superar el viewport del dispositivo. */
+.cdk-overlay-pane {
+  max-width: calc(100vw - 24px) !important;
+  max-height: calc(100dvh - 24px) !important;
+}
+
+.mat-mdc-dialog-container,
+.mat-mdc-dialog-surface,
+.mat-mdc-dialog-content {
+  max-width: 100% !important;
+}
+
+.mat-mdc-dialog-content {
+  max-height: calc(100dvh - 132px) !important;
+  overflow: auto;
+}
+
 /*
   Tablas extensas: a partir de siete filas se conserva visible el encabezado
   y el listado usa scroll interno. Las listas de hasta seis registros siguen
@@ -180,5 +289,83 @@ color: white;
 .accion-estado:hover {
   filter: brightness(.96);
   transform: translateY(-2px);
+}
+
+@media (max-width: 991px) {
+  .contenedor-global {
+    max-width: 100%;
+    margin: 0;
+    padding: 16px;
+  }
+
+  .mat-mdc-paginator-container {
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 599px) {
+  body {
+    font-size: 14px;
+  }
+
+  h1 { font-size: clamp(1.35rem, 7vw, 1.75rem); }
+  h2 { font-size: clamp(1.15rem, 6vw, 1.45rem); }
+
+  input, select, textarea {
+    font-size: 16px; /* evita el zoom automático de iOS al enfocar */
+  }
+
+  .contenedor-global {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .table-container {
+    padding: 6px;
+  }
+
+  .actions__btn {
+    min-height: 44px;
+    margin: 4px 2px;
+  }
+
+  .acciones-fila,
+  .acciones-tabla,
+  .acciones-lista {
+    gap: 4px;
+  }
+
+  .acciones-fila button,
+  .acciones-tabla button,
+  .acciones-lista button {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .cdk-overlay-pane.mat-mdc-dialog-panel,
+  .cdk-overlay-pane:has(.mat-mdc-dialog-container) {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+  }
+
+  .mat-mdc-dialog-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .mat-mdc-dialog-actions > button {
+    flex: 1 1 120px;
+  }
+
+  .mat-mdc-paginator-container {
+    min-height: auto !important;
+    padding: 8px !important;
+  }
+
+  .mat-mdc-paginator-page-size-label,
+  .mat-mdc-paginator-range-label {
+    margin: 0 6px !important;
+  }
 }
 

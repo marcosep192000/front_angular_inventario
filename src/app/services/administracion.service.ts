@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environments } from '../../environments/environments.prod';
+import { environments } from '../../environments/environments';
 import { CompanyResponse, Empresa, EmpresaRequest, UsuarioEmpresa, UsuarioEmpresaRequest } from '../interfaces/administracion';
 @Injectable({ providedIn: 'root' })
 export class AdministracionService {

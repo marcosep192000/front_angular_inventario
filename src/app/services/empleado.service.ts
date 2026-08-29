@@ -2,12 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Empleado, EstadoCuentaEmpleado, LiquidacionSueldo, PagoEmpleado } from '../interfaces/empleado';
+import { environments } from '../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmpleadoService {
-  private apiUrl = 'http://localhost:8080/api/v1/empleados';
+  private readonly apiUrl = `${environments.baseURL}empleados`;
 
   constructor(private http: HttpClient) {}
 

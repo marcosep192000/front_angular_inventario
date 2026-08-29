@@ -8,14 +8,14 @@
   "scripts": {
     "electron": "electron electron/main.js",
     "package:exe": "node scripts/build-electron.js",
-    "build:electron": "ng build --configuration=production && electron electron/main.js",
+    "build:electron": "npm run build && npm run copy-angular:electron && electron electron/main.js",
     "ng": "ng",
     "start": "ng serve",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "postbuild": "node scripts/copy-angular.js",
-    "package": "npm run build && npm run postbuild && electron-builder",
-    "build": "ng build --configuration=production --base-href ./"
+    "copy-angular:electron": "node scripts/copy-angular.js",
+    "package": "npm run build && npm run copy-angular:electron && electron-builder",
+    "build": "ng build --configuration=production"
   },
   "private": true,
   "dependencies": {

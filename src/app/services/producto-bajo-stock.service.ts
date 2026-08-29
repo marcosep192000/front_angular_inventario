@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { LowStockByProvider } from '../interfaces/producto-bajo-stock';
 import { Observable } from 'rxjs';
-import { environments } from '../../environments/environments.prod';
+import { environments } from '../../environments/environments';
 
 @Injectable({
   providedIn: 'root'

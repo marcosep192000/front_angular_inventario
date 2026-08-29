@@ -1,5 +1,7 @@
 export const environments = {
-  baseURL: 'http://localhost:8080/api/v1/',
-  baseURL1: 'http://localhost:8080/',
-production:true
-}
+  // Producción LAN: la API se sirve desde el mismo host y puerto que Angular.
+  // Así funciona desde cualquier PC cliente sin recompilar por cambios de IP.
+  baseURL: '/api/v1/',
+  baseURL1: '/',
+  production: true,
+};

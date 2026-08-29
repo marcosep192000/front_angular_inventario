@@ -30,6 +30,15 @@
 
     </aside>
 
+    @if (isHandset && !menuCollapsed) {
+        <button
+            class="sidebar-backdrop"
+            type="button"
+            aria-label="Cerrar menú"
+            (click)="toggleMenu()">
+        </button>
+    }
+
     <!-- ===========================
          CONTENIDO
     ============================ -->

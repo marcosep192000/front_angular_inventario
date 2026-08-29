@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environments } from '../../environments/environments.prod';
+import { environments } from '../../environments/environments';
 import { Caja } from '../interfaces/Caja';
 import { Observable } from 'rxjs';
 import { cajaSaldoApertura } from '../interfaces/cajaSaldoApertura';
