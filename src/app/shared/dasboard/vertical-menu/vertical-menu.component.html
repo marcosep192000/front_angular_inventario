@@ -199,6 +199,12 @@
       @if(!collapsed){ <span>Administración</span> }
     </div>
   </div>
+  <div class="menu-item" routerLink="administracion/permisos">
+    <div class="menu-title">
+      <app-icon [iconSrc]="'assets/icons/settings_accessibility_24dp_FFF_FILL1_wght400_GRAD0_opsz24.png'" [size]="'28px'"></app-icon>
+      @if(!collapsed){ <span>Permisos de usuarios</span> }
+    </div>
+  </div>
   <div class="menu-item" routerLink="empleados">
     <div class="menu-title">
       <app-icon [iconSrc]="'assets/icons/group_person.png'" [size]="'28px'"></app-icon>

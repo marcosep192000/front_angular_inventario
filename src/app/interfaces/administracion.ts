@@ -5,3 +5,6 @@ export interface UsuarioEmpresaRequest { nombre: string; apellido: string; email
 export interface Empresa { id: number; name: string; cuit: string; address: string; phone: string; email: string; nombreFantasia?: string; ingresosBrutos?: string; inicioActividades?: string; puntoVenta?: number; sitioWeb?: string; condicionIva?: CondicionIvaEmpresa; usuarios: UsuarioEmpresa[]; }
 export type EmpresaRequest = Omit<Empresa, 'id' | 'usuarios'>;
 export interface CompanyResponse { id: number; name: string; logoUrl: string | null; }
+export interface PermisoEmpresa { codigo: string; nombre: string; descripcion?: string; grupo: string; }
+export interface PermisosUsuarioResponse { usuarioId: number; role: RolUsuario; permissions: string[]; }
+export interface PermisosUsuarioRequest { role: RolUsuario; permissions: string[]; }

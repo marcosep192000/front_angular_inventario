@@ -13,6 +13,7 @@ import { InicioComponent } from './shared/dasboard/dashboard/inicio/inicio.compo
 import { BajoStockComponent } from './shared/dasboard/dashboard/inicio/bajo-stock/bajo-stock.component';
 import { BuscarProductoPorProveedorComponent } from './pages/crud-product/buscar-producto-por-proveedor/buscar-producto-por-proveedor.component';
 import { AdministracionComponent } from './pages/administracion/administracion.component';
+import { PermisosComponent } from './pages/administracion/permisos/permisos.component';
 import { EmpleadosComponent } from './pages/empleados/empleados.component';
 import { ReportesComponent } from './modules/reportes/reportes.component';
 import { ReporteDetalleComponent } from './modules/reportes/reporte-detalle.component';
@@ -36,6 +37,7 @@ export const routes: Routes = [
       { path:'bajo-stock', component: BajoStockComponent },
       { path:'buscar-producto-por-proveedor',component: BuscarProductoPorProveedorComponent}
       ,{ path:'administracion', component: AdministracionComponent }
+      ,{ path:'administracion/permisos', component: PermisosComponent }
       ,{ path:'empleados', component: EmpleadosComponent }
       ,{ path:'reportes', component: ReportesComponent }
       ,{ path:'reportes/:area/:reporte', component: ReporteDetalleComponent, data:{area:'Reportes',titulo:'Reporte',descripcion:'Consulta de información',endpoint:''} }
