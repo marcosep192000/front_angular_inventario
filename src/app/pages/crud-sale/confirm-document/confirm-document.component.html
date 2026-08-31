@@ -120,6 +120,13 @@
 
     </div>
 
+    <p
+      class="whatsapp-ayuda"
+      *ngIf="data.tipoDocumento === 'PRESUPUESTO' && !data.whatsappDisponible">
+      <mat-icon>info</mat-icon>
+      {{ data.motivoWhatsappNoDisponible }}
+    </p>
+
   </mat-dialog-content>
 
 
@@ -145,6 +152,19 @@
 
 
     <button
+      *ngIf="data.tipoDocumento === 'PRESUPUESTO'"
+      mat-stroked-button
+      type="button"
+      class="btn-whatsapp"
+      [disabled]="!data.whatsappDisponible"
+      (click)="enviarWhatsapp()">
+
+      <mat-icon>send</mat-icon>
+      Enviar por WhatsApp
+
+    </button>
+
+    <button
       mat-raised-button
       color="primary"
       type="button"
@@ -155,7 +175,7 @@
         check
       </mat-icon>
 
-      Generar documento
+      {{ data.tipoDocumento === 'PRESUPUESTO' ? 'Generar PDF' : 'Generar documento' }}
 
     </button>
 

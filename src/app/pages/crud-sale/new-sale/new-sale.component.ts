@@ -76,7 +76,8 @@ import { IconComponent } from '../../../shared/dasboard/icon/icon.component';
 
 import {
   ConfirmDocumentComponent,
-  ConfirmDocumentData
+  ConfirmDocumentData,
+  ConfirmDocumentAction
 } from '../confirm-document/confirm-document.component';
 
 
@@ -124,6 +125,7 @@ export class NewSaleComponent implements OnInit {
 
   tipoDocumento: string = 'FACTURA_C';
   private condicionIvaEmisor: CondicionIvaEmpresa = 'RESPONSABLE_INSCRIPTO';
+  private generarPdfAlGuardar = true;
   private empresaDocumento: Partial<Empresa> = {
     name: CompanyDocumentConfig.legalName,
     nombreFantasia: CompanyDocumentConfig.tradeName,
@@ -1103,7 +1105,13 @@ export class NewSaleComponent implements OnInit {
         this.getTotalPrice(),
 
       mensaje:
-        this.obtenerMensajeConfirmacion()
+        this.obtenerMensajeConfirmacion(),
+
+      whatsappDisponible:
+        this.puedeEnviarPresupuestoWhatsapp,
+
+      motivoWhatsappNoDisponible:
+        this.motivoWhatsappNoDisponible
 
     };
 
@@ -1134,13 +1142,13 @@ export class NewSaleComponent implements OnInit {
     dialogRef
       .afterClosed()
       .subscribe(
-        (confirmado: boolean) => {
+        (accion: ConfirmDocumentAction | null) => {
 
           // =========================================
           // CANCELÓ
           // =========================================
 
-          if (!confirmado) {
+          if (!accion) {
 
             console.log(
               'Generación de documento cancelada.'
@@ -1158,6 +1166,12 @@ export class NewSaleComponent implements OnInit {
           // RECIÉN ACÁ SE CONSTRUYE
           // Y SE GUARDA EL DOCUMENTO.
           // =========================================
+
+          this.generarPdfAlGuardar = accion === 'pdf';
+
+          if (accion === 'whatsapp') {
+            this.enviarPresupuestoWhatsapp();
+          }
 
           const sale =
             this.buildSaleCommon(
@@ -2082,7 +2096,9 @@ export class NewSaleComponent implements OnInit {
 
           try {
 
-            this.generatePDF({ ...saleCommon, numero: numeroFinal });
+            if (this.generarPdfAlGuardar) {
+              this.generatePDF({ ...saleCommon, numero: numeroFinal });
+            }
 
           } catch (pdfError: any) {
 
@@ -2102,6 +2118,7 @@ export class NewSaleComponent implements OnInit {
           // =============================================
 
           this.limpiarVenta();
+          this.generarPdfAlGuardar = true;
 
 
           // =============================================
@@ -2109,6 +2126,8 @@ export class NewSaleComponent implements OnInit {
         // =============================================
 
         error: (error: any) => {
+
+          this.generarPdfAlGuardar = true;
 
           console.error(
             '=========================================='

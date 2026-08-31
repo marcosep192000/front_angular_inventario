@@ -254,6 +254,33 @@ button {
   min-width: 190px;
 }
 
+.btn-whatsapp {
+  min-width: 185px;
+  border-color: #20a95a !important;
+  color: #147a3b !important;
+  background: #f1fff6 !important;
+}
+
+.btn-whatsapp:hover:not(:disabled) {
+  color: #fff !important;
+  background: #20a95a !important;
+}
+
+.whatsapp-ayuda {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 14px 0 0;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.whatsapp-ayuda mat-icon {
+  width: 17px;
+  height: 17px;
+  font-size: 17px;
+}
+
 
 /* =========================================================
    RESPONSIVE
