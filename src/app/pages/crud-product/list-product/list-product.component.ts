@@ -186,6 +186,10 @@ onPageChange(event: PageEvent): void {
 const dialogRef = this.dialog.open(BuscarProductoPorProveedorComponent, {
       autoFocus: true,
       hasBackdrop: true,
+      width: '1180px',
+      maxWidth: '96vw',
+      maxHeight: '92vh',
+      panelClass: 'dialogo-precios-productos',
     });
   dialogRef.afterClosed().subscribe(result => {
     if (result === true) {
