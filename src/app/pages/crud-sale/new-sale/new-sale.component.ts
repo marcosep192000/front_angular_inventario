@@ -1497,8 +1497,23 @@ export class NewSaleComponent implements OnInit {
 
   get puedeEnviarPresupuestoWhatsapp(): boolean {
     const cuit = String(this.selectedClient?.cuit ?? '').trim();
-    const telefono = String(this.selectedClient?.tel ?? '').replace(/\D/g, '');
+    const telefono = this.telefonoCliente.replace(/\D/g, '');
     return this.tipoDocumento === 'PRESUPUESTO' && cuit !== '' && cuit !== '0' && telefono.length >= 8;
+  }
+
+  get telefonoCliente(): string {
+    return String(
+      this.selectedClient?.tel ??
+      this.selectedClient?.telefono ??
+      this.selectedClient?.phone ??
+      ''
+    ).trim();
+  }
+
+  get motivoWhatsappNoDisponible(): string {
+    if (String(this.selectedClient?.cuit ?? '').trim() === '0') return 'Seleccioná un cliente registrado.';
+    if (this.telefonoCliente.replace(/\D/g, '').length < 8) return 'El cliente no tiene un celular válido.';
+    return '';
   }
 
   enviarPresupuestoWhatsapp(): void {
@@ -1507,7 +1522,7 @@ export class NewSaleComponent implements OnInit {
       return;
     }
 
-    const telefono = this.normalizarTelefonoWhatsapp(this.selectedClient.tel);
+    const telefono = this.normalizarTelefonoWhatsapp(this.telefonoCliente);
     const detalle = this.products
       .map(producto => `• ${producto.name} x${producto.quantity}: $${(producto.salePrice * producto.quantity).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`)
       .join('\n');

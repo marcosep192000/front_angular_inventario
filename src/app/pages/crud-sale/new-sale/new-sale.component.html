@@ -686,7 +686,7 @@
 
 
           <p>
-            📞 {{ selectedClient.tel }}
+            📞 {{ telefonoCliente || 'Sin teléfono' }}
           </p>
 
 
@@ -829,16 +829,22 @@
       </button>
 
       <button
-        *ngIf="puedeEnviarPresupuestoWhatsapp"
+        *ngIf="tipoDocumento === 'PRESUPUESTO'"
         mat-stroked-button
         color="primary"
         class="btn-whatsapp"
         type="button"
-        [disabled]="products.length === 0"
+        [disabled]="products.length === 0 || !puedeEnviarPresupuestoWhatsapp"
         (click)="enviarPresupuestoWhatsapp()">
         <mat-icon>send</mat-icon>
         Descargar y enviar por WhatsApp
       </button>
+
+      <small
+        class="whatsapp-ayuda"
+        *ngIf="tipoDocumento === 'PRESUPUESTO' && motivoWhatsappNoDisponible">
+        {{ motivoWhatsappNoDisponible }}
+      </small>
 
     </section>
 

@@ -31,17 +31,20 @@
                     <mat-hint align="end">{{ formGroup.get('name')?.value?.length }}/20</mat-hint>
                 </mat-form-field>
 
-                <mat-form-field class="input" hintLabel="Máximo 14 caracteres">
-                    <mat-label>Teléfono</mat-label>
+                <mat-form-field class="input" hintLabel="Formato internacional recomendado">
+                    <mat-label>Celular / WhatsApp</mat-label>
                     <input
                       matInput
-                      maxlength="14"
+                      maxlength="20"
                       formControlName="tel"
-                      type="text"
-                      pattern="[0-9]*"
-                      (keydown)="onlyAllowNumbers($event)"
+                      type="tel"
+                      autocomplete="tel"
+                      inputmode="tel"
+                      placeholder="Ej.: +54 9 11 2345-6789"
+                      (input)="onPhoneInput($event)"
                     />
-                    <mat-hint align="end">{{ formGroup.get('tel')?.value?.length || 0 }}/14</mat-hint>
+                    <mat-hint>Incluí código de país y área</mat-hint>
+                    <mat-error *ngIf="formGroup.get('tel')?.hasError('pattern')">Ingresá un teléfono válido</mat-error>
                   </mat-form-field>
             </div><!-- FIN COLUMNA 1 -->
 

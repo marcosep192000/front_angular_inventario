@@ -1022,6 +1022,21 @@ t.css
   transform: translateY(-1px);
 }
 
+.btn-whatsapp {
+  width: 100%;
+  min-height: 44px;
+  border-color: #1fa855 !important;
+  color: #147a3b !important;
+  font-weight: 700;
+}
+
+.whatsapp-ayuda {
+  display: block;
+  margin-top: -4px;
+  color: #7a8190;
+  text-align: center;
+}
+
 /* ============================================================
    ESTADO VACÍO
    ============================================================ */

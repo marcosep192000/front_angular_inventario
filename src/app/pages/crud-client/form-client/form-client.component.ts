@@ -95,7 +95,11 @@ throw new Error('Method not implemented.');
     this.formGroup = this.fb.group({
       cuit: ['', [Validators.required, Validators.maxLength(12), Validators.pattern('[0-9]*')]],
       name: ['', [Validators.required, Validators.maxLength(20)]],
-      tel: ['', [Validators.required, Validators.maxLength(14), Validators.pattern('[0-9]*')]],
+      tel: ['', [
+        Validators.required,
+        Validators.maxLength(20),
+        Validators.pattern(/^\+?[0-9\s()-]{8,20}$/)
+      ]],
       lastName: ['', [Validators.required, Validators.maxLength(20)]],
       address: ['', [Validators.required, Validators.maxLength(40)]],
       email: this.emailFormControl,
@@ -201,6 +205,13 @@ throw new Error('Method not implemented.');
     if (!isNumber && !allowedKeys.includes(event.key)) {
       event.preventDefault();
     }
+  }
+
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value.replace(/[^0-9+\s()-]/g, '').slice(0, 20);
+    this.formGroup.get('tel')?.setValue(value, { emitEvent: false });
+    input.value = value;
   }
   
 }
