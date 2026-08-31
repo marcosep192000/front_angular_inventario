@@ -812,6 +812,7 @@
 
       <!-- COBRAR -->
 
+      <div class="acciones-documento">
       <button
         mat-raised-button
         color="primary"
@@ -829,7 +830,6 @@
       </button>
 
       <button
-        *ngIf="tipoDocumento === 'PRESUPUESTO'"
         mat-stroked-button
         color="primary"
         class="btn-whatsapp"
@@ -837,12 +837,13 @@
         [disabled]="products.length === 0 || !puedeEnviarPresupuestoWhatsapp"
         (click)="enviarPresupuestoWhatsapp()">
         <mat-icon>send</mat-icon>
-        Descargar y enviar por WhatsApp
+        Enviar presupuesto por WhatsApp
       </button>
+      </div>
 
       <small
         class="whatsapp-ayuda"
-        *ngIf="tipoDocumento === 'PRESUPUESTO' && motivoWhatsappNoDisponible">
+        *ngIf="motivoWhatsappNoDisponible">
         {{ motivoWhatsappNoDisponible }}
       </small>
 

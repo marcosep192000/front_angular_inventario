@@ -1498,7 +1498,7 @@ export class NewSaleComponent implements OnInit {
   get puedeEnviarPresupuestoWhatsapp(): boolean {
     const cuit = String(this.selectedClient?.cuit ?? '').trim();
     const telefono = this.telefonoCliente.replace(/\D/g, '');
-    return this.tipoDocumento === 'PRESUPUESTO' && cuit !== '' && cuit !== '0' && telefono.length >= 8;
+    return cuit !== '' && cuit !== '0' && telefono.length >= 8 && this.products.length > 0;
   }
 
   get telefonoCliente(): string {
@@ -1532,11 +1532,9 @@ export class NewSaleComponent implements OnInit {
       detalle,
       '',
       `Total: $${this.getTotalPrice().toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
-      'El PDF del presupuesto se descargará para que puedas adjuntarlo en WhatsApp.'
+      `Presupuesto generado el ${new Date().toLocaleDateString('es-AR')}.`
     ].join('\n');
 
-    const presupuesto = this.buildSaleCommon('CONTADO', null, this.medioPago);
-    this.generatePDF(presupuesto);
     window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank', 'noopener,noreferrer');
   }
 
