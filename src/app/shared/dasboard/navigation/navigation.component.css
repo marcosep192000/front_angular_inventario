@@ -174,8 +174,9 @@
 
 @media (max-width:991px){
 
-    .layout{
-        grid-template-columns:1fr;
+    .layout,
+    .layout.collapsed{
+        grid-template-columns:minmax(0, 1fr);
     }
 
     .sidebar{
@@ -195,6 +196,7 @@
 
     .content{
         width:100%;
+        grid-column:1;
     }
 
     .sidebar-backdrop{
