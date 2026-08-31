@@ -21,7 +21,7 @@
 
   <!-- INICIO -->
 
-  <div class="menu-item" routerLink="/dashboard">
+  <div class="menu-item" routerLink="/dashboard" *ngIf="puede('DASHBOARD_VER')">
 
     <div class="menu-title">
 
@@ -40,7 +40,7 @@
 
   <!-- VENTAS -->
 
-  <div class="menu-item">
+  <div class="menu-item" *ngIf="puede('VENTAS_VER') || puede('VENTAS_CREAR') || puede('CAJA_VER')">
 
     <div class="menu-title" (click)="toggleMenu('ventas')">
 
@@ -67,7 +67,7 @@
     @if(!collapsed){
     <div class="submenu" [class.open]="isMenuOpen('ventas')">
 
-      <div class="submenu-item" routerLink="new-sale">
+      <div class="submenu-item" routerLink="new-sale" *ngIf="puede('VENTAS_CREAR')">
 
         <app-icon [iconSrc]="'assets/icons/sell.png'" [size]="'22px'">
         </app-icon>
@@ -76,7 +76,7 @@
 
       </div>
 
-      <div class="submenu-item" routerLink="cash-closing">
+      <div class="submenu-item" routerLink="cash-closing" *ngIf="puede('CAJA_VER')">
 
         <app-icon [iconSrc]="'assets/icons/savings.png'" [size]="'22px'">
         </app-icon>
@@ -91,7 +91,7 @@
 
   <!-- CLIENTES -->
 
-  <div class="menu-item" routerLink="client-list">
+  <div class="menu-item" routerLink="client-list" *ngIf="puede('CLIENTES_VER')">
 
     <div class="menu-title">
 
@@ -109,7 +109,7 @@
 
   <!-- PROVEEDORES -->
 
-  <div class="menu-item" routerLink="supplier-list">
+  <div class="menu-item" routerLink="supplier-list" *ngIf="puede('PROVEEDORES_VER')">
 
     <div class="menu-title">
 
@@ -128,7 +128,7 @@
 
   <!-- PRODUCTOS -->
 
-  <div class="menu-item">
+  <div class="menu-item" *ngIf="puede('PRODUCTOS_VER')">
 
     <div class="menu-title" (click)="toggleMenu('productos')">
 
@@ -192,19 +192,23 @@
 
   </div>
 
-  @if (esAdmin) {
+  @if (puede('EMPRESA_CONFIGURAR')) {
   <div class="menu-item" routerLink="administracion">
     <div class="menu-title">
       <app-icon [iconSrc]="'assets/icons/settings_accessibility_24dp_FFF_FILL1_wght400_GRAD0_opsz24.png'" [size]="'28px'"></app-icon>
       @if(!collapsed){ <span>Administración</span> }
     </div>
   </div>
+  }
+  @if (puede('PERMISOS_GESTIONAR')) {
   <div class="menu-item" routerLink="administracion/permisos">
     <div class="menu-title">
       <app-icon [iconSrc]="'assets/icons/settings_accessibility_24dp_FFF_FILL1_wght400_GRAD0_opsz24.png'" [size]="'28px'"></app-icon>
       @if(!collapsed){ <span>Permisos de usuarios</span> }
     </div>
   </div>
+  }
+  @if (puede('EMPLEADOS_GESTIONAR')) {
   <div class="menu-item" routerLink="empleados">
     <div class="menu-title">
       <app-icon [iconSrc]="'assets/icons/group_person.png'" [size]="'28px'"></app-icon>
@@ -215,7 +219,7 @@
 
   <!-- REPORTES -->
 
-  <div class="menu-item" routerLink="reportes">
+  <div class="menu-item" routerLink="reportes" *ngIf="puede('REPORTES_VER')">
 
     <div class="menu-title" (click)="toggleMenu('reportes')">
 

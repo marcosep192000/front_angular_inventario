@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 const TOKEN_KEY = 'token';
 const USERNAME_KEY = 'username';
 const AUTHORITIES_KEY = 'authorities';
+const PERMISSIONS_KEY = 'permissions';
 
 @Injectable({
   providedIn: 'root',
@@ -47,21 +48,24 @@ export class TokenService {
         const username = decodedToken['username'] || decodedToken['sub'];
         const authorities =
           decodedToken['authorities'] || decodedToken['roles'] || [];
+        const permissions = decodedToken['permissions'] || [];
         this.setUserName(username);
         this.setAuthorities(authorities);
+        this.setPermissions(permissions);
       }
     }
   }
 
   public setToken(token: string): void {
     if (this.isBrowser()) {
-      this.limpiarSesionLocal();
       this.accessToken = token;
+      localStorage.setItem(TOKEN_KEY, token);
       this.loggedIn.next(this.isTokenValid());
     }
   }
 
   public getToken(): string {
+    if (!this.accessToken && this.isBrowser()) this.accessToken = localStorage.getItem(TOKEN_KEY);
     return this.accessToken || '';
   }
 
@@ -127,14 +131,48 @@ export class TokenService {
     }
   }
 
+  public setPermissions(permissions: string[] = []): void {
+    if (this.isBrowser()) localStorage.setItem(PERMISSIONS_KEY, JSON.stringify(permissions));
+  }
+
+  public getPermissions(): string[] {
+    if (!this.isBrowser()) return [];
+    try { return JSON.parse(localStorage.getItem(PERMISSIONS_KEY) || '[]'); } catch { return []; }
+  }
+
+  public hasPermission(permission: string): boolean {
+    const authorities = this.getAuthorities();
+    if (authorities.some(role => role === 'ADMIN' || role === 'ROLE_ADMIN')) return true;
+    return this.getPermissions().includes(permission);
+  }
+
+  public getDefaultRoute(): string {
+    const routes: Array<[string, string]> = [
+      ['DASHBOARD_VER', '/dashboard'], ['VENTAS_CREAR', '/dashboard/new-sale'], ['CAJA_VER', '/dashboard/cash-closing'],
+      ['CLIENTES_VER', '/dashboard/client-list'], ['PRODUCTOS_VER', '/dashboard/product-list'], ['PROVEEDORES_VER', '/dashboard/supplier-list'],
+      ['REPORTES_VER', '/dashboard/reportes'], ['EMPRESA_CONFIGURAR', '/dashboard/administracion'], ['PERMISOS_GESTIONAR', '/dashboard/administracion/permisos'],
+    ];
+    return routes.find(([permission]) => this.hasPermission(permission))?.[1] || '/login';
+  }
+
+  public setSession(data: { token?: string; accessToken?: string; username: string; authorities?: string[]; permissions?: string[] }): void {
+    const token = data.accessToken || data.token;
+    if (token) this.setToken(token);
+    this.setUserName(data.username);
+    this.setAuthorities(data.authorities || []);
+    this.setPermissions(data.permissions || []);
+  }
+
   private limpiarSesionLocal(): void {
     this.accessToken = null;
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USERNAME_KEY);
     localStorage.removeItem(AUTHORITIES_KEY);
+    localStorage.removeItem(PERMISSIONS_KEY);
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(USERNAME_KEY);
     sessionStorage.removeItem(AUTHORITIES_KEY);
+    sessionStorage.removeItem(PERMISSIONS_KEY);
   }
 
   get isLogged(): Observable<Boolean> {

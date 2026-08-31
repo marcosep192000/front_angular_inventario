@@ -53,10 +53,8 @@ export class LoginComponent {
     this.accesoService.login(objeto).subscribe({
       next: (data) => {
         if (data.accessToken) {
-          this.tokenService.setToken(data.accessToken);
-          this.tokenService.setAuthorities(data.authorities);
-          this.tokenService.setUserName(data.username);
-          this.route.navigate(['/dashboard']);
+          this.tokenService.setSession(data);
+          this.route.navigateByUrl(this.tokenService.getDefaultRoute());
         } else {
           alert('Credenciales incorrectas');
         }

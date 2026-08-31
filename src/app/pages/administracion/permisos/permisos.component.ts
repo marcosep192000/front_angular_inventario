@@ -39,7 +39,12 @@ export class PermisosComponent implements OnInit {
   ngOnInit(): void {
     this.api.listarUsuarios().subscribe({ next: usuarios => this.usuarios = usuarios, error: () => this.toastr.error('No se pudieron cargar los usuarios.') });
     this.api.listarPermisos().subscribe({
-      next: permisos => { this.permisos = permisos?.length ? permisos : this.catalogoBase; this.cargando = false; },
+      next: codigos => {
+        const conocidos = new Map(this.catalogoBase.map(permiso => [permiso.codigo, permiso]));
+        this.permisos = (codigos || []).map(codigo => conocidos.get(codigo) || { codigo, nombre: this.nombrePermiso(codigo), grupo: 'Otros' });
+        if (!this.permisos.length) this.permisos = this.catalogoBase;
+        this.cargando = false;
+      },
       error: () => { this.permisos = this.catalogoBase; this.backendDisponible = false; this.cargando = false; },
     });
   }
@@ -76,5 +81,9 @@ export class PermisosComponent implements OnInit {
       next: respuesta => { this.seleccionados = new Set(respuesta.permissions || []); this.backendDisponible = true; this.guardando = false; this.toastr.success('Permisos guardados.'); },
       error: error => { this.backendDisponible = false; this.guardando = false; this.toastr.error(error?.error?.error || 'El backend de permisos todavía no está disponible.'); },
     });
+  }
+
+  private nombrePermiso(codigo: string): string {
+    return codigo.toLowerCase().split('_').map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1)).join(' ');
   }
 }
