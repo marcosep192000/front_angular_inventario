@@ -2,13 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 import { environments } from '../../environments/environments';
-import { catchError, Observable, pipe, throwError } from 'rxjs';
+import { catchError, Observable, Subject, tap, throwError } from 'rxjs';
 import { Supplier } from '../interfaces/supplier';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SupplierService {
+  private readonly suppliersChangedSubject = new Subject<void>();
+  readonly suppliersChanged$ = this.suppliersChangedSubject.asObservable();
   suppliers: any[] = [];
   selectedSupplier: any;
   loading: boolean = false;
@@ -28,13 +30,16 @@ export class SupplierService {
     return this.http.put<Supplier>(
       `${this.base}provider/update/${id}`,
       supplier
-    );
+    ).pipe(tap(() => this.suppliersChangedSubject.next()));
   }
 
   createSupplier(supplier: Supplier): Observable<Supplier> {
     return this.http
       .post<Supplier>(`${this.base}provider/create-provider`, supplier)
-      .pipe(catchError(this.manejarError));
+      .pipe(
+        tap(() => this.suppliersChangedSubject.next()),
+        catchError(this.manejarError)
+      );
   }
   manejarError(error: HttpErrorResponse) {
     if (error.status === 500) {
@@ -45,7 +50,8 @@ export class SupplierService {
   }
 
   deleteSupplier(id: number): Observable<Supplier> {
-    return this.http.delete<Supplier>(`${this.base}provider/deleted/${id}`);
+    return this.http.delete<Supplier>(`${this.base}provider/deleted/${id}`)
+      .pipe(tap(() => this.suppliersChangedSubject.next()));
   }
 
   getPayMethod(): Observable<string[]> {

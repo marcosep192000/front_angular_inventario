@@ -828,6 +828,18 @@
 
       </button>
 
+      <button
+        *ngIf="puedeEnviarPresupuestoWhatsapp"
+        mat-stroked-button
+        color="primary"
+        class="btn-whatsapp"
+        type="button"
+        [disabled]="products.length === 0"
+        (click)="enviarPresupuestoWhatsapp()">
+        <mat-icon>send</mat-icon>
+        Descargar y enviar por WhatsApp
+      </button>
+
     </section>
 
   </aside>

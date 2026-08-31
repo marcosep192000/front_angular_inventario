@@ -29,7 +29,8 @@ import { MatSelect } from '@angular/material/select';
 
 import {
   Subject,
-  of
+  of,
+  firstValueFrom
 } from 'rxjs';
 
 import {
@@ -46,7 +47,7 @@ import autoTable from 'jspdf-autotable';
 import { CompanyDocumentConfig } from '../../../config/company-document.config';
 import { TicketService } from '../../../services/ticket.service';
 import { AdministracionService } from '../../../services/administracion.service';
-import { CondicionIvaEmpresa } from '../../../interfaces/administracion';
+import { CondicionIvaEmpresa, Empresa } from '../../../interfaces/administracion';
 
 import { ProductService } from '../../../services/product.service';
 import { ProductItemSale } from '../../../interfaces/ProductItemSale';
@@ -123,6 +124,14 @@ export class NewSaleComponent implements OnInit {
 
   tipoDocumento: string = 'FACTURA_C';
   private condicionIvaEmisor: CondicionIvaEmpresa = 'RESPONSABLE_INSCRIPTO';
+  private empresaDocumento: Partial<Empresa> = {
+    name: CompanyDocumentConfig.legalName,
+    nombreFantasia: CompanyDocumentConfig.tradeName,
+    cuit: CompanyDocumentConfig.cuit,
+    address: CompanyDocumentConfig.address,
+    phone: CompanyDocumentConfig.phone,
+    email: CompanyDocumentConfig.email,
+  };
 
   condicionVenta: string = 'CONTADO';
 
@@ -236,6 +245,7 @@ export class NewSaleComponent implements OnInit {
   private cargarCondicionIvaEmisor(): void {
     this.administracionService.obtenerEmpresa().subscribe({
       next: empresa => {
+        this.empresaDocumento = empresa;
         this.condicionIvaEmisor = empresa.condicionIva || 'RESPONSABLE_INSCRIPTO';
         if (this.selectedClient) this.actualizarTipoFactura(this.selectedClient);
       }
@@ -1485,6 +1495,45 @@ export class NewSaleComponent implements OnInit {
 
   }
 
+  get puedeEnviarPresupuestoWhatsapp(): boolean {
+    const cuit = String(this.selectedClient?.cuit ?? '').trim();
+    const telefono = String(this.selectedClient?.tel ?? '').replace(/\D/g, '');
+    return this.tipoDocumento === 'PRESUPUESTO' && cuit !== '' && cuit !== '0' && telefono.length >= 8;
+  }
+
+  enviarPresupuestoWhatsapp(): void {
+    if (!this.puedeEnviarPresupuestoWhatsapp) {
+      this.toastr.warning('El cliente debe estar registrado y tener un celular válido.');
+      return;
+    }
+
+    const telefono = this.normalizarTelefonoWhatsapp(this.selectedClient.tel);
+    const detalle = this.products
+      .map(producto => `• ${producto.name} x${producto.quantity}: $${(producto.salePrice * producto.quantity).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`)
+      .join('\n');
+    const mensaje = [
+      `Hola ${this.obtenerNombreCliente()}, te enviamos el presupuesto de ${this.nombreEmpresaDocumento}:`,
+      '',
+      detalle,
+      '',
+      `Total: $${this.getTotalPrice().toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+      'El PDF del presupuesto se descargará para que puedas adjuntarlo en WhatsApp.'
+    ].join('\n');
+
+    const presupuesto = this.buildSaleCommon('CONTADO', null, this.medioPago);
+    this.generatePDF(presupuesto);
+    window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank', 'noopener,noreferrer');
+  }
+
+  private normalizarTelefonoWhatsapp(valor: string): string {
+    let telefono = String(valor ?? '').replace(/\D/g, '');
+    if (telefono.startsWith('00')) telefono = telefono.slice(2);
+    if (telefono.startsWith('0')) telefono = telefono.slice(1);
+    if (!telefono.startsWith('54')) telefono = `549${telefono}`;
+    else if (!telefono.startsWith('549')) telefono = `549${telefono.slice(2)}`;
+    return telefono;
+  }
+
   private async generarPdfProfesional(saleCommon: SaleCommon): Promise<void> {
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
     const ancho = doc.internal.pageSize.getWidth();
@@ -1502,11 +1551,11 @@ export class NewSaleComponent implements OnInit {
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
-    doc.text(CompanyDocumentConfig.tradeName, logo ? 43 : 14, 18);
+    doc.text(this.nombreEmpresaDocumento, logo ? 43 : 14, 18);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
-    doc.text(`CUIT ${CompanyDocumentConfig.cuit} · Comprobante interno`, logo ? 43 : 14, 25);
-    doc.text(CompanyDocumentConfig.contactLine || 'Sistema de gestión comercial', logo ? 43 : 14, 30);
+    doc.text(`CUIT ${this.empresaDocumento.cuit || '-'} · Comprobante interno`, logo ? 43 : 14, 25);
+    doc.text(this.contactoEmpresaDocumento || 'Sistema de gestión comercial', logo ? 43 : 14, 30);
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
@@ -1573,7 +1622,7 @@ export class NewSaleComponent implements OnInit {
       doc.line(14, alto - 17, ancho - 14, alto - 17);
       doc.setTextColor(120, 125, 135);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
-      doc.text(`${CompanyDocumentConfig.footerText} · Documento generado por el sistema`, 14, alto - 11);
+      doc.text(`${this.nombreEmpresaDocumento} · Documento generado por el sistema`, 14, alto - 11);
       doc.text(`Página ${pagina} de ${paginas}`, ancho - 14, alto - 11, { align: 'right' });
     }
 
@@ -1581,15 +1630,32 @@ export class NewSaleComponent implements OnInit {
   }
 
   private obtenerLogoPdf(): Promise<string | null> {
-    return fetch(CompanyDocumentConfig.logoUrl)
-      .then((respuesta) => respuesta.blob())
+    return firstValueFrom(this.administracionService.obtenerLogo())
       .then((blob) => new Promise<string>((resolve, reject) => {
         const lector = new FileReader();
         lector.onloadend = () => resolve(String(lector.result));
         lector.onerror = () => reject();
         lector.readAsDataURL(blob);
       }))
-      .catch(() => null);
+      .catch(() => fetch(CompanyDocumentConfig.logoUrl)
+        .then(respuesta => respuesta.blob())
+        .then(blob => new Promise<string>((resolve, reject) => {
+          const lector = new FileReader();
+          lector.onloadend = () => resolve(String(lector.result));
+          lector.onerror = () => reject();
+          lector.readAsDataURL(blob);
+        }))
+        .catch(() => null));
+  }
+
+  private get nombreEmpresaDocumento(): string {
+    return this.empresaDocumento.nombreFantasia || this.empresaDocumento.name || CompanyDocumentConfig.tradeName;
+  }
+
+  private get contactoEmpresaDocumento(): string {
+    return [this.empresaDocumento.address, this.empresaDocumento.phone, this.empresaDocumento.email]
+      .filter(Boolean)
+      .join(' · ');
   }
 
 
@@ -2541,7 +2607,7 @@ export class NewSaleComponent implements OnInit {
                 text-align: center;
               "
             >
-              ${CompanyDocumentConfig.tradeName}
+              ${this.nombreEmpresaDocumento}
             </h2>
 
 
@@ -2550,7 +2616,7 @@ export class NewSaleComponent implements OnInit {
                 text-align: center;
               "
             >
-              CUIT ${CompanyDocumentConfig.cuit}
+              CUIT ${this.empresaDocumento.cuit || '-'}
             </p>
 
 
