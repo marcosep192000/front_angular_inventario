@@ -128,6 +128,13 @@
 
   <!-- PRODUCTOS -->
 
+  <div class="menu-item" routerLink="purchase-orders" *ngIf="puede('COMPRAS_REGISTRAR')">
+    <div class="menu-title">
+      <app-icon [iconSrc]="'assets/icons/real_estate_agent.png'" [size]="'28px'"></app-icon>
+      @if(!collapsed){ <span>Pedidos de compra</span> }
+    </div>
+  </div>
+
   <div class="menu-item" *ngIf="puede('PRODUCTOS_VER')">
 
     <div class="menu-title" (click)="toggleMenu('productos')">

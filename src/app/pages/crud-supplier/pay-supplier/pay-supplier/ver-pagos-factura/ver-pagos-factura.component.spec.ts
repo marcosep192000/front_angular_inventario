@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { VerPagosFacturaComponent } from './ver-pagos-factura.component';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('VerPagosFacturaComponent', () => {
   let component: VerPagosFacturaComponent;
@@ -8,7 +9,8 @@ describe('VerPagosFacturaComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [VerPagosFacturaComponent]
+      imports: [VerPagosFacturaComponent],
+      providers: [provideHttpClient()]
     })
     .compileComponents();
     

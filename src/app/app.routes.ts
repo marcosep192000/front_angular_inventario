@@ -16,6 +16,9 @@ import { PermisosComponent } from './pages/administracion/permisos/permisos.comp
 import { EmpleadosComponent } from './pages/empleados/empleados.component';
 import { ReportesComponent } from './modules/reportes/reportes.component';
 import { ReporteDetalleComponent } from './modules/reportes/reporte-detalle.component';
+import { PurchaseOrderListComponent } from './pages/purchase-orders/purchase-order-list.component';
+import { PurchaseOrderFormComponent } from './pages/purchase-orders/purchase-order-form.component';
+import { PurchaseOrderDetailComponent } from './pages/purchase-orders/purchase-order-detail.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -33,6 +36,10 @@ export const routes: Routes = [
       { path: 'client-list', component: ListClientComponent, canActivate: [permissionGuard], data: { permission: 'CLIENTES_VER' } },
       { path: 'new-sale', component: NewSaleComponent, canActivate: [permissionGuard], data: { permission: 'VENTAS_CREAR' } },
       { path: 'supplier-list', component: ListSupplierComponent, canActivate: [permissionGuard], data: { permission: 'PROVEEDORES_VER' } },
+      { path: 'purchase-orders', component: PurchaseOrderListComponent, canActivate: [permissionGuard], data: { permission: 'COMPRAS_REGISTRAR' } },
+      { path: 'purchase-orders/new', component: PurchaseOrderFormComponent, canActivate: [permissionGuard], data: { permission: 'COMPRAS_REGISTRAR' } },
+      { path: 'purchase-orders/:id/edit', component: PurchaseOrderFormComponent, canActivate: [permissionGuard], data: { permission: 'COMPRAS_REGISTRAR' } },
+      { path: 'purchase-orders/:id', component: PurchaseOrderDetailComponent, canActivate: [permissionGuard], data: { permission: 'COMPRAS_REGISTRAR' } },
       { path:'bajo-stock', component: BajoStockComponent, canActivate: [permissionGuard], data: { permission: 'PRODUCTOS_VER' } },
       { path:'administracion', component: AdministracionComponent, canActivate: [permissionGuard], data: { permission: 'EMPRESA_CONFIGURAR' } }
       ,{ path:'administracion/permisos', component: PermisosComponent, canActivate: [permissionGuard], data: { permission: 'PERMISOS_GESTIONAR' } }
