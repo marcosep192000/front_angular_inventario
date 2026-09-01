@@ -855,7 +855,7 @@ export class NewSaleComponent implements OnInit {
 
           data: {
             tipo: 'createProduct'
-          }
+          }, width: '780px', maxWidth: '96vw', maxHeight: '94vh', panelClass: 'pixels-client-dialog'
 
         }
       );

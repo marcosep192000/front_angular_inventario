@@ -18,6 +18,8 @@ import { RolUsuario, UsuarioEmpresa } from '../../interfaces/administracion';
 import { TokenService } from '../../services/token.service';
 import { UiRefreshService } from '../../services/ui-refresh.service';
 import { LicenseService } from '../../services/license.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { applyDuplicateResourceError } from '../../shared/forms/duplicate-resource-error';
 
 @Component({
   selector: 'app-administracion',
@@ -230,10 +232,7 @@ export class AdministracionComponent implements OnInit {
         this.editarUsuario();
         this.cargarUsuarios();
       },
-      error: (error) =>
-        this.toastr.error(
-          error?.error?.error || 'No se pudo guardar el usuario.',
-        ),
+      error: (error: HttpErrorResponse) => { const duplicate=applyDuplicateResourceError(error,this.usuarioForm); this.toastr.error(duplicate||error.error?.message||error.error?.error||'No se pudo guardar el usuario.'); },
     });
   }
   alternarUsuario(usuario: UsuarioEmpresa): void {

@@ -225,6 +225,7 @@
               onInputChange($event, 'cuit')
             "
           >
+          <mat-error *ngIf="formGroup.get('cuit')?.hasError('duplicate')">Ya existe un proveedor con ese CUIT.</mat-error>
 
           <mat-hint align="end">
 

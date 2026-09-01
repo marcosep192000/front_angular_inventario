@@ -141,8 +141,6 @@ export class TokenService {
   }
 
   public hasPermission(permission: string): boolean {
-    const authorities = this.getAuthorities();
-    if (authorities.some(role => role === 'ADMIN' || role === 'ROLE_ADMIN')) return true;
     return this.getPermissions().includes(permission);
   }
 
@@ -150,6 +148,7 @@ export class TokenService {
     const routes: Array<[string, string]> = [
       ['DASHBOARD_VER', '/dashboard'], ['VENTAS_CREAR', '/dashboard/new-sale'], ['CAJA_VER', '/dashboard/cash-closing'],
       ['CLIENTES_VER', '/dashboard/client-list'], ['PRODUCTOS_VER', '/dashboard/product-list'], ['PROVEEDORES_VER', '/dashboard/supplier-list'],
+      ['COMPRAS_REGISTRAR', '/dashboard/purchase-orders'], ['EMPLEADOS_GESTIONAR', '/dashboard/empleados'],
       ['REPORTES_VER', '/dashboard/reportes'], ['EMPRESA_CONFIGURAR', '/dashboard/administracion'], ['PERMISOS_GESTIONAR', '/dashboard/administracion/permisos'],
     ];
     return routes.find(([permission]) => this.hasPermission(permission))?.[1] || '/login';

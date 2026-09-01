@@ -1,11 +1,221 @@
-.title__color{
-    color: white;
+:host {
+  display: block;
 }
-.container__serch{
-
-    margin-top: 20px;
-    margin-bottom: 20px;
-    margin-left: 10px;
-    margin-right: 10px;
-
+:host-context(.tema-oscuro) .client-picker { color: #eee8f5; background: #19151f; }
+:host-context(.tema-oscuro) main,
+:host-context(.tema-oscuro) .client-picker > footer { background: #19151f; }
+:host-context(.tema-oscuro) .client-picker > footer { border-color: #3d3347; }
+:host-context(.tema-oscuro) .client-card { color: #f4eff8; border-color: #403648; background: #211c27; }
+:host-context(.tema-oscuro) .client-card:hover,
+:host-context(.tema-oscuro) .client-card:focus-visible { border-color: #9164c1; background: #2a2232; }
+:host-context(.tema-oscuro) .identity small,
+:host-context(.tema-oscuro) .contact small,
+:host-context(.tema-oscuro) .results-title small { color: #b2a7ba; }
+:host-context(.tema-oscuro) .empty strong { color: #eee8f5; }
+.client-picker {
+  width: min(760px, 94vw);
+  max-height: min(780px, 92vh);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fff;
+}
+.client-picker > header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 15px;
+  align-items: center;
+  padding: 22px 24px;
+  color: #fff;
+  background: linear-gradient(125deg, #35166d, #6930ad 58%, #8a4bd0);
+}
+.brand-icon {
+  display: grid;
+  width: 53px;
+  height: 53px;
+  place-items: center;
+  border: 1px solid #ffffff38;
+  border-radius: 15px;
+  background: #ffffff18;
+}
+.brand-icon mat-icon {
+  width: 29px;
+  height: 29px;
+  font-size: 29px;
+}
+header p {
+  margin: 0 0 3px;
+  color: #e1cbff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+header h2 {
+  margin: 0;
+  font-size: 24px;
+}
+header span {
+  display: block;
+  margin-top: 3px;
+  color: #e7dbf3;
+  font-size: 13px;
+}
+header button {
+  color: #fff;
+}
+main {
+  padding: 22px 24px;
+  overflow: auto;
+}
+.search-field {
+  width: 100%;
+}
+.loading,
+.empty,
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 150px;
+  color: #776b80;
+}
+.empty {
+  flex-direction: column;
+}
+.empty mat-icon {
+  width: 42px;
+  height: 42px;
+  color: #9a78c5;
+  font-size: 42px;
+}
+.empty strong {
+  color: #493456;
+  font-size: 17px;
+}
+.error {
+  color: #a72f3c;
+}
+.results {
+  margin-top: 14px;
+}
+.results-title {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 9px;
+  color: #5c3a7d;
+  font-size: 12px;
+  font-weight: 800;
+}
+.results-title small {
+  color: #8a808f;
+  font-weight: 400;
+}
+.client-card {
+  box-sizing: border-box;
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(150px, 1fr) minmax(150px, 0.8fr) auto;
+  gap: 12px;
+  align-items: center;
+  margin: 7px 0;
+  padding: 12px;
+  border: 1px solid #e9e0f0;
+  border-radius: 13px;
+  color: #352a3e;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+.client-card:hover,
+.client-card:focus-visible {
+  border-color: #8d5cc5;
+  background: #faf7fd;
+  box-shadow: 0 7px 18px #512b7e18;
+  transform: translateY(-1px);
+  outline: none;
+}
+.avatar,
+.mini-avatar {
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(135deg, #6332a2, #9862d4);
+  font-weight: 800;
+}
+.avatar {
+  width: 43px;
+  height: 43px;
+}
+.identity strong,
+.identity small,
+.contact small {
+  display: block;
+}
+.identity small,
+.contact small {
+  margin-top: 4px;
+  color: #7e7385;
+  font-size: 11px;
+}
+.identity small {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.identity mat-icon {
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
+}
+.choose {
+  color: #7540ad;
+}
+.client-picker > footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 24px;
+  border-top: 1px solid #eee7f2;
+  background: #fbf9fc;
+}
+.option-client {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mini-avatar {
+  width: 32px;
+  height: 32px;
+}
+.option-client span:last-child,
+.option-client strong,
+.option-client small {
+  display: block;
+}
+.option-client small {
+  color: #7b7180;
+  font-size: 11px;
+}
+@media (max-width: 620px) {
+  .client-picker > header,
+  main,
+  .client-picker > footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .client-card {
+    grid-template-columns: auto 1fr auto;
+  }
+  .contact {
+    display: none;
+  }
+  .results-title small {
+    display: none;
+  }
+  header span {
+    display: none;
+  }
 }

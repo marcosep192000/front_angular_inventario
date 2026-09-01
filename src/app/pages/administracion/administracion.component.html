@@ -112,7 +112,7 @@
             ><input matInput formControlName="apellido" /></mat-form-field
           ><mat-form-field
             ><mat-label>Email</mat-label
-            ><input matInput formControlName="email" /></mat-form-field
+            ><input matInput formControlName="email" /><mat-error *ngIf="usuarioForm.get('email')?.hasError('duplicate')">Ya existe un usuario con ese email.</mat-error></mat-form-field
           ><mat-form-field
             ><mat-label
               >Contraseña {{ editandoUsuario ? "(opcional)" : "" }}</mat-label

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { FormsModule, NgModel } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -31,6 +32,7 @@ export class EmpleadosComponent implements OnInit {
   periodo = this.periodoActual(); reporte = this.periodoActual();
   form: FormEmpleado = this.formVacio();
   readonly medios = ['EFECTIVO','TRANSFERENCIA','DEBITO','CREDITO','MERCADO_PAGO','CHEQUE','OTRO'];
+  @ViewChild('dniControl') dniControl?: NgModel;
 
   constructor(private api: EmpleadoService, private clientesApi: ClientService, private toast: ToastrService, private dialog: MatDialog) {}
   ngOnInit(): void { this.cargar(); this.clientesApi.getClients().subscribe({ next: x => this.clientes = x }); }
@@ -56,7 +58,7 @@ export class EmpleadosComponent implements OnInit {
     if (!this.form.nombre.trim() || !this.form.apellido.trim() || !/^\d{7,11}$/.test(this.form.dni) || Number(this.form.sueldo) <= 0) { this.toast.warning('Revisá nombre, apellido, DNI y sueldo.'); return; }
     this.guardando = true; const data = { ...this.form, nombre: this.form.nombre.trim(), apellido: this.form.apellido.trim(), dni: this.form.dni.trim(), puesto: this.form.puesto.trim() };
     const op = this.editando ? this.api.actualizar(this.editando.id, data) : this.api.crear(data);
-    op.subscribe({ next: empleado => { this.guardando = false; this.toast.success(this.editando ? 'Empleado actualizado.' : 'Empleado creado.'); this.cancelarFormulario(); this.cargar(); if (this.seleccionado?.id === empleado.id) this.seleccionar(empleado, false); }, error: e => { this.guardando = false; this.toast.error(e.error?.error || 'No se pudo guardar el empleado.'); } });
+    op.subscribe({ next: empleado => { this.guardando = false; this.toast.success(this.editando ? 'Empleado actualizado.' : 'Empleado creado.'); this.cancelarFormulario(); this.cargar(); if (this.seleccionado?.id === empleado.id) this.seleccionar(empleado, false); }, error: (e:HttpErrorResponse) => { this.guardando = false; const body=e.error as {error?:string;field?:string;message?:string}; if(e.status===409&&body?.error==='DUPLICATE_RESOURCE'&&body.field==='dni'){const message=body.message||'Ya existe un empleado con ese DNI.';this.dniControl?.control.setErrors({...this.dniControl.control.errors,duplicate:message});this.dniControl?.control.markAsTouched();this.toast.error(message);return;} this.toast.error(body?.message||body?.error||'No se pudo guardar el empleado.'); } });
   }
   seleccionar(e: Empleado, abrirNomina = true): void {
     this.seleccionado = e; this.estado = undefined; this.liquidaciones = []; this.liquidacionAPagar = undefined;

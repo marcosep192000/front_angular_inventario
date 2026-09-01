@@ -1,4 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
@@ -30,14 +31,6 @@ import {
   MatDatepickerModule
 } from '@angular/material/datepicker';
 import {
-  catchError,
-  map,
-  Observable,
-  of,
-  switchMap,
-  throwError
-} from 'rxjs';
-import {
   FormsModule,
   ReactiveFormsModule
 } from '@angular/forms';
@@ -50,6 +43,7 @@ import {
 import {
   IconComponent
 } from '../../../shared/dasboard/icon/icon.component';
+import { applyDuplicateResourceError } from '../../../shared/forms/duplicate-resource-error';
 
 @Component({
   selector: 'app-form-client',
@@ -133,18 +127,7 @@ throw new Error('Method not implemented.');
     }
 
     const clientData = this.formGroup.value;
-    const clientCuit = this.formGroup.get('cuit')?.value;
-
-    this.existeCliente(clientCuit)
-      .pipe(
-        switchMap((existe) => {
-          if (existe) {
-            this.toastr.error('El CUIT ingresado ya existe.');
-            return throwError(() => new Error('El CUIT ingresado ya existe.'));
-          }
-          return this.clientService.addClient(clientData);
-        })
-      )
+    this.clientService.addClient(clientData)
       .subscribe({
         next: (data) => {
           this.dialogRef.close(data);
@@ -154,11 +137,7 @@ throw new Error('Method not implemented.');
           });
         },
         error: (error) => {
-          console.error('Error al guardar el cliente:', error);
-          this.toastr.error('Hubo un error al guardar el cliente.', '', {
-            timeOut: 5000,
-            positionClass: 'toast-bottom-right',
-          });
+          this.handleSaveError(error);
         },
       });
   }
@@ -175,26 +154,11 @@ throw new Error('Method not implemented.');
             positionClass: 'toast-bottom-right',
           });
         },
-        (error) => {
-          console.error('Error al actualizar el cliente:', error);
-          this.toastr.error('Hubo un error al actualizar el cliente.', '', {
-            timeOut: 5000,
-            positionClass: 'toast-bottom-right',
-          });
-        }
+        (error) => this.handleSaveError(error)
       );
     }
   }
 
-  existeCliente(cuit: string): Observable<boolean> {
-    return this.clientService.getClientByCuit(cuit).pipe(
-      map((client) => !!client),
-      catchError((error) => {
-        console.error('Error al buscar el cliente por CUIT:', error);
-        return of(false);
-      })
-    );
-  }
   cancel(){
     this.dialogRef.close(); 
   }
@@ -206,6 +170,8 @@ throw new Error('Method not implemented.');
       event.preventDefault();
     }
   }
+
+  private handleSaveError(error: HttpErrorResponse): void { const duplicate=applyDuplicateResourceError(error,this.formGroup); this.toastr.error(duplicate||error.error?.message||error.error?.error||'No se pudo guardar el cliente.'); }
 
   onPhoneInput(event: Event): void {
     const input = event.target as HTMLInputElement;

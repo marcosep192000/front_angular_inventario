@@ -28,7 +28,8 @@
           <div *ngIf="cargando" class="vacio">Cargando empleados…</div>
           <div *ngIf="!cargando && !empleadosFiltrados.length" class="vacio">
             <mat-icon>person_search</mat-icon><strong>No encontramos empleados</strong><span>Probá otra búsqueda o creá
-              uno nuevo.</span></div>
+              uno nuevo.</span>
+          </div>
           <article class="empleado" *ngFor="let e of empleadosFiltrados" [class.inactivo]="!e.activo">
             <button class="empleado-main" type="button" (click)="seleccionar(e)"><span class="avatar">{{
                 e.nombre.charAt(0) }}{{ e.apellido.charAt(0) }}</span><span class="datos"><strong>{{ e.nombre }} {{
@@ -52,18 +53,20 @@
           <div class="form-grid"><label>Nombre *<input required maxlength="40" autocomplete="given-name"
                 [(ngModel)]="form.nombre" name="nombre"></label><label>Apellido *<input required maxlength="40"
                 autocomplete="family-name" [(ngModel)]="form.apellido" name="apellido"></label><label>DNI *<input
-                required maxlength="11" inputmode="numeric" pattern="[0-9]*" [(ngModel)]="form.dni"
-                name="dni"></label><label>Puesto<input maxlength="60" [(ngModel)]="form.puesto" name="puesto"
-                placeholder="Ej.: Vendedor"></label><label>Sueldo mensual *<input required type="number" min="0.01"
-                step="100" inputmode="decimal" [(ngModel)]="form.sueldo" name="sueldo" placeholder="0,00"><small
-                class="importe-preview">{{ form.sueldo | currency:'ARS':'symbol':'1.2-2':'es-AR'
+                required maxlength="11" inputmode="numeric" pattern="[0-9]*" [(ngModel)]="form.dni" name="dni"
+                #dniControl="ngModel"><small class="field-error" *ngIf="dniControl.hasError('duplicate')">{{
+                dniControl.getError('duplicate') }}</small></label><label>Puesto<input maxlength="60" [(ngModel)]="form.puesto"
+                name="puesto" placeholder="Ej.: Vendedor"></label><label>Sueldo mensual *<input required type="number"
+                min="0.01" step="100" inputmode="decimal" [(ngModel)]="form.sueldo" name="sueldo"
+                placeholder="0,00"><small class="importe-preview">{{ form.sueldo |
+                currency:'ARS':'symbol':'1.2-2':'es-AR'
                 }}</small></label><label>Fecha de ingreso<input type="date" [(ngModel)]="form.fechaIngreso"
                 name="fechaIngreso"></label><label>Frecuencia de pago<select [(ngModel)]="form.frecuenciaPago"
                 name="frecuencia">
                 <option value="SEMANAL">Semanal</option>
                 <option value="QUINCENAL">Quincenal</option>
                 <option value="MENSUAL">Mensual</option>
-              </select></label><label>Cliente vinculado  (opcional) <select [(ngModel)]="form.clienteId"
+              </select></label><label>Cliente vinculado (opcional) <select [(ngModel)]="form.clienteId"
                 name="clienteId">
                 <option [ngValue]="null">Sin vincular</option>
                 <option *ngFor="let c of clientes" [ngValue]="c.id">{{ c.name }} {{ c.lastName }} · {{ c.cuit }}
@@ -175,7 +178,7 @@
           <div class="pago-total" [class.incorrecto]="saldoPago !== 0"><span>Total ingresado <strong>{{ totalPagos |
                 currency:'ARS' }}</strong></span><span>{{ saldoPago > 0 ? 'Falta' : saldoPago < 0 ? 'Excede'
                 : 'Importe correcto' }} <strong>{{ (saldoPago < 0 ? -saldoPago : saldoPago) | currency:'ARS' }}</strong>
-                  </span><button mat-raised-button color="primary" [disabled]="saldoPago !== 0"
+            </span><button mat-raised-button color="primary" [disabled]="saldoPago !== 0"
               (click)="pagar()"><mat-icon>payments</mat-icon>Confirmar pago</button></div>
         </section>
       </section>
