@@ -1111,7 +1111,12 @@ export class NewSaleComponent implements OnInit {
         this.puedeEnviarPresupuestoWhatsapp,
 
       motivoWhatsappNoDisponible:
-        this.motivoWhatsappNoDisponible
+        this.motivoWhatsappNoDisponible,
+
+      whatsappUrl:
+        this.puedeEnviarPresupuestoWhatsapp
+          ? this.obtenerUrlPresupuestoWhatsapp()
+          : undefined
 
     };
 
@@ -1167,12 +1172,6 @@ export class NewSaleComponent implements OnInit {
           // Y SE GUARDA EL DOCUMENTO.
           // =========================================
 
-          this.generarPdfAlGuardar = accion === 'pdf';
-
-          if (accion === 'whatsapp') {
-            this.enviarPresupuestoWhatsapp();
-          }
-
           const sale =
             this.buildSaleCommon(
 
@@ -1183,6 +1182,13 @@ export class NewSaleComponent implements OnInit {
               this.medioPago
 
             );
+
+          const esPresupuesto = this.tipoDocumento === 'PRESUPUESTO';
+          this.generarPdfAlGuardar = !esPresupuesto && accion === 'pdf';
+
+          if (esPresupuesto && accion === 'pdf') {
+            this.generatePDF({ ...sale, numero: 'BORRADOR' });
+          }
 
 
           console.log(
@@ -1536,6 +1542,10 @@ export class NewSaleComponent implements OnInit {
       return;
     }
 
+    window.open(this.obtenerUrlPresupuestoWhatsapp(), '_blank');
+  }
+
+  private obtenerUrlPresupuestoWhatsapp(): string {
     const telefono = this.normalizarTelefonoWhatsapp(this.telefonoCliente);
     const detalle = this.products
       .map(producto => `• ${producto.name} x${producto.quantity}: $${(producto.salePrice * producto.quantity).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`)
@@ -1549,7 +1559,7 @@ export class NewSaleComponent implements OnInit {
       `Presupuesto generado el ${new Date().toLocaleDateString('es-AR')}.`
     ].join('\n');
 
-    window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank', 'noopener,noreferrer');
+    return `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
   }
 
   private normalizarTelefonoWhatsapp(valor: string): string {

@@ -21,6 +21,7 @@ export interface ConfirmDocumentData {
   mensaje: string;
   whatsappDisponible?: boolean;
   motivoWhatsappNoDisponible?: string;
+  whatsappUrl?: string;
 }
 
 export type ConfirmDocumentAction = 'pdf' | 'whatsapp';
@@ -60,6 +61,9 @@ export class ConfirmDocumentComponent {
   }
 
   enviarWhatsapp(): void {
+    if (this.data.whatsappUrl) {
+      window.open(this.data.whatsappUrl, '_blank');
+    }
     this.dialogRef.close('whatsapp');
   }
 obtenerIcono(): string {
