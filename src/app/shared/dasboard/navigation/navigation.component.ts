@@ -17,6 +17,7 @@ import { IconComponent } from '../icon/icon.component';
 import { TokenService } from '../../../services/token.service';
 import { AdministracionService } from '../../../services/administracion.service';
 import { UiRefreshService } from '../../../services/ui-refresh.service';
+import { LicenseBannerComponent } from '../../license-banner/license-banner.component';
 
 @Component({
     selector: 'app-navigation',
@@ -32,6 +33,7 @@ import { UiRefreshService } from '../../../services/ui-refresh.service';
         MatTooltipModule,
         VerticalMenuComponent,
         IconComponent
+        ,LicenseBannerComponent
     ]
 })
 export class NavigationComponent implements OnInit {

@@ -8,7 +8,7 @@
         <span>Consultá y administrá la información de tus clientes.</span>
       </div>
     </div>
-    <div class="cabecera-acciones"><button mat-stroked-button type="button" class="btn-alertas" (click)="mostrarAlertas = !mostrarAlertas"><mat-icon>notifications_active</mat-icon> Alertas ({{ alertas.length }})</button><button mat-raised-button color="primary" type="button" class="btn-nuevo" (click)="createClient()">
+    <div class="cabecera-acciones"><button mat-stroked-button type="button" class="btn-alertas" (click)="mostrarAlertas = !mostrarAlertas"><mat-icon>notifications_active</mat-icon> Alertas ({{ alertas.length }})</button><button mat-raised-button color="primary" type="button" class="btn-nuevo" (click)="createClient()" [disabled]="limiteClientesAlcanzado" [matTooltip]="limiteClientesAlcanzado ? 'Alcanzaste el límite de clientes permitido por tu plan.' : ''">
       <mat-icon>person_add</mat-icon> Nuevo cliente
     </button></div>
   </header>
@@ -24,7 +24,7 @@
     </div>
 
     <div class="resumen-lista">
-      <span><mat-icon>group</mat-icon>{{ dataSource.filteredData.length }} cliente(s) activos</span>
+      <span><mat-icon>group</mat-icon>{{ dataSource.filteredData.length }} cliente(s) activos</span><span *ngIf="resumenLicenciaClientes">{{ resumenLicenciaClientes }}</span>
     </div>
 
     <div class="tabla-contenedor">

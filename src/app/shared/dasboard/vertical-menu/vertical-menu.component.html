@@ -217,6 +217,10 @@
         <app-icon [iconSrc]="'assets/icons/group_person.png'" [size]="'22px'"></app-icon>
         Permisos de usuarios
       </div>
+      <div class="submenu-item" routerLink="administracion/licencia" *ngIf="puede('EMPRESA_CONFIGURAR')">
+        <app-icon [iconSrc]="'assets/icons/settings_accessibility_24dp_FFF_FILL1_wght400_GRAD0_opsz24.png'" [size]="'22px'"></app-icon>
+        Licencia
+      </div>
     </div>
     }
   </div>

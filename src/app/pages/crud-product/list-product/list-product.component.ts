@@ -21,6 +21,8 @@ import { IconComponent } from '../../../shared/dasboard/icon/icon.component';
 import { AddExcelListProductComponent } from '../add-excel-list-product/add-excel-list-product.component';
 import { BuscarProductoPorProveedorComponent } from '../buscar-producto-por-proveedor/buscar-producto-por-proveedor.component';
 import { DialogRef } from '@angular/cdk/dialog';
+import { LicenseService } from '../../../services/license.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-list-product',
@@ -70,7 +72,7 @@ totalElements = 0;
 
   constructor(
     private productService: ProductService,
-    public dialog: MatDialog
+    public dialog: MatDialog, public license: LicenseService, private toastr: ToastrService
   ) {}
 
 ngOnInit(): void {
@@ -134,6 +136,7 @@ onPageChange(event: PageEvent): void {
   // ➕ CREAR
   // ============================
   createProduct(): void {
+    if (this.limiteProductosAlcanzado) { this.toastr.warning('Alcanzaste el límite de productos permitido por tu plan.'); return; }
     const dialogRef = this.dialog.open(FormProductComponent, {
       disableClose: true,
       autoFocus: true,
@@ -230,13 +233,15 @@ claseStock(producto: Product): string {
   if (producto.stock <= 0) {
     return 'sin-stock';
   }
-
   if (producto.stock <= producto.stockMin) {
     return 'stock-bajo';
   }
 
   return 'stock-ok';
 }
+
+get limiteProductosAlcanzado(): boolean { const s=this.license.snapshot; return Boolean(s && s.maxProducts !== -1 && s.currentProducts >= s.maxProducts); }
+get resumenLicenciaProductos(): string { const s=this.license.snapshot; return !s ? '' : `Productos: ${s.currentProducts} / ${s.maxProducts === -1 ? 'Ilimitados' : s.maxProducts.toLocaleString('es-AR')}`; }
 
 iconoStock(producto: Product): string {
   return producto.stock <= producto.stockMin ? 'warning_amber' : 'check_circle';

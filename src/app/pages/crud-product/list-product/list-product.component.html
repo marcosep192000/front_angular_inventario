@@ -16,7 +16,7 @@
 
     </div>
 
-    <button mat-raised-button color="primary" type="button" class="btn-nuevo" (click)="createProduct()">
+    <button mat-raised-button color="primary" type="button" class="btn-nuevo" (click)="createProduct()" [disabled]="limiteProductosAlcanzado" [matTooltip]="limiteProductosAlcanzado ? 'Alcanzaste el límite de productos permitido por tu plan.' : ''">
       <mat-icon>add</mat-icon>
       Nuevo producto
     </button>
@@ -62,7 +62,7 @@
         <mat-icon>inventory</mat-icon>
         {{ totalElements }} producto(s) registrados
       </span>
-      <span>Mostrando página {{ pageIndex + 1 }}</span>
+      <span>Mostrando página {{ pageIndex + 1 }}</span><span *ngIf="resumenLicenciaProductos">{{ resumenLicenciaProductos }}</span>
     </div>
 
     <div class="tabla-contenedor">

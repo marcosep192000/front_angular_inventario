@@ -7,6 +7,7 @@ import { HttpErrorResponse, provideHttpClient, withFetch, withInterceptors } fro
 import { provideToastr } from 'ngx-toastr';
 import { authInterceptor } from './auth/interceptor/auth.interceptor';
 import { spinnerInterceptor } from './auth/interceptor/spinner.interceptor';
+import { licenseInterceptor } from './auth/interceptor/license.interceptor';
 
 
 export const appConfig: ApplicationConfig = {
@@ -15,7 +16,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(
     withFetch(),
-    withInterceptors([authInterceptor ,spinnerInterceptor])
+    withInterceptors([authInterceptor, licenseInterceptor, spinnerInterceptor])
   ),
     provideToastr(), 
   ]

@@ -19,15 +19,19 @@ import { ReporteDetalleComponent } from './modules/reportes/reporte-detalle.comp
 import { PurchaseOrderListComponent } from './pages/purchase-orders/purchase-order-list.component';
 import { PurchaseOrderFormComponent } from './pages/purchase-orders/purchase-order-form.component';
 import { PurchaseOrderDetailComponent } from './pages/purchase-orders/purchase-order-detail.component';
+import { LicenseComponent } from './pages/license/license.component';
+import { LicenseInfoComponent } from './pages/license/license-info.component';
+import { licenseGuard } from './auth/guard/license.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'registro', component: RegistroComponent },
+  { path: 'activacion', component: LicenseComponent },
   // Agrupar rutas protegidas dentro del dashboa
   {
     path: 'dashboard',
     component: NavigationComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, licenseGuard],
     children: [
       { path: '', component: InicioComponent, pathMatch: 'full', canActivate: [permissionGuard], data: { permission: 'DASHBOARD_VER' } },
       { path: 'cash-closing', component: CashClosingComponent, canActivate: [permissionGuard], data: { permission: 'CAJA_VER' } },
@@ -43,6 +47,7 @@ export const routes: Routes = [
       { path:'bajo-stock', component: BajoStockComponent, canActivate: [permissionGuard], data: { permission: 'PRODUCTOS_VER' } },
       { path:'administracion', component: AdministracionComponent, canActivate: [permissionGuard], data: { permission: 'EMPRESA_CONFIGURAR' } }
       ,{ path:'administracion/permisos', component: PermisosComponent, canActivate: [permissionGuard], data: { permission: 'PERMISOS_GESTIONAR' } }
+      ,{ path:'administracion/licencia', component: LicenseInfoComponent, canActivate: [permissionGuard], data: { permission: 'EMPRESA_CONFIGURAR' } }
       ,{ path:'empleados', component: EmpleadosComponent, canActivate: [permissionGuard], data: { permission: 'EMPLEADOS_GESTIONAR' } }
       ,{ path:'reportes', component: ReportesComponent, canActivate: [permissionGuard], data: { permission: 'REPORTES_VER' } }
       ,{ path:'reportes/:area/:reporte', component: ReporteDetalleComponent, canActivate: [permissionGuard], data:{permission:'REPORTES_VER',area:'Reportes',titulo:'Reporte',descripcion:'Consulta de información',endpoint:''} }

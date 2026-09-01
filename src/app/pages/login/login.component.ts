@@ -11,6 +11,8 @@ import { TokenService } from '../../services/token.service';
 import { MatIcon } from "@angular/material/icon";
 import { MatCheckbox } from "@angular/material/checkbox";
 import { MatDivider } from "@angular/material/divider";
+import { LicenseService } from '../../services/license.service';
+import { LICENSE_USABLE } from '../../interfaces/license';
 
 @Component({
   selector: 'app-login',
@@ -36,6 +38,7 @@ export class LoginComponent {
   private route = inject(Router);
   private formBuild = inject(FormBuilder);
   private tokenService = inject(TokenService);
+  private licenseService = inject(LicenseService);
 
   public formGroup: FormGroup = this.formBuild.group({
     email: ['', [Validators.required, Validators.email]],
@@ -54,7 +57,10 @@ export class LoginComponent {
       next: (data) => {
         if (data.accessToken) {
           this.tokenService.setSession(data);
-          this.route.navigateByUrl(this.tokenService.getDefaultRoute());
+          this.licenseService.obtenerEstado(true).subscribe({
+            next: license => this.route.navigateByUrl(LICENSE_USABLE.includes(license.status) ? this.tokenService.getDefaultRoute() : '/activacion'),
+            error: () => this.route.navigate(['/activacion'], { queryParams: { connectionError: 1 } }),
+          });
         } else {
           alert('Credenciales incorrectas');
         }

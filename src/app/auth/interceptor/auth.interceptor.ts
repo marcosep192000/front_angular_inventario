@@ -13,6 +13,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const http = inject(HttpClient);
   const esApiPropia = req.url.startsWith(environments.baseURL);
   const esAcceso = /\/acceso(?:\/|$)|\/login(?:\/|$)|\/auth(?:\/|$)/i.test(req.url);
+  const esLicencia = /\/license(?:\/|$)/i.test(req.url);
+  if (esApiPropia && esLicencia) {
+    const token = tokenService.getToken();
+    return token && tokenService.isTokenValid()
+      ? next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }))
+      : next(req);
+  }
   if (!esApiPropia || esAcceso) return next(req);
 
   const refrescar = (): Observable<ResponseAcceso> => {
