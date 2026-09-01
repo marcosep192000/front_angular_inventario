@@ -5,5 +5,6 @@ export interface ResponseAcceso {
   expiresIn: number;
   username: string;
   authorities: string[];
+  permissions: string[];
 
 }

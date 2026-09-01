@@ -1,4 +1,5 @@
 import { Component, Inject, OnInit, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   FormBuilder,
   FormGroup,
@@ -35,6 +36,7 @@ import {
   TIPOS_IVA,
   resolverTipoIva,
 } from '../../../interfaces/tipo-iva';
+import { applyDuplicateResourceError } from '../../../shared/forms/duplicate-resource-error';
 
 @Component({
   selector: 'app-form-product',
@@ -165,11 +167,7 @@ export class FormProductComponent implements OnInit {
   save(): void {
     console.log(this.formGroup.value);
     if (this.formGroup.valid) {
-      this.productService.save(this.formGroup.value).subscribe((data) => {
-        this.dialogRef.close(data);
-        this.showSuccess();
-        console.log(this.formGroup.value);
-      });
+      this.productService.save(this.formGroup.value).subscribe({ next: (data) => { this.dialogRef.close(data); this.showSuccess(); }, error: (error: HttpErrorResponse) => this.handleSaveError(error) });
     } else {
       console.log(this.formGroup.errors);
       console.log(this.data);
@@ -194,11 +192,10 @@ export class FormProductComponent implements OnInit {
   update(): void {
     this.productService
       .update(this.data.updateProduct, this.formGroup.value)
-      .subscribe((data) => {
-        console.log(this.formGroup.value);
-        this.dialogRef.close(data);
-      });
+      .subscribe({ next: (data) => this.dialogRef.close(data), error: (error: HttpErrorResponse) => this.handleSaveError(error) });
   }
+
+  private handleSaveError(error: HttpErrorResponse): void { const duplicate = applyDuplicateResourceError(error, this.formGroup); this.toastr.error(duplicate || error.error?.message || error.error?.error || 'No se pudo guardar el producto.'); }
 
   /* nueva marca */
   createMarca() {

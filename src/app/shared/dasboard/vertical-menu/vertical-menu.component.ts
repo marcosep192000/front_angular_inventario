@@ -89,4 +89,8 @@ export class VerticalMenuComponent implements OnInit {
         return this.roles?.some((rol: string) => rol === 'ADMIN' || rol === 'ROLE_ADMIN');
     }
 
+    puede(permission: string): boolean {
+        return this.tokenService.hasPermission(permission);
+    }
+
 }

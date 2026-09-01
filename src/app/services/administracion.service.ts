@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environments } from '../../environments/environments';
-import { CompanyResponse, Empresa, EmpresaRequest, UsuarioEmpresa, UsuarioEmpresaRequest } from '../interfaces/administracion';
+import { CompanyResponse, Empresa, EmpresaRequest, PermisosUsuarioRequest, PermisosUsuarioResponse, UsuarioEmpresa, UsuarioEmpresaRequest } from '../interfaces/administracion';
 @Injectable({ providedIn: 'root' })
 export class AdministracionService {
   private readonly url = `${environments.baseURL}company`;
@@ -19,4 +19,7 @@ export class AdministracionService {
   cargarFotoUsuario(id: number, file: File): Observable<UsuarioEmpresa> { const data = new FormData(); data.append('file', file); return this.http.post<UsuarioEmpresa>(`${this.url}/usuarios/${id}/foto`, data); }
   obtenerFotoUsuario(id: number): Observable<Blob> { return this.http.get(`${this.url}/usuarios/${id}/foto?t=${Date.now()}`, { responseType: 'blob' }); }
   eliminarFotoUsuario(id: number): Observable<void> { return this.http.delete<void>(`${this.url}/usuarios/${id}/foto`); }
+  listarPermisos(): Observable<string[]> { return this.http.get<string[]>(`${this.url}/permisos`); }
+  obtenerPermisosUsuario(id: number): Observable<PermisosUsuarioResponse> { return this.http.get<PermisosUsuarioResponse>(`${this.url}/usuarios/${id}/permisos`); }
+  guardarPermisosUsuario(id: number, request: PermisosUsuarioRequest): Observable<PermisosUsuarioResponse> { return this.http.put<PermisosUsuarioResponse>(`${this.url}/usuarios/${id}/permisos`, request); }
 }

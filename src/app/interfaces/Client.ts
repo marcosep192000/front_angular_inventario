@@ -7,6 +7,8 @@ export interface Client {
 	lastName?: string;
 	address: string;
 	tel: string;
+	telefono?: string;
+	phone?: string;
 	email: string;
 	initialDate?: any;
 	time?: any;

@@ -686,7 +686,7 @@
 
 
           <p>
-            📞 {{ selectedClient.tel }}
+            📞 {{ telefonoCliente || 'Sin teléfono' }}
           </p>
 
 
@@ -812,6 +812,7 @@
 
       <!-- COBRAR -->
 
+      <div class="acciones-documento">
       <button
         mat-raised-button
         color="primary"
@@ -827,6 +828,8 @@
   {{ textoAccionDocumento }}
 
       </button>
+
+      </div>
 
     </section>
 

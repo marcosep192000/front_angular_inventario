@@ -21,7 +21,7 @@
 
   <!-- INICIO -->
 
-  <div class="menu-item" routerLink="/dashboard">
+  <div class="menu-item" routerLink="/dashboard" *ngIf="puede('DASHBOARD_VER')">
 
     <div class="menu-title">
 
@@ -40,7 +40,7 @@
 
   <!-- VENTAS -->
 
-  <div class="menu-item">
+  <div class="menu-item" *ngIf="puede('VENTAS_VER') || puede('VENTAS_CREAR') || puede('CAJA_VER')">
 
     <div class="menu-title" (click)="toggleMenu('ventas')">
 
@@ -67,7 +67,7 @@
     @if(!collapsed){
     <div class="submenu" [class.open]="isMenuOpen('ventas')">
 
-      <div class="submenu-item" routerLink="new-sale">
+      <div class="submenu-item" routerLink="new-sale" *ngIf="puede('VENTAS_CREAR')">
 
         <app-icon [iconSrc]="'assets/icons/sell.png'" [size]="'22px'">
         </app-icon>
@@ -76,7 +76,7 @@
 
       </div>
 
-      <div class="submenu-item" routerLink="cash-closing">
+      <div class="submenu-item" routerLink="cash-closing" *ngIf="puede('CAJA_VER')">
 
         <app-icon [iconSrc]="'assets/icons/savings.png'" [size]="'22px'">
         </app-icon>
@@ -91,7 +91,7 @@
 
   <!-- CLIENTES -->
 
-  <div class="menu-item" routerLink="client-list">
+  <div class="menu-item" routerLink="client-list" *ngIf="puede('CLIENTES_VER')">
 
     <div class="menu-title">
 
@@ -109,9 +109,9 @@
 
   <!-- PROVEEDORES -->
 
-  <div class="menu-item" routerLink="supplier-list">
+  <div class="menu-item" *ngIf="puede('PROVEEDORES_VER') || puede('COMPRAS_REGISTRAR')">
 
-    <div class="menu-title">
+    <div class="menu-title" (click)="toggleMenu('proveedores')">
 
       <app-icon [iconSrc]="'assets/icons/real_estate_agent.png'" [size]="'28px'">
       </app-icon>
@@ -122,13 +122,30 @@
 
 }
 
+      @if(!collapsed){
+      <span class="arrow" [class.rotate]="isMenuOpen('proveedores')">▼</span>
+      }
+
     </div>
+
+    @if(!collapsed){
+    <div class="submenu" [class.open]="isMenuOpen('proveedores')">
+      <div class="submenu-item" routerLink="supplier-list" *ngIf="puede('PROVEEDORES_VER')">
+        <app-icon [iconSrc]="'assets/icons/real_estate_agent.png'" [size]="'22px'"></app-icon>
+        Lista de proveedores
+      </div>
+      <div class="submenu-item" routerLink="purchase-orders" *ngIf="puede('COMPRAS_REGISTRAR')">
+        <app-icon [iconSrc]="'assets/icons/store1.png'" [size]="'22px'"></app-icon>
+        Pedidos de compra
+      </div>
+    </div>
+    }
 
   </div>
 
   <!-- PRODUCTOS -->
 
-  <div class="menu-item">
+  <div class="menu-item" *ngIf="puede('PRODUCTOS_VER')">
 
     <div class="menu-title" (click)="toggleMenu('productos')">
 
@@ -170,15 +187,6 @@
 
       </div>
 
-      <div class="submenu-item" routerLink="buscar-producto-por-proveedor">
-
-        <app-icon [iconSrc]="'assets/icons/category_search.png'" [size]="'22px'">
-        </app-icon>
-
-        Productos por Proveedor
-
-      </div>
-
       <div class="submenu-item" routerLink="category-list">
 
         <app-icon [iconSrc]="'assets/icons/category_search.png'" [size]="'22px'">
@@ -192,13 +200,32 @@
 
   </div>
 
-  @if (esAdmin) {
-  <div class="menu-item" routerLink="administracion">
-    <div class="menu-title">
+  @if (puede('EMPRESA_CONFIGURAR') || puede('PERMISOS_GESTIONAR')) {
+  <div class="menu-item">
+    <div class="menu-title" (click)="toggleMenu('administracion')">
       <app-icon [iconSrc]="'assets/icons/settings_accessibility_24dp_FFF_FILL1_wght400_GRAD0_opsz24.png'" [size]="'28px'"></app-icon>
       @if(!collapsed){ <span>Administración</span> }
+      @if(!collapsed){ <span class="arrow" [class.rotate]="isMenuOpen('administracion')">▼</span> }
     </div>
+    @if(!collapsed){
+    <div class="submenu" [class.open]="isMenuOpen('administracion')">
+      <div class="submenu-item" routerLink="administracion" *ngIf="puede('EMPRESA_CONFIGURAR')">
+        <app-icon [iconSrc]="'assets/icons/settings_accessibility_24dp_FFF_FILL1_wght400_GRAD0_opsz24.png'" [size]="'22px'"></app-icon>
+        Configuración
+      </div>
+      <div class="submenu-item" routerLink="administracion/permisos" *ngIf="puede('PERMISOS_GESTIONAR')">
+        <app-icon [iconSrc]="'assets/icons/group_person.png'" [size]="'22px'"></app-icon>
+        Permisos de usuarios
+      </div>
+      <div class="submenu-item" routerLink="administracion/licencia" *ngIf="puede('EMPRESA_CONFIGURAR')">
+        <app-icon [iconSrc]="'assets/icons/settings_accessibility_24dp_FFF_FILL1_wght400_GRAD0_opsz24.png'" [size]="'22px'"></app-icon>
+        Licencia
+      </div>
+    </div>
+    }
   </div>
+  }
+  @if (puede('EMPLEADOS_GESTIONAR')) {
   <div class="menu-item" routerLink="empleados">
     <div class="menu-title">
       <app-icon [iconSrc]="'assets/icons/group_person.png'" [size]="'28px'"></app-icon>
@@ -209,9 +236,9 @@
 
   <!-- REPORTES -->
 
-  <div class="menu-item" routerLink="reportes">
+  <div class="menu-item" routerLink="reportes" *ngIf="puede('REPORTES_VER')">
 
-    <div class="menu-title" (click)="toggleMenu('reportes')">
+    <div class="menu-title">
 
       <app-icon [iconSrc]="'assets/icons/monitoring.png'" [size]="'28px'">
       </app-icon>
@@ -222,40 +249,7 @@
 
 }
 
-@if(!collapsed){
-
-    <span
-        class="arrow"
-        [class.rotate]="isMenuOpen('reportes')">
-
-        ▼
-
-    </span>
-
-}
-
     </div>
-@if(!collapsed){
-
-<div
-    class="submenu"
-    [class.open]="isMenuOpen('reportes')">
-
-      <div class="submenu-item">
-
-        Ventas · Próximamente
-
-      </div>
-
-      <div class="submenu-item">
-
-        Compras · Próximamente
-
-      </div>
-
-    </div>
-
-    }
 
   </div>
 

@@ -19,7 +19,11 @@ export interface ConfirmDocumentData {
   cantidadProductos: number;
   total: number;
   mensaje: string;
+  whatsappDisponible?: boolean;
+  motivoWhatsappNoDisponible?: string;
 }
+
+export type ConfirmDocumentAction = 'pdf' | 'whatsapp';
 
 @Component({
   selector: 'app-confirm-document',
@@ -45,14 +49,18 @@ export class ConfirmDocumentComponent {
 
   cancelar(): void {
 
-    this.dialogRef.close(false);
+    this.dialogRef.close(null);
 
   }
 
   confirmar(): void {
 
-    this.dialogRef.close(true);
+    this.dialogRef.close('pdf');
 
+  }
+
+  enviarWhatsapp(): void {
+    this.dialogRef.close('whatsapp');
   }
 obtenerIcono(): string {
 

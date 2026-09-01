@@ -132,6 +132,8 @@
 
 .barra__logout{
     margin-left:12px;
+    display:flex;
+    align-items:center;
 }
 
 /* =====================================================

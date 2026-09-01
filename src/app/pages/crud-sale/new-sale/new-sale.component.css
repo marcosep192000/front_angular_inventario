@@ -1022,6 +1022,70 @@ t.css
   transform: translateY(-1px);
 }
 
+.acciones-documento {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.acciones-documento.con-whatsapp {
+  grid-template-columns: minmax(0, 1fr) minmax(170px, .78fr);
+}
+
+.btn-whatsapp {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #20a95a !important;
+  border-radius: 10px !important;
+  color: #13783d !important;
+  background: #f1fff6 !important;
+  font-weight: 650;
+  letter-spacing: 0;
+  box-shadow: none !important;
+}
+
+.btn-whatsapp:hover:not(:disabled) {
+  color: #fff !important;
+  background: #20a95a !important;
+  transform: translateY(-1px);
+}
+
+.btn-whatsapp:disabled {
+  border-color: #d7ddd9 !important;
+  color: #939b96 !important;
+  background: #f6f7f6 !important;
+}
+
+.whatsapp-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 7px;
+  border-radius: 50%;
+  color: #fff;
+  background: #20a95a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.btn-whatsapp:hover:not(:disabled) .whatsapp-icon {
+  color: #20a95a;
+  background: #fff;
+}
+
+.whatsapp-ayuda {
+  display: block;
+  margin-top: 3px;
+  color: #7a8190;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .acciones-documento.con-whatsapp { grid-template-columns: 1fr; }
+}
+
 /* ============================================================
    ESTADO VACÍO
    ============================================================ */

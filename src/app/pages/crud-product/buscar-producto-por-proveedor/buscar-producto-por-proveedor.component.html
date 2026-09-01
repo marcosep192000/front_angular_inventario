@@ -1,159 +1,33 @@
-<form [formGroup]="form" class="form-container">
+<form [formGroup]="form" class="precios-dialogo">
+  <header class="dialogo-header"><div class="header-icon"><mat-icon>price_change</mat-icon></div><div><p>GESTIÓN DE PRODUCTOS</p><h2>Actualización masiva de precios</h2><span>Elegí un grupo, revisá los nuevos importes y aplicá los cambios.</span></div><button mat-icon-button type="button" class="cerrar" aria-label="Cerrar" (click)="cerrar()"><mat-icon>close</mat-icon></button></header>
 
-  <!-- ================= FILTROS ================= -->
-  <div class="form-row">
+  <section class="configuracion">
+    <div class="seccion-titulo"><mat-icon>tune</mat-icon><div><h3>Configuración</h3><span>Definí el alcance y la variación del precio.</span></div></div>
+    <div class="form-row">
+      <mat-form-field appearance="outline" *ngIf="mostrarComboReferencia"><mat-label>{{ labelReferencia }}</mat-label><mat-select formControlName="referenciaId" (selectionChange)="cargarProductos()"><mat-option *ngFor="let r of referencias" [value]="r.id">{{ r.name || r.nombre || r.razonSocial || r.nameCategory || r.marca }}</mat-option></mat-select></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Operación</mat-label><mat-select formControlName="tipoCambio"><mat-option value="AUMENTO">Aumentar</mat-option><mat-option value="DISMINUCION">Disminuir</mat-option></mat-select></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Precio a modificar</mat-label><mat-select formControlName="aplicaA"><mat-option value="COSTO">Precio de costo</mat-option><mat-option value="VENTA">Precio de venta</mat-option></mat-select></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Variación</mat-label><input matInput type="number" min="0.01" formControlName="porcentaje"><span matTextSuffix>%</span></mat-form-field>
+    </div>
+  </section>
 
-    <!-- CRITERIO -->
-    <mat-form-field appearance="outline">
-      <mat-label>Aplicar por</mat-label>
-      <mat-select
-        formControlName="criterio"
-        (selectionChange)="onCriterioChange()">
-        <mat-option value="PROVEEDOR">Proveedor</mat-option>
-        <mat-option value="MARCA">Marca</mat-option>
-        <mat-option value="CATEGORIA">Categoría</mat-option>
-      </mat-select>
-    </mat-form-field>
+  <section class="productos-panel">
+    <div class="productos-toolbar"><div class="seccion-titulo"><mat-icon>inventory_2</mat-icon><div><h3>Productos</h3><span>{{ dataSource.data.length }} encontrados · {{ selectedProducts.size }} seleccionados</span></div></div><mat-form-field appearance="outline" class="search-box"><mat-icon matPrefix>search</mat-icon><mat-label>Buscar producto</mat-label><input matInput (keyup)="applyFilter($event)"></mat-form-field></div>
+    <div class="estado" *ngIf="loading"><mat-icon>hourglass_top</mat-icon><span>Cargando productos…</span></div>
+    <div class="estado" *ngIf="!loading && !dataSource.data.length"><mat-icon>inventory_2</mat-icon><strong>Elegí un proveedor</strong><span>Los productos asociados aparecerán acá.</span></div>
+    <div class="tabla-wrapper" *ngIf="!loading && dataSource.data.length">
+      <table mat-table [dataSource]="dataSource" matSort>
+        <ng-container matColumnDef="select"><th mat-header-cell *matHeaderCellDef><mat-checkbox [checked]="isAllSelected()" (change)="toggleAll($event)"></mat-checkbox></th><td mat-cell *matCellDef="let p"><mat-checkbox [checked]="isSelected(p)" (change)="toggleProduct(p)"></mat-checkbox></td></ng-container>
+        <ng-container matColumnDef="name"><th mat-header-cell *matHeaderCellDef mat-sort-header>Producto</th><td mat-cell *matCellDef="let p"><div class="producto"><span>{{ p.name?.charAt(0) || '?' }}</span><strong>{{ p.name }}</strong></div></td></ng-container>
+        <ng-container matColumnDef="price"><th mat-header-cell *matHeaderCellDef>Costo</th><td mat-cell *matCellDef="let p">{{ p.price | currency:'ARS':'symbol':'1.2-2' }}</td></ng-container>
+        <ng-container matColumnDef="salePrice"><th mat-header-cell *matHeaderCellDef>Venta actual</th><td mat-cell *matCellDef="let p"><strong>{{ p.salePrice | currency:'ARS':'symbol':'1.2-2' }}</strong></td></ng-container>
+        <ng-container matColumnDef="preview"><th mat-header-cell *matHeaderCellDef>Nuevo precio</th><td mat-cell *matCellDef="let p"><span class="preview-price">{{ previewPrice(p) | currency:'ARS':'symbol':'1.2-2' }}</span></td></ng-container>
+        <ng-container matColumnDef="fechaUltimaActualizacion"><th mat-header-cell *matHeaderCellDef>Última actualización</th><td mat-cell *matCellDef="let p">{{ p.fechaUltimaActualizacion | date:'dd/MM/yyyy' }}</td></ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr><tr mat-row *matRowDef="let row; columns: displayedColumns" [class.seleccionada]="isSelected(row)"></tr>
+      </table>
+      <mat-paginator [pageSize]="5" [pageSizeOptions]="[5,10,25]" showFirstLastButtons></mat-paginator>
+    </div>
+  </section>
 
-    <!-- REFERENCIA -->
-    <mat-form-field
-      appearance="outline"
-      *ngIf="mostrarComboReferencia">
-      <mat-label>{{ labelReferencia }}</mat-label>
-      <mat-select
-        formControlName="referenciaId"
-        (selectionChange)="cargarProductos()">
-        <mat-option
-          *ngFor="let r of referencias"
-          [value]="r.id">
-          {{ r.name || r.nombre || r.razonSocial || r.nameCategory || r.marca }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <!-- TIPO CAMBIO -->
-    <mat-form-field appearance="outline">
-      <mat-label>Tipo de cambio</mat-label>
-      <mat-select formControlName="tipoCambio">
-        <mat-option value="AUMENTO">Aumento</mat-option>
-        <mat-option value="DISMINUCION">Disminución</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <!-- APLICAR A -->
-    <mat-form-field appearance="outline">
-      <mat-label>Aplicar sobre</mat-label>
-      <mat-select formControlName="aplicaA">
-        <mat-option value="COSTO">Precio de costo</mat-option>
-        <mat-option value="VENTA">Precio de venta</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <!-- PORCENTAJE -->
-    <mat-form-field appearance="outline">
-      <mat-label>Porcentaje</mat-label>
-      <input
-        matInput
-        type="number"
-        min="0"
-        formControlName="porcentaje">
-    </mat-form-field>
-
-  </div>
-
-  <!-- ================= BUSCADOR ================= -->
-  <mat-form-field appearance="outline" class="search-box">
-    <mat-label>Buscar producto</mat-label>
-    <input
-      matInput
-      placeholder="Nombre del producto"
-      (keyup)="applyFilter($event)">
-  </mat-form-field>
-
-  <!-- ================= TABLA ================= -->
-  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2">
-
-    <!-- CHECK -->
-    <ng-container matColumnDef="select">
-      <th mat-header-cell *matHeaderCellDef>
-        <mat-checkbox
-          [checked]="isAllSelected()"
-          (change)="toggleAll($event)">
-        </mat-checkbox>
-      </th>
-      <td mat-cell *matCellDef="let p">
-        <mat-checkbox
-          [checked]="isSelected(p)"
-          (change)="toggleProduct(p)">
-        </mat-checkbox>
-      </td>
-    </ng-container>
-
-    <!-- PRODUCTO -->
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-        Producto
-      </th>
-      <td mat-cell *matCellDef="let p">
-        <div class="product-name">{{ p.name }}</div>
-      </td>
-    </ng-container>
-
-    <!-- COSTO -->
-    <ng-container matColumnDef="price">
-      <th mat-header-cell *matHeaderCellDef>Costo</th>
-      <td mat-cell *matCellDef="let p">
-        ${{ p.price | number:'1.2-2' }}
-      </td>
-    </ng-container>
-
-    <!-- VENTA -->
-    <ng-container matColumnDef="salePrice">
-      <th mat-header-cell *matHeaderCellDef>Venta</th>
-      <td mat-cell *matCellDef="let p">
-        ${{ p.salePrice | number:'1.2-2' }}
-      </td>
-    </ng-container>
-  
-        <!-- VENTA -->
-    <ng-container matColumnDef="fechaUltimaActualizacion">
-      <th mat-header-cell *matHeaderCellDef>Ultima Act.</th>
-      <td mat-cell *matCellDef="let p">
-        {{ p.fechaUltimaActualizacion}}
-      </td>
-    </ng-container>
-
-    <!-- PREVIEW -->
-    <ng-container matColumnDef="preview">
-      <th mat-header-cell *matHeaderCellDef>Nuevo precio</th>
-      <td mat-cell *matCellDef="let p">
-        <span class="preview-price">
-          ${{ previewPrice(p) | number:'1.2-2' }}
-        </span>
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-
-  </table>
-
-  <!-- ================= PAGINADOR ================= -->
-  <mat-paginator
-    [pageSize]="5"
-    [pageSizeOptions]="[3,5]"
-    showFirstLastButtons>
-  </mat-paginator>
-
-  <!-- ================= ACCIÓN ================= -->
-  <div class="action-bar">
-    <button
-      mat-raised-button
-      color="primary"
-      [disabled]="form.invalid || selectedProducts.size === 0"
-      (click)="aplicarCambio()">
-      Aplicar cambio masivo
-    </button>
-  </div>
-
+  <footer class="action-bar"><div><mat-icon>info</mat-icon><span>El cambio se aplicará únicamente a los productos seleccionados.</span></div><button mat-button type="button" (click)="cerrar()">Cancelar</button><button mat-raised-button color="primary" type="button" [disabled]="form.invalid || selectedProducts.size === 0" (click)="aplicarCambio()"><mat-icon>published_with_changes</mat-icon>Aplicar a {{ selectedProducts.size }} producto(s)</button></footer>
 </form>

@@ -9,6 +9,7 @@ import { filter, map, shareReplay } from 'rxjs/operators';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { VerticalMenuComponent } from '../vertical-menu/vertical-menu.component';
 import { IconComponent } from '../icon/icon.component';
@@ -16,6 +17,7 @@ import { IconComponent } from '../icon/icon.component';
 import { TokenService } from '../../../services/token.service';
 import { AdministracionService } from '../../../services/administracion.service';
 import { UiRefreshService } from '../../../services/ui-refresh.service';
+import { LicenseBannerComponent } from '../../license-banner/license-banner.component';
 
 @Component({
     selector: 'app-navigation',
@@ -28,8 +30,10 @@ import { UiRefreshService } from '../../../services/ui-refresh.service';
         MatToolbarModule,
         MatButtonModule,
         MatIconModule,
+        MatTooltipModule,
         VerticalMenuComponent,
         IconComponent
+        ,LicenseBannerComponent
     ]
 })
 export class NavigationComponent implements OnInit {
@@ -47,6 +51,7 @@ export class NavigationComponent implements OnInit {
     roles: string[] = [];
     isHandset = typeof window !== 'undefined' && window.matchMedia('(max-width: 991px)').matches;
     fotoUsuarioSrc: string | null = null;
+    temaOscuro = false;
 
     /**
      * Menú expandido o contraído.
@@ -61,6 +66,8 @@ export class NavigationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
+
+        this.inicializarTema();
 
         this.username = this.tokenService.getUserName();
         this.roles = this.tokenService.getAuthorities();
@@ -103,6 +110,12 @@ export class NavigationComponent implements OnInit {
             .join(' · ');
     }
 
+    alternarTema(): void {
+        this.temaOscuro = !this.temaOscuro;
+        this.aplicarTema();
+        if (typeof window !== 'undefined') localStorage.setItem('tema', this.temaOscuro ? 'oscuro' : 'claro');
+    }
+
     private cargarFotoUsuario(): void {
         const usuarioId = this.tokenService.getUserId();
         if (!usuarioId) return;
@@ -110,6 +123,17 @@ export class NavigationComponent implements OnInit {
             next: blob => this.fotoUsuarioSrc = URL.createObjectURL(blob),
             error: () => this.fotoUsuarioSrc = null
         });
+    }
+
+    private inicializarTema(): void {
+        if (typeof window === 'undefined') return;
+        const guardado = localStorage.getItem('tema');
+        this.temaOscuro = guardado ? guardado === 'oscuro' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        this.aplicarTema();
+    }
+
+    private aplicarTema(): void {
+        if (typeof document !== 'undefined') document.body.classList.toggle('tema-oscuro', this.temaOscuro);
     }
 
     logout(): void {

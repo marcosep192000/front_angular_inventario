@@ -1,21 +1,91 @@
-<form [formGroup]="formGroup">
-<div class="container__title">
-    <h2 class="title__color" mat-dialog-title>Buscar Cliente</h2>
-</div>
-<div class="container__serch">
-    <div class="container__serch">
-        <mat-form-field class="input" hintLabel="Máximo 11 caracteres">
-            <mat-label>CUIT</mat-label>
-            <input matInput maxlength="13" formControlName="cuit"/>
-            <mat-hint align="end">{{
-                formGroup.get('cuit')?.value?.length
-                }}/13</mat-hint>
-        </mat-form-field>
+<section class="client-picker">
+  <header>
+    <div class="brand-icon"><mat-icon>person_search</mat-icon></div>
+    <div>
+      <p>INVENTARIO PIXELS</p>
+      <h2>Seleccionar cliente</h2>
+      <span>Buscá por nombre, apellido, CUIT/DNI, teléfono o email.</span>
     </div>
-    <div class="actions__btn">
-  <button mat-raised-button color="warn" class="actions__btn btn__search" (click)="close()">Cancelar</button>
-        <button mat-raised-button color="primary" class="actions__btn btn__search" (click)="buscarPorCuit()">Buscar por CUIT</button>
-   
+    <button mat-icon-button type="button" aria-label="Cerrar" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+  <main>
+    <mat-form-field appearance="outline" class="search-field"
+      ><mat-icon matPrefix>search</mat-icon
+      ><mat-label>Nombre o apellido del cliente</mat-label
+      ><input
+        matInput
+        [formControl]="search"
+        [matAutocomplete]="auto"
+        autocomplete="off"
+        placeholder="Ej.: Juan Pérez"
+        autofocus
+      /><button
+        *ngIf="search.value"
+        mat-icon-button
+        matSuffix
+        type="button"
+        aria-label="Limpiar búsqueda"
+        (click)="search.setValue('')"
+      >
+        <mat-icon>close</mat-icon></button
+      ><mat-hint
+        >También podés escribir el CUIT/DNI, teléfono o email</mat-hint
+      ></mat-form-field
+    ><mat-autocomplete #auto="matAutocomplete" class="pixels-autocomplete"
+      ><mat-option
+        *ngFor="let client of filtered"
+        [value]="fullName(client)"
+        (onSelectionChange)="$event.isUserInput && select(client)"
+        ><div class="option-client">
+          <span class="mini-avatar">{{ initials(client) }}</span
+          ><span
+            ><strong>{{ fullName(client) }}</strong
+            ><small
+              >{{ client.cuit || "Sin CUIT/DNI" }} ·
+              {{ client.tel || client.telefono || "Sin teléfono" }}</small
+            ></span
+          >
+        </div></mat-option
+      ></mat-autocomplete
+    >
+    <div class="loading" *ngIf="loading">
+      <mat-spinner diameter="34"></mat-spinner><span>Cargando clientes…</span>
     </div>
-</div>
-</form>
+    <div class="empty" *ngIf="!loading && !error && !filtered.length">
+      <mat-icon>person_off</mat-icon><strong>No encontramos clientes</strong
+      ><span>Probá con otro nombre, apellido o documento.</span>
+    </div>
+    <div class="error" *ngIf="error">
+      <mat-icon>cloud_off</mat-icon><span>{{ error }}</span>
+    </div>
+    <section class="results" *ngIf="!loading && filtered.length">
+      <div class="results-title">
+        <span>{{ filtered.length }} resultado(s)</span
+        ><small>Seleccioná un cliente para continuar</small>
+      </div>
+      <button
+        class="client-card"
+        type="button"
+        *ngFor="let client of filtered"
+        (click)="select(client)"
+      >
+        <span class="avatar">{{ initials(client) }}</span
+        ><span class="identity"
+          ><strong>{{ fullName(client) }}</strong
+          ><small
+            ><mat-icon>badge</mat-icon
+            >{{ client.cuit || "Sin CUIT/DNI" }}</small
+          ></span
+        ><span class="contact"
+          ><small>{{ client.tel || client.telefono || "Sin teléfono" }}</small
+          ><small>{{ client.email || "Sin email" }}</small></span
+        ><mat-icon class="choose">arrow_forward</mat-icon>
+      </button>
+    </section>
+  </main>
+  <footer>
+    <button mat-stroked-button type="button" (click)="close()">Cancelar</button>
+  </footer>
+</section>

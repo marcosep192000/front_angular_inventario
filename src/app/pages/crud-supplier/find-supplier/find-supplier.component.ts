@@ -1,5 +1,6 @@
 import {
   Component,
+  DestroyRef,
   EventEmitter,
   OnInit,
   Output
@@ -24,6 +25,7 @@ import { Supplier } from '../../../interfaces/supplier';
 import {
   SupplierService
 } from '../../../services/supplier.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 
 @Component({
@@ -103,7 +105,8 @@ export class FindSupplierComponent
 
   constructor(
     private supplierService:
-      SupplierService
+      SupplierService,
+    private destroyRef: DestroyRef
   ) {}
 
 
@@ -114,6 +117,10 @@ export class FindSupplierComponent
   ngOnInit(): void {
 
     this.getAllSuppliers();
+
+    this.supplierService.suppliersChanged$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.getAllSuppliers());
 
   }
 

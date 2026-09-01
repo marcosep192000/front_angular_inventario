@@ -22,6 +22,14 @@ export const authGuard: CanActivateFn = (route, state) => {
   return true;
 };
 
+export const permissionGuard: CanActivateFn = (route) => {
+  const router = inject(Router);
+  const tokenService = inject(TokenService);
+  const permission = route.data?.['permission'] as string | undefined;
+  if (!permission || tokenService.hasPermission(permission)) return true;
+  return router.parseUrl(tokenService.getDefaultRoute());
+};
+
 // Interceptor para agregar el token a las solicitudes
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = localStorage.getItem('token');

@@ -1,0 +1,4 @@
+import { PurchaseOrderStatus, ReceivePurchaseOrderDetailRequest } from '../../interfaces/purchase-order';
+export interface PurchaseOrderActions { edit: boolean; send: boolean; receive: boolean; cancel: boolean; }
+export function purchaseOrderActions(status: PurchaseOrderStatus): PurchaseOrderActions { return { edit: status === 'DRAFT', send: status === 'DRAFT' || status === 'PENDING_APPROVAL', receive: status === 'SENT' || status === 'PARTIALLY_RECEIVED', cancel: status !== 'RECEIVED' && status !== 'CANCELLED' }; }
+export function buildReceiveRequest(pending: Array<{ id: number; pendingQuantity: number }>, quantities: Record<number, number>): ReceivePurchaseOrderDetailRequest[] { return pending.map(item => ({ purchaseOrderDetailId: item.id, quantityReceivedNow: Math.trunc(quantities[item.id] || 0) })).filter(item => item.quantityReceivedNow > 0 && item.quantityReceivedNow <= (pending.find(p => p.id === item.purchaseOrderDetailId)?.pendingQuantity || 0)); }

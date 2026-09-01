@@ -21,6 +21,7 @@
   <mat-hint align="end">
     {{ formGroup.get('barCode')?.value?.length }}/15
   </mat-hint>
+  <mat-error *ngIf="formGroup.get('barCode')?.hasError('duplicate')">Ya existe un producto con ese código de barras.</mat-error>
 </mat-form-field>
 
             </div><!-- FIN CODIGO DE BARRAS  -->

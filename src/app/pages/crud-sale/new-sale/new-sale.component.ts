@@ -29,7 +29,8 @@ import { MatSelect } from '@angular/material/select';
 
 import {
   Subject,
-  of
+  of,
+  firstValueFrom
 } from 'rxjs';
 
 import {
@@ -46,7 +47,7 @@ import autoTable from 'jspdf-autotable';
 import { CompanyDocumentConfig } from '../../../config/company-document.config';
 import { TicketService } from '../../../services/ticket.service';
 import { AdministracionService } from '../../../services/administracion.service';
-import { CondicionIvaEmpresa } from '../../../interfaces/administracion';
+import { CondicionIvaEmpresa, Empresa } from '../../../interfaces/administracion';
 
 import { ProductService } from '../../../services/product.service';
 import { ProductItemSale } from '../../../interfaces/ProductItemSale';
@@ -57,6 +58,7 @@ import { CtaCteService } from '../../../services/cta-cte.service';
 import { ClientService } from '../../../services/client.service';
 
 import { TotalSaleComponent } from '../total-sale/total-sale.component';
+import { SaldoInsuficienteDialogComponent } from '../total-sale/saldo-insuficiente-dialog.component';
 
 import {
   registrarDeudaCtaCteCliente
@@ -75,7 +77,8 @@ import { IconComponent } from '../../../shared/dasboard/icon/icon.component';
 
 import {
   ConfirmDocumentComponent,
-  ConfirmDocumentData
+  ConfirmDocumentData,
+  ConfirmDocumentAction
 } from '../confirm-document/confirm-document.component';
 
 
@@ -123,6 +126,15 @@ export class NewSaleComponent implements OnInit {
 
   tipoDocumento: string = 'FACTURA_C';
   private condicionIvaEmisor: CondicionIvaEmpresa = 'RESPONSABLE_INSCRIPTO';
+  private generarPdfAlGuardar = true;
+  private empresaDocumento: Partial<Empresa> = {
+    name: CompanyDocumentConfig.legalName,
+    nombreFantasia: CompanyDocumentConfig.tradeName,
+    cuit: CompanyDocumentConfig.cuit,
+    address: CompanyDocumentConfig.address,
+    phone: CompanyDocumentConfig.phone,
+    email: CompanyDocumentConfig.email,
+  };
 
   condicionVenta: string = 'CONTADO';
 
@@ -236,6 +248,7 @@ export class NewSaleComponent implements OnInit {
   private cargarCondicionIvaEmisor(): void {
     this.administracionService.obtenerEmpresa().subscribe({
       next: empresa => {
+        this.empresaDocumento = empresa;
         this.condicionIvaEmisor = empresa.condicionIva || 'RESPONSABLE_INSCRIPTO';
         if (this.selectedClient) this.actualizarTipoFactura(this.selectedClient);
       }
@@ -842,7 +855,7 @@ export class NewSaleComponent implements OnInit {
 
           data: {
             tipo: 'createProduct'
-          }
+          }, width: '780px', maxWidth: '96vw', maxHeight: '94vh', panelClass: 'pixels-client-dialog'
 
         }
       );
@@ -970,6 +983,8 @@ export class NewSaleComponent implements OnInit {
     // DOCUMENTOS QUE REQUIEREN COBRO
     // =============================================
 
+    const estadoCuentaCorriente = await this.obtenerEstadoCuentaCorriente(this.selectedClient.id);
+
     const dialogRef =
       this.dialog.open(
         TotalSaleComponent,
@@ -991,8 +1006,13 @@ export class NewSaleComponent implements OnInit {
             client:
               this.selectedClient.id,
 
+            clienteNombre:
+              `${this.selectedClient.name} ${this.selectedClient.lastName || ''}`.trim(),
+
             totalPrice:
-              this.getTotalPrice()
+              this.getTotalPrice(),
+
+            cuentaCorriente: estadoCuentaCorriente
 
           }
 
@@ -1027,16 +1047,20 @@ export class NewSaleComponent implements OnInit {
           const soloCuentaCorriente = pagos.every(
             pago => pago.medioPago === 'CUENTA_CORRIENTE'
           );
+          const montoCuentaCorriente = pagos
+            .filter(pago => pago.medioPago === 'CUENTA_CORRIENTE')
+            .reduce((total, pago) => total + (Number(pago.monto) || 0), 0);
 
 
           try {
 
-            const idCtaCte = usaCuentaCorriente
-              ? await this.buscarCuentaIdCorrienteCliente(this.selectedClient.id)
+            const estadoActual = usaCuentaCorriente
+              ? await this.obtenerEstadoCuentaCorriente(this.selectedClient.id)
               : null;
+            const idCtaCte = estadoActual?.id ?? null;
 
-            if (usaCuentaCorriente && !idCtaCte) {
-              this.toastr.error('El cliente seleccionado no posee una cuenta corriente válida.');
+            if (usaCuentaCorriente && (!estadoActual?.habilitada || montoCuentaCorriente > estadoActual.disponible + 0.009)) {
+              this.mostrarSaldoCuentaCorriente(montoCuentaCorriente, estadoActual);
               return;
             }
 
@@ -1093,7 +1117,13 @@ export class NewSaleComponent implements OnInit {
         this.getTotalPrice(),
 
       mensaje:
-        this.obtenerMensajeConfirmacion()
+        this.obtenerMensajeConfirmacion(),
+
+      whatsappDisponible:
+        this.puedeEnviarPresupuestoWhatsapp,
+
+      motivoWhatsappNoDisponible:
+        this.motivoWhatsappNoDisponible
 
     };
 
@@ -1124,13 +1154,13 @@ export class NewSaleComponent implements OnInit {
     dialogRef
       .afterClosed()
       .subscribe(
-        (confirmado: boolean) => {
+        (accion: ConfirmDocumentAction | null) => {
 
           // =========================================
           // CANCELÓ
           // =========================================
 
-          if (!confirmado) {
+          if (!accion) {
 
             console.log(
               'Generación de documento cancelada.'
@@ -1148,6 +1178,12 @@ export class NewSaleComponent implements OnInit {
           // RECIÉN ACÁ SE CONSTRUYE
           // Y SE GUARDA EL DOCUMENTO.
           // =========================================
+
+          this.generarPdfAlGuardar = accion === 'pdf';
+
+          if (accion === 'whatsapp') {
+            this.enviarPresupuestoWhatsapp();
+          }
 
           const sale =
             this.buildSaleCommon(
@@ -1243,6 +1279,30 @@ export class NewSaleComponent implements OnInit {
   // =====================================================
   // CUENTA CORRIENTE
   // =====================================================
+
+  private async obtenerEstadoCuentaCorriente(id: number): Promise<{ id: number | null; habilitada: boolean; disponible: number }> {
+    try {
+      const cliente = await firstValueFrom(this.clienteService.obtenerClientePorId(id));
+      const cuenta = cliente.cuentaCorriente;
+      if (!cuenta?.id || cuenta.estado === false) return { id: cuenta?.id ?? null, habilitada: false, disponible: 0 };
+      try {
+        const historial = await firstValueFrom(this.ctaCteService.obtenerHistorialCuenta(id));
+        return { id: cuenta.id, habilitada: true, disponible: Math.max(0, Number(historial.saldoDisponible) || 0) };
+      } catch {
+        return { id: cuenta.id, habilitada: true, disponible: Math.max(0, Number(cuenta.saldo) || 0) };
+      }
+    } catch {
+      const cuenta = this.selectedClient?.cuentaCorriente;
+      return { id: cuenta?.id ?? null, habilitada: Boolean(cuenta?.id && cuenta.estado !== false), disponible: Math.max(0, Number(cuenta?.saldo) || 0) };
+    }
+  }
+
+  private mostrarSaldoCuentaCorriente(solicitado: number, estado: { habilitada: boolean; disponible: number } | null): void {
+    this.dialog.open(SaldoInsuficienteDialogComponent, {
+      width: '480px', maxWidth: '94vw', autoFocus: false,
+      data: { cliente: `${this.selectedClient?.name || 'Cliente'} ${this.selectedClient?.lastName || ''}`.trim(), disponible: estado?.disponible ?? 0, solicitado, sinCuenta: !estado?.habilitada },
+    });
+  }
 
   buscarCuentaIdCorrienteCliente(
     id: number
@@ -1485,6 +1545,58 @@ export class NewSaleComponent implements OnInit {
 
   }
 
+  get puedeEnviarPresupuestoWhatsapp(): boolean {
+    const cuit = String(this.selectedClient?.cuit ?? '').trim();
+    const telefono = this.telefonoCliente.replace(/\D/g, '');
+    return cuit !== '' && cuit !== '0' && telefono.length >= 8 && this.products.length > 0;
+  }
+
+  get telefonoCliente(): string {
+    return String(
+      this.selectedClient?.tel ??
+      this.selectedClient?.telefono ??
+      this.selectedClient?.phone ??
+      ''
+    ).trim();
+  }
+
+  get motivoWhatsappNoDisponible(): string {
+    if (String(this.selectedClient?.cuit ?? '').trim() === '0') return 'Seleccioná un cliente registrado.';
+    if (this.telefonoCliente.replace(/\D/g, '').length < 8) return 'El cliente no tiene un celular válido.';
+    return '';
+  }
+
+  enviarPresupuestoWhatsapp(): void {
+    if (!this.puedeEnviarPresupuestoWhatsapp) {
+      this.toastr.warning('El cliente debe estar registrado y tener un celular válido.');
+      return;
+    }
+
+    const telefono = this.normalizarTelefonoWhatsapp(this.telefonoCliente);
+    const detalle = this.products
+      .map(producto => `• ${producto.name} x${producto.quantity}: $${(producto.salePrice * producto.quantity).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`)
+      .join('\n');
+    const mensaje = [
+      `Hola ${this.obtenerNombreCliente()}, te enviamos el presupuesto de ${this.nombreEmpresaDocumento}:`,
+      '',
+      detalle,
+      '',
+      `Total: $${this.getTotalPrice().toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+      `Presupuesto generado el ${new Date().toLocaleDateString('es-AR')}.`
+    ].join('\n');
+
+    window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank', 'noopener,noreferrer');
+  }
+
+  private normalizarTelefonoWhatsapp(valor: string): string {
+    let telefono = String(valor ?? '').replace(/\D/g, '');
+    if (telefono.startsWith('00')) telefono = telefono.slice(2);
+    if (telefono.startsWith('0')) telefono = telefono.slice(1);
+    if (!telefono.startsWith('54')) telefono = `549${telefono}`;
+    else if (!telefono.startsWith('549')) telefono = `549${telefono.slice(2)}`;
+    return telefono;
+  }
+
   private async generarPdfProfesional(saleCommon: SaleCommon): Promise<void> {
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
     const ancho = doc.internal.pageSize.getWidth();
@@ -1502,11 +1614,11 @@ export class NewSaleComponent implements OnInit {
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
-    doc.text(CompanyDocumentConfig.tradeName, logo ? 43 : 14, 18);
+    doc.text(this.nombreEmpresaDocumento, logo ? 43 : 14, 18);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
-    doc.text(`CUIT ${CompanyDocumentConfig.cuit} · Comprobante interno`, logo ? 43 : 14, 25);
-    doc.text(CompanyDocumentConfig.contactLine || 'Sistema de gestión comercial', logo ? 43 : 14, 30);
+    doc.text(`CUIT ${this.empresaDocumento.cuit || '-'} · Comprobante interno`, logo ? 43 : 14, 25);
+    doc.text(this.contactoEmpresaDocumento || 'Sistema de gestión comercial', logo ? 43 : 14, 30);
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
@@ -1573,7 +1685,7 @@ export class NewSaleComponent implements OnInit {
       doc.line(14, alto - 17, ancho - 14, alto - 17);
       doc.setTextColor(120, 125, 135);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
-      doc.text(`${CompanyDocumentConfig.footerText} · Documento generado por el sistema`, 14, alto - 11);
+      doc.text(`${this.nombreEmpresaDocumento} · Documento generado por el sistema`, 14, alto - 11);
       doc.text(`Página ${pagina} de ${paginas}`, ancho - 14, alto - 11, { align: 'right' });
     }
 
@@ -1581,15 +1693,32 @@ export class NewSaleComponent implements OnInit {
   }
 
   private obtenerLogoPdf(): Promise<string | null> {
-    return fetch(CompanyDocumentConfig.logoUrl)
-      .then((respuesta) => respuesta.blob())
+    return firstValueFrom(this.administracionService.obtenerLogo())
       .then((blob) => new Promise<string>((resolve, reject) => {
         const lector = new FileReader();
         lector.onloadend = () => resolve(String(lector.result));
         lector.onerror = () => reject();
         lector.readAsDataURL(blob);
       }))
-      .catch(() => null);
+      .catch(() => fetch(CompanyDocumentConfig.logoUrl)
+        .then(respuesta => respuesta.blob())
+        .then(blob => new Promise<string>((resolve, reject) => {
+          const lector = new FileReader();
+          lector.onloadend = () => resolve(String(lector.result));
+          lector.onerror = () => reject();
+          lector.readAsDataURL(blob);
+        }))
+        .catch(() => null));
+  }
+
+  private get nombreEmpresaDocumento(): string {
+    return this.empresaDocumento.nombreFantasia || this.empresaDocumento.name || CompanyDocumentConfig.tradeName;
+  }
+
+  private get contactoEmpresaDocumento(): string {
+    return [this.empresaDocumento.address, this.empresaDocumento.phone, this.empresaDocumento.email]
+      .filter(Boolean)
+      .join(' · ');
   }
 
 
@@ -2003,7 +2132,9 @@ export class NewSaleComponent implements OnInit {
 
           try {
 
-            this.generatePDF({ ...saleCommon, numero: numeroFinal });
+            if (this.generarPdfAlGuardar) {
+              this.generatePDF({ ...saleCommon, numero: numeroFinal });
+            }
 
           } catch (pdfError: any) {
 
@@ -2023,6 +2154,7 @@ export class NewSaleComponent implements OnInit {
           // =============================================
 
           this.limpiarVenta();
+          this.generarPdfAlGuardar = true;
 
 
           // =============================================
@@ -2030,6 +2162,8 @@ export class NewSaleComponent implements OnInit {
         // =============================================
 
         error: (error: any) => {
+
+          this.generarPdfAlGuardar = true;
 
           console.error(
             '=========================================='
@@ -2541,7 +2675,7 @@ export class NewSaleComponent implements OnInit {
                 text-align: center;
               "
             >
-              ${CompanyDocumentConfig.tradeName}
+              ${this.nombreEmpresaDocumento}
             </h2>
 
 
@@ -2550,7 +2684,7 @@ export class NewSaleComponent implements OnInit {
                 text-align: center;
               "
             >
-              CUIT ${CompanyDocumentConfig.cuit}
+              CUIT ${this.empresaDocumento.cuit || '-'}
             </p>
 
 

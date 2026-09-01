@@ -8,18 +8,18 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ProductService } from '../../../services/product.service';
 import { SupplierService } from '../../../services/supplier.service';
-import { MarcaService } from '../../../services/marca.service';
-import { CategoryService } from '../../../services/category.service';
 import { MatDialogRef } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-price-massive-update',
   standalone: true,
   templateUrl: './buscar-producto-por-proveedor.component.html',
-  styleUrls: ['./buscar-producto-por-proveedor.component.scss'],
+  styleUrl: './buscar-producto-por-proveedor.component.css',
   imports: [
        // 🔥 ESTO ES LO QUE FALTABA
     ReactiveFormsModule,
@@ -31,7 +31,8 @@ import { MatDialogRef } from '@angular/material/dialog';
     MatCheckboxModule,
     MatSelectModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    MatIconModule
   ]
 })
 export class BuscarProductoPorProveedorComponent implements OnInit {
@@ -45,6 +46,7 @@ export class BuscarProductoPorProveedorComponent implements OnInit {
   displayedColumns = ['select', 'name', 'price', 'salePrice', 'preview','fechaUltimaActualizacion'];
   dataSource = new MatTableDataSource<any>([]);
   selectedProducts = new Set<number>();
+  loading = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -53,8 +55,8 @@ export class BuscarProductoPorProveedorComponent implements OnInit {
     private fb: FormBuilder,
     private productService: ProductService,
     private proveedorService: SupplierService,
-    private marcaService: MarcaService,
-    private categoriaService: CategoryService,  private dialogRef: MatDialogRef<BuscarProductoPorProveedorComponent>
+    private dialogRef: MatDialogRef<BuscarProductoPorProveedorComponent>,
+    private toastr: ToastrService,
   ) {}
 
   ngOnInit(): void {
@@ -81,16 +83,6 @@ export class BuscarProductoPorProveedorComponent implements OnInit {
       this.proveedorService.getAllSuppliers().subscribe(r => this.referencias = r);
     }
 
-    if (criterio === 'MARCA') {
-      this.labelReferencia = 'Marca';
-      this.marcaService.allMarca().subscribe(r => this.referencias = r);
-    }
-
-    if (criterio === 'CATEGORIA') {
-      this.labelReferencia = 'Categoría';
-      this.categoriaService.getCategories().subscribe(r => this.referencias = r);
-    }
-
     this.mostrarComboReferencia = true;
   }
 
@@ -99,10 +91,12 @@ export class BuscarProductoPorProveedorComponent implements OnInit {
     if (!referenciaId) return;
 
     if (criterio === 'PROVEEDOR') {
+      this.loading = true;
       this.productService.getProductoPorProveedor(referenciaId).subscribe(p => {
         this.dataSource.data = p;
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
+        this.loading = false;
       });
     }
   }
@@ -154,7 +148,7 @@ aplicarCambio(): void {
   }
 
   if (this.selectedProducts.size === 0) {
-    alert('⚠️ Debe seleccionar al menos un producto');
+    this.toastr.warning('Debe seleccionar al menos un producto.');
     return;
   }
 
@@ -166,14 +160,18 @@ aplicarCambio(): void {
   this.productService.actualizarPreciosMasivo(payload)
     .subscribe({
       next: () => {
-        alert('✅ Precios actualizados correctamente');
+        this.toastr.success('Precios actualizados correctamente.');
         this.dialogRef.close(true);
       },
       error: err => {
         console.error(err);
-        alert('❌ Error al actualizar precios');
+        this.toastr.error('No se pudieron actualizar los precios.');
       }
     });
+}
+
+cerrar(): void {
+  this.dialogRef.close(false);
 }
 
 }

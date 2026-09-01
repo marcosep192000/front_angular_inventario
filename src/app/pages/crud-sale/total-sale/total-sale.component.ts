@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
+  MatDialog,
   MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
@@ -15,11 +16,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ToastrService } from 'ngx-toastr';
 
 import { MedioPago, PagoTicketRequest } from '../../../interfaces/pago-ticket';
+import { SaldoInsuficienteDialogComponent } from './saldo-insuficiente-dialog.component';
 
 interface TotalSaleData {
   client: number;
+  clienteNombre?: string;
   totalPrice: number;
   tipoDocumento: string;
+  cuentaCorriente?: { habilitada: boolean; disponible: number };
 }
 
 @Component({
@@ -56,6 +60,7 @@ export class TotalSaleComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public readonly data: TotalSaleData,
     private readonly dialogRef: MatDialogRef<TotalSaleComponent>,
+    private readonly dialog: MatDialog,
     private readonly toastr: ToastrService,
   ) {}
 
@@ -73,6 +78,16 @@ export class TotalSaleComponent implements OnInit {
 
   get restante(): number {
     return this.redondear(this.totalVenta - this.totalIngresado);
+  }
+
+  get totalCuentaCorriente(): number {
+    return this.redondear(this.pagos.filter(pago => pago.medioPago === 'CUENTA_CORRIENTE').reduce((total, pago) => total + (Number(pago.monto) || 0), 0));
+  }
+
+  get saldoCuentaCorriente(): number { return Math.max(0, Number(this.data.cuentaCorriente?.disponible) || 0); }
+
+  get cuentaCorrienteInvalida(): boolean {
+    return this.totalCuentaCorriente > 0 && (!this.data.cuentaCorriente?.habilitada || this.totalCuentaCorriente > this.saldoCuentaCorriente + 0.009);
   }
 
   get puedeConfirmar(): boolean {
@@ -107,6 +122,8 @@ export class TotalSaleComponent implements OnInit {
       return;
     }
 
+    if (this.cuentaCorrienteInvalida) { this.mostrarSaldoInsuficiente(); return; }
+
     const pagos = this.pagos.map(pago => ({
       medioPago: pago.medioPago,
       monto: this.redondear(Number(pago.monto)),
@@ -118,6 +135,10 @@ export class TotalSaleComponent implements OnInit {
 
   cancelar(): void {
     this.dialogRef.close();
+  }
+
+  private mostrarSaldoInsuficiente(): void {
+    this.dialog.open(SaldoInsuficienteDialogComponent, { width: '480px', maxWidth: '94vw', autoFocus: false, data: { cliente: this.data.clienteNombre || 'el cliente seleccionado', disponible: this.saldoCuentaCorriente, solicitado: this.totalCuentaCorriente, sinCuenta: !this.data.cuentaCorriente?.habilitada } });
   }
 
   private redondear(valor: number): number {

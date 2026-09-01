@@ -1,0 +1,42 @@
+<section class="permisos-page">
+  <header class="hero">
+    <div><p>ADMINISTRACIÓN</p><h1>Permisos de usuarios</h1><span>Controlá qué puede consultar y modificar cada integrante.</span></div>
+    <mat-icon>admin_panel_settings</mat-icon>
+  </header>
+
+  <aside class="integracion" *ngIf="!backendDisponible">
+    <mat-icon>construction</mat-icon>
+    <div><strong>Interfaz preparada</strong><span>Usamos el catálogo local mientras el backend habilita los endpoints de permisos.</span></div>
+  </aside>
+
+  <section class="toolbar">
+    <mat-form-field appearance="outline">
+      <mat-label>Seleccionar usuario</mat-label>
+      <mat-select (selectionChange)="seleccionarUsuario($event.value)">
+        <mat-option *ngFor="let item of usuarios" [value]="item.id">{{ item.nombre }} {{ item.apellido }} · {{ item.role }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <div class="plantillas" *ngIf="usuario">
+      <span>Plantilla rápida</span>
+      <button mat-stroked-button *ngFor="let rol of roles" (click)="aplicarPlantilla(rol)">{{ rol }}</button>
+    </div>
+  </section>
+
+  <section class="vacio" *ngIf="!usuario">
+    <mat-icon>manage_accounts</mat-icon><h2>Seleccioná un usuario</h2><p>Podrás asignarle permisos individuales o comenzar desde una plantilla.</p>
+  </section>
+
+  <main class="grupos" *ngIf="usuario">
+    <article *ngFor="let grupo of grupos">
+      <header><div><h2>{{ grupo }}</h2><span>{{ porGrupo(grupo).length }} permisos</span></div><mat-checkbox [checked]="grupoCompleto(grupo)" (change)="cambiarGrupo(grupo, $event.checked)">Todos</mat-checkbox></header>
+      <label *ngFor="let permiso of porGrupo(grupo)">
+        <mat-checkbox [checked]="activo(permiso.codigo)" (change)="cambiar(permiso.codigo, $event.checked)"><strong>{{ permiso.nombre }}</strong><small>{{ permiso.codigo }}</small></mat-checkbox>
+      </label>
+    </article>
+  </main>
+
+  <footer *ngIf="usuario">
+    <div><strong>{{ usuario.nombre }} {{ usuario.apellido }}</strong><span>{{ seleccionados.size }} de {{ permisos.length }} permisos activos</span></div>
+    <button mat-raised-button color="primary" [disabled]="guardando || cargando" (click)="guardar()"><mat-icon>save</mat-icon>{{ guardando ? 'Guardando…' : 'Guardar permisos' }}</button>
+  </footer>
+</section>

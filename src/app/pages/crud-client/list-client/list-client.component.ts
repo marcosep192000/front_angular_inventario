@@ -18,6 +18,7 @@ import { CrudCtaCteClienteComponent } from '../../crud-cta-cte-cliente/crud-cta-
 import { FormCtaCteClienteComponent } from '../../form-cta-cte-cliente/form-cta-cte-cliente.component';
 import { CtaCteService } from '../../../services/cta-cte.service';
 import { AlertaCuentaCorriente } from '../../../interfaces/historial-cuenta-corriente';
+import { LicenseService } from '../../../services/license.service';
 
 @Component({
   selector: 'app-list-client',
@@ -60,7 +61,7 @@ export class ListClientComponent implements OnInit {
   dataSource = new MatTableDataSource<Client>(this.clients);
   alertas: AlertaCuentaCorriente[] = [];
   mostrarAlertas = false;
-  constructor(public clientService: ClientService, public dialog: MatDialog, private ctaCteService: CtaCteService) {}
+  constructor(public clientService: ClientService, public dialog: MatDialog, private ctaCteService: CtaCteService, public license: LicenseService) {}
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator; // Añadimos el paginador al datasource
@@ -136,6 +137,7 @@ export class ListClientComponent implements OnInit {
     }
   }
   createClient() {
+    if (this.limiteClientesAlcanzado) { window.alert('Alcanzaste el límite de clientes permitido por tu plan.'); return; }
     const dialogRef = this.dialog.open(FormClientComponent, {
       disableClose: true,
       autoFocus: true,
@@ -149,6 +151,8 @@ export class ListClientComponent implements OnInit {
       this.refrescarModulo();
     });
   }
+  get limiteClientesAlcanzado(): boolean { const s=this.license.snapshot; return Boolean(s && s.maxClients !== -1 && s.currentClients >= s.maxClients); }
+  get resumenLicenciaClientes(): string { const s=this.license.snapshot; return !s ? '' : `Clientes: ${s.currentClients} / ${s.maxClients === -1 ? 'Ilimitados' : s.maxClients.toLocaleString('es-AR')}`; }
   ctaCteClient(id: number) {
     const dialogRef = this.dialog.open(FormCtaCteClienteComponent,{
       disableClose: true,

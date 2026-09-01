@@ -1,7 +1,7 @@
 <div class="cards-container">
 
     <!-- Productos -->
-    <button class="dashboard-card products">
+    <button class="dashboard-card products" routerLink="/dashboard/product-list">
 
         <mat-icon>inventory_2</mat-icon>
 
@@ -21,27 +21,27 @@
 
     <!-- Compras -->
 
-    <button class="dashboard-card purchases">
+    <button class="dashboard-card purchases" routerLink="/dashboard/purchase-orders">
 
         <mat-icon>shopping_cart</mat-icon>
 
         <span class="title">
-            Compras
+            Pedidos de compra
         </span>
 
         <span class="value">
-            —
+            Abrir
         </span>
 
         <span class="subtitle">
-            Próximamente
+            Gestionar pedidos
         </span>
 
     </button>
 
     <!-- Ventas -->
 
-    <button class="dashboard-card sales">
+    <button class="dashboard-card sales" routerLink="/dashboard/reportes/ventas/resumen">
 
         <mat-icon>point_of_sale</mat-icon>
 
@@ -74,7 +74,7 @@
         </span>
 
         <span class="subtitle">
-            Pendiente
+            Resultado de hoy
         </span>
 
     </button>
@@ -113,7 +113,7 @@
 
     <!-- Hoy -->
 
-    <button class="dashboard-card today">
+    <button class="dashboard-card today" routerLink="/dashboard/cash-closing">
 
         <mat-icon>
 

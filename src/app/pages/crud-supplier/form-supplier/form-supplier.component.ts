@@ -33,6 +33,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
 import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { applyDuplicateResourceError } from '../../../shared/forms/duplicate-resource-error';
 
 import { SupplierService } from '../../../services/supplier.service';
 import { Supplier } from '../../../interfaces/supplier';
@@ -233,7 +234,7 @@ export class FormSupplierComponent
           '',
 
           [
-            Validators.maxLength(30)
+            Validators.maxLength(80)
           ]
 
         ],
@@ -687,7 +688,9 @@ export class FormSupplierComponent
     );
 
 
+    const duplicate = applyDuplicateResourceError(error, this.formGroup);
     this.toast.error(
+      duplicate ||
       this.obtenerMensajeError(
         error,
         mensajeDefault

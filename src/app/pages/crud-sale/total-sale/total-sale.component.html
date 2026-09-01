@@ -20,6 +20,7 @@
       <div><span>Total ingresado</span><strong>{{ totalIngresado | currency:'ARS':'symbol':'1.2-2' }}</strong></div>
       <div [class.correcto]="restante === 0" [class.pendiente]="restante > 0" [class.excedido]="restante < 0"><span>{{ restante < 0 ? 'Excedente' : 'Restante' }}</span><strong>{{ (restante < 0 ? -restante : restante) | currency:'ARS':'symbol':'1.2-2' }}</strong></div>
     </section>
+    <section class="alerta-credito" *ngIf="totalCuentaCorriente > 0" [class.sin-saldo]="cuentaCorrienteInvalida"><mat-icon>{{ cuentaCorrienteInvalida ? 'warning_amber' : 'verified' }}</mat-icon><div><strong>{{ cuentaCorrienteInvalida ? 'Crédito insuficiente' : 'Crédito disponible' }}</strong><span>Disponible: {{ saldoCuentaCorriente | currency:'ARS':'symbol':'1.2-2' }} · A utilizar: {{ totalCuentaCorriente | currency:'ARS':'symbol':'1.2-2' }}</span></div></section>
     <p class="aviso" *ngIf="!puedeConfirmar"><mat-icon>info</mat-icon>La suma de los pagos debe coincidir con el total para confirmar.</p>
   </main>
 

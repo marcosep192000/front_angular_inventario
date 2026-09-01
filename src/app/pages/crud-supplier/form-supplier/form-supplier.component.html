@@ -113,15 +113,16 @@
 
           <input
             matInput
-            maxlength="30"
+            maxlength="80"
             formControlName="address"
+            autocomplete="street-address"
           >
 
           <mat-hint align="end">
 
             {{
               formGroup.get('address')?.value?.length || 0
-            }}/30
+            }}/80
 
           </mat-hint>
 
@@ -131,7 +132,7 @@
             "
           >
 
-            Máximo 30 caracteres.
+            Máximo 80 caracteres.
 
           </mat-error>
 
@@ -224,6 +225,7 @@
               onInputChange($event, 'cuit')
             "
           >
+          <mat-error *ngIf="formGroup.get('cuit')?.hasError('duplicate')">Ya existe un proveedor con ese CUIT.</mat-error>
 
           <mat-hint align="end">
 

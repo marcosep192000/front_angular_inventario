@@ -23,6 +23,7 @@
                     (keydown)="onlyAllowNumbers($event)"
                   />
                     <mat-hint align="end">{{ formGroup.get('cuit')?.value?.length || 0 }}/12</mat-hint>
+                    <mat-error *ngIf="formGroup.get('cuit')?.hasError('duplicate')">Ya existe un cliente con ese CUIT/DNI.</mat-error>
                 </mat-form-field>
 
                 <mat-form-field class="input" hintLabel="Máximo 20 caracteres">
@@ -31,17 +32,20 @@
                     <mat-hint align="end">{{ formGroup.get('name')?.value?.length }}/20</mat-hint>
                 </mat-form-field>
 
-                <mat-form-field class="input" hintLabel="Máximo 14 caracteres">
-                    <mat-label>Teléfono</mat-label>
+                <mat-form-field class="input" hintLabel="Formato internacional recomendado">
+                    <mat-label>Celular / WhatsApp</mat-label>
                     <input
                       matInput
-                      maxlength="14"
+                      maxlength="20"
                       formControlName="tel"
-                      type="text"
-                      pattern="[0-9]*"
-                      (keydown)="onlyAllowNumbers($event)"
+                      type="tel"
+                      autocomplete="tel"
+                      inputmode="tel"
+                      placeholder="Ej.: +54 9 11 2345-6789"
+                      (input)="onPhoneInput($event)"
                     />
-                    <mat-hint align="end">{{ formGroup.get('tel')?.value?.length || 0 }}/14</mat-hint>
+                    <mat-hint>Incluí código de país y área</mat-hint>
+                    <mat-error *ngIf="formGroup.get('tel')?.hasError('pattern')">Ingresá un teléfono válido</mat-error>
                   </mat-form-field>
             </div><!-- FIN COLUMNA 1 -->
 
@@ -53,10 +57,12 @@
                     <mat-hint align="end">{{ formGroup.get('lastName')?.value?.length }}/20</mat-hint>
                 </mat-form-field>
 
-                <mat-form-field class="input" hintLabel="Máximo 40 caracteres">
-                    <mat-label>Direccion</mat-label>
-                    <input matInput maxlength="40" formControlName="address" />
-                    <mat-hint align="end">{{ formGroup.get('address')?.value?.length }}/40</mat-hint>
+                <mat-form-field class="input" hintLabel="Máximo 80 caracteres">
+                    <mat-label>Dirección</mat-label>
+                    <input matInput maxlength="80" formControlName="address" autocomplete="street-address" />
+                    <mat-hint align="end">{{ formGroup.get('address')?.value?.length || 0 }}/80</mat-hint>
+                    <mat-error *ngIf="formGroup.get('address')?.hasError('required')">La dirección es obligatoria</mat-error>
+                    <mat-error *ngIf="formGroup.get('address')?.hasError('maxlength')">Máximo 80 caracteres</mat-error>
                 </mat-form-field>
 
                 <mat-form-field class="input">
@@ -66,6 +72,7 @@
                         favor ingrese una direccion valida</mat-error>
                     <mat-error *ngIf="emailFormControl.hasError('required')">Email es
                         <strong>requerido</strong></mat-error>
+                    <mat-error *ngIf="emailFormControl.hasError('duplicate')">Ya existe un cliente con ese email.</mat-error>
                 </mat-form-field>
                 <mat-form-field class="input"><mat-label>Condición IVA</mat-label><mat-select formControlName="condicionIva"><mat-option value="RESPONSABLE_INSCRIPTO">Responsable inscripto</mat-option><mat-option value="MONOTRIBUTISTA">Monotributista</mat-option><mat-option value="EXENTO">Exento</mat-option><mat-option value="CONSUMIDOR_FINAL">Consumidor final</mat-option><mat-option value="NO_ALCANZADO">No alcanzado</mat-option><mat-option value="NO_CATEGORIZADO">No categorizado</mat-option></mat-select></mat-form-field>
             </div><!-- FIN COLUMNA 2 -->
