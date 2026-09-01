@@ -1,0 +1,15 @@
+import { CommonModule } from '@angular/common';
+import { Component, Inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+
+export interface SaldoInsuficienteDialogData { cliente: string; disponible: number; solicitado: number; sinCuenta?: boolean; }
+
+@Component({
+  selector: 'app-saldo-insuficiente-dialog', standalone: true,
+  imports: [CommonModule, MatButtonModule, MatDialogModule, MatIconModule],
+  template: `<section class="alerta-saldo"><div class="icono"><mat-icon>account_balance_wallet</mat-icon></div><p class="etiqueta">CUENTA CORRIENTE</p><h2>{{ data.sinCuenta ? 'Cuenta corriente no disponible' : 'Saldo insuficiente' }}</h2><p class="mensaje" *ngIf="!data.sinCuenta">La cuenta de <strong>{{ data.cliente }}</strong> no tiene crédito suficiente para completar este pago.</p><p class="mensaje" *ngIf="data.sinCuenta"><strong>{{ data.cliente }}</strong> no posee una cuenta corriente habilitada. Elegí otro medio de pago.</p><div class="importes" *ngIf="!data.sinCuenta"><div><span>Crédito disponible</span><strong>{{ data.disponible | currency:'ARS':'symbol':'1.2-2' }}</strong></div><div><span>Pago solicitado</span><strong>{{ data.solicitado | currency:'ARS':'symbol':'1.2-2' }}</strong></div></div><p class="ayuda">La venta no fue registrada. Podés reducir el importe en cuenta corriente o elegir otro medio de pago.</p><mat-dialog-actions align="end"><button mat-raised-button color="primary" type="button" (click)="ref.close()">Revisar pago</button></mat-dialog-actions></section>`,
+  styles: [`.alerta-saldo{max-width:470px;padding:28px;color:#352642;text-align:center}.icono{display:grid;width:62px;height:62px;margin:0 auto 12px;place-items:center;border-radius:18px;color:#fff;background:linear-gradient(135deg,#b45b12,#e0992f)}.icono mat-icon{width:32px;height:32px;font-size:32px}.etiqueta{margin:0;color:#9b5d1b;font-size:11px;font-weight:800;letter-spacing:1.3px}.alerta-saldo h2{margin:5px 0 9px;font-size:24px}.mensaje{margin:0;color:#716777;line-height:1.5}.importes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0 12px;text-align:left}.importes div{padding:13px;border:1px solid #eadfeb;border-radius:11px;background:#faf7fc}.importes span{display:block;margin-bottom:4px;color:#786d7f;font-size:12px}.importes strong{color:#442665;font-size:17px}.importes div:last-child strong{color:#b23838}.ayuda{margin:16px 0 4px;padding:11px;border-radius:9px;color:#765523;background:#fff6e7;font-size:12px;line-height:1.4}mat-dialog-actions{margin-top:12px;padding:0}mat-dialog-actions button{min-width:145px}@media(max-width:480px){.alerta-saldo{padding:22px 18px}.importes{grid-template-columns:1fr}}`],
+})
+export class SaldoInsuficienteDialogComponent { constructor(@Inject(MAT_DIALOG_DATA) public readonly data: SaldoInsuficienteDialogData, public readonly ref: MatDialogRef<SaldoInsuficienteDialogComponent>) {} }

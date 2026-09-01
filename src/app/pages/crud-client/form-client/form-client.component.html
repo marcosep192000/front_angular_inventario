@@ -56,10 +56,12 @@
                     <mat-hint align="end">{{ formGroup.get('lastName')?.value?.length }}/20</mat-hint>
                 </mat-form-field>
 
-                <mat-form-field class="input" hintLabel="Máximo 40 caracteres">
-                    <mat-label>Direccion</mat-label>
-                    <input matInput maxlength="40" formControlName="address" />
-                    <mat-hint align="end">{{ formGroup.get('address')?.value?.length }}/40</mat-hint>
+                <mat-form-field class="input" hintLabel="Máximo 80 caracteres">
+                    <mat-label>Dirección</mat-label>
+                    <input matInput maxlength="80" formControlName="address" autocomplete="street-address" />
+                    <mat-hint align="end">{{ formGroup.get('address')?.value?.length || 0 }}/80</mat-hint>
+                    <mat-error *ngIf="formGroup.get('address')?.hasError('required')">La dirección es obligatoria</mat-error>
+                    <mat-error *ngIf="formGroup.get('address')?.hasError('maxlength')">Máximo 80 caracteres</mat-error>
                 </mat-form-field>
 
                 <mat-form-field class="input">

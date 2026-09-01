@@ -84,6 +84,15 @@
                     <button
                         mat-icon-button
                         type="button"
+                        [attr.aria-label]="temaOscuro ? 'Activar tema claro' : 'Activar tema oscuro'"
+                        [matTooltip]="temaOscuro ? 'Tema claro' : 'Tema oscuro'"
+                        (click)="alternarTema()">
+                        <mat-icon>{{ temaOscuro ? 'light_mode' : 'dark_mode' }}</mat-icon>
+                    </button>
+
+                    <button
+                        mat-icon-button
+                        type="button"
                         aria-label="Cerrar sesión"
                         (click)="logout()">
 

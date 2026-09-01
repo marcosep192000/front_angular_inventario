@@ -8,11 +8,26 @@ export interface FiltrosReporte {
   marcaId?: number;
   medioPago?: string;
   tipoComprobante?: string;
-  tipoRanking?: 'MAS_VENDIDOS' | 'MAYOR_FACTURACION' | 'MAYOR_GANANCIA';
+  condicionVenta?: string;
+  tipoCuenta?: string;
+  estadoPago?: boolean;
+  tipoRanking?: 'MAS_VENDIDOS' | 'MAYOR_FACTURACION' | 'MAYOR_GANANCIA' | 'MAYOR_MARGEN' | 'MENOS_VENDIDOS' | 'SIN_VENTAS';
   limit?: number;
-  dias?: number;
+  diasSinVenta?: number;
+  cajaId?: number;
+  page?: number;
+  size?: number;
+  sort?: string;
 }
 
 export interface ResumenReporte {
-  [campo: string]: string | number | null | undefined;
+  [campo: string]: unknown;
+}
+
+export interface PaginaReporte<T = ResumenReporte> {
+  contenido: T[];
+  pagina: number;
+  tamanio: number;
+  totalElementos: number;
+  totalPaginas: number;
 }

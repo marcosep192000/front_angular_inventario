@@ -101,7 +101,7 @@ throw new Error('Method not implemented.');
         Validators.pattern(/^\+?[0-9\s()-]{8,20}$/)
       ]],
       lastName: ['', [Validators.required, Validators.maxLength(20)]],
-      address: ['', [Validators.required, Validators.maxLength(40)]],
+      address: ['', [Validators.required, Validators.maxLength(80)]],
       email: this.emailFormControl,
       condicionIva: ['CONSUMIDOR_FINAL']
     });

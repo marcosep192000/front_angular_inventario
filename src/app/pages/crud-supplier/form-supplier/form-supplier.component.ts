@@ -233,7 +233,7 @@ export class FormSupplierComponent
           '',
 
           [
-            Validators.maxLength(30)
+            Validators.maxLength(80)
           ]
 
         ],

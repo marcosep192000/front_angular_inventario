@@ -489,8 +489,8 @@ button[mat-raised-button]{
 .cards-resumen .card-resumen.cheque .titulo-card{color:#75533d;font-weight:700}.cards-resumen .card-resumen.cheque .valor{color:#5b3925}
 
 /* El diálogo muestra todos los medios de pago sin recortar el último. */
-.detalle-caja-container{width:94vw;max-width:1400px;max-height:none;overflow:visible}.contenido{overflow:visible}.tabla-wrapper{flex:none;max-height:none;overflow:visible}.cards-resumen{padding-bottom:2px}
-@media(max-width:700px){.detalle-caja-container{width:98vw;max-height:none}.tabla-wrapper{max-height:none}}
+.detalle-caja-container{width:100%;max-width:none;max-height:none;overflow:visible}.contenido{overflow:visible}.tabla-wrapper{flex:none;max-height:none;overflow:visible}.cards-resumen{padding-bottom:2px}
+@media(max-width:700px){.detalle-caja-container{width:100%;max-height:none}.tabla-wrapper{max-height:none}}
 
 .medio-pago {
   display: inline-flex;

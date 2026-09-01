@@ -58,6 +58,7 @@ import { CtaCteService } from '../../../services/cta-cte.service';
 import { ClientService } from '../../../services/client.service';
 
 import { TotalSaleComponent } from '../total-sale/total-sale.component';
+import { SaldoInsuficienteDialogComponent } from '../total-sale/saldo-insuficiente-dialog.component';
 
 import {
   registrarDeudaCtaCteCliente
@@ -982,6 +983,8 @@ export class NewSaleComponent implements OnInit {
     // DOCUMENTOS QUE REQUIEREN COBRO
     // =============================================
 
+    const estadoCuentaCorriente = await this.obtenerEstadoCuentaCorriente(this.selectedClient.id);
+
     const dialogRef =
       this.dialog.open(
         TotalSaleComponent,
@@ -1003,8 +1006,13 @@ export class NewSaleComponent implements OnInit {
             client:
               this.selectedClient.id,
 
+            clienteNombre:
+              `${this.selectedClient.name} ${this.selectedClient.lastName || ''}`.trim(),
+
             totalPrice:
-              this.getTotalPrice()
+              this.getTotalPrice(),
+
+            cuentaCorriente: estadoCuentaCorriente
 
           }
 
@@ -1039,16 +1047,20 @@ export class NewSaleComponent implements OnInit {
           const soloCuentaCorriente = pagos.every(
             pago => pago.medioPago === 'CUENTA_CORRIENTE'
           );
+          const montoCuentaCorriente = pagos
+            .filter(pago => pago.medioPago === 'CUENTA_CORRIENTE')
+            .reduce((total, pago) => total + (Number(pago.monto) || 0), 0);
 
 
           try {
 
-            const idCtaCte = usaCuentaCorriente
-              ? await this.buscarCuentaIdCorrienteCliente(this.selectedClient.id)
+            const estadoActual = usaCuentaCorriente
+              ? await this.obtenerEstadoCuentaCorriente(this.selectedClient.id)
               : null;
+            const idCtaCte = estadoActual?.id ?? null;
 
-            if (usaCuentaCorriente && !idCtaCte) {
-              this.toastr.error('El cliente seleccionado no posee una cuenta corriente válida.');
+            if (usaCuentaCorriente && (!estadoActual?.habilitada || montoCuentaCorriente > estadoActual.disponible + 0.009)) {
+              this.mostrarSaldoCuentaCorriente(montoCuentaCorriente, estadoActual);
               return;
             }
 
@@ -1267,6 +1279,30 @@ export class NewSaleComponent implements OnInit {
   // =====================================================
   // CUENTA CORRIENTE
   // =====================================================
+
+  private async obtenerEstadoCuentaCorriente(id: number): Promise<{ id: number | null; habilitada: boolean; disponible: number }> {
+    try {
+      const cliente = await firstValueFrom(this.clienteService.obtenerClientePorId(id));
+      const cuenta = cliente.cuentaCorriente;
+      if (!cuenta?.id || cuenta.estado === false) return { id: cuenta?.id ?? null, habilitada: false, disponible: 0 };
+      try {
+        const historial = await firstValueFrom(this.ctaCteService.obtenerHistorialCuenta(id));
+        return { id: cuenta.id, habilitada: true, disponible: Math.max(0, Number(historial.saldoDisponible) || 0) };
+      } catch {
+        return { id: cuenta.id, habilitada: true, disponible: Math.max(0, Number(cuenta.saldo) || 0) };
+      }
+    } catch {
+      const cuenta = this.selectedClient?.cuentaCorriente;
+      return { id: cuenta?.id ?? null, habilitada: Boolean(cuenta?.id && cuenta.estado !== false), disponible: Math.max(0, Number(cuenta?.saldo) || 0) };
+    }
+  }
+
+  private mostrarSaldoCuentaCorriente(solicitado: number, estado: { habilitada: boolean; disponible: number } | null): void {
+    this.dialog.open(SaldoInsuficienteDialogComponent, {
+      width: '480px', maxWidth: '94vw', autoFocus: false,
+      data: { cliente: `${this.selectedClient?.name || 'Cliente'} ${this.selectedClient?.lastName || ''}`.trim(), disponible: estado?.disponible ?? 0, solicitado, sinCuenta: !estado?.habilitada },
+    });
+  }
 
   buscarCuentaIdCorrienteCliente(
     id: number

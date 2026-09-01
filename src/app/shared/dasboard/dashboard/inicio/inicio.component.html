@@ -5,10 +5,11 @@
 
         <div>
 
-            <h1>Dashboard</h1>
+            <p class="eyebrow">RESUMEN DE HOY</p>
+            <h1>Hola, {{ nombreUsuario }}</h1>
 
             <span class="subtitle">
-                Bienvenido a Inventario Pixels
+                Acá tenés el estado general de tu negocio.
             </span>
 
         </div>
@@ -18,6 +19,16 @@
         </div>
 
     </div>
+
+    <section class="session-panel" aria-label="Información de la sesión">
+        <div class="user-summary"><span class="user-avatar">{{ nombreUsuario.charAt(0) }}</span><div><small>Sesión activa</small><strong>{{ username || nombreUsuario }}</strong><span>{{ rolUsuario }} · {{ permisos.length }} permisos asignados</span></div></div>
+        <nav class="quick-actions" aria-label="Accesos rápidos">
+            <a *ngIf="puede('VENTAS_CREAR')" routerLink="/dashboard/new-sale"><mat-icon>add_shopping_cart</mat-icon>Nueva venta</a>
+            <a *ngIf="puede('CLIENTES_CREAR')" routerLink="/dashboard/client-list"><mat-icon>person_add</mat-icon>Clientes</a>
+            <a *ngIf="puede('COMPRAS_REGISTRAR')" routerLink="/dashboard/purchase-orders/new"><mat-icon>inventory</mat-icon>Nuevo pedido</a>
+            <a *ngIf="puede('REPORTES_VER')" routerLink="/dashboard/reportes"><mat-icon>monitoring</mat-icon>Reportes</a>
+        </nav>
+    </section>
 
     <!-- Cards -->
 

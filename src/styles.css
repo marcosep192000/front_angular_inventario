@@ -63,6 +63,8 @@ body {
   min-width: 320px;
   overflow-x: hidden;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+  color: #312a3b;
+  background: #f4f6fa;
 }
 
 img, svg, canvas, video {
@@ -73,6 +75,142 @@ button, input, select, textarea {
   max-width: 100%;
   font: inherit;
 }
+
+button, a, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid rgba(121, 85, 187, .35);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: not-allowed !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* Tema oscuro global, persistente y compatible con componentes Material. */
+body.tema-oscuro {
+  color-scheme: dark;
+  color: #ece8f2;
+  background: #0f0d15;
+  --mat-table-background-color: #1c1924;
+  --mat-table-header-headline-color: #d8c8ed;
+  --mat-table-row-item-label-text-color: #ece8f2;
+  --mat-paginator-container-background-color: #1c1924;
+  --mat-paginator-container-text-color: #ddd5e8;
+  --mat-select-panel-background-color: #24202d;
+  --mat-option-label-text-color: #ece8f2;
+  --mdc-dialog-container-color: #1c1924;
+  --mdc-outlined-text-field-input-text-color: #f0edf4;
+  --mdc-outlined-text-field-label-text-color: #bdb3c9;
+  --mdc-outlined-text-field-outline-color: #5a5266;
+}
+
+body.tema-oscuro .layout,
+body.tema-oscuro .content,
+body.tema-oscuro .router-content,
+body.tema-oscuro app-inicio,
+body.tema-oscuro .dashboard-container { background: radial-gradient(circle at 85% 0, #21182f 0, #121019 34%, #0f0d15 72%) !important; }
+
+body.tema-oscuro .sidebar { background: linear-gradient(180deg, #241533 0%, #17101f 100%) !important; box-shadow: 8px 0 24px rgba(0,0,0,.38); }
+body.tema-oscuro .mat-toolbar.mat-primary { background: rgba(34,23,48,.96) !important; border-bottom: 1px solid #443552; box-shadow: 0 5px 20px rgba(0,0,0,.24); }
+
+body.tema-oscuro .panel,
+body.tema-oscuro .session-panel,
+body.tema-oscuro .contenedor-global,
+body.tema-oscuro .table-container,
+body.tema-oscuro .area,
+body.tema-oscuro .cards article,
+body.tema-oscuro .tabla,
+body.tema-oscuro .po-panel,
+body.tema-oscuro .admin-page .panel,
+body.tema-oscuro .permisos-page .panel,
+body.tema-oscuro .mat-mdc-card,
+body.tema-oscuro .mat-mdc-dialog-surface {
+  color: #ece8f2 !important;
+  border-color: #383241 !important;
+  background: #1c1924 !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,.28) !important;
+}
+
+body.tema-oscuro .lista-panel,
+body.tema-oscuro .persona-bar,
+body.tema-oscuro .operacion,
+body.tema-oscuro .historial,
+body.tema-oscuro .pago-panel { color:#ece8f2!important;border-color:#383241!important;background:#1c1924!important; }
+body.tema-oscuro .toolbar { border-color:#383241!important;background:#25212e!important; }
+body.tema-oscuro .empleado, body.tema-oscuro .liquidacion { border-color:#383241!important; }
+body.tema-oscuro .empleado-main:hover { background:#292431!important; }
+body.tema-oscuro .datos strong, body.tema-oscuro .operacion-title h3 { color:#f2eef7!important; }
+
+body.tema-oscuro .panel:hover,
+body.tema-oscuro .area:hover { border-color: #59456d !important; box-shadow: 0 14px 34px rgba(0,0,0,.4) !important; }
+
+body.tema-oscuro h1, body.tema-oscuro h2, body.tema-oscuro h3,
+body.tema-oscuro strong, body.tema-oscuro .panel-header,
+body.tema-oscuro .cards strong, body.tema-oscuro .reporte h1 { color: #f2eef7; }
+
+body.tema-oscuro .subtitle, body.tema-oscuro .descripcion,
+body.tema-oscuro .user-summary small, body.tema-oscuro .user-summary span { color: #b8afc4 !important; }
+
+body.tema-oscuro .filtros, body.tema-oscuro .estado,
+body.tema-oscuro thead, body.tema-oscuro .area-head,
+body.tema-oscuro .mat-mdc-tab-header {
+  color: #e8e1ef !important;
+  border-color: #403849 !important;
+  background: #25212e !important;
+}
+
+body.tema-oscuro input, body.tema-oscuro select, body.tema-oscuro textarea {
+  color: #f1edf5 !important;
+  border-color: #5a5266 !important;
+  background: #211d29 !important;
+}
+
+body.tema-oscuro table tbody tr:hover, body.tema-oscuro .area a:hover,
+body.tema-oscuro .quick-actions a:hover { background: #292431 !important; }
+
+body.tema-oscuro .quick-actions a, body.tema-oscuro .area a,
+body.tema-oscuro th { color: #cdb8e8 !important; border-color: #383241 !important; }
+
+body.tema-oscuro .header-date { color: #d8cfe2; border: 1px solid #393142; background: #1c1924; box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+body.tema-oscuro .session-panel { background: linear-gradient(110deg,#1c1924,#241d2d) !important; }
+body.tema-oscuro .user-avatar { background: linear-gradient(135deg,#8058bd,#a17bdd); box-shadow: 0 6px 16px rgba(122,82,178,.28); }
+body.tema-oscuro .quick-actions a { background: #221d2a; }
+body.tema-oscuro .divider, body.tema-oscuro hr { border-color: #3a3044 !important; }
+
+body.tema-oscuro .mat-mdc-form-field-focus-overlay,
+body.tema-oscuro .mat-mdc-text-field-wrapper { background-color: #211d29 !important; }
+body.tema-oscuro .mat-mdc-select-value,
+body.tema-oscuro .mat-mdc-input-element,
+body.tema-oscuro .mat-mdc-form-field-hint,
+body.tema-oscuro .mat-mdc-tab .mdc-tab__text-label { color: #e8e1ef !important; }
+body.tema-oscuro .mat-mdc-select-arrow { color: #bda9d5 !important; }
+body.tema-oscuro .mat-mdc-option:hover:not(.mdc-list-item--disabled),
+body.tema-oscuro .mat-mdc-option.mdc-list-item--selected { background: #342a40 !important; }
+
+body.tema-oscuro .mat-mdc-table,
+body.tema-oscuro .mat-mdc-paginator,
+body.tema-oscuro table { color: #e8e1ef; background: #1c1924 !important; }
+body.tema-oscuro tr, body.tema-oscuro td, body.tema-oscuro th { border-bottom-color: #393241 !important; }
+body.tema-oscuro .mat-mdc-header-row { background: #282230 !important; }
+
+body.tema-oscuro .estado.error { color: #ffb9bf !important; border: 1px solid #71343d !important; background: #351c23 !important; }
+body.tema-oscuro .proximamente { color: #9f96a9 !important; background: #211e27 !important; }
+
+body.tema-oscuro ::-webkit-scrollbar-track { background: #15121b; }
+body.tema-oscuro ::-webkit-scrollbar-thumb { border: 2px solid #15121b; border-radius: 10px; background: #5b4a69; }
+body.tema-oscuro ::selection { color: #fff; background: #7652ac; }
 
 /* Los componentes Angular deben poder encogerse dentro de grids y flexbox. */
 app-root, router-outlet, mat-form-field, .mat-mdc-form-field {
@@ -207,14 +345,22 @@ table {
 
 /* Los overlays de Material no pueden superar el viewport del dispositivo. */
 .cdk-overlay-pane {
-  max-width: calc(100vw - 24px) !important;
-  max-height: calc(100dvh - 24px) !important;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100dvh - 24px);
 }
 
 .mat-mdc-dialog-container,
 .mat-mdc-dialog-surface,
 .mat-mdc-dialog-content {
   max-width: 100% !important;
+}
+
+/* El componente proyectado debe completar el panel calculado por MatDialog.
+   Evita franjas vacías cuando el diálogo define width y maxWidth distintos. */
+.mat-mdc-dialog-component-host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
 }
 
 .mat-mdc-dialog-content {
@@ -368,4 +514,236 @@ table {
     margin: 0 6px !important;
   }
 }
+
+.calculo-sueldo{display:flex;align-items:center;gap:12px;margin-top:14px;padding:13px 15px;border:1px solid #d8cae8;border-radius:11px;color:#5e3a8d;background:linear-gradient(105deg,#f6f0fc,#fcfaff)}
+.calculo-sueldo>mat-icon{display:grid;width:38px;height:38px;place-items:center;border-radius:10px;color:#fff;background:#7048a4}
+.calculo-sueldo div{display:grid;gap:2px}.calculo-sueldo small{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}.calculo-sueldo strong{font-size:1.2rem}.calculo-sueldo span{color:#7a6d87;font-size:.72rem}
+.calculo-sueldo .importe-calculado{display:block!important;visibility:visible!important;min-height:25px;color:#4f267e!important;font-size:1.35rem!important;font-weight:800!important;line-height:1.25!important}
+.periodo-aviso{display:flex;grid-column:1/-1;align-items:center;gap:7px;padding:9px 11px;border-radius:8px;color:#995927;background:#fff1df;font-size:.78rem;font-weight:700}.periodo-aviso mat-icon{width:19px;height:19px;font-size:19px}
+body.tema-oscuro .calculo-sueldo{color:#d5c1eb!important;border-color:#554364!important;background:linear-gradient(105deg,#292132,#211c29)!important}body.tema-oscuro .calculo-sueldo span{color:#b8afc4!important}body.tema-oscuro .periodo-aviso{color:#ffc68f!important;background:#3b291d!important}
+body.tema-oscuro .calculo-sueldo .importe-calculado{color:#eadcff!important}
+.importe-preview{margin-top:-2px;color:#725494!important;font-size:.74rem!important;font-weight:700!important}.cuenta-estado{display:flex;align-items:center;gap:12px;margin:12px 0;padding:14px 16px;border:1px solid #bfe4cc;border-radius:12px;color:#246440;background:#edf9f1}.cuenta-estado.deuda{border-color:#f0b6b6;color:#9b3030;background:#fff0f0}.cuenta-estado.sin-cuenta{border-color:#ddd4e6;color:#685d72;background:#f6f3f8}.cuenta-icon{display:grid;flex:0 0 42px;width:42px;height:42px;place-items:center;border-radius:11px;color:#fff;background:#3a9761}.cuenta-estado.deuda .cuenta-icon{background:#c44545}.cuenta-estado.sin-cuenta .cuenta-icon{background:#81748d}.cuenta-info{display:grid;flex:1;gap:2px}.cuenta-info small,.cuenta-monto small{font-size:.66rem;font-weight:800;letter-spacing:.08em}.cuenta-info span,.cuenta-monto span{font-size:.74rem;opacity:.85}.cuenta-monto{display:grid;gap:2px;text-align:right}.cuenta-monto strong{font-size:1.08rem}@media(max-width:620px){.cuenta-estado{align-items:flex-start;flex-wrap:wrap}.cuenta-monto{width:100%;padding-left:54px;text-align:left}}
+body.tema-oscuro .importe-preview{color:#cbb4e5!important}body.tema-oscuro .cuenta-estado{border-color:#315e45!important;color:#bde7cb!important;background:#182b20!important}body.tema-oscuro .cuenta-estado.deuda{border-color:#693b42!important;color:#ffbdc3!important;background:#351d23!important}body.tema-oscuro .cuenta-estado.sin-cuenta{border-color:#494050!important;color:#c6bccd!important;background:#24202a!important}
+
+/* Listados principales: superficie y contraste consistentes en modo oscuro. */
+body.tema-oscuro .clientes-page,
+body.tema-oscuro .productos-page,
+body.tema-oscuro .categorias-page { background:transparent!important; }
+body.tema-oscuro .panel-clientes,
+body.tema-oscuro .panel-productos,
+body.tema-oscuro .panel-categorias,
+body.tema-oscuro .panel-alertas {
+  color:#ebe5f1!important;
+  border-color:#3b3344!important;
+  background:#1b1822!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.28)!important;
+}
+body.tema-oscuro .barra-herramientas,
+body.tema-oscuro .resumen-lista {
+  color:#c9bdd5!important;
+  border-color:#3b3344!important;
+  background:#211d29!important;
+}
+body.tema-oscuro .titulo-seccion h1 { color:#f1ebf6!important; }
+body.tema-oscuro .titulo-seccion>div>span { color:#aaa0b6!important; }
+body.tema-oscuro .eyebrow,
+body.tema-oscuro .contador-productos,
+body.tema-oscuro .resumen-lista mat-icon { color:#b78be9!important; }
+body.tema-oscuro .tabla-contenedor { border-color:#3b3344!important;background:#19161f!important; }
+body.tema-oscuro .mat-mdc-table .mat-mdc-header-cell {
+  color:#d2b9ed!important;
+  border-color:#403748!important;
+  background:#26212e!important;
+}
+body.tema-oscuro .mat-mdc-table .mat-mdc-cell {
+  color:#d7cfdf!important;
+  border-color:#383140!important;
+  background:#1b1822!important;
+}
+body.tema-oscuro .mat-mdc-table .mat-mdc-row:hover .mat-mdc-cell { background:#282230!important; }
+body.tema-oscuro .codigo,
+body.tema-oscuro .cliente-nombre span,
+body.tema-oscuro .producto-avatar {
+  color:#d9c4f1!important;
+  background:#352b42!important;
+}
+body.tema-oscuro .precio { color:#5bd096!important; }
+body.tema-oscuro .accion-editar { color:#cba8f3!important;background:#352847!important; }
+body.tema-oscuro .accion-eliminar { color:#ff9ca8!important;background:#47262d!important; }
+body.tema-oscuro .accion-cuenta { color:#87d7ad!important;background:#203d30!important; }
+body.tema-oscuro .stock-ok { color:#8ce0ae!important;background:#203c2d!important; }
+body.tema-oscuro .stock-bajo { color:#ffc879!important;background:#45331e!important; }
+body.tema-oscuro .sin-stock { color:#ff9ca8!important;background:#47262d!important; }
+body.tema-oscuro .mat-mdc-paginator { border-color:#3b3344!important;background:#1b1822!important; }
+body.tema-oscuro .mat-mdc-paginator,
+body.tema-oscuro .mat-mdc-paginator .mat-mdc-select-value,
+body.tema-oscuro .mat-mdc-paginator button { color:#d8cfdf!important; }
+body.tema-oscuro .mat-mdc-menu-panel,
+body.tema-oscuro .mat-mdc-menu-content { color:#eee8f3!important;background:#24202c!important; }
+
+/* Nueva venta: sus paneles no usan las superficies Material estándar. */
+body.tema-oscuro .ventas-container { background:transparent!important; }
+body.tema-oscuro .buscador-card,
+body.tema-oscuro .tabla-card,
+body.tema-oscuro .tabla-card .tabla-wrapper,
+body.tema-oscuro .cliente-card,
+body.tema-oscuro .resumen-card {
+  color:#e9e3ef!important;
+  border-color:#3b3344!important;
+  background:#1b1822!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.26)!important;
+}
+body.tema-oscuro .buscador-card .icon-search { background:#30263d!important; }
+body.tema-oscuro .search-input {
+  color:#f0ebf5!important;
+  border-color:#51465d!important;
+  background:#211d29!important;
+}
+body.tema-oscuro .search-input::placeholder { color:#958b9f!important; }
+body.tema-oscuro .resultados-productos,
+body.tema-oscuro .buscando { color:#e9e2ef!important;border-color:#453a50!important;background:#24202c!important; }
+body.tema-oscuro .resultado-producto { border-color:#3e3646!important; }
+body.tema-oscuro .resultado-producto:hover,
+body.tema-oscuro .resultado-producto.seleccionado { background:#342a41!important; }
+body.tema-oscuro .resultado-info span,
+body.tema-oscuro .resultado-datos span { color:#b5aabd!important; }
+body.tema-oscuro .tabla-header { border-color:#3b3344!important;background:#211d29!important; }
+body.tema-oscuro .tabla-title h2,
+body.tema-oscuro .cliente-card .panel-header h2,
+body.tema-oscuro .resumen-header h2,
+body.tema-oscuro .empty-sale h2,
+body.tema-oscuro .cliente-datos h3 { color:#f0eaf5!important; }
+body.tema-oscuro .tabla-header small,
+body.tema-oscuro .empty-sale p,
+body.tema-oscuro .cliente-datos p,
+body.tema-oscuro .resumen-item span { color:#aea4b8!important; }
+body.tema-oscuro .empty-sale { color:#cfc5d8!important;background:#1b1822!important; }
+body.tema-oscuro .empty-icon { color:#b88be8!important;background:#2d2537!important; }
+body.tema-oscuro .shortcut { color:#bcb2c5!important;border-color:#463c50!important;background:#24202c!important; }
+body.tema-oscuro .tabla-ventas thead,
+body.tema-oscuro .tabla-ventas th { color:#d5bfed!important;background:#26212e!important; }
+body.tema-oscuro .tabla-ventas td { color:#ddd5e4!important;border-color:#3a3342!important;background:#1b1822!important; }
+body.tema-oscuro .tabla-ventas tbody tr:hover td { background:#282230!important; }
+body.tema-oscuro .cliente-card .panel-header,
+body.tema-oscuro .resumen-header { border-color:#3b3344!important;background:#211d29!important; }
+body.tema-oscuro .cliente-info { border-color:#3f3747!important;background:#211d29!important; }
+body.tema-oscuro .resumen-item strong { color:#eee8f3!important; }
+body.tema-oscuro .resumen-card hr { border-color:#403748!important; }
+body.tema-oscuro .total-final span { color:#b7abc0!important; }
+body.tema-oscuro .total-final h1 { color:#d1a8fa!important; }
+
+/* Superficies restantes del sistema. */
+body.tema-oscuro .cash-closing-container,
+body.tema-oscuro .caja-actual,
+body.tema-oscuro .historial,
+body.tema-oscuro .historial-header,
+body.tema-oscuro .contenido-card,
+body.tema-oscuro .card-info,
+body.tema-oscuro .paginador-container,
+body.tema-oscuro .detalle-caja-container,
+body.tema-oscuro .detalle-caja-container .contenido,
+body.tema-oscuro .detalle-caja-container .acciones,
+body.tema-oscuro .ticket-container,
+body.tema-oscuro .info-card,
+body.tema-oscuro .conteo-card,
+body.tema-oscuro .medio-card,
+body.tema-oscuro .dialog-container,
+body.tema-oscuro .confirm-container,
+body.tema-oscuro .movimiento-form-container,
+body.tema-oscuro .modern-form,
+body.tema-oscuro .form-section,
+body.tema-oscuro .cta-cte-container,
+body.tema-oscuro .dialogo-cobro,
+body.tema-oscuro .cobro-dialogo,
+body.tema-oscuro .cobro-dialogo main,
+body.tema-oscuro .cobro-dialogo footer,
+body.tema-oscuro .pay-supplier-container,
+body.tema-oscuro .proveedor-header-card,
+body.tema-oscuro .pay-supplier-card,
+body.tema-oscuro .formulario-pago-card,
+body.tema-oscuro .factura-info,
+body.tema-oscuro .cheque-container,
+body.tema-oscuro .detalle-factura-container,
+body.tema-oscuro .pago-card,
+body.tema-oscuro .impuestos-container,
+body.tema-oscuro .parent-container,
+body.tema-oscuro .po-card,
+body.tema-oscuro .po-card .summary,
+body.tema-oscuro .metrics article,
+body.tema-oscuro .logo-empresa,
+body.tema-oscuro .grupos article,
+body.tema-oscuro footer {
+  color:#e9e2ef!important;
+  border-color:#3c3445!important;
+  background:#1b1822!important;
+}
+
+body.tema-oscuro mat-dialog-content,
+body.tema-oscuro mat-dialog-actions,
+body.tema-oscuro .mat-mdc-dialog-content,
+body.tema-oscuro .mat-mdc-dialog-actions {
+  color:#e9e2ef!important;
+  border-color:#3c3445!important;
+  background:#1b1822!important;
+}
+
+body.tema-oscuro .card-resumen,
+body.tema-oscuro .metricas-ventas article,
+body.tema-oscuro .tabla-ventas,
+body.tema-oscuro .tabla-wrapper,
+body.tema-oscuro .tabla-ventas table,
+body.tema-oscuro .tabla-detalles,
+body.tema-oscuro .tabla-detalles td,
+body.tema-oscuro .tabla-facturas,
+body.tema-oscuro .factura-item {
+  color:#ddd5e5!important;
+  border-color:#3b3344!important;
+  background:#201c27!important;
+}
+
+body.tema-oscuro .subtitulo,
+body.tema-oscuro .otros-ingresos,
+body.tema-oscuro .saldo-barra,
+body.tema-oscuro .section-header,
+body.tema-oscuro .section-title,
+body.tema-oscuro .pagos-section,
+body.tema-oscuro .grupos article>header {
+  color:#d5c3e8!important;
+  border-color:#44394e!important;
+  background:#27212f!important;
+}
+
+body.tema-oscuro .titulo-card,
+body.tema-oscuro .contenido-card small,
+body.tema-oscuro .section-title span,
+body.tema-oscuro .factura-item span,
+body.tema-oscuro .resumen-card span,
+body.tema-oscuro .cuenta-card span,
+body.tema-oscuro .pago-card span { color:#b5abbf!important; }
+
+body.tema-oscuro .valor,
+body.tema-oscuro .contenido-card strong,
+body.tema-oscuro .section-title strong,
+body.tema-oscuro .factura-item strong,
+body.tema-oscuro .resumen-card strong,
+body.tema-oscuro .cuenta-card strong,
+body.tema-oscuro .pago-card strong { color:#eee8f3!important; }
+
+body.tema-oscuro .po-table th,
+body.tema-oscuro .receive-table th { color:#d5c0ed!important;background:#27212f!important; }
+body.tema-oscuro .po-table td,
+body.tema-oscuro .receive-table td { color:#ddd5e5!important;border-color:#3b3344!important;background:#1b1822!important; }
+body.tema-oscuro .po-table tr:hover td { background:#292331!important; }
+
+body.tema-oscuro .mat-mdc-dialog-surface form,
+body.tema-oscuro .mat-mdc-dialog-surface form>div:not(.container__title):not(.header-form),
+body.tema-oscuro .mat-mdc-dialog-surface .container-col { border-color:#3b3344;background:#1b1822; }
+body.tema-oscuro .mat-mdc-dialog-surface .barCode,
+body.tema-oscuro .mat-mdc-dialog-surface .iva,
+body.tema-oscuro .editar-limite { color:#d5c3e8!important;border-color:#44394e!important;background:#27212f!important; }
+
+body.tema-oscuro .panel-alertas .alertas-cabecera { color:#ffd392!important;background:#3a2a1d!important; }
+body.tema-oscuro .panel-alertas article { color:#e8ded1!important;border-color:#56432d!important;background:#292219!important; }
+body.tema-oscuro .panel-alertas article:hover { background:#34291d!important; }
+body.tema-oscuro .sin-alertas { color:#9addb8!important;background:#173124!important; }
 

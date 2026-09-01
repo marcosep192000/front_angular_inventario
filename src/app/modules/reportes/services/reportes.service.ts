@@ -21,11 +21,16 @@ export class ReportesService {
   getVentasResumen(f: FiltrosReporte) { return this.consultar('ventas/resumen', f); }
   getVentasProductos(f: FiltrosReporte) { return this.consultar('ventas/productos', f); }
   getRankingProductos(f: FiltrosReporte) { return this.consultar('ventas/ranking-productos', f); }
+  getCuentaCorrienteClientes(f: FiltrosReporte = {}) { return this.consultar('clientes/cuenta-corriente', f); }
+  getAntiguedadDeuda(f: FiltrosReporte = {}) { return this.consultar('clientes/antiguedad-deuda', f); }
   getStockValorizado(f: FiltrosReporte) { return this.consultar('inventario/stock-valorizado', f); }
   getBajoStock(f: FiltrosReporte) { return this.consultar('inventario/bajo-stock', f); }
+  getSinStock(f: FiltrosReporte) { return this.consultar('inventario/sin-stock', f); }
   getStockInmovilizado(f: FiltrosReporte) { return this.consultar('inventario/inmovilizado', f); }
   getComprasProveedor(f: FiltrosReporte) { return this.consultar('proveedores/compras', f); }
   getDeudaProveedores(f: FiltrosReporte) { return this.consultar('proveedores/deuda', f); }
+  getEvolucionCostos(productoId: number) { return this.consultar(`proveedores/evolucion-costos/${productoId}`); }
   getResumenCaja(f: FiltrosReporte) { return this.consultar('caja/resumen', f); }
-  getCuentaCorrienteClientes(f: FiltrosReporte) { return this.consultar('clientes/cuenta-corriente', f); }
+  getArqueosCaja(f: FiltrosReporte = {}) { return this.consultar('caja/arqueos', f); }
+  getMediosPago(f: FiltrosReporte) { return this.consultar('caja/medios-pago', f); }
 }

@@ -1,1 +1,185 @@
-:host{display:block}.cobro-dialogo{min-width:min(820px,90vw);overflow:hidden;border-radius:16px;background:#fff}.cobro-dialogo header,.pagos-titulo,.pago-fila,.totales,footer{display:flex;align-items:center}.cobro-dialogo header{justify-content:space-between;padding:21px 24px;color:#fff;background:linear-gradient(135deg,#482488,#7850ba)}.cobro-dialogo header p{margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:1.3px;opacity:.8}.cobro-dialogo h2{margin:0;font-size:23px}.total-venta{text-align:right}.total-venta span,.totales span{display:block;font-size:12px}.total-venta strong{font-size:22px}main{padding:22px 24px}.pagos-titulo{justify-content:space-between;margin-bottom:16px}.pagos-titulo h3{margin:0;color:#342545}.pagos-titulo span{color:#786f83;font-size:13px}.pago-fila{gap:10px;margin-bottom:10px;padding:12px;border:1px solid #ede8f4;border-radius:12px;background:#fcfbfe}.pago-fila mat-form-field{margin:0;flex:1}.numero-pago{display:grid;flex:0 0 27px;width:27px;height:27px;place-items:center;border-radius:50%;color:#512da8;background:#ede6f8;font-size:12px;font-weight:800}.sin-referencia{flex:1;color:#887e92;font-size:12px;font-style:italic}.eliminar-pago{color:#b82f40;background:#fdecef}.totales{justify-content:flex-end;gap:12px;margin-top:18px}.totales>div{min-width:180px;padding:12px 15px;border-radius:10px;background:#f4f1f8;text-align:right}.totales strong{font-size:18px}.correcto{color:#257443;background:#e7f5ec!important}.pendiente{color:#a65c04;background:#fff2dc!important}.excedido{color:#b42d3d;background:#fdebed!important}.aviso{display:flex;align-items:center;gap:7px;margin:16px 0 0;color:#7b607b;font-size:13px}.aviso mat-icon{font-size:19px}footer{justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid #eeeaf4;background:#fff}footer button{min-width:130px}@media(max-width:700px){.cobro-dialogo{min-width:0}.cobro-dialogo header,main,footer{padding-left:16px;padding-right:16px}.pago-fila{align-items:stretch;flex-wrap:wrap}.pago-fila mat-form-field{min-width:calc(50% - 30px)}.sin-referencia{min-width:calc(100% - 45px)}.totales{align-items:stretch;flex-direction:column}.totales>div{width:100%}}
+:host {
+  display: block;
+}
+.cobro-dialogo {
+  min-width: min(820px, 90vw);
+  overflow: hidden;
+  border-radius: 16px;
+  background: #fff;
+}
+.cobro-dialogo header,
+.pagos-titulo,
+.pago-fila,
+.totales,
+footer {
+  display: flex;
+  align-items: center;
+}
+.cobro-dialogo header {
+  justify-content: space-between;
+  padding: 21px 24px;
+  color: #fff;
+  background: linear-gradient(135deg, #482488, #7850ba);
+}
+.cobro-dialogo header p {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  opacity: 0.8;
+}
+.cobro-dialogo h2 {
+  margin: 0;
+  font-size: 23px;
+}
+.total-venta {
+  text-align: right;
+}
+.total-venta span,
+.totales span {
+  display: block;
+  font-size: 12px;
+}
+.total-venta strong {
+  font-size: 22px;
+}
+main {
+  padding: 22px 24px;
+}
+.pagos-titulo {
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.pagos-titulo h3 {
+  margin: 0;
+  color: #342545;
+}
+.pagos-titulo span {
+  color: #786f83;
+  font-size: 13px;
+}
+.pago-fila {
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 12px;
+  border: 1px solid #ede8f4;
+  border-radius: 12px;
+  background: #fcfbfe;
+}
+.pago-fila mat-form-field {
+  margin: 0;
+  flex: 1;
+}
+.numero-pago {
+  display: grid;
+  flex: 0 0 27px;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border-radius: 50%;
+  color: #512da8;
+  background: #ede6f8;
+  font-size: 12px;
+  font-weight: 800;
+}
+.sin-referencia {
+  flex: 1;
+  color: #887e92;
+  font-size: 12px;
+  font-style: italic;
+}
+.eliminar-pago {
+  color: #b82f40;
+  background: #fdecef;
+}
+.totales {
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+}
+.totales > div {
+  min-width: 180px;
+  padding: 12px 15px;
+  border-radius: 10px;
+  background: #f4f1f8;
+  text-align: right;
+}
+.totales strong {
+  font-size: 18px;
+}
+.correcto {
+  color: #257443;
+  background: #e7f5ec !important;
+}
+.pendiente {
+  color: #a65c04;
+  background: #fff2dc !important;
+}
+.excedido {
+  color: #b42d3d;
+  background: #fdebed !important;
+}
+.aviso {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 16px 0 0;
+  color: #7b607b;
+  font-size: 13px;
+}
+.alerta-credito {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #bce0c8;
+  border-radius: 10px;
+  color: #24683c;
+  background: #edf8f1;
+}
+.alerta-credito mat-icon { flex: 0 0 auto; }
+.alerta-credito strong, .alerta-credito span { display: block; }
+.alerta-credito span { margin-top: 2px; font-size: 12px; }
+.alerta-credito.sin-saldo { border-color: #efc187; color: #98530a; background: #fff5e7; }
+.aviso mat-icon {
+  font-size: 19px;
+}
+footer {
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid #eeeaf4;
+  background: #fff;
+}
+footer button {
+  min-width: 130px;
+}
+@media (max-width: 700px) {
+  .cobro-dialogo {
+    min-width: 0;
+  }
+  .cobro-dialogo header,
+  main,
+  footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .pago-fila {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+  .pago-fila mat-form-field {
+    min-width: calc(50% - 30px);
+  }
+  .sin-referencia {
+    min-width: calc(100% - 45px);
+  }
+  .totales {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .totales > div {
+    width: 100%;
+  }
+}
