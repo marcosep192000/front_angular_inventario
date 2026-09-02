@@ -1,6 +1,259 @@
-:host{display:block}form{overflow:hidden;border-radius:18px;background:#fff}.container__title{display:flex;align-items:center;gap:12px;padding:15px 22px;color:#fff;background:linear-gradient(135deg,#472486,#7852bb)}.container__title app-icon{display:grid;width:44px;height:44px;place-items:center;border-radius:12px;background:rgba(255,255,255,.14)}.container__title app-icon img{max-width:34px;max-height:34px;object-fit:contain}.title__color{margin:0;color:#fff;font-size:21px;font-weight:700}mat-dialog-content{display:block;max-height:calc(100vh - 132px);padding:16px 22px!important;background:#fcfbfe}.container-col{display:grid;width:min(760px,calc(100vw - 68px));grid-template-columns:1fr 1fr;grid-template-areas:"barCode barCode" "col1 col2";gap:12px}.barCode{grid-area:barCode;padding:8px 14px 0;border-radius:10px;background:#f5f0fc}.col1{grid-area:col1}.col2{grid-area:col2}.col1,.col2{display:flex;flex-direction:column;gap:0;padding:0 5px}.input,.codigo__barras{width:100%}.col2__btnMarca{display:flex;align-items:flex-start;gap:7px}.marca{flex:1;width:auto}.btn__marca{display:grid;flex:0 0 42px;width:42px;height:42px;margin-top:5px;place-items:center;border:0;border-radius:10px;color:#fff;background:#5b359d;box-shadow:0 4px 10px rgba(81,45,168,.22);cursor:pointer;transition:transform .18s,background .18s}.btn__marca mat-icon{color:#fff}.btn__marca:hover{background:#6f48b2;transform:translateY(-1px)}.iva{display:flex;min-height:42px;align-items:center;justify-content:center;margin:0 0 8px;padding:0 12px;border:1px solid #e7def5;border-radius:10px;background:#f8f5fc;color:#53308e;font-weight:600}mat-dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin:0!important;padding:12px 22px!important;border-top:1px solid #eeeaf4;background:#fff}mat-dialog-actions button{min-width:105px;border-radius:9px}.warn{color:#9b3341!important;background:#fdecef!important}@media(max-width:650px){.container__title{padding:14px 16px}.title__color{font-size:19px}mat-dialog-content{max-height:calc(100vh - 122px);padding:12px!important}.container-col{width:100%;grid-template-columns:1fr;grid-template-areas:"barCode" "col1" "col2";gap:8px}.barCode{padding:8px 12px}.col1,.col2{padding:0}.container__title app-icon{width:40px;height:40px}mat-dialog-actions{padding:11px 14px!important}.col2__btnMarca{gap:6px}}
-.precio-venta-box{margin:4px 0 12px;padding:14px;border:1px solid #dfd7f0;border-radius:12px;background:linear-gradient(135deg,#faf8ff,#f3effa)}.precio-venta-box.manual{border-color:#a99ae0;background:linear-gradient(135deg,#f8f6ff,#eeeaff)}.precio-venta-titulo{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:#4d3280}.precio-venta-titulo div{display:grid;gap:2px;font-weight:700}.precio-venta-titulo small{color:#75698a;font-size:.73rem;font-weight:500}.precio-venta-titulo>mat-icon{padding:7px;border-radius:9px;background:#e8e0f7}.precio-venta-box mat-form-field{margin-bottom:-10px}.precio-venta-acciones{display:flex;justify-content:flex-end;gap:4px}.precio-venta-acciones button{color:#57369b;font-size:.78rem}.precio-venta-acciones mat-icon{margin-right:4px;font-size:17px}
-.ganancia-info{display:grid;grid-template-columns:1fr auto;gap:3px;padding:8px 2px 2px;color:#6e6382;font-size:.75rem}.ganancia-info strong{color:#18734d;font-size:.92rem}.ganancia-info span:last-child{grid-column:span 2}
+:host {
+  display: block;
+  max-height: calc(100dvh - 24px);
+  overflow: hidden;
+}
+form {
+  display: flex;
+  max-height: calc(100dvh - 24px);
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #fff;
+}
+.container__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 22px;
+  color: #fff;
+  background: linear-gradient(135deg, #472486, #7852bb);
+}
+.container__title app-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+}
+.container__title app-icon img {
+  max-width: 34px;
+  max-height: 34px;
+  object-fit: contain;
+}
+.title__color {
+  margin: 0;
+  color: #fff;
+  font-size: 21px;
+  font-weight: 700;
+}
+mat-dialog-content {
+  display: block;
+  min-height: 0;
+  max-height: none !important;
+  flex: 1 1 auto;
+  padding: 16px 22px !important;
+  background: #fcfbfe;
+}
+.container-col {
+  display: grid;
+  width: min(760px, calc(100vw - 68px));
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "barCode barCode" "col1 col2";
+  gap: 12px;
+}
+.barCode {
+  grid-area: barCode;
+  padding: 8px 14px 0;
+  border-radius: 10px;
+  background: #f5f0fc;
+}
+.col1 {
+  grid-area: col1;
+}
+.col2 {
+  grid-area: col2;
+}
+.col1,
+.col2 {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0 5px;
+}
+.input,
+.codigo__barras {
+  width: 100%;
+}
+.col2__btnMarca {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+.marca {
+  flex: 1;
+  width: auto;
+}
+.btn__marca {
+  display: grid;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  margin-top: 5px;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  background: #5b359d;
+  box-shadow: 0 4px 10px rgba(81, 45, 168, 0.22);
+  cursor: pointer;
+  transition:
+    transform 0.18s,
+    background 0.18s;
+}
+.btn__marca mat-icon {
+  color: #fff;
+}
+.btn__marca:hover {
+  background: #6f48b2;
+  transform: translateY(-1px);
+}
+.iva {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 8px;
+  padding: 0 12px;
+  border: 1px solid #e7def5;
+  border-radius: 10px;
+  background: #f8f5fc;
+  color: #53308e;
+  font-weight: 600;
+}
+mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 0 !important;
+  padding: 12px 22px !important;
+  border-top: 1px solid #eeeaf4;
+  background: #fff;
+}
+mat-dialog-actions button {
+  min-width: 105px;
+  border-radius: 9px;
+}
+.warn {
+  color: #9b3341 !important;
+  background: #fdecef !important;
+}
+@media (max-width: 650px) {
+  .container__title {
+    padding: 14px 16px;
+  }
+  .title__color {
+    font-size: 19px;
+  }
+  mat-dialog-content {
+    max-height: calc(100vh - 122px);
+    padding: 12px !important;
+  }
+  .container-col {
+    width: 100%;
+    grid-template-columns: 1fr;
+    grid-template-areas: "barCode" "col1" "col2";
+    gap: 8px;
+  }
+  .barCode {
+    padding: 8px 12px;
+  }
+  .col1,
+  .col2 {
+    padding: 0;
+  }
+  .container__title app-icon {
+    width: 40px;
+    height: 40px;
+  }
+  mat-dialog-actions {
+    padding: 11px 14px !important;
+  }
+  .col2__btnMarca {
+    gap: 6px;
+  }
+}
+.precio-venta-box {
+  margin: 4px 0 12px;
+  padding: 14px;
+  border: 1px solid #dfd7f0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #faf8ff, #f3effa);
+}
+.precio-venta-box.manual {
+  border-color: #a99ae0;
+  background: linear-gradient(135deg, #f8f6ff, #eeeaff);
+}
+.precio-venta-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  color: #4d3280;
+}
+.precio-venta-titulo div {
+  display: grid;
+  gap: 2px;
+  font-weight: 700;
+}
+.precio-venta-titulo small {
+  color: #75698a;
+  font-size: 0.73rem;
+  font-weight: 500;
+}
+.precio-venta-titulo > mat-icon {
+  padding: 7px;
+  border-radius: 9px;
+  background: #e8e0f7;
+}
+.precio-venta-box mat-form-field {
+  margin-bottom: -10px;
+}
+.precio-venta-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.precio-venta-acciones button {
+  color: #57369b;
+  font-size: 0.78rem;
+}
+.precio-venta-acciones mat-icon {
+  margin-right: 4px;
+  font-size: 17px;
+}
+.ganancia-info {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 3px;
+  padding: 8px 2px 2px;
+  color: #6e6382;
+  font-size: 0.75rem;
+}
+.ganancia-info strong {
+  color: #18734d;
+  font-size: 0.92rem;
+}
+.ganancia-info span:last-child {
+  grid-column: span 2;
+}
 
 /* Espaciado de lectura: conserva la distribución compacta del diálogo. */
-.container-col{gap:16px}.barCode{padding:11px 16px 2px}.col1,.col2{gap:6px;padding:0 7px}.col2__btnMarca{gap:9px}.precio-venta-box{margin:8px 0 14px}
+.container-col {
+  gap: 16px;
+}
+.barCode {
+  padding: 11px 16px 2px;
+}
+.col1,
+.col2 {
+  gap: 6px;
+  padding: 0 7px;
+}
+.col2__btnMarca {
+  gap: 9px;
+}
+.precio-venta-box {
+  margin: 8px 0 14px;
+}

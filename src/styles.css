@@ -355,6 +355,20 @@ table {
   max-width: 100% !important;
 }
 
+.mat-mdc-dialog-surface {
+  max-height: calc(100dvh - 24px) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+/* Solo los diálogos estructurados con mat-dialog-content delegan allí el
+   desplazamiento. Los diálogos personalizados conservan el scroll normal de
+   la superficie para no cortar detalles o comprobantes extensos. */
+.mat-mdc-dialog-surface:has(.mat-mdc-dialog-content) {
+  overflow-y: hidden !important;
+}
+
 /* El componente proyectado debe completar el panel calculado por MatDialog.
    Evita franjas vacías cuando el diálogo define width y maxWidth distintos. */
 .mat-mdc-dialog-component-host {
@@ -365,7 +379,10 @@ table {
 
 .mat-mdc-dialog-content {
   max-height: calc(100dvh - 132px) !important;
-  overflow: auto;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 /*
