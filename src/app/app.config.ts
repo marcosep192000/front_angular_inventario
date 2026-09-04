@@ -1,7 +1,6 @@
-import { ApplicationConfig } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { HttpErrorResponse, provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideToastr } from 'ngx-toastr';
@@ -12,7 +11,7 @@ import { licenseInterceptor } from './auth/interceptor/license.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideRouter(routes),
-    provideClientHydration(),
+    { provide: LOCALE_ID, useValue: 'es-AR' },
     provideAnimationsAsync(),
     provideHttpClient(
     withFetch(),

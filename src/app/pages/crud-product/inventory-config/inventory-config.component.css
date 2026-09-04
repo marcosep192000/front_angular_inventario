@@ -1,0 +1,357 @@
+:host {
+  display: block;
+}
+.inventory-config {
+  width: min(900px, 96vw);
+  max-height: 94dvh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  color: #392947;
+  background: #f7f5f9;
+}
+.inventory-config > header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 18px 22px;
+  color: #fff;
+  background: linear-gradient(135deg, #492473, #7847b4);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+.header-icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.14);
+}
+.header-copy {
+  min-width: 0;
+  flex: 1;
+}
+.header-copy p {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+}
+.header-copy h2 {
+  margin: 2px 0;
+  font-size: 21px;
+}
+.header-copy span {
+  display: block;
+  color: #e7daf2;
+  font-size: 11px;
+}
+.inventory-config > header button {
+  color: #fff;
+}
+.inventory-config mat-tab-group {
+  flex: none;
+}
+.inventory-config ::ng-deep .mat-mdc-tab-body-wrapper {
+  overflow: visible;
+}
+.inventory-config ::ng-deep .mat-mdc-tab-body-content {
+  overflow: visible;
+}
+.inventory-config ::ng-deep .mdc-tab {
+  min-width: 180px;
+}
+.inventory-config ::ng-deep .mdc-tab__content {
+  gap: 7px;
+}
+.count {
+  display: grid;
+  min-width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 10px;
+  background: #ece4f3;
+  font-size: 10px;
+}
+.tab-content {
+  padding: 18px 20px 30px;
+}
+.intro {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid #ded2e9;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #fff, #f7f1fb);
+}
+.intro-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  place-items: center;
+  border-radius: 11px;
+  color: #fff;
+  background: #7042a5;
+}
+.intro h3,
+.card-heading h3 {
+  margin: 0;
+  color: #4c2c69;
+  font-size: 15px;
+}
+.intro p,
+.card-heading p {
+  margin: 4px 0 0;
+  color: #716778;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.form-card,
+.attribute-builder {
+  padding: 16px;
+  border: 1px solid #e3dbe9;
+  border-radius: 13px;
+  background: #fff;
+}
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px 12px;
+}
+.field-grid.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.choice {
+  margin: 4px 0 15px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f7f3fa;
+}
+.choice p {
+  margin: 5px 0 0 38px;
+  color: #766d7c;
+  font-size: 11px;
+}
+.primary-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+.empty-state {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-bottom: 14px;
+  padding: 24px;
+  border: 1px dashed #cfc1da;
+  border-radius: 12px;
+  color: #7c7084;
+  text-align: center;
+  background: #fbfafc;
+}
+.empty-state > mat-icon {
+  width: 34px;
+  height: 34px;
+  margin-bottom: 6px;
+  color: #9c82b6;
+  font-size: 34px;
+}
+.empty-state strong {
+  color: #583b70;
+}
+.empty-state span {
+  margin-top: 4px;
+  font-size: 11px;
+}
+.item-list {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.item-list > h3 {
+  margin: 5px 0;
+  color: #553473;
+  font-size: 14px;
+}
+.item-list article {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  border: 1px solid #e5deea;
+  border-radius: 10px;
+  background: #fff;
+}
+.item-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  place-items: center;
+  border-radius: 9px;
+  color: #684092;
+  background: #f0e9f6;
+}
+.item-main {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+.item-main strong {
+  color: #3e294d;
+}
+.item-main span,
+.item-main small {
+  margin-top: 2px;
+  color: #766d7d;
+  font-size: 11px;
+}
+.equivalence {
+  color: #5e3781 !important;
+  font-weight: 700;
+}
+.item-price {
+  color: #18704c;
+  font-size: 12px;
+  font-weight: 800;
+}
+.add-card {
+  margin-top: 12px;
+}
+.card-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-bottom: 14px;
+}
+.card-heading > mat-icon {
+  color: #7042a5;
+}
+.toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+.preview-line {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 13px;
+  padding: 10px;
+  border-radius: 9px;
+  color: #60417a;
+  background: #f4eff8;
+  font-size: 11px;
+}
+.attribute-builder {
+  margin-bottom: 14px;
+}
+.inline-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.inline-form mat-form-field {
+  flex: 1;
+}
+.attribute-row {
+  display: grid;
+  grid-template-columns: 130px 1fr 210px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px;
+  border-top: 1px solid #eee8f1;
+}
+.attribute-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #54336f;
+}
+.attribute-name mat-icon {
+  width: 17px;
+  height: 17px;
+  font-size: 17px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.chips span {
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: #5c377c;
+  background: #eee6f5;
+  font-size: 10px;
+}
+.chips small {
+  color: #918797;
+}
+.value-add {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd3e4;
+  border-radius: 8px;
+  background: #fff;
+}
+.value-add input {
+  min-width: 0;
+  flex: 1;
+  padding: 8px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+}
+.value-add button {
+  color: #6d3f9c;
+}
+.loading {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  color: #67438a;
+}
+@media (max-width: 700px) {
+  .inventory-config {
+    max-height: 96dvh;
+  }
+  .header-copy span {
+    display: none;
+  }
+  .field-grid,
+  .field-grid.two {
+    grid-template-columns: 1fr;
+  }
+  .attribute-row {
+    grid-template-columns: 1fr;
+  }
+  .item-list article {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .item-price {
+    margin-left: 47px;
+  }
+  .toggles {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .tab-content {
+    padding: 14px 12px 24px;
+  }
+  .inventory-config ::ng-deep .mdc-tab {
+    min-width: auto;
+    padding: 0 10px;
+  }
+  .inventory-config ::ng-deep .mdc-tab mat-icon {
+    display: none;
+  }
+}

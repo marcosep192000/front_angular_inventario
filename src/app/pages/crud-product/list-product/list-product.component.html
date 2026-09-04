@@ -1,9 +1,6 @@
 <section class="productos-page">
-
   <header class="productos-header">
-
     <div class="titulo-seccion">
-
       <div class="titulo-icono">
         <mat-icon>inventory_2</mat-icon>
       </div>
@@ -11,22 +8,32 @@
       <div>
         <p class="eyebrow">INVENTARIO</p>
         <h1>Lista de productos</h1>
-        <span>Administrá precios, stock y proveedores desde un solo lugar.</span>
+        <span
+          >Administrá precios, stock y proveedores desde un solo lugar.</span
+        >
       </div>
-
     </div>
 
-    <button mat-raised-button color="primary" type="button" class="btn-nuevo" (click)="createProduct()" [disabled]="limiteProductosAlcanzado" [matTooltip]="limiteProductosAlcanzado ? 'Alcanzaste el límite de productos permitido por tu plan.' : ''">
+    <button
+      mat-raised-button
+      color="primary"
+      type="button"
+      class="btn-nuevo"
+      (click)="createProduct()"
+      [disabled]="limiteProductosAlcanzado"
+      [matTooltip]="
+        limiteProductosAlcanzado
+          ? 'Alcanzaste el límite de productos permitido por tu plan.'
+          : ''
+      "
+    >
       <mat-icon>add</mat-icon>
       Nuevo producto
     </button>
-
   </header>
 
   <section class="panel-productos">
-
     <div class="barra-herramientas">
-
       <mat-form-field appearance="outline" class="buscador">
         <mat-icon matPrefix>search</mat-icon>
         <mat-label>Buscar producto</mat-label>
@@ -35,7 +42,8 @@
           #buscadorProducto
           type="search"
           placeholder="Nombre o código de barras"
-          (input)="onSearchChange(buscadorProducto.value)">
+          (input)="onSearchChange(buscadorProducto.value)"
+        />
       </mat-form-field>
 
       <button mat-stroked-button type="button" [matMenuTriggerFor]="menu">
@@ -54,7 +62,6 @@
           Precios por proveedor
         </button>
       </mat-menu>
-
     </div>
 
     <div class="resumen-lista">
@@ -62,16 +69,18 @@
         <mat-icon>inventory</mat-icon>
         {{ totalElements }} producto(s) registrados
       </span>
-      <span>Mostrando página {{ pageIndex + 1 }}</span><span *ngIf="resumenLicenciaProductos">{{ resumenLicenciaProductos }}</span>
+      <span>Mostrando página {{ pageIndex + 1 }}</span
+      ><span *ngIf="resumenLicenciaProductos">{{
+        resumenLicenciaProductos
+      }}</span>
     </div>
 
     <div class="tabla-contenedor">
       <table mat-table [dataSource]="dataSource" class="tabla-productos">
-
         <ng-container matColumnDef="barCode">
           <th mat-header-cell *matHeaderCellDef>Código</th>
           <td mat-cell *matCellDef="let element">
-            <span class="codigo">{{ element.barCode || 'Sin código' }}</span>
+            <span class="codigo">{{ element.barCode || "Sin código" }}</span>
           </td>
         </ng-container>
 
@@ -79,7 +88,9 @@
           <th mat-header-cell *matHeaderCellDef>Producto</th>
           <td mat-cell *matCellDef="let element">
             <div class="producto-nombre">
-              <span class="producto-avatar">{{ element.name?.charAt(0) || '?' }}</span>
+              <span class="producto-avatar">{{
+                element.name?.charAt(0) || "?"
+              }}</span>
               <strong>{{ element.name }}</strong>
             </div>
           </td>
@@ -87,13 +98,17 @@
 
         <ng-container matColumnDef="provider">
           <th mat-header-cell *matHeaderCellDef>Proveedor</th>
-          <td mat-cell *matCellDef="let element">{{ element.provider?.name || 'Sin asignar' }}</td>
+          <td mat-cell *matCellDef="let element">
+            {{ element.provider?.name || "Sin asignar" }}
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="salePrice">
           <th mat-header-cell *matHeaderCellDef>Precio de venta</th>
           <td mat-cell *matCellDef="let element">
-            <strong class="precio">{{ element.salePrice | currency:'ARS':'symbol':'1.2-2' }}</strong>
+            <strong class="precio">{{
+              element.salePrice | currency: "ARS" : "symbol" : "1.2-2"
+            }}</strong>
           </td>
         </ng-container>
 
@@ -110,20 +125,32 @@
         <ng-container matColumnDef="fechaUltimaActualizacion">
           <th mat-header-cell *matHeaderCellDef>Actualizado</th>
           <td mat-cell *matCellDef="let element">
-            {{ element.fechaUltimaActualizacion | date:'dd/MM/yyyy' }}
+            {{ element.fechaUltimaActualizacion | date: "dd/MM/yyyy" }}
           </td>
         </ng-container>
 
         <ng-container matColumnDef="Opciones">
-          <th mat-header-cell *matHeaderCellDef class="acciones-header">Acciones</th>
+          <th mat-header-cell *matHeaderCellDef class="acciones-header">
+            Acciones
+          </th>
           <td mat-cell *matCellDef="let element">
             <div class="acciones-fila">
               <button
                 mat-icon-button
                 type="button"
+                class="accion-configurar"
+                matTooltip="Configurar unidades, presentaciones y variantes"
+                (click)="configureInventory(element)"
+              >
+                <mat-icon>tune</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                type="button"
                 class="accion-editar"
                 matTooltip="Editar producto"
-                (click)="updateProduct(element.id)">
+                (click)="updateProduct(element.id)"
+              >
                 <mat-icon>edit</mat-icon>
               </button>
               <button
@@ -131,7 +158,8 @@
                 type="button"
                 class="accion-eliminar"
                 matTooltip="Eliminar producto"
-                (click)="deleteProduct(element.id)">
+                (click)="deleteProduct(element.id)"
+              >
                 <mat-icon>delete_outline</mat-icon>
               </button>
             </div>
@@ -147,7 +175,6 @@
             No encontramos productos con esa búsqueda.
           </td>
         </tr>
-
       </table>
     </div>
 
@@ -157,9 +184,8 @@
       [pageSize]="pageSize"
       [pageSizeOptions]="[5, 8, 10, 25]"
       showFirstLastButtons
-      (page)="onPageChange($event)">
+      (page)="onPageChange($event)"
+    >
     </mat-paginator>
-
   </section>
-
 </section>

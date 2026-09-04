@@ -1,0 +1,223 @@
+:host {
+  display: block;
+}
+.fiscal {
+  width: min(720px, 94vw);
+  overflow: hidden;
+  border-radius: 17px;
+  color: #352641;
+  background: #fff;
+}
+.fiscal header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 13px;
+  align-items: center;
+  padding: 20px 22px;
+  color: #fff;
+  background: linear-gradient(135deg, #4b267f, #7950b5);
+}
+header[data-status="AUTHORIZED"] {
+  background: linear-gradient(135deg, #17643b, #29925a);
+}
+header[data-status="REJECTED"],
+header[data-status="ERROR"] {
+  background: linear-gradient(135deg, #8c2632, #c74752);
+}
+header[data-status="RECONCILIATION_REQUIRED"] {
+  background: linear-gradient(135deg, #8c5908, #d18a1d);
+}
+header > mat-icon {
+  width: 38px;
+  height: 38px;
+  font-size: 38px;
+}
+header p {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.3px;
+  opacity: 0.8;
+}
+header h2 {
+  margin: 3px 0;
+  font-size: 20px;
+}
+header button {
+  color: #fff;
+}
+main {
+  padding: 20px 22px;
+}
+.progress {
+  display: grid;
+  grid-template-columns: 1fr 36px 1fr 36px 1fr;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: #948a9b;
+}
+.step > span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border: 2px solid #dcd3e2;
+  border-radius: 50%;
+  background: #fff;
+}
+.step mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
+.step div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+.step strong {
+  font-size: 12px;
+}
+.step small {
+  margin-top: 2px;
+  font-size: 10px;
+}
+.step.complete {
+  color: #1d7952;
+}
+.step.complete > span {
+  border-color: #48a77d;
+  color: #fff;
+  background: #2d8d65;
+}
+.step.active {
+  color: #633592;
+}
+.step.active > span {
+  border-color: #8050b2;
+  color: #7040a1;
+  background: #f5effa;
+}
+.step.failed {
+  color: #a24343;
+}
+.step.failed > span {
+  border-color: #d86a6a;
+  color: #fff;
+  background: #bd4848;
+}
+.progress > i {
+  height: 2px;
+  background: #ded7e3;
+}
+.progress > i.complete {
+  background: #48a77d;
+}
+.status-message {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 16px;
+  padding: 13px;
+  border-radius: 11px;
+  color: #553274;
+  background: #f4eff8;
+}
+.status-message[data-status="AUTHORIZED"] {
+  color: #176342;
+  background: #eaf7f0;
+}
+.status-message[data-status="REJECTED"],
+.status-message[data-status="ERROR"] {
+  color: #92343b;
+  background: #fdecee;
+}
+.status-message[data-status="RECONCILIATION_REQUIRED"] {
+  color: #805510;
+  background: #fff2d8;
+}
+.status-message div {
+  display: flex;
+  flex-direction: column;
+}
+.status-message strong {
+  font-size: 13px;
+  line-height: 1.4;
+}
+.status-message small {
+  margin-top: 3px;
+  opacity: 0.72;
+}
+.critical,
+.manual {
+  padding: 13px;
+  border-radius: 10px;
+  color: #79500e;
+  background: #fff1d6;
+  line-height: 1.45;
+}
+.manual {
+  color: #8e3038;
+  background: #fdebed;
+}
+.data {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.data div {
+  padding: 12px;
+  border: 1px solid #dcecdf;
+  border-radius: 10px;
+  background: #f5fbf7;
+}
+.data span {
+  display: block;
+  color: #65776b;
+  font-size: 11px;
+}
+.data strong {
+  display: block;
+  margin-top: 4px;
+  color: #23583b;
+  font-size: 14px;
+}
+ul {
+  padding-left: 22px;
+  color: #9c303b;
+}
+footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding: 14px 22px;
+  border-top: 1px solid #eee8f2;
+  background: #fbf9fc;
+}
+@media (max-width: 620px) {
+  .progress {
+    grid-template-columns: 1fr;
+  }
+  .progress > i {
+    width: 2px;
+    height: 16px;
+    margin-left: 16px;
+  }
+  .data {
+    grid-template-columns: 1fr;
+  }
+  footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  footer button {
+    width: 100%;
+  }
+}

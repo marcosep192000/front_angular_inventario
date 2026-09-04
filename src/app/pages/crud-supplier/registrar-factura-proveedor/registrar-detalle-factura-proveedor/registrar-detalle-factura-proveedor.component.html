@@ -166,6 +166,17 @@
 
           <!-- CANTIDAD -->
 
+          <mat-form-field appearance="outline" class="input">
+            <mat-label>Presentación de compra</mat-label>
+            <mat-select formControlName="presentationId">
+              <mat-option [value]="null">Unidad base ({{ unidadBaseSymbol }})</mat-option>
+              <mat-option *ngFor="let presentacion of purchasePresentations" [value]="presentacion.id">
+                {{ presentacion.name }} · ingresa {{ presentacion.conversionFactor }} {{ unidadBaseSymbol }}
+              </mat-option>
+            </mat-select>
+            <mat-hint>Elegí cómo viene facturado por el proveedor.</mat-hint>
+          </mat-form-field>
+
           <mat-form-field
             appearance="outline"
             class="input">
@@ -177,8 +188,11 @@
             <input
               matInput
               type="number"
-              min="1"
+              min="0.000001"
+              step="any"
               formControlName="quantity">
+
+            <mat-hint>{{ unidadCompraLabel }} · admite decimales</mat-hint>
 
           </mat-form-field>
 
@@ -208,6 +222,14 @@
           </mat-form-field>
 
 
+        </div>
+
+        <div class="descuento-detectado" *ngIf="descuentoDetectado !== null">
+          <mat-icon>price_check</mat-icon>
+          <div>
+            <strong>Posible descuento del proveedor: {{ descuentoDetectado }}%</strong>
+            <span>El costo neto ingresado es menor al costo de compra configurado. Verificá la factura; si corresponde, registrá el descuento para conservar la trazabilidad.</span>
+          </div>
         </div>
 
 
@@ -550,7 +572,7 @@
               formProduct.get('totalStock')?.value
             }}
 
-            unidades
+            {{ unidadBaseSymbol }}
 
           </strong>
 
@@ -836,8 +858,8 @@
 
                 <input
                   type="number"
-                  min="1"
-                  step="1"
+                  min="0.000001"
+                  step="any"
                   [ngModel]="data.quantity"
                   (ngModelChange)="actualizarCantidad(i, $event)"
                   [attr.aria-label]="'Cantidad de ' + data.name">
@@ -854,6 +876,8 @@
                 </button>
 
               </div>
+
+              <small>{{ data.presentationName || data.unitSymbol || 'Unidad' }} · ingresa {{ data.baseQuantity ?? data.quantity }} {{ data.unitSymbol || 'un' }}</small>
 
             </td>
 

@@ -12,7 +12,7 @@ import { TicketService } from '../../../services/ticket.service';
 import { MovimientoCajaService } from '../../../services/movimiento-caja.service';
 import { ClientService } from '../../../services/client.service';
 
-import { SaleCommon } from '../../../interfaces/sale-common';
+import { SaleCommon, TicketDetail } from '../../../interfaces/sale-common';
 import { MovimientoDetalle } from '../../../interfaces/movimiento-detalle';
 import { Client } from '../../../interfaces/Client';
 
@@ -150,6 +150,20 @@ export class DetallesIngresosCajaPorFacturaComponent implements OnInit {
 
   get detallesVenta() {
     return this.ticket?.ticketDetails ?? [];
+  }
+
+  detallePresentacion(detalle: TicketDetail): string {
+    return [detalle.presentationSnapshot, detalle.variantSnapshot]
+      .filter(Boolean)
+      .join(' · ');
+  }
+
+  cantidadDetalle(detalle: TicketDetail): string {
+    const cantidad = Number(detalle.quantity ?? detalle.amount ?? 0);
+    const valor = new Intl.NumberFormat('es-AR', {
+      maximumFractionDigits: 6,
+    }).format(cantidad);
+    return `${valor}${detalle.unitSnapshot ? ` ${detalle.unitSnapshot}` : ''}`;
   }
 
 

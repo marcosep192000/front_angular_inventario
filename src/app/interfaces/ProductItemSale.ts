@@ -1,7 +1,6 @@
-
 export interface Marca {
-	id: number;
-	marca: string;
+  id: number;
+  marca: string;
 }
 
 export interface ProductItemSale {
@@ -19,4 +18,13 @@ export interface ProductItemSale {
   quantity: number;
   precioTotal: number;
   totalStock: number;
+  presentationId?: number | null;
+  inputUnitId?: number | null;
+  variantId?: number | null;
+  baseQuantity?: number;
+  displayQuantity?: string;
+  cartKey?: string;
+  variantLabel?: string;
+  advancedSale?: boolean;
+  conversionFactor?: number;
 }

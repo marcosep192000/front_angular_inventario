@@ -13,6 +13,7 @@
         <div class="panel-title">
           <h2>Datos de la empresa</h2>
           <span *ngIf="!esAdmin">Modo consulta</span>
+          <span *ngIf="esAdmin && !empresaExiste">Configuración inicial</span>
         </div>
         <div class="logo-empresa">
           <img *ngIf="logoSrc" [src]="logoSrc" alt="Logo" /><mat-icon
@@ -33,66 +34,179 @@
             Quitar
           </button>
         </div>
-        <div class="form-grid">
-          <mat-form-field
-            ><mat-label>Razón social</mat-label
-            ><input matInput formControlName="name" /></mat-form-field
-          ><mat-form-field
-            ><mat-label>Nombre de fantasía</mat-label
-            ><input matInput formControlName="nombreFantasia" /></mat-form-field
-          ><mat-form-field
-            ><mat-label>CUIT</mat-label
-            ><input matInput formControlName="cuit" /></mat-form-field
-          ><mat-form-field
-            ><mat-label>Ingresos Brutos</mat-label
-            ><input matInput formControlName="ingresosBrutos" /></mat-form-field
-          ><mat-form-field
-            ><mat-label>Dirección</mat-label
-            ><input matInput formControlName="address" /></mat-form-field
-          ><mat-form-field
-            ><mat-label>Teléfono</mat-label
-            ><input matInput formControlName="phone" /></mat-form-field
-          ><mat-form-field
-            ><mat-label>Email</mat-label
-            ><input matInput formControlName="email" /></mat-form-field
-          ><mat-form-field
-            ><mat-label>Sitio web</mat-label
-            ><input matInput formControlName="sitioWeb" /></mat-form-field
-          ><mat-form-field
-            ><mat-label>Inicio de actividades</mat-label
-            ><input
-              matInput
-              type="date"
-              formControlName="inicioActividades" /></mat-form-field
-          ><mat-form-field
-            ><mat-label>Punto de venta</mat-label
-            ><input
-              matInput
-              type="number"
-              formControlName="puntoVenta" /></mat-form-field
-          ><mat-form-field
-            ><mat-label>Condición IVA</mat-label
-            ><mat-select formControlName="condicionIva"
-              ><mat-option value="RESPONSABLE_INSCRIPTO"
-                >Responsable inscripto</mat-option
-              ><mat-option value="MONOTRIBUTISTA">Monotributista</mat-option
-              ><mat-option value="EXENTO">Exento</mat-option
-              ><mat-option value="CONSUMIDOR_FINAL"
-                >Consumidor final</mat-option
-              ></mat-select
-            ></mat-form-field
-          >
-        </div>
-          <p *ngIf="resumenLicenciaUsuarios"><strong>{{ resumenLicenciaUsuarios }}</strong></p>
-          <p *ngIf="limiteUsuariosAlcanzado && !editandoUsuario">Alcanzaste el límite de usuarios permitido por tu plan.</p>
+        <section class="form-section">
+          <h3><mat-icon>storefront</mat-icon> Datos generales</h3>
+          <div class="form-grid">
+            <mat-form-field
+              ><mat-label>Razón social</mat-label
+              ><input matInput formControlName="name" /><mat-error
+                *ngIf="empresaForm.controls.name.hasError('required')"
+                >La razón social es obligatoria.</mat-error
+              ><mat-error
+                *ngIf="empresaForm.controls.name.hasError('maxlength')"
+                >Máximo 120 caracteres.</mat-error
+              ></mat-form-field
+            ><mat-form-field
+              ><mat-label>Nombre de fantasía</mat-label
+              ><input matInput formControlName="nombreFantasia"
+            /></mat-form-field>
+          </div>
+        </section>
+        <section class="form-section">
+          <h3><mat-icon>location_on</mat-icon> Domicilio</h3>
+          <div class="form-grid">
+            <mat-form-field
+              ><mat-label>Domicilio fiscal</mat-label
+              ><input matInput formControlName="address" /><mat-error
+                >El domicilio fiscal es obligatorio.</mat-error
+              ></mat-form-field
+            ><mat-form-field
+              ><mat-label>Localidad</mat-label
+              ><input matInput formControlName="localidad" /></mat-form-field
+            ><mat-form-field
+              ><mat-label>Provincia</mat-label
+              ><mat-select formControlName="provincia"
+                ><mat-option value="">Sin especificar</mat-option
+                ><mat-option
+                  *ngFor="let provincia of provincias"
+                  [value]="provincia"
+                  >{{ provincia }}</mat-option
+                ></mat-select
+              ></mat-form-field
+            ><mat-form-field
+              ><mat-label>Código postal</mat-label
+              ><input matInput formControlName="codigoPostal"
+            /></mat-form-field>
+          </div>
+        </section>
+        <section class="form-section">
+          <h3><mat-icon>receipt_long</mat-icon> Datos fiscales</h3>
+          <div class="form-grid">
+            <mat-form-field
+              ><mat-label>CUIT</mat-label
+              ><input
+                matInput
+                formControlName="cuit"
+                placeholder="30-12345678-9"
+                inputmode="numeric"
+                (input)="formatearCuit()"
+              /><mat-error
+                *ngIf="empresaForm.controls.cuit.hasError('required')"
+                >El CUIT es obligatorio.</mat-error
+              ><mat-error *ngIf="empresaForm.controls.cuit.hasError('pattern')"
+                >Ingresá 11 dígitos.</mat-error
+              ></mat-form-field
+            ><mat-form-field
+              ><mat-label>Ingresos Brutos</mat-label
+              ><input
+                matInput
+                formControlName="ingresosBrutos" /></mat-form-field
+            ><mat-form-field
+              ><mat-label>Inicio de actividades</mat-label
+              ><input
+                matInput
+                type="date"
+                [max]="hoy"
+                formControlName="inicioActividades"
+              /><mat-error
+                *ngIf="
+                  empresaForm.controls.inicioActividades.hasError('futureDate')
+                "
+                >La fecha no puede ser futura.</mat-error
+              ></mat-form-field
+            ><mat-form-field
+              ><mat-label>Punto de venta</mat-label
+              ><input
+                matInput
+                type="number"
+                formControlName="puntoVenta"
+              /><mat-error
+                >Ingresá un punto de venta entre 1 y 99999.</mat-error
+              ></mat-form-field
+            ><mat-form-field
+              ><mat-label>Condición IVA</mat-label
+              ><mat-select formControlName="condicionIva"
+                ><mat-option
+                  *ngFor="let condicion of condicionesIva"
+                  [value]="condicion.value"
+                  >{{ condicion.label }}</mat-option
+                ></mat-select
+              ><mat-error
+                >La condición frente al IVA es obligatoria.</mat-error
+              ></mat-form-field
+            >
+          </div>
+        </section>
+        <section class="form-section">
+          <h3><mat-icon>contact_phone</mat-icon> Contacto</h3>
+          <div class="form-grid">
+            <mat-form-field
+              ><mat-label>Teléfono</mat-label
+              ><input matInput formControlName="phone" /><mat-error
+                >El teléfono es obligatorio.</mat-error
+              ></mat-form-field
+            >
+            <mat-form-field
+              ><mat-label>Email</mat-label
+              ><input matInput type="email" formControlName="email" /><mat-error
+                >Ingresá un email válido.</mat-error
+              ></mat-form-field
+            >
+            <mat-form-field
+              ><mat-label>Sitio web</mat-label
+              ><input matInput formControlName="sitioWeb"
+            /></mat-form-field>
+          </div>
+        </section>
+        <section class="arca-summary">
+          <div>
+            <p>FACTURACIÓN ELECTRÓNICA ARCA</p>
+            <h3>
+              Estado fiscal:
+              <strong [class.complete]="empresaFiscalCompleta">{{
+                empresaFiscalCompleta ? "COMPLETO" : "INCOMPLETO"
+              }}</strong>
+            </h3>
+            <span
+              >Los certificados y credenciales se administran en la pantalla
+              técnica de ARCA.</span
+            >
+          </div>
+          <ul>
+            <li
+              *ngFor="let campo of camposArca"
+              [class.complete]="campo.completo"
+            >
+              <mat-icon>{{
+                campo.completo ? "check_circle" : "cancel"
+              }}</mat-icon
+              >{{ campo.label }}
+            </li>
+          </ul>
           <button
-            mat-raised-button
+            *ngIf="puedeConfigurarArca"
+            mat-stroked-button
+            type="button"
+            (click)="configurarArca()"
+          >
+            <mat-icon>receipt_long</mat-icon>Configurar ARCA
+          </button>
+        </section>
+        <p *ngIf="resumenLicenciaUsuarios">
+          <strong>{{ resumenLicenciaUsuarios }}</strong>
+        </p>
+        <p *ngIf="limiteUsuariosAlcanzado && !editandoUsuario">
+          Alcanzaste el límite de usuarios permitido por tu plan.
+        </p>
+        <button
+          mat-raised-button
           color="primary"
           type="button"
-          [disabled]="!esAdmin"
+          [disabled]="!esAdmin || guardandoEmpresa || cargandoEmpresa"
           (click)="guardarEmpresa()"
         >
-          <mat-icon>save</mat-icon> Guardar configuración
+          <mat-icon>{{ guardandoEmpresa ? "hourglass_top" : "save" }}</mat-icon>
+          {{ guardandoEmpresa ? "Guardando…" : "Guardar empresa" }}
         </button>
       </form></mat-tab
     ><mat-tab label="Usuarios" [disabled]="!esAdmin"
@@ -112,7 +226,10 @@
             ><input matInput formControlName="apellido" /></mat-form-field
           ><mat-form-field
             ><mat-label>Email</mat-label
-            ><input matInput formControlName="email" /><mat-error *ngIf="usuarioForm.get('email')?.hasError('duplicate')">Ya existe un usuario con ese email.</mat-error></mat-form-field
+            ><input matInput formControlName="email" /><mat-error
+              *ngIf="usuarioForm.get('email')?.hasError('duplicate')"
+              >Ya existe un usuario con ese email.</mat-error
+            ></mat-form-field
           ><mat-form-field
             ><mat-label
               >Contraseña {{ editandoUsuario ? "(opcional)" : "" }}</mat-label

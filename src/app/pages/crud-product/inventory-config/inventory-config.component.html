@@ -1,0 +1,396 @@
+<section class="inventory-config">
+  <header>
+    <div class="header-icon"><mat-icon>tune</mat-icon></div>
+    <div class="header-copy">
+      <p>CONFIGURACIÓN DE VENTA</p>
+      <h2>{{ data.productName }}</h2>
+      <span>Definí cómo se mide, presenta y vende este producto.</span>
+    </div>
+    <button mat-icon-button aria-label="Cerrar" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="loading" *ngIf="loading">
+    <mat-icon>hourglass_top</mat-icon><strong>Cargando configuración…</strong>
+  </div>
+
+  <mat-tab-group
+    *ngIf="!loading"
+    animationDuration="180ms"
+    mat-stretch-tabs="false"
+  >
+    <mat-tab>
+      <ng-template mat-tab-label
+        ><mat-icon>straighten</mat-icon
+        ><span>1. Unidad y stock</span></ng-template
+      >
+      <div class="tab-content">
+        <section class="intro">
+          <div class="intro-icon"><mat-icon>scale</mat-icon></div>
+          <div>
+            <h3>¿Cómo se mide este producto?</h3>
+            <p>
+              Para productos normales elegí <strong>Unidad</strong>. Para cable
+              usá metros y para productos fraccionables, gramos o kilogramos.
+            </p>
+          </div>
+        </section>
+        <div class="form-card">
+          <div class="field-grid">
+            <mat-form-field appearance="outline"
+              ><mat-label>Unidad base</mat-label
+              ><mat-select [(ngModel)]="base.unitId"
+                ><mat-option *ngFor="let unit of units" [value]="unit.id"
+                  >{{ unit.name }} · {{ unit.symbol }}</mat-option
+                ></mat-select
+              ><mat-hint
+                >La unidad real en la que se descuenta el stock</mat-hint
+              ></mat-form-field
+            >
+            <mat-form-field appearance="outline"
+              ><mat-label>Stock disponible</mat-label
+              ><input
+                matInput
+                type="number"
+                step="any"
+                min="0"
+                [(ngModel)]="base.stock"
+              /><mat-hint>Acepta cantidades decimales</mat-hint></mat-form-field
+            >
+            <mat-form-field appearance="outline"
+              ><mat-label>Avisar cuando queden</mat-label
+              ><input
+                matInput
+                type="number"
+                step="any"
+                min="0"
+                [(ngModel)]="base.minimumStock"
+              /><mat-hint>Stock mínimo</mat-hint></mat-form-field
+            >
+          </div>
+          <div class="choice">
+            <mat-slide-toggle [(ngModel)]="base.fractionable"
+              ><strong>Permitir cantidades fraccionadas</strong></mat-slide-toggle
+            >
+            <p>Activá esta opción para kilos, metros, litros u otras cantidades con decimales.</p>
+            <mat-slide-toggle [(ngModel)]="base.variantStockManaged"
+              ><strong>Controlar stock por variante</strong></mat-slide-toggle
+            >
+            <p>
+              Activá esta opción sólo si cada combinación —por ejemplo color y
+              talle— tiene su propio stock.
+            </p>
+          </div>
+          <div class="primary-action">
+            <button
+              mat-raised-button
+              color="primary"
+              [disabled]="!base.unitId || saving"
+              (click)="saveBase()"
+            >
+              <mat-icon>save</mat-icon
+              >{{ saving ? "Guardando…" : "Guardar unidad y stock" }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label
+        ><mat-icon>inventory_2</mat-icon><span>2. Presentaciones</span
+        ><span class="count">{{
+          config?.presentations?.length || 0
+        }}</span></ng-template
+      >
+      <div class="tab-content">
+        <section class="intro">
+          <div class="intro-icon"><mat-icon>package_2</mat-icon></div>
+          <div>
+            <h3>Vendé el mismo producto de distintas formas</h3>
+            <p>
+              Ejemplos: unidad, pack x6, kilogramo o caja. Indicá cuánto
+              contiene cada presentación y su precio.
+            </p>
+          </div>
+        </section>
+        <section class="empty-state" *ngIf="!config?.presentations?.length">
+          <mat-icon>inventory_2</mat-icon
+          ><strong>Todavía no hay presentaciones</strong
+          ><span
+            >Si se vende únicamente por su unidad base, no necesitás agregar
+            ninguna.</span
+          >
+        </section>
+        <div class="item-list" *ngIf="config?.presentations?.length">
+          <article *ngFor="let p of config?.presentations">
+            <div class="item-icon"><mat-icon>inventory</mat-icon></div>
+            <div class="item-main">
+              <strong>{{ p.name }}</strong
+              ><span class="equivalence">{{ equivalence(p) }}</span
+              ><small
+                >{{
+                  p.saleEnabled
+                    ? "Disponible para venta"
+                    : "No disponible para venta"
+                }}<ng-container *ngIf="p.defaultSale">
+                  · Predeterminada</ng-container
+                ></small
+              >
+            </div>
+            <div class="item-price">
+              {{
+                p.salePrice ? (p.salePrice | currency: "ARS") : "Precio base"
+              }}
+            </div>
+            <button
+              mat-icon-button
+              color="warn"
+              matTooltip="Desactivar presentación"
+              (click)="deletePresentation(p.id)"
+            >
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </article>
+        </div>
+        <div class="form-card add-card">
+          <div class="card-heading">
+            <mat-icon>add_circle</mat-icon>
+            <div>
+              <h3>Nueva presentación</h3>
+              <p>
+                Completá sólo lo necesario. El código de barras y el precio
+                propio son opcionales.
+              </p>
+            </div>
+          </div>
+          <div class="field-grid two">
+            <mat-form-field appearance="outline"
+              ><mat-label>Nombre</mat-label
+              ><input
+                matInput
+                [(ngModel)]="presentation.name"
+                placeholder="Ej. Pack x6"
+              /><mat-hint>Nombre visible al vender</mat-hint></mat-form-field
+            ><mat-form-field appearance="outline"
+              ><mat-label>Unidad de la presentación</mat-label
+              ><mat-select [(ngModel)]="presentation.unitId"
+                ><mat-option *ngFor="let unit of units" [value]="unit.id"
+                  >{{ unit.name }} · {{ unit.symbol }}</mat-option
+                ></mat-select
+              ></mat-form-field
+            ><mat-form-field appearance="outline"
+              ><mat-label>Contenido en unidad base</mat-label
+              ><input
+                matInput
+                type="number"
+                step="any"
+                min="0.001"
+                [(ngModel)]="presentation.conversionFactor"
+              /><mat-hint
+                >Ejemplo: Pack x6 = 6 unidades</mat-hint
+              ></mat-form-field
+            ><mat-form-field appearance="outline"
+              ><mat-label>Precio de venta opcional</mat-label
+              ><input
+                matInput
+                type="number"
+                step=".01"
+                min="0"
+                [(ngModel)]="presentation.salePrice"
+              /><span matTextPrefix>$&nbsp;</span></mat-form-field
+            ><mat-form-field appearance="outline"
+              ><mat-label>Código de barras opcional</mat-label
+              ><input matInput [(ngModel)]="presentation.barcode"
+            /></mat-form-field>
+          </div>
+          <div class="toggles">
+            <mat-slide-toggle [(ngModel)]="presentation.saleEnabled"
+              >Se puede vender</mat-slide-toggle
+            ><mat-slide-toggle [(ngModel)]="presentation.purchaseEnabled"
+              >Se puede comprar</mat-slide-toggle
+            ><mat-slide-toggle [(ngModel)]="presentation.defaultSale"
+              >Usar por defecto</mat-slide-toggle
+            >
+          </div>
+          <div
+            class="preview-line"
+            *ngIf="presentation.name && presentation.conversionFactor"
+          >
+            <mat-icon>visibility</mat-icon>Se mostrará como:
+            <strong
+              >1 {{ presentation.name }} = {{ presentation.conversionFactor }}
+              {{ config?.unit?.symbol || "un." }}</strong
+            >
+          </div>
+          <div class="primary-action">
+            <button
+              mat-raised-button
+              color="primary"
+              [disabled]="
+                saving || !presentation.name.trim() || !presentation.unitId
+              "
+              (click)="addPresentation()"
+            >
+              <mat-icon>add</mat-icon>Agregar presentación
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label
+        ><mat-icon>category</mat-icon><span>3. Variantes</span
+        ><span class="count">{{
+          config?.variants?.length || 0
+        }}</span></ng-template
+      >
+      <div class="tab-content">
+        <section class="intro">
+          <div class="intro-icon"><mat-icon>account_tree</mat-icon></div>
+          <div>
+            <h3>Combinaciones con stock propio</h3>
+            <p>
+              Creá atributos genéricos como Color, Talle, Medida o Material.
+              Después combiná sus valores en variantes.
+            </p>
+          </div>
+        </section>
+        <div class="attribute-builder">
+          <div class="card-heading">
+            <mat-icon>label</mat-icon>
+            <div>
+              <h3>1. Definir atributos</h3>
+              <p>Reutilizá los existentes para evitar duplicados.</p>
+            </div>
+          </div>
+          <div class="inline-form">
+            <mat-form-field appearance="outline"
+              ><mat-label>Nuevo atributo</mat-label
+              ><input
+                matInput
+                [(ngModel)]="newAttribute"
+                placeholder="Ej. Color" /></mat-form-field
+            ><button
+              mat-stroked-button
+              color="primary"
+              [disabled]="!newAttribute.trim()"
+              (click)="createAttribute()"
+            >
+              <mat-icon>add</mat-icon>Crear
+            </button>
+          </div>
+          <article class="attribute-row" *ngFor="let a of attributes">
+            <div class="attribute-name">
+              <mat-icon>sell</mat-icon><strong>{{ a.name }}</strong>
+            </div>
+            <div class="chips">
+              <span *ngFor="let v of values[a.id]">{{ v.value }}</span
+              ><small *ngIf="!values[a.id]?.length">Sin valores</small>
+            </div>
+            <div class="value-add">
+              <input
+                [(ngModel)]="newValue[a.id]"
+                [placeholder]="'Nuevo valor de ' + a.name"
+                (keydown.enter)="createValue(a.id)"
+              /><button
+                mat-icon-button
+                [disabled]="!newValue[a.id]"
+                (click)="createValue(a.id)"
+              >
+                <mat-icon>add_circle</mat-icon>
+              </button>
+            </div>
+          </article>
+        </div>
+        <div class="item-list variants" *ngIf="config?.variants?.length">
+          <h3>Variantes creadas</h3>
+          <article *ngFor="let v of config?.variants">
+            <div class="item-icon"><mat-icon>category</mat-icon></div>
+            <div class="item-main">
+              <strong>{{ attributesLabel(v.attributes) }}</strong
+              ><span
+                >SKU {{ v.sku
+                }}<ng-container *ngIf="v.barcode">
+                  · {{ v.barcode }}</ng-container
+                ></span
+              ><small>Stock disponible: {{ v.stock }}</small>
+            </div>
+            <div class="item-price">
+              {{ v.salePrice || 0 | currency: "ARS" }}
+            </div>
+            <button
+              mat-icon-button
+              color="warn"
+              matTooltip="Desactivar variante"
+              (click)="deleteVariant(v.id)"
+            >
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </article>
+        </div>
+        <section class="empty-state" *ngIf="!config?.variants?.length">
+          <mat-icon>category</mat-icon><strong>Todavía no hay variantes</strong
+          ><span
+            >Primero creá atributos y valores; luego armá la primera
+            combinación.</span
+          >
+        </section>
+        <div class="form-card add-card">
+          <div class="card-heading">
+            <mat-icon>add_circle</mat-icon>
+            <div>
+              <h3>2. Crear variante</h3>
+              <p>Elegí un valor de cada atributo que forme esta combinación.</p>
+            </div>
+          </div>
+          <div class="field-grid two">
+            <mat-form-field appearance="outline" *ngFor="let a of attributes"
+              ><mat-label>{{ a.name }}</mat-label
+              ><mat-select [(ngModel)]="variant.selected[a.id]"
+                ><mat-option *ngFor="let v of values[a.id]" [value]="v.id">{{
+                  v.value
+                }}</mat-option></mat-select
+              ></mat-form-field
+            ><mat-form-field appearance="outline"
+              ><mat-label>SKU</mat-label
+              ><input matInput [(ngModel)]="variant.sku" /></mat-form-field
+            ><mat-form-field appearance="outline"
+              ><mat-label>Código de barras opcional</mat-label
+              ><input matInput [(ngModel)]="variant.barcode" /></mat-form-field
+            ><mat-form-field appearance="outline"
+              ><mat-label>Stock</mat-label
+              ><input
+                matInput
+                type="number"
+                step="any"
+                min="0"
+                [(ngModel)]="variant.stock" /></mat-form-field
+            ><mat-form-field appearance="outline"
+              ><mat-label>Precio de venta</mat-label
+              ><input
+                matInput
+                type="number"
+                step=".01"
+                min="0"
+                [(ngModel)]="variant.salePrice"
+              /><span matTextPrefix>$&nbsp;</span></mat-form-field
+            >
+          </div>
+          <div class="primary-action">
+            <button
+              mat-raised-button
+              color="primary"
+              [disabled]="saving || !variant.sku.trim()"
+              (click)="addVariant()"
+            >
+              <mat-icon>add</mat-icon>Crear variante
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</section>

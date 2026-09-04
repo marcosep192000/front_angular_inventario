@@ -22,10 +22,10 @@
     <mat-dialog-actions>
         <button mat-raised-button  class="warn" (click)="cancel()">Cancelar</button>
      @if (data.tipo =='createCategory') {
-       <button mat-raised-button  cdkFocusInitial color="primary" (click)="save()">Guardar</button>
+       <button mat-raised-button cdkFocusInitial color="primary" [disabled]="saving" (click)="save()">{{ saving ? 'Guardando…' : 'Guardar' }}</button>
      } 
      @else{
-         <button mat-raised-button cdkFocusInitial color="primary" (click)="update()">modificar</button>
+         <button mat-raised-button cdkFocusInitial color="primary" [disabled]="saving" (click)="update()">{{ saving ? 'Guardando…' : 'Modificar' }}</button>
      }
     
     

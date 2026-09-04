@@ -7,6 +7,7 @@ export interface Marca {
 
 export interface ProductItemBuy {
   id: number;
+  productId?: number;
   barCode: string;
   name: string;
   description?: string;
@@ -36,6 +37,15 @@ importeIva?: number;
   marca?: Marca;
 
   quantity: number;
+
+  presentationId?: number | null;
+  variantId?: number | null;
+  baseQuantity?: number;
+  unitSymbol?: string;
+  presentationName?: string;
+  conversionFactor?: number;
+  expectedPurchasePrice?: number | null;
+  detectedDiscountPercent?: number | null;
 
   totalStock: number;
 

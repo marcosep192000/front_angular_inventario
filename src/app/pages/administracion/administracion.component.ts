@@ -2,9 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
+  AbstractControl,
   FormsModule,
   ReactiveFormsModule,
   Validators,
+  ValidationErrors,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,6 +22,19 @@ import { UiRefreshService } from '../../services/ui-refresh.service';
 import { LicenseService } from '../../services/license.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { applyDuplicateResourceError } from '../../shared/forms/duplicate-resource-error';
+import { finalize } from 'rxjs';
+import { Router } from '@angular/router';
+import {
+  CondicionIvaEmpresa,
+  EmpresaRequest,
+} from '../../interfaces/administracion';
+
+function fechaNoFutura(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) return null;
+  return String(control.value) <= new Date().toISOString().slice(0, 10)
+    ? null
+    : { futureDate: true };
+}
 
 @Component({
   selector: 'app-administracion',
@@ -39,27 +54,73 @@ import { applyDuplicateResourceError } from '../../shared/forms/duplicate-resour
   styleUrl: './administracion.component.css',
 })
 export class AdministracionComponent implements OnInit {
+  readonly hoy = new Date().toISOString().slice(0, 10);
+  readonly condicionesIva: { value: CondicionIvaEmpresa; label: string }[] = [
+    { value: 'RESPONSABLE_INSCRIPTO', label: 'Responsable inscripto' },
+    { value: 'MONOTRIBUTISTA', label: 'Monotributista' },
+    { value: 'EXENTO', label: 'Exento' },
+    { value: 'CONSUMIDOR_FINAL', label: 'Consumidor final' },
+  ];
+  readonly provincias = [
+    'Buenos Aires',
+    'Catamarca',
+    'Chaco',
+    'Chubut',
+    'Ciudad Autónoma de Buenos Aires',
+    'Córdoba',
+    'Corrientes',
+    'Entre Ríos',
+    'Formosa',
+    'Jujuy',
+    'La Pampa',
+    'La Rioja',
+    'Mendoza',
+    'Misiones',
+    'Neuquén',
+    'Río Negro',
+    'Salta',
+    'San Juan',
+    'San Luis',
+    'Santa Cruz',
+    'Santa Fe',
+    'Santiago del Estero',
+    'Tierra del Fuego',
+    'Tucumán',
+  ];
   readonly roles: RolUsuario[] = ['ADMIN', 'VENDEDOR', 'COMPRADOR'];
   esAdmin = false;
+  puedeConfigurarArca = false;
+  cargandoEmpresa = true;
+  guardandoEmpresa = false;
+  empresaExiste = false;
   usuarios: UsuarioEmpresa[] = [];
   editandoUsuario: UsuarioEmpresa | null = null;
   logoSrc: string | null = null;
   fotosUsuarios: Record<number, string> = {};
   empresaForm = this.fb.group({
-    name: ['', [Validators.required, Validators.maxLength(80)]],
+    name: ['', [Validators.required, Validators.maxLength(120)]],
     nombreFantasia: ['', Validators.maxLength(80)],
-    cuit: ['', [Validators.required, Validators.maxLength(13)]],
-    address: ['', [Validators.required, Validators.maxLength(80)]],
-    phone: ['', [Validators.required, Validators.maxLength(20)]],
-    email: [
+    cuit: [
       '',
-      [Validators.required, Validators.email, Validators.maxLength(100)],
+      [Validators.required, Validators.pattern(/^(?:\d{11}|\d{2}-\d{8}-\d)$/)],
     ],
+    address: ['', [Validators.required, Validators.maxLength(80)]],
+    localidad: ['', Validators.maxLength(80)],
+    provincia: ['', Validators.maxLength(80)],
+    codigoPostal: ['', Validators.maxLength(12)],
+    phone: ['', [Validators.required, Validators.maxLength(30)]],
+    email: ['', [Validators.email, Validators.maxLength(120)]],
     ingresosBrutos: ['', Validators.maxLength(30)],
-    inicioActividades: [''],
-    puntoVenta: [1, [Validators.min(1), Validators.max(99999)]],
+    inicioActividades: ['', fechaNoFutura],
+    puntoVenta: [
+      1,
+      [Validators.required, Validators.min(1), Validators.max(99999)],
+    ],
     sitioWeb: ['', Validators.maxLength(120)],
-    condicionIva: ['RESPONSABLE_INSCRIPTO'],
+    condicionIva: [
+      'RESPONSABLE_INSCRIPTO' as CondicionIvaEmpresa,
+      Validators.required,
+    ],
   });
   usuarioForm = this.fb.group({
     nombre: ['', Validators.required],
@@ -77,23 +138,33 @@ export class AdministracionComponent implements OnInit {
     private readonly toastr: ToastrService,
     private readonly uiRefresh: UiRefreshService,
     public readonly license: LicenseService,
+    private readonly router: Router,
   ) {}
   ngOnInit(): void {
     this.esAdmin = this.token
       .getAuthorities()
       .some((rol: string) => rol === 'ADMIN' || rol === 'ROLE_ADMIN');
+    this.puedeConfigurarArca = this.token.hasPermission('ARCA_CONFIGURAR');
     this.cargarEmpresa();
     this.cargarLogo();
     if (this.esAdmin) this.cargarUsuarios();
   }
   cargarEmpresa(): void {
-    this.api.obtenerEmpresa().subscribe({
-      next: (empresa) => this.empresaForm.patchValue(empresa),
-      error: (error) => {
-        if (error.status !== 400)
-          this.toastr.error('No se pudo cargar la configuración de empresa.');
-      },
-    });
+    this.cargandoEmpresa = true;
+    this.api
+      .obtenerEmpresa()
+      .pipe(finalize(() => (this.cargandoEmpresa = false)))
+      .subscribe({
+        next: (empresa) => {
+          this.empresaExiste = true;
+          this.empresaForm.patchValue(empresa);
+        },
+        error: (error) => {
+          this.empresaExiste = false;
+          if (error.status !== 400)
+            this.toastr.error('No se pudo cargar la configuración de empresa.');
+        },
+      });
   }
   cargarUsuarios(): void {
     this.api.listarUsuarios().subscribe({
@@ -105,19 +176,15 @@ export class AdministracionComponent implements OnInit {
     });
   }
   cargarLogo(): void {
-    this.api
-      .obtenerLogo()
-      .subscribe({
-        next: (blob) => (this.logoSrc = URL.createObjectURL(blob)),
-        error: () => (this.logoSrc = null),
-      });
+    this.api.obtenerLogo().subscribe({
+      next: (blob) => (this.logoSrc = URL.createObjectURL(blob)),
+      error: () => (this.logoSrc = null),
+    });
   }
   cargarFoto(id: number): void {
-    this.api
-      .obtenerFotoUsuario(id)
-      .subscribe({
-        next: (blob) => (this.fotosUsuarios[id] = URL.createObjectURL(blob)),
-      });
+    this.api.obtenerFotoUsuario(id).subscribe({
+      next: (blob) => (this.fotosUsuarios[id] = URL.createObjectURL(blob)),
+    });
   }
   validarArchivo(file: File): boolean {
     const permitido = ['image/jpeg', 'image/png', 'image/webp'].includes(
@@ -180,20 +247,68 @@ export class AdministracionComponent implements OnInit {
     });
   }
   guardarEmpresa(): void {
-    if (!this.esAdmin || this.empresaForm.invalid) {
+    if (!this.esAdmin || this.guardandoEmpresa || this.empresaForm.invalid) {
       this.empresaForm.markAllAsTouched();
       return;
     }
-    this.api.guardarEmpresa(this.empresaForm.getRawValue() as any).subscribe({
-      next: (empresa) => {
-        this.empresaForm.patchValue(empresa);
-        this.toastr.success('Configuración de empresa guardada.');
-      },
-      error: (error) =>
-        this.toastr.error(
-          error?.error?.error || 'No se pudo guardar la empresa.',
-        ),
-    });
+    this.guardandoEmpresa = true;
+    const value = this.empresaForm.getRawValue();
+    const request: EmpresaRequest = {
+      name: value.name || '',
+      nombreFantasia: value.nombreFantasia || undefined,
+      cuit: value.cuit || '',
+      address: value.address || '',
+      localidad: value.localidad || undefined,
+      provincia: value.provincia || undefined,
+      codigoPostal: value.codigoPostal || undefined,
+      phone: value.phone || '',
+      email: value.email || undefined,
+      ingresosBrutos: value.ingresosBrutos || undefined,
+      inicioActividades: value.inicioActividades || undefined,
+      puntoVenta: Number(value.puntoVenta),
+      sitioWeb: value.sitioWeb || undefined,
+      condicionIva: value.condicionIva || undefined,
+    };
+    this.api
+      .guardarEmpresa(request)
+      .pipe(finalize(() => (this.guardandoEmpresa = false)))
+      .subscribe({
+        next: (empresa) => {
+          this.empresaExiste = true;
+          this.empresaForm.patchValue(empresa);
+          this.toastr.success('Empresa actualizada correctamente.');
+        },
+        error: (error) =>
+          this.toastr.error(
+            error?.error?.error || 'No se pudo guardar la empresa.',
+          ),
+      });
+  }
+  formatearCuit(): void {
+    const control = this.empresaForm.controls.cuit;
+    const digits = (control.value || '').replace(/\D/g, '').slice(0, 11);
+    const formatted =
+      digits.length > 10
+        ? `${digits.slice(0, 2)}-${digits.slice(2, 10)}-${digits.slice(10)}`
+        : digits;
+    control.setValue(formatted, { emitEvent: false });
+  }
+  get camposArca(): { label: string; completo: boolean }[] {
+    const v = this.empresaForm.getRawValue();
+    return [
+      { label: 'Razón social', completo: !!v.name?.trim() },
+      { label: 'CUIT', completo: this.empresaForm.controls.cuit.valid },
+      { label: 'Condición IVA', completo: !!v.condicionIva },
+      { label: 'Domicilio', completo: !!v.address?.trim() },
+      { label: 'Localidad', completo: !!v.localidad?.trim() },
+      { label: 'Punto de venta', completo: Number(v.puntoVenta) > 0 },
+    ];
+  }
+  get empresaFiscalCompleta(): boolean {
+    return this.camposArca.every((campo) => campo.completo);
+  }
+  configurarArca(): void {
+    void this.router.navigate(['/dashboard/administracion/arca']);
   }
   editarUsuario(usuario?: UsuarioEmpresa): void {
     this.editandoUsuario = usuario || null;
@@ -205,7 +320,9 @@ export class AdministracionComponent implements OnInit {
   }
   guardarUsuario(): void {
     if (!this.editandoUsuario && this.limiteUsuariosAlcanzado) {
-      this.toastr.warning('Alcanzaste el límite de usuarios permitido por tu plan.');
+      this.toastr.warning(
+        'Alcanzaste el límite de usuarios permitido por tu plan.',
+      );
       return;
     }
     if (!this.esAdmin || this.usuarioForm.invalid) {
@@ -232,12 +349,22 @@ export class AdministracionComponent implements OnInit {
         this.editarUsuario();
         this.cargarUsuarios();
       },
-      error: (error: HttpErrorResponse) => { const duplicate=applyDuplicateResourceError(error,this.usuarioForm); this.toastr.error(duplicate||error.error?.message||error.error?.error||'No se pudo guardar el usuario.'); },
+      error: (error: HttpErrorResponse) => {
+        const duplicate = applyDuplicateResourceError(error, this.usuarioForm);
+        this.toastr.error(
+          duplicate ||
+            error.error?.message ||
+            error.error?.error ||
+            'No se pudo guardar el usuario.',
+        );
+      },
     });
   }
   alternarUsuario(usuario: UsuarioEmpresa): void {
     if (!usuario.enabled && this.limiteUsuariosAlcanzado) {
-      this.toastr.warning('Alcanzaste el límite de usuarios permitido por tu plan.');
+      this.toastr.warning(
+        'Alcanzaste el límite de usuarios permitido por tu plan.',
+      );
       return;
     }
     this.api
@@ -254,18 +381,24 @@ export class AdministracionComponent implements OnInit {
           ),
       });
   }
-  get limiteUsuariosAlcanzado(): boolean { const s=this.license.snapshot; return Boolean(s && s.maxUsers !== -1 && s.currentUsers >= s.maxUsers); }
-  get resumenLicenciaUsuarios(): string { const s=this.license.snapshot; return !s ? '' : `Usuarios habilitados: ${s.currentUsers} / ${s.maxUsers === -1 ? 'Ilimitados' : s.maxUsers}`; }
+  get limiteUsuariosAlcanzado(): boolean {
+    const s = this.license.snapshot;
+    return Boolean(s && s.maxUsers !== -1 && s.currentUsers >= s.maxUsers);
+  }
+  get resumenLicenciaUsuarios(): string {
+    const s = this.license.snapshot;
+    return !s
+      ? ''
+      : `Usuarios habilitados: ${s.currentUsers} / ${s.maxUsers === -1 ? 'Ilimitados' : s.maxUsers}`;
+  }
   eliminarUsuario(usuario: UsuarioEmpresa): void {
     if (!confirm(`¿Eliminar a ${usuario.nombre} ${usuario.apellido}?`)) return;
-    this.api
-      .eliminarUsuario(usuario.id)
-      .subscribe({
-        next: () => this.cargarUsuarios(),
-        error: (error) =>
-          this.toastr.error(
-            error?.error?.error || 'No se pudo eliminar el usuario.',
-          ),
-      });
+    this.api.eliminarUsuario(usuario.id).subscribe({
+      next: () => this.cargarUsuarios(),
+      error: (error) =>
+        this.toastr.error(
+          error?.error?.error || 'No se pudo eliminar el usuario.',
+        ),
+    });
   }
 }

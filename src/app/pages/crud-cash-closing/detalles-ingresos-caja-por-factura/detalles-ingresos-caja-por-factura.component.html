@@ -172,10 +172,11 @@
 
           <td>
             {{ p.productName }}
+            <small *ngIf="detallePresentacion(p)">{{ detallePresentacion(p) }}</small>
           </td>
 
           <td>
-            {{ p.amount }}
+            {{ cantidadDetalle(p) }}
           </td>
 
           <td>

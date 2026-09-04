@@ -24,6 +24,7 @@ export class PermisosComponent implements OnInit {
     ['PROVEEDORES_VER', 'Ver proveedores', 'Proveedores'], ['PROVEEDORES_CREAR', 'Crear proveedores', 'Proveedores'], ['PROVEEDORES_EDITAR', 'Editar proveedores', 'Proveedores'], ['PROVEEDORES_ELIMINAR', 'Eliminar proveedores', 'Proveedores'], ['COMPRAS_REGISTRAR', 'Registrar compras', 'Proveedores'],
     ['CAJA_VER', 'Ver caja', 'Caja'], ['CAJA_OPERAR', 'Operar caja', 'Caja'], ['CAJA_CERRAR', 'Cerrar caja', 'Caja'], ['REPORTES_VER', 'Ver reportes', 'Reportes'],
     ['EMPLEADOS_GESTIONAR', 'Gestionar empleados', 'Administración'], ['EMPRESA_CONFIGURAR', 'Configurar empresa', 'Administración'], ['USUARIOS_GESTIONAR', 'Gestionar usuarios', 'Administración'], ['PERMISOS_GESTIONAR', 'Gestionar permisos', 'Administración'],
+    ['ARCA_CONFIGURAR', 'Configurar ARCA', 'Facturación fiscal'], ['COMPROBANTES_FISCALES_EMITIR', 'Autorizar comprobantes fiscales', 'Facturación fiscal'], ['COMPROBANTES_FISCALES_REINTENTAR', 'Reintentar emisión fiscal', 'Facturación fiscal'], ['COMPROBANTES_FISCALES_CONSULTAR', 'Consultar y reconciliar comprobantes', 'Facturación fiscal'],
   ].map(([codigo, nombre, grupo]) => ({ codigo, nombre, grupo }));
 
   usuarios: UsuarioEmpresa[] = [];

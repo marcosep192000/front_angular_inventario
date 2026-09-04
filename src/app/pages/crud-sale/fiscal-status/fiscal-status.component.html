@@ -1,0 +1,182 @@
+<section class="fiscal">
+  <header [attr.data-status]="status">
+    <mat-icon>{{
+      status === "AUTHORIZED"
+        ? "verified"
+        : status === "REJECTED"
+          ? "cancel"
+          : status === "RECONCILIATION_REQUIRED"
+            ? "warning"
+            : "receipt_long"
+    }}</mat-icon>
+    <div>
+      <p>FACTURACIÓN ELECTRÓNICA ARCA</p>
+      <h2>
+        {{
+          status === "AUTHORIZED"
+            ? "Comprobante autorizado"
+            : status === "REJECTED"
+              ? "Factura rechazada por ARCA"
+              : status === "RECONCILIATION_REQUIRED"
+                ? "Estado fiscal pendiente de confirmación"
+                : status === "PROCESSING"
+                  ? "Procesando autorización fiscal…"
+                  : status === "ERROR"
+                    ? "Error de configuración o datos fiscales"
+                    : "Venta creada · autorización pendiente"
+        }}
+      </h2>
+    </div>
+    <button mat-icon-button (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+  <main>
+    <section class="progress" aria-label="Progreso de autorización fiscal">
+      <div class="step complete">
+        <span><mat-icon>check</mat-icon></span>
+        <div>
+          <strong>Venta creada</strong><small>Registrada en el sistema</small>
+        </div>
+      </div>
+      <i [class.complete]="authorizationStarted"></i>
+      <div
+        class="step"
+        [class.active]="status === 'PENDING' || status === 'PROCESSING'"
+        [class.complete]="authorized"
+        [class.failed]="
+          status === 'REJECTED' ||
+          status === 'ERROR' ||
+          status === 'RECONCILIATION_REQUIRED'
+        "
+      >
+        <span
+          ><mat-icon>{{
+            authorized
+              ? "check"
+              : status === "REJECTED" || status === "ERROR"
+                ? "close"
+                : "sync"
+          }}</mat-icon></span
+        >
+        <div>
+          <strong>Autorización</strong
+          ><small>{{
+            status === "PENDING"
+              ? "Pendiente"
+              : status === "PROCESSING"
+                ? "Procesando"
+                : authorized
+                  ? "Confirmada"
+                  : "Requiere atención"
+          }}</small>
+        </div>
+      </div>
+      <i [class.complete]="authorized"></i>
+      <div class="step" [class.complete]="authorized">
+        <span
+          ><mat-icon>{{ authorized ? "check" : "description" }}</mat-icon></span
+        >
+        <div>
+          <strong>Comprobante</strong
+          ><small>{{
+            authorized ? "Listo para imprimir" : "Aún no disponible"
+          }}</small>
+        </div>
+      </div>
+    </section>
+    <div class="status-message" [attr.data-status]="status">
+      <mat-spinner *ngIf="loading" diameter="22"></mat-spinner>
+      <mat-icon *ngIf="!loading">{{
+        authorized ? "task_alt" : status === "PENDING" ? "schedule" : "info"
+      }}</mat-icon>
+      <div>
+        <strong>{{ statusDescription }}</strong
+        ><small>Venta #{{ document.ticketId }}</small>
+      </div>
+    </div>
+    <p class="critical" *ngIf="status === 'RECONCILIATION_REQUIRED'">
+      La comunicación con ARCA se interrumpió y todavía no es posible determinar
+      si el comprobante fue autorizado.
+      <strong>No vuelva a facturar esta operación.</strong>
+    </p>
+    <section class="data" *ngIf="status === 'AUTHORIZED'">
+      <div>
+        <span>Tipo</span><strong>{{ document.tipoComprobante || "—" }}</strong>
+      </div>
+      <div>
+        <span>Comprobante</span
+        ><strong>{{
+          document.comprobanteCompleto ||
+            (document.puntoVenta || "—") +
+              "-" +
+              (document.numeroComprobante || "—")
+        }}</strong>
+      </div>
+      <div>
+        <span>CAE</span><strong>{{ document.cae || "—" }}</strong>
+      </div>
+      <div>
+        <span>Vencimiento CAE</span
+        ><strong>{{ document.caeVencimiento | date: "dd/MM/yyyy" }}</strong>
+      </div>
+    </section>
+    <ul *ngIf="messages.length">
+      <li *ngFor="let message of messages">{{ message }}</li>
+    </ul>
+    <p *ngIf="document.message">{{ document.message }}</p>
+    <p
+      class="manual"
+      *ngIf="document.reconciliationResult === 'MISMATCH_MANUAL_REVIEW'"
+    >
+      Se requiere revisión manual. No reintente ni vuelva a crear la venta.
+    </p>
+  </main>
+  <footer>
+    <button mat-button type="button" (click)="close()" [disabled]="loading">
+      Cerrar
+    </button>
+    <button mat-stroked-button (click)="refresh()" [disabled]="loading">
+      <mat-icon>refresh</mat-icon>Actualizar estado</button
+    ><button
+      mat-raised-button
+      color="primary"
+      *ngIf="canAuthorize"
+      (click)="authorize()"
+      [disabled]="loading"
+    >
+      <mat-icon>verified</mat-icon>Solicitar autorización</button
+    ><button
+      mat-raised-button
+      color="warn"
+      *ngIf="canReconcile"
+      (click)="reconcile()"
+      [disabled]="loading"
+    >
+      Reconciliar con ARCA</button
+    ><button
+      mat-raised-button
+      color="primary"
+      *ngIf="canRetry"
+      (click)="retry()"
+      [disabled]="loading"
+    >
+      Reintentar emisión</button
+    ><button
+      mat-stroked-button
+      *ngIf="status === 'AUTHORIZED'"
+      (click)="downloadQr()"
+      [disabled]="loading"
+    >
+      <mat-icon>qr_code_2</mat-icon>Descargar QR</button
+    ><button
+      mat-raised-button
+      color="primary"
+      *ngIf="status === 'AUTHORIZED'"
+      (click)="print()"
+      [disabled]="loading"
+    >
+      <mat-icon>print</mat-icon>Imprimir comprobante
+    </button>
+  </footer>
+</section>

@@ -37,6 +37,11 @@ import {
   resolverTipoIva,
 } from '../../../interfaces/tipo-iva';
 import { applyDuplicateResourceError } from '../../../shared/forms/duplicate-resource-error';
+import { InventoryConfigComponent } from '../inventory-config/inventory-config.component';
+import { DialogGenericComponent } from '../../../shared/genericsComponents/dialog-generic/dialog-generic.component';
+import { finalize, map, of, switchMap } from 'rxjs';
+import { InventoryService } from '../../../services/inventory.service';
+import { UnitOfMeasure } from '../../../interfaces/inventory';
 
 @Component({
   selector: 'app-form-product',
@@ -64,6 +69,9 @@ export class FormProductComponent implements OnInit {
   editarPrecioVenta = false;
   gananciaCalculada = 0;
   readonly tiposIva = TIPOS_IVA;
+  loadingProduct = false;
+  saving = false;
+  units: UnitOfMeasure[] = [];
 
   protected onInput(event: Event) {
     this.value.set((event.target as HTMLInputElement).value);
@@ -83,6 +91,7 @@ export class FormProductComponent implements OnInit {
     private toastr: ToastrService,
     private marcaService: MarcaService,
     private supplierService: SupplierService,
+    private inventoryService: InventoryService,
   ) {
     this.formGroup = this.fb.group({
       category: [1],
@@ -97,8 +106,12 @@ export class FormProductComponent implements OnInit {
           Validators.pattern('^\\d*\\.?\\d*$'), // Acepta números decimales
         ],
       ],
-      stock: ['', Validators.required],
-      stockMin: ['', Validators.required],
+      stock: ['', [Validators.required, Validators.min(0)]],
+      stockMin: ['', [Validators.required, Validators.min(0)]],
+      baseUnitId: [
+        null,
+        this.data.tipo === 'createProduct' ? Validators.required : [],
+      ],
       status: [true],
       tipoIva: ['IVA_21' as TipoIva, Validators.required],
       salePrice: [null, Validators.required],
@@ -110,10 +123,13 @@ export class FormProductComponent implements OnInit {
     this.loadCategories();
     this.loadMarcas();
     this.loadSuplier();
+    this.loadUnits();
 
     if (this.data.updateProduct != null) {
+      this.loadingProduct = true;
       this.productService
         .findById(this.data.updateProduct)
+        .pipe(finalize(() => (this.loadingProduct = false)))
         .subscribe((datos) => {
           console.log(datos);
           this.formGroup.patchValue({
@@ -160,17 +176,90 @@ export class FormProductComponent implements OnInit {
     });
   }
 
+  loadUnits(): void {
+    this.inventoryService.getUnits().subscribe({
+      next: (units) => {
+        this.units = units;
+        if (this.data.tipo !== 'createProduct') return;
+        const defaultUnit =
+          units.find((unit) => unit.name.toUpperCase() === 'UNIDAD') ||
+          units.find((unit) => unit.dimension === 'COUNT') ||
+          units[0];
+        if (defaultUnit)
+          this.formGroup.get('baseUnitId')?.setValue(defaultUnit.id);
+      },
+      error: () =>
+        this.toastr.error(
+          'No se pudieron cargar las unidades. No es posible crear el producto.',
+        ),
+    });
+  }
+
   cancel() {
-    this.dialogRef.close();
+    if (!this.formGroup.dirty) {
+      this.dialogRef.close();
+      return;
+    }
+    this.dialog
+      .open(DialogGenericComponent, {
+        width: '430px',
+        maxWidth: '94vw',
+        data: {
+          state: 'Descartar cambios',
+          icon: 'warning',
+          message: 'Hay cambios sin guardar. ¿Querés cerrar igualmente?',
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (confirmed === true) this.dialogRef.close();
+      });
   }
 
   save(): void {
-    console.log(this.formGroup.value);
+    if (this.saving) return;
     if (this.formGroup.valid) {
-      this.productService.save(this.formGroup.value).subscribe({ next: (data) => { this.dialogRef.close(data); this.showSuccess(); }, error: (error: HttpErrorResponse) => this.handleSaveError(error) });
+      this.saving = true;
+      const { baseUnitId, ...productPayload } = this.formGroup.getRawValue();
+      this.productService
+        .save(productPayload)
+        .pipe(
+          // El endpoint legado de alta responde { message } aunque el producto
+          // haya sido creado. Recuperamos el registro por su codigo para poder
+          // configurar la unica fuente de stock sin mostrar un falso error.
+          switchMap((product) =>
+            product?.id
+              ? of(product)
+              : this.productService.findAdministrativeByBarcode(
+                  String(productPayload.barCode),
+                ),
+          ),
+          switchMap((product) => {
+            const productId = product.id;
+            if (!productId || !baseUnitId)
+              throw new Error('El producto se creó, pero no se pudo identificar para configurar su stock.');
+            return this.inventoryService
+              .updateBaseUnit(productId, {
+                unitId: Number(baseUnitId),
+                stock: Number(productPayload.stock),
+                minimumStock: Number(productPayload.stockMin),
+                fractionable: false,
+                variantStockManaged: false,
+              })
+              .pipe(map(() => product));
+          }),
+        )
+        .pipe(finalize(() => (this.saving = false)))
+        .subscribe({
+          next: (data) => {
+            this.toastr.success('Producto guardado correctamente.');
+            this.dialogRef.close({ saved: true, data });
+          },
+          error: (error: HttpErrorResponse) => this.handleSaveError(error),
+        });
     } else {
-      console.log(this.formGroup.errors);
-      console.log(this.data);
+      this.formGroup.markAllAsTouched();
+      this.focusFirstInvalid();
       this.toastr.error(
         'Por favor, complete todos los campos requeridos!',
         '',
@@ -182,20 +271,36 @@ export class FormProductComponent implements OnInit {
     }
   }
 
-  showSuccess() {
-    this.toastr.success('Producto guardado con Exito!', '', {
-      timeOut: 10000,
-      positionClass: 'toast-bottom-right',
-    });
-  }
-
   update(): void {
+    if (this.saving) return;
+    if (this.formGroup.invalid) {
+      this.formGroup.markAllAsTouched();
+      this.focusFirstInvalid();
+      this.toastr.warning('Revisá los campos marcados antes de guardar.');
+      return;
+    }
+    this.saving = true;
     this.productService
       .update(this.data.updateProduct, this.formGroup.value)
-      .subscribe({ next: (data) => this.dialogRef.close(data), error: (error: HttpErrorResponse) => this.handleSaveError(error) });
+      .pipe(finalize(() => (this.saving = false)))
+      .subscribe({
+        next: (data) => {
+          this.toastr.success('Producto actualizado correctamente.');
+          this.dialogRef.close({ saved: true, data });
+        },
+        error: (error: HttpErrorResponse) => this.handleSaveError(error),
+      });
   }
 
-  private handleSaveError(error: HttpErrorResponse): void { const duplicate = applyDuplicateResourceError(error, this.formGroup); this.toastr.error(duplicate || error.error?.message || error.error?.error || 'No se pudo guardar el producto.'); }
+  private handleSaveError(error: HttpErrorResponse): void {
+    const duplicate = applyDuplicateResourceError(error, this.formGroup);
+    this.toastr.error(
+      duplicate ||
+        error.error?.message ||
+        error.error?.error ||
+        'No se pudo guardar el producto.',
+    );
+  }
 
   /* nueva marca */
   createMarca() {
@@ -209,8 +314,8 @@ export class FormProductComponent implements OnInit {
       },
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.loadMarcas();
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.saved) this.loadMarcas();
     });
   }
 
@@ -225,9 +330,8 @@ export class FormProductComponent implements OnInit {
         tipo: 'createSupplier',
       },
     });
-    dialogRef.afterClosed().subscribe(() => {
-      this.loadSuplier();
-      console.log(dialogRef);
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.saved) this.loadSuplier();
     });
   }
 
@@ -315,7 +419,10 @@ export class FormProductComponent implements OnInit {
   onInputChange(event: Event, controlName: string): void {
     const input = event.target as HTMLInputElement;
     // Filtra todos los caracteres no numéricos, excepto el punto decimal
-    const filteredValue = input.value.replace(/[^0-9.]/g, '');
+    const raw = input.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
+    const parts = raw.split('.');
+    const filteredValue =
+      parts.length > 1 ? `${parts.shift()}.${parts.join('')}` : raw;
     // Limita la longitud a 12 caracteres
     const finalValue = filteredValue.slice(0, 10);
     const control = this.formGroup.get(controlName);
@@ -339,8 +446,43 @@ export class FormProductComponent implements OnInit {
       },
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.loadCategories();
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.saved) this.loadCategories();
     });
+  }
+
+  openInventoryConfig(): void {
+    if (!this.data.updateProduct) return;
+    this.dialog
+      .open(InventoryConfigComponent, {
+        width: '900px',
+        maxWidth: '97vw',
+        autoFocus: false,
+        disableClose: true,
+        data: {
+          productId: this.data.updateProduct,
+          productName: this.formGroup.get('name')?.value || 'Producto',
+          stock: Number(this.formGroup.get('stock')?.value || 0),
+          stockMin: Number(this.formGroup.get('stockMin')?.value || 0),
+        },
+      })
+      .afterClosed()
+      .subscribe((result) => {
+        if (result?.changed) {
+          this.formGroup.patchValue({
+            stock: Math.max(0, Number(result.stock)),
+            stockMin: Math.max(0, Number(result.stockMin)),
+          });
+        }
+      });
+  }
+  private focusFirstInvalid(): void {
+    setTimeout(() =>
+      document
+        .querySelector<HTMLElement>(
+          '.product-form .ng-invalid[formControlName]',
+        )
+        ?.focus(),
+    );
   }
 }

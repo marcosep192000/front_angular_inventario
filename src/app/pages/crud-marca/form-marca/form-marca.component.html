@@ -31,8 +31,8 @@
     <mat-dialog-actions>
         <div class="btn"></div>
         <button mat-raised-button class="warn" (click)="cancel()">Cancelar</button>
-        <button mat-raised-button color="primary" (click)="save()"
-            *ngIf="data.tipo === 'createMarca'">Guardar</button>
+        <button mat-raised-button color="primary" (click)="save()" [disabled]="saving"
+            *ngIf="data.tipo === 'createMarca'">{{ saving ? 'Guardando…' : 'Guardar' }}</button>
         <button mat-raised-button color="primary" (click)="update()"
             *ngIf="data.tipo !== 'createMarca'">Modificar</button>
     </mat-dialog-actions>

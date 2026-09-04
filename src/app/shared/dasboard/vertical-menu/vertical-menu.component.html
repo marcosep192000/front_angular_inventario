@@ -200,7 +200,7 @@
 
   </div>
 
-  @if (puede('EMPRESA_CONFIGURAR') || puede('PERMISOS_GESTIONAR')) {
+  @if (puede('EMPRESA_CONFIGURAR') || puede('PERMISOS_GESTIONAR') || puede('ARCA_CONFIGURAR')) {
   <div class="menu-item">
     <div class="menu-title" (click)="toggleMenu('administracion')">
       <app-icon [iconSrc]="'assets/icons/settings_accessibility_24dp_FFF_FILL1_wght400_GRAD0_opsz24.png'" [size]="'28px'"></app-icon>
@@ -220,6 +220,10 @@
       <div class="submenu-item" routerLink="administracion/licencia" *ngIf="puede('EMPRESA_CONFIGURAR')">
         <app-icon [iconSrc]="'assets/icons/settings_accessibility_24dp_FFF_FILL1_wght400_GRAD0_opsz24.png'" [size]="'22px'"></app-icon>
         Licencia
+      </div>
+      <div class="submenu-item" routerLink="administracion/arca" *ngIf="puede('ARCA_CONFIGURAR')">
+        <app-icon [iconSrc]="'assets/icons/settings_accessibility_24dp_FFF_FILL1_wght400_GRAD0_opsz24.png'" [size]="'22px'"></app-icon>
+        Facturación ARCA
       </div>
     </div>
     }

@@ -234,7 +234,7 @@ export class ListSupplierComponent implements OnInit, AfterViewInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
+      if (result?.saved) {
         this.getSuppliers();
       }
     });
@@ -272,7 +272,7 @@ export class ListSupplierComponent implements OnInit, AfterViewInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
+      if (result?.saved) {
         this.getSuppliers();
       }
     });

@@ -60,6 +60,8 @@ import {
 import {
   ProductService
 } from '../../../../services/product.service';
+import { InventoryService } from '../../../../services/inventory.service';
+import { ProductPresentation, ProductSaleConfiguration } from '../../../../interfaces/inventory';
 
 import {
   ProductItemBuy
@@ -194,6 +196,9 @@ export class RegistrarDetalleFacturaProveedorComponent
   product:
     ProductItemBuy | null = null;
 
+  inventoryConfig: ProductSaleConfiguration | null = null;
+  purchasePresentations: ProductPresentation[] = [];
+
 
   // =========================================================
   // FORMULARIO
@@ -239,6 +244,8 @@ export class RegistrarDetalleFacturaProveedorComponent
 
     private productService:
       ProductService,
+
+    private inventoryService: InventoryService,
 
     private fb:
       FormBuilder,
@@ -332,11 +339,13 @@ export class RegistrarDetalleFacturaProveedorComponent
 
             Validators.required,
 
-            Validators.min(1)
+            Validators.min(0.000001)
 
           ]
 
         ],
+
+        presentationId: [null],
 
 
         totalStock: [
@@ -435,6 +444,14 @@ export class RegistrarDetalleFacturaProveedorComponent
 
       });
 
+    this.formProduct.get('presentationId')?.valueChanges.subscribe(() => {
+      const price = this.presentacionSeleccionada()?.purchasePrice;
+      if (price != null && Number(price) > 0) {
+        this.formProduct.patchValue({ price: Number(price) }, { emitEvent: false });
+      }
+      this.calcularTotalesProducto();
+    });
+
   }
 
 
@@ -526,9 +543,7 @@ export class RegistrarDetalleFacturaProveedorComponent
     // STOCK FINAL
     // =======================================================
 
-    const totalStock =
-      stock +
-      quantity;
+    const totalStock = stock + this.obtenerCantidadBase(quantity);
 
 
     // =======================================================
@@ -871,6 +886,8 @@ export class RegistrarDetalleFacturaProveedorComponent
 
           this.loadProduct(data);
 
+          this.cargarConfiguracionCompra(data.id);
+
           this.showForm = true;
         },
 
@@ -1083,6 +1100,45 @@ export class RegistrarDetalleFacturaProveedorComponent
 
   }
 
+  private cargarConfiguracionCompra(productId: number): void {
+    this.inventoryConfig = null;
+    this.purchasePresentations = [];
+    this.inventoryService.getSaleConfiguration(productId).subscribe({
+      next: config => {
+        this.inventoryConfig = config;
+        this.purchasePresentations = (config.presentations ?? [])
+          .filter(p => p.active && p.purchaseEnabled);
+        this.formProduct.patchValue({ stock: Number(config.stock) || 0 }, { emitEvent: false });
+        this.calcularTotalesProducto();
+      },
+      error: () => this.calcularTotalesProducto()
+    });
+  }
+
+  private presentacionSeleccionada(): ProductPresentation | null {
+    const id = Number(this.formProduct.get('presentationId')?.value);
+    return this.purchasePresentations.find(p => p.id === id) ?? null;
+  }
+
+  private obtenerCantidadBase(cantidad: number): number {
+    return this.redondear(cantidad * (Number(this.presentacionSeleccionada()?.conversionFactor) || 1), 6);
+  }
+
+  get unidadCompraLabel(): string {
+    return this.presentacionSeleccionada()?.name ?? this.inventoryConfig?.unit?.name ?? 'Unidad';
+  }
+
+  get unidadBaseSymbol(): string {
+    return this.inventoryConfig?.unit?.symbol ?? 'un';
+  }
+
+  get descuentoDetectado(): number | null {
+    const esperado = Number(this.presentacionSeleccionada()?.purchasePrice ?? this.product?.price);
+    const neto = Number(this.formProduct?.get('precioNeto')?.value);
+    if (!(esperado > 0) || !(neto >= 0) || neto >= esperado) return null;
+    return this.redondear(((esperado - neto) / esperado) * 100);
+  }
+
 
   // =========================================================
   // AGREGAR PRODUCTO
@@ -1241,6 +1297,9 @@ export class RegistrarDetalleFacturaProveedorComponent
       id:
         this.product.id,
 
+      productId:
+        this.product.id,
+
 
       barCode:
         this.product.barCode ??
@@ -1315,14 +1374,21 @@ export class RegistrarDetalleFacturaProveedorComponent
       quantity:
         cantidad,
 
+      presentationId: this.presentacionSeleccionada()?.id ?? null,
+      variantId: null,
+      baseQuantity: this.obtenerCantidadBase(cantidad),
+      unitSymbol: this.unidadBaseSymbol,
+      presentationName: this.unidadCompraLabel,
+      conversionFactor: Number(this.presentacionSeleccionada()?.conversionFactor) || 1,
+      expectedPurchasePrice: Number(this.presentacionSeleccionada()?.purchasePrice ?? this.product.price) || null,
+      detectedDiscountPercent: this.descuentoDetectado,
+
 
       // =====================================================
       // STOCK TOTAL
       // =====================================================
 
-      totalStock:
-        stock +
-        cantidad,
+      totalStock: stock + this.obtenerCantidadBase(cantidad),
 
 
       // =====================================================
@@ -1469,7 +1535,7 @@ export class RegistrarDetalleFacturaProveedorComponent
 
     if (
       !Number.isFinite(cantidad) ||
-      cantidad < 1 ||
+      cantidad <= 0 ||
       index < 0 ||
       index >= this.products.length
     ) {
@@ -1489,7 +1555,8 @@ export class RegistrarDetalleFacturaProveedorComponent
         ? {
             ...item,
             quantity: cantidad,
-            totalStock: (Number(item.stock) || 0) + cantidad,
+            baseQuantity: this.redondear(cantidad * (Number(item.conversionFactor) || 1), 6),
+            totalStock: (Number(item.stock) || 0) + cantidad * (Number(item.conversionFactor) || 1),
             subtotalNeto,
             importeIva,
             precioTotal: this.redondear(subtotalNeto + importeIva)
@@ -1515,7 +1582,7 @@ export class RegistrarDetalleFacturaProveedorComponent
 
     this.actualizarCantidad(
       index,
-      Math.max(1, (Number(producto.quantity) || 1) + variacion)
+      Math.max(0.001, (Number(producto.quantity) || 1) + variacion)
     );
 
   }
@@ -1844,17 +1911,20 @@ export class RegistrarDetalleFacturaProveedorComponent
   // =========================================================
 
   private redondear(
-    valor: number
+    valor: number,
+    decimales = 2
   ): number {
+
+    const factor = Math.pow(10, decimales);
 
     return Math.round(
 
       (
         Number(valor) +
         Number.EPSILON
-      ) * 100
+      ) * factor
 
-    ) / 100;
+    ) / factor;
 
   }
 

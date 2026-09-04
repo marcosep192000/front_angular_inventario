@@ -150,6 +150,7 @@ export class TokenService {
       ['CLIENTES_VER', '/dashboard/client-list'], ['PRODUCTOS_VER', '/dashboard/product-list'], ['PROVEEDORES_VER', '/dashboard/supplier-list'],
       ['COMPRAS_REGISTRAR', '/dashboard/purchase-orders'], ['EMPLEADOS_GESTIONAR', '/dashboard/empleados'],
       ['REPORTES_VER', '/dashboard/reportes'], ['EMPRESA_CONFIGURAR', '/dashboard/administracion'], ['PERMISOS_GESTIONAR', '/dashboard/administracion/permisos'],
+      ['ARCA_CONFIGURAR', '/dashboard/administracion/arca'],
     ];
     return routes.find(([permission]) => this.hasPermission(permission))?.[1] || '/login';
   }

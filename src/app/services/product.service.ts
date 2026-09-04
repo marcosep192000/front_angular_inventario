@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Product } from '../interfaces/Product';
 
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { ProductItemSale } from '../interfaces/ProductItemSale';
 
@@ -216,6 +216,25 @@ export class ProductService {
 
     return this.http.get<ProductItemBuy>(
       `${this.base}supermarket/findByCode/${code.trim()}`
+    );
+  }
+
+  /** Recuperación administrativa: incluye productos sin stock y no vendibles. */
+  findAdministrativeByBarcode(barCode: string): Observable<Product> {
+    const normalized = barCode.trim().toLocaleLowerCase();
+    return this.getProducts(0, 20, barCode).pipe(
+      map((page) => {
+        const products: Product[] = page?.content ?? [];
+        const product = products.find(
+          (item) => item.barCode?.trim().toLocaleLowerCase() === normalized,
+        );
+        if (!product) {
+          throw new Error(
+            'El producto fue creado, pero no pudo recuperarse para configurar la unidad y el stock.',
+          );
+        }
+        return product;
+      }),
     );
   }
 

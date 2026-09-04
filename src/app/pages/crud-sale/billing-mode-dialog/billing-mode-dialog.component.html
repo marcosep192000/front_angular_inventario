@@ -1,0 +1,57 @@
+<section class="mode-dialog" [attr.data-mode]="data.mode">
+  <header>
+    <div class="icon">
+      <mat-icon>{{
+        data.mode === "ARCA" ? "verified" : "receipt_long"
+      }}</mat-icon>
+    </div>
+    <div>
+      <p>MODO DE FACTURACIÓN</p>
+      <h2>
+        {{
+          data.mode === "ARCA" ? "Cambiar a ARCA" : "Usar comprobante interno"
+        }}
+      </h2>
+    </div>
+  </header>
+
+  <mat-dialog-content>
+    <div class="homologation" *ngIf="data.mode === 'ARCA' && data.homologation">
+      <mat-icon>science</mat-icon>
+      <div>
+        <strong>Ambiente de homologación</strong
+        ><span>Es una operación de prueba y no corresponde a producción.</span>
+      </div>
+    </div>
+
+    <p class="description" *ngIf="data.mode === 'ARCA'">
+      Al finalizar la venta, el comprobante se enviará al proceso de
+      autorización fiscal. El estado y las acciones disponibles se mostrarán en
+      un diálogo específico.
+    </p>
+    <p class="description" *ngIf="data.mode === 'INTERNA'">
+      El comprobante se registrará únicamente dentro del sistema. No tendrá
+      autorización, CAE ni QR fiscal de ARCA.
+    </p>
+
+    <div class="result">
+      <mat-icon>{{
+        data.mode === "ARCA" ? "cloud_sync" : "inventory_2"
+      }}</mat-icon>
+      <span>{{
+        data.mode === "ARCA"
+          ? "Requiere conexión y configuración fiscal válida"
+          : "Registro interno disponible inmediatamente"
+      }}</span>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" (click)="cancel()">
+      Mantener modo actual
+    </button>
+    <button mat-raised-button color="primary" type="button" (click)="confirm()">
+      Confirmar cambio
+    </button>
+  </mat-dialog-actions>
+</section>

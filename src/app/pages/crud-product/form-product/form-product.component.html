@@ -1,181 +1,349 @@
-<form [formGroup]="formGroup">
-
-    <div class="container__title">
-        <app-icon [iconSrc]="'assets/icons/store1.png'"  [size]="'50px'"></app-icon> 
-        <h2 class="title__color" mat-dialog-title>{{ data.tipo === 'createProduct' ?
-            'Crear Nuevo Producto' : 'Actualizar Producto' }}</h2>
+<form [formGroup]="formGroup" class="product-form">
+  <div class="container__title">
+    <app-icon [iconSrc]="'assets/icons/store1.png'" [size]="'50px'"></app-icon>
+    <div class="title-copy">
+      <h2 class="title__color" mat-dialog-title>
+        {{
+          data.tipo === "createProduct" ? "Nuevo producto" : "Editar producto"
+        }}
+      </h2>
+      <span>{{
+        data.tipo === "createProduct"
+          ? "Cargá lo esencial; la configuración avanzada es opcional."
+          : "Datos comerciales, unidades y variantes en un solo lugar."
+      }}</span>
     </div>
+    <button
+      mat-icon-button
+      type="button"
+      class="header-close"
+      aria-label="Cerrar"
+      (click)="cancel()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-    <mat-dialog-content>
-        <div class="container-col">
-            <div class="barCode">
-
-                <!-- CODIGO DE BARRAS -->
-          <mat-form-field class="input codigo__barras" hintLabel="Máximo 15 caracteres">
-  <mat-label>Codigo de Barras</mat-label>
-  <input 
-    matInput 
-    maxlength="15" 
-    formControlName="barCode"
-    (keydown.enter)="$event.preventDefault()" />
-  <mat-hint align="end">
-    {{ formGroup.get('barCode')?.value?.length }}/15
-  </mat-hint>
-  <mat-error *ngIf="formGroup.get('barCode')?.hasError('duplicate')">Ya existe un producto con ese código de barras.</mat-error>
-</mat-form-field>
-
-            </div><!-- FIN CODIGO DE BARRAS  -->
-
-            <!-- COLUMNA1  -->
-
-
-            <div class="col1"> <!-- SELECT  proveedor  LOAD  -->
-                <div class="col2__btnMarca">
-                    <!-- SELECT  MARCAS  LOAD  -->
-                    <mat-form-field class="input marca">
-                        <mat-label>Proveedor</mat-label>
-                        <mat-select formControlName="provider">
-                            <mat-option *ngFor="let item of dataSuplier; " [value]="item.id">
-                                {{item.id}}- {{ item.name}}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <button type="button" class="btn__marca" (click)="createSupplier()">
-                        <mat-icon>add_business</mat-icon>
-                    </button>
-
-                </div>
-
-
-
-
-                <!-- PRODUCTO -->
-                <mat-form-field class="input" hintLabel="Máximo 50 caracteres">
-                    <mat-label>Producto</mat-label>
-                    <input matInput maxlength="50" formControlName="name" />
-                    <mat-hint align="end">{{
-                        formGroup.get('name')?.value?.length
-                        }}/50</mat-hint>
-                </mat-form-field>
-
-        <!-- STOCK MINIMO -->
-        <mat-form-field class="input" hintLabel="Máximo 5 caracteres">
-            <mat-label>Stock Minimo</mat-label>
-            <input matInput maxlength="5" formControlName="stockMin" (input)="onInputChange($event, 'stockMin')" type="text"
-                pattern="[0-9]*" />
-            <mat-hint align="end">{{ formGroup.get('stockMin')?.value?.length }}/5</mat-hint>
-        </mat-form-field>
- 
-        <!-- PRECIO  COSTO -->
-        <mat-form-field class="input" hintLabel="Máximo 12 caracteres">
-            <mat-label>Precio de costo</mat-label>
-            <input matInput maxlength="12" formControlName="price" (input)="onInputChange($event, 'price')" type="text"
-                inputmode="decimal" data-money placeholder="0.00" pattern="^\d*\.?\d*$" />
+  <mat-dialog-content>
+    <div class="loading-product" *ngIf="loadingProduct">
+      <mat-icon>hourglass_top</mat-icon>Cargando producto…
+    </div>
+    <fieldset [disabled]="loadingProduct || saving">
+      <div class="container-col">
+        <div class="barCode">
+          <p class="section-label">
+            <mat-icon>qr_code_scanner</mat-icon>Identificación
+          </p>
+          <!-- CODIGO DE BARRAS -->
+          <mat-form-field
+            class="input codigo__barras"
+            hintLabel="Máximo 15 caracteres"
+          >
+            <mat-label>Codigo de Barras</mat-label>
+            <input
+              matInput
+              maxlength="15"
+              formControlName="barCode"
+              (keydown.enter)="$event.preventDefault()"
+            />
             <mat-hint align="end">
-                {{ formGroup.get('price')?.value?.toString().length || 0 }}/12
+              {{ formGroup.get("barCode")?.value?.length }}/15
+            </mat-hint>
+            <mat-error *ngIf="formGroup.get('barCode')?.hasError('duplicate')"
+              >Ya existe un producto con ese código de barras.</mat-error
+            >
+            <mat-error *ngIf="formGroup.get('barCode')?.hasError('required')"
+              >Ingresá el código de barras.</mat-error
+            >
+          </mat-form-field>
+        </div>
+        <!-- FIN CODIGO DE BARRAS  -->
+
+        <!-- COLUMNA1  -->
+
+        <div class="col1">
+          <p class="section-label">
+            <mat-icon>inventory_2</mat-icon>Datos del producto
+          </p>
+          <!-- SELECT  proveedor  LOAD  -->
+          <div class="col2__btnMarca">
+            <!-- SELECT  MARCAS  LOAD  -->
+            <mat-form-field class="input marca">
+              <mat-label>Proveedor</mat-label>
+              <mat-select formControlName="provider">
+                <mat-option *ngFor="let item of dataSuplier" [value]="item.id">
+                  {{ item.id }}- {{ item.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button type="button" class="btn__marca" (click)="createSupplier()">
+              <mat-icon>add_business</mat-icon>
+            </button>
+          </div>
+
+          <!-- PRODUCTO -->
+          <mat-form-field class="input" hintLabel="Máximo 50 caracteres">
+            <mat-label>Producto</mat-label>
+            <input matInput maxlength="50" formControlName="name" />
+            <mat-hint align="end"
+              >{{ formGroup.get("name")?.value?.length }}/50</mat-hint
+            >
+            <mat-error *ngIf="formGroup.get('name')?.hasError('required')"
+              >Ingresá el nombre del producto.</mat-error
+            >
+          </mat-form-field>
+
+          <!-- PRECIO  COSTO -->
+          <mat-form-field class="input" hintLabel="Máximo 12 caracteres">
+            <mat-label>Precio de costo</mat-label>
+            <input
+              matInput
+              maxlength="12"
+              formControlName="price"
+              (input)="onInputChange($event, 'price')"
+              type="text"
+              inputmode="decimal"
+              data-money
+              placeholder="0.00"
+              pattern="^\d*\.?\d*$"
+            />
+            <mat-hint align="end">
+              {{ formGroup.get("price")?.value?.toString().length || 0 }}/12
             </mat-hint>
             <mat-error *ngIf="formGroup.get('price')?.hasError('pattern')">
-                Solo se permiten números y un punto decimal.
+              Solo se permiten números y un punto decimal.
             </mat-error>
-        </mat-form-field>
+          </mat-form-field>
 
-                <!-- UTILIDAD PORCENTAJE -->
+          <!-- UTILIDAD PORCENTAJE -->
 
-
-    <mat-form-field class="input" hintLabel="Máximo 5 caracteres">
-        <mat-label>Utilidad/Ganacia</mat-label>
-        <input matInput maxlength="7" formControlName="productUsefulness" (input)="onInputChange($event, 'productUsefulness')" type="text"
-            pattern="^\d*\.?\d*$" />
-        <mat-hint align="end">{{ formGroup.get('productUsefulness')?.value?.length }}/5</mat-hint>
-    </mat-form-field>
-
-
-
-
-            </div><!-- FIN COL1  -->
-
-            <!-- COLUMNA 2 -->
-            <div class="col2">
-
-                <div class="col2__btnMarca">
-                    <!-- SELECT  MARCAS  LOAD  -->
-                    <mat-form-field class="input marca">
-                        <mat-label>Marca</mat-label>
-                        <mat-select formControlName="marca">
-                            <mat-option *ngFor="let item of dataMarca; " [value]="item.id">
-                                {{item.id}}- {{ item.marca}}
-
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <button type="button" class="btn__marca" (click)="createMarca()">
-                        <mat-icon>add_circle</mat-icon>
-
-                    </button>
-
-                </div>
-                <!-- STOCK-->
-            <mat-form-field class="input" hintLabel="Máximo 12 caracteres">
-                <mat-label>stock</mat-label>
-                <input matInput maxlength="12" formControlName="stock"
-                    (input)="onInputChange($event,'stock' )" type="text" pattern="[0-9]*" />
-                <mat-hint align="end">{{
-                    formGroup.get('stock')?.value?.length
-                    }}/12</mat-hint>
-            </mat-form-field>
-
-                <mat-form-field class="input" appearance="outline">
-                    <mat-label>Tipo de IVA</mat-label>
-                    <mat-select formControlName="tipoIva"><mat-option *ngFor="let tipo of tiposIva" [value]="tipo.value">{{ tipo.label }}</mat-option></mat-select>
-                </mat-form-field>
-               
-               
-                <!-- PRECIO VENTA -->
-                <section class="precio-venta-box" [class.manual]="precioVentaManual">
-                    <div class="precio-venta-titulo"><div><span>Precio de venta</span><small>{{ editarPrecioVenta ? 'Edición manual: utilidad actualizada' : 'Calculado automáticamente y protegido' }}</small></div><mat-icon>{{ editarPrecioVenta ? 'edit' : 'lock' }}</mat-icon></div>
-                    <mat-form-field class="input" appearance="outline">
-                        <mat-label>Precio final</mat-label>
-                        <span matTextPrefix>$&nbsp;</span>
-                        <input matInput formControlName="salePrice" type="number" min="0" step="0.01" data-money [readonly]="!editarPrecioVenta" (input)="onPrecioVentaManual($event)" />
-                    </mat-form-field>
-                    <div class="ganancia-info"><span>Ganancia</span><strong>{{ gananciaCalculada | currency:'ARS' }}</strong><span>Utilidad: {{ formGroup.get('productUsefulness')?.value || 0 }}%</span></div>
-                    <div class="precio-venta-acciones">
-                        <button mat-button type="button" (click)="habilitarEdicionPrecio()"><mat-icon>edit</mat-icon> Editar precio</button>
-                        <button mat-button type="button" (click)="calcularPrecioAutomatico()"><mat-icon>restart_alt</mat-icon> Automático</button>
-                        <button mat-button type="button" (click)="redondearPrecioVenta()"><mat-icon>roundabout_right</mat-icon> Redondear</button>
-                    </div>
-                </section>
-
-
-
-
-                <!-- SELECT CATEGORIA  -->
-                <div class="col2__btnMarca">
-                <mat-form-field class="input marca">
-                    <mat-label>Categorias</mat-label>
-                    <mat-select formControlName="category">
-                        <mat-option *ngFor="let item of dataCategories; " [value]="item.id">
-                            {{ item.id }} - {{ item.nameCategory }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <button type="button" class="btn__marca" (click)="createCategoria()">
-                    <mat-icon>create_new_folder</mat-icon>
-                </button>
-                </div>
-            </div><!-- FIN DE COL 2 -->
-
+          <mat-form-field class="input" hintLabel="Máximo 5 caracteres">
+            <mat-label>Utilidad / Ganancia (%)</mat-label>
+            <input
+              matInput
+              maxlength="7"
+              formControlName="productUsefulness"
+              (input)="onInputChange($event, 'productUsefulness')"
+              type="text"
+              pattern="^\d*\.?\d*$"
+            />
+            <mat-hint align="end"
+              >{{
+                formGroup.get("productUsefulness")?.value?.length
+              }}/5</mat-hint
+            >
+          </mat-form-field>
         </div>
+        <!-- FIN COL1  -->
 
+        <!-- COLUMNA 2 -->
+        <div class="col2">
+          <p class="section-label">
+            <mat-icon>sell</mat-icon>Precio y clasificación
+          </p>
+          <div class="col2__btnMarca">
+            <!-- SELECT  MARCAS  LOAD  -->
+            <mat-form-field class="input marca">
+              <mat-label>Marca</mat-label>
+              <mat-select formControlName="marca">
+                <mat-option *ngFor="let item of dataMarca" [value]="item.id">
+                  {{ item.id }}- {{ item.marca }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button type="button" class="btn__marca" (click)="createMarca()">
+              <mat-icon>add_circle</mat-icon>
+            </button>
+          </div>
+          <mat-form-field class="input" appearance="outline">
+            <mat-label>Tipo de IVA</mat-label>
+            <mat-select formControlName="tipoIva"
+              ><mat-option *ngFor="let tipo of tiposIva" [value]="tipo.value">{{
+                tipo.label
+              }}</mat-option></mat-select
+            >
+          </mat-form-field>
 
-    </mat-dialog-content>
+          <!-- PRECIO VENTA -->
+          <section class="precio-venta-box" [class.manual]="precioVentaManual">
+            <div class="precio-venta-titulo">
+              <div>
+                <span>Precio de venta</span
+                ><small>{{
+                  editarPrecioVenta
+                    ? "Edición manual: utilidad actualizada"
+                    : "Calculado automáticamente y protegido"
+                }}</small>
+              </div>
+              <mat-icon>{{ editarPrecioVenta ? "edit" : "lock" }}</mat-icon>
+            </div>
+            <mat-form-field class="input" appearance="outline">
+              <mat-label>Precio final</mat-label>
+              <span matTextPrefix>$&nbsp;</span>
+              <input
+                matInput
+                formControlName="salePrice"
+                type="number"
+                min="0"
+                step="0.01"
+                data-money
+                [readonly]="!editarPrecioVenta"
+                (input)="onPrecioVentaManual($event)"
+              />
+            </mat-form-field>
+            <div class="ganancia-info">
+              <span>Ganancia</span
+              ><strong>{{ gananciaCalculada | currency: "ARS" }}</strong
+              ><span
+                >Utilidad:
+                {{ formGroup.get("productUsefulness")?.value || 0 }}%</span
+              >
+            </div>
+            <div class="precio-venta-acciones">
+              <button
+                mat-button
+                type="button"
+                (click)="habilitarEdicionPrecio()"
+              >
+                <mat-icon>edit</mat-icon> Editar precio
+              </button>
+              <button
+                mat-button
+                type="button"
+                (click)="calcularPrecioAutomatico()"
+              >
+                <mat-icon>restart_alt</mat-icon> Automático
+              </button>
+              <button mat-button type="button" (click)="redondearPrecioVenta()">
+                <mat-icon>roundabout_right</mat-icon> Redondear
+              </button>
+            </div>
+          </section>
 
-    <mat-dialog-actions>
-        <div class="btn"></div>
-        <button mat-raised-button class="warn" (click)="cancel()">Cancelar</button>
-        <button mat-raised-button color="primary" (click)="save()"
-            *ngIf="data.tipo === 'createProduct'">Guardar</button>
-        <button mat-raised-button color="primary" (click)="update()"
-            *ngIf="data.tipo !== 'createProduct'">Modificar</button>
-    </mat-dialog-actions>
+          <!-- SELECT CATEGORIA  -->
+          <div class="col2__btnMarca">
+            <mat-form-field class="input marca">
+              <mat-label>Categorias</mat-label>
+              <mat-select formControlName="category">
+                <mat-option
+                  *ngFor="let item of dataCategories"
+                  [value]="item.id"
+                >
+                  {{ item.id }} - {{ item.nameCategory }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button
+              type="button"
+              class="btn__marca"
+              (click)="createCategoria()"
+            >
+              <mat-icon>create_new_folder</mat-icon>
+            </button>
+          </div>
+        </div>
+        <!-- FIN DE COL 2 -->
+      </div>
+
+      <section
+        class="create-stock-config"
+        *ngIf="data.tipo === 'createProduct'"
+      >
+        <div class="stock-config-heading">
+          <mat-icon>inventory</mat-icon>
+          <div>
+            <strong>Unidad y stock inicial</strong
+            ><small
+              >Obligatorio para crear el producto. Podrás modificarlo después
+              desde Administrar stock.</small
+            >
+          </div>
+          <span class="required-badge">REQUERIDO</span>
+        </div>
+        <div class="stock-config-fields">
+          <mat-form-field appearance="outline"
+            ><mat-label>Unidad base</mat-label
+            ><mat-select formControlName="baseUnitId"
+              ><mat-option *ngFor="let unit of units" [value]="unit.id"
+                >{{ unit.name }} · {{ unit.symbol }}</mat-option
+              ></mat-select
+            ><mat-hint>Unidad seleccionada por defecto</mat-hint
+            ><mat-error>Seleccioná una unidad</mat-error></mat-form-field
+          >
+          <mat-form-field appearance="outline"
+            ><mat-label>Stock disponible</mat-label
+            ><input
+              matInput
+              formControlName="stock"
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+            /><mat-hint>Acepta decimales</mat-hint
+            ><mat-error>Ingresá el stock inicial</mat-error></mat-form-field
+          >
+          <mat-form-field appearance="outline"
+            ><mat-label>Avisar cuando queden</mat-label
+            ><input
+              matInput
+              formControlName="stockMin"
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+            /><mat-hint>Stock mínimo</mat-hint
+            ><mat-error>Ingresá un valor válido</mat-error></mat-form-field
+          >
+        </div>
+      </section>
+
+      <section class="inventory-extension" *ngIf="data.updateProduct">
+        <div>
+          <mat-icon>straighten</mat-icon
+          ><span
+            ><strong>{{ "Stock, unidad, presentaciones y variantes" }}</strong
+            ><small
+              >Único lugar para administrar stock, unidades, packs y
+              variantes.</small
+            ></span
+          >
+        </div>
+        <button
+          mat-stroked-button
+          color="primary"
+          type="button"
+          (click)="openInventoryConfig()"
+        >
+          <mat-icon>settings</mat-icon>Administrar stock
+        </button>
+      </section>
+    </fieldset>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <span class="form-status" *ngIf="formGroup.invalid && formGroup.touched"
+      ><mat-icon>info</mat-icon>Revisá los campos obligatorios</span
+    >
+    <button mat-button type="button" (click)="cancel()">Cancelar</button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="save()"
+      [disabled]="
+        saving || loadingProduct || formGroup.invalid || !units.length
+      "
+      *ngIf="data.tipo === 'createProduct'"
+    >
+      <mat-icon>save</mat-icon>{{ saving ? "Guardando…" : "Guardar producto" }}
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="update()"
+      [disabled]="saving || loadingProduct"
+      *ngIf="data.tipo !== 'createProduct'"
+    >
+      <mat-icon>save</mat-icon>{{ saving ? "Guardando…" : "Guardar cambios" }}
+    </button>
+  </mat-dialog-actions>
 </form>

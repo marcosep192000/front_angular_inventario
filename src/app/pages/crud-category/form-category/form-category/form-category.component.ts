@@ -16,6 +16,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { CategoryService } from '../../../../services/category.service';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from "../../../../shared/dasboard/icon/icon.component";
+import { ToastrService } from 'ngx-toastr';
+import { finalize } from 'rxjs';
 @Component({
   selector: 'app-form-category',
   standalone: true,
@@ -30,12 +32,14 @@ import { IconComponent } from "../../../../shared/dasboard/icon/icon.component";
 })
 export class FormCategoryComponent implements OnInit {
   formGroup!: FormGroup;
+  saving = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<FormCategoryComponent>,
     private fb: FormBuilder,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private toastr: ToastrService,
   ) {}
   ngOnInit(): void {
     this.initForm();
@@ -47,18 +51,30 @@ export class FormCategoryComponent implements OnInit {
   }
 
   save(): void {
+    if (this.saving || this.formGroup.invalid) {
+      this.formGroup.markAllAsTouched();
+      return;
+    }
+    this.saving = true;
     this.categoryService
       .createCategory(this.formGroup.value)
-      .subscribe((data) => {
-        this.dialogRef.close(data);
-      });
+      .pipe(finalize(() => (this.saving = false)))
+      .subscribe({ next: (data) => {
+        this.toastr.success('Categoría guardada correctamente.');
+        this.dialogRef.close({ saved: true, data });
+      }, error: (error) => {
+        this.toastr.error(error?.error?.message || 'No se pudo guardar la categoría.');
+      }});
   }
   update(): void {
-   
-    this.categoryService.updateCategory(this.data.idCategory,this.formGroup.value).subscribe((data) => {
-      console.log(data + ' updated', this.data.idCategory);
-      this.dialogRef.close(data);
-    });
+    if (this.saving || this.formGroup.invalid) return;
+    this.saving = true;
+    this.categoryService.updateCategory(this.data.idCategory,this.formGroup.value)
+      .pipe(finalize(() => (this.saving = false)))
+      .subscribe({ next: (data) => {
+        this.toastr.success('Categoría actualizada correctamente.');
+        this.dialogRef.close({ saved: true, data });
+      }, error: (error) => this.toastr.error(error?.error?.message || 'No se pudo actualizar la categoría.') });
 
   }
 

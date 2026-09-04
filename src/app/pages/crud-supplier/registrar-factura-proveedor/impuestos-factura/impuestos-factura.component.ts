@@ -131,8 +131,18 @@ export class ImpuestosFacturaComponent
     },
 
     {
+      value: 'IMPUESTOS_INTERNOS',
+      label: 'Impuestos internos'
+    },
+
+    {
+      value: 'TASA_MUNICIPAL',
+      label: 'Tasa municipal'
+    },
+
+    {
       value: 'RETENCION',
-      label: 'Retención'
+      label: 'Retención informada'
     },
 
     {

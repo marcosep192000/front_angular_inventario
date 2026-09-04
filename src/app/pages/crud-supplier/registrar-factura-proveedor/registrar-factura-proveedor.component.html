@@ -56,11 +56,21 @@
         <strong>{{ totalCalculado | currency:'ARS' }}</strong>
       </div>
 
-      <div class="total-line ajuste-linea">
-        <span>Ajuste de redondeo:</span>
+      <div class="total-line ajuste-linea" *ngIf="diferenciaEsRedondeo">
+        <span>Diferencia:</span>
         <strong [class.text-danger]="ajusteRedondeo < 0" [class.text-success]="ajusteRedondeo > 0">
           {{ ajusteRedondeo | currency:'ARS' }}
         </strong>
+      </div>
+
+      <div class="alerta-diferencia descuento" *ngIf="descuentoFacturaDetectado > 0">
+        <strong>Posible descuento no informado: {{ descuentoFacturaDetectado | currency:'ARS' }}</strong>
+        <span>El total impreso es menor que la suma cargada. Revisá bonificaciones o descuentos antes de registrar.</span>
+      </div>
+
+      <div class="alerta-diferencia recargo" *ngIf="diferenciaFacturaPositiva > 0">
+        <strong>Falta distribuir: {{ diferenciaFacturaPositiva | currency:'ARS' }}</strong>
+        <span>Revisá percepciones, impuestos, gastos o redondeos de la factura.</span>
       </div>
 
       <div class="total-line total-final">

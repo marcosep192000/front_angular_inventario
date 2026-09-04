@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { ResumenReporte } from '../../../../../../../modules/reportes/interfaces/reportes';
 import { ReportesService } from '../../../../../../../modules/reportes/services/reportes.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { switchMap, timer } from 'rxjs';
 
 @Component({
   selector: 'app-inicio-cards-bancos',
@@ -15,6 +17,7 @@ import { ReportesService } from '../../../../../../../modules/reportes/services/
 export class InicioCardsBancosComponent implements OnInit {
   productos: ResumenReporte[] = [];
   cargando = true;
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private readonly reportesService: ReportesService,
@@ -22,8 +25,18 @@ export class InicioCardsBancosComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.reportesService
-      .getRankingProductos({ tipoRanking: 'MAS_VENDIDOS', limit: 10 })
+    // Esta consulta es una de las mas costosas del inicio. Se difiere para que
+    // toolbar, menu y accesos rapidos respondan primero, y se cancela al salir.
+    timer(600)
+      .pipe(
+        switchMap(() =>
+          this.reportesService.getRankingProductos({
+            tipoRanking: 'MAS_VENDIDOS',
+            limit: 10,
+          }),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (respuesta) => {
           this.productos = Array.isArray(respuesta) ? respuesta.slice(0, 10) : [];

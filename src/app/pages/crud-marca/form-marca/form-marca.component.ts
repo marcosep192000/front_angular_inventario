@@ -11,6 +11,7 @@ import { MarcaService } from '../../../services/marca.service';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Marca } from '../../../interfaces/marca';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-form-marca',
@@ -32,6 +33,7 @@ import { Marca } from '../../../interfaces/marca';
 export class FormMarcaComponent implements OnInit {
   formGroup!: FormGroup;
   marcas: Marca[] = [];
+  saving = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -56,18 +58,18 @@ export class FormMarcaComponent implements OnInit {
     this.dialogRef.close();
   }
   save() {
-    
+    if (this.saving) return;
     if (this.formGroup.valid) {
-    this.marcaService.saveMarca(this.formGroup.value).subscribe((data) => {
-      this.dialogRef.close(data);
-      console.log(data);
+    this.saving = true;
+    this.marcaService.saveMarca(this.formGroup.value)
+      .pipe(finalize(() => (this.saving = false)))
+      .subscribe((data) => {
       this.toastr.success("Marca guardada correctamente");
-      this.allMarca();
+      this.dialogRef.close({ saved: true, data });
     }, (error) => {
-      console.error(error);
-      this.toastr.error("Error guardando Marca");
+      this.toastr.error(error?.error?.message || "No se pudo guardar la marca.");
     });  
-}else {this.toastr.error('Error guardando Marca');}
+}else {this.formGroup.markAllAsTouched(); this.toastr.error('Revisá los campos de la marca.');}
 
   
   }

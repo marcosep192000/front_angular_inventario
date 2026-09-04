@@ -97,8 +97,8 @@ export class ListCategoryComponent implements AfterViewInit, OnInit {
       },
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.getCategories();
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.saved) this.getCategories();
     });
   }
   updateCategory(id: number) {
@@ -114,8 +114,8 @@ export class ListCategoryComponent implements AfterViewInit, OnInit {
       },
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.getCategories();
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.saved) this.getCategories();
     });
   }
 

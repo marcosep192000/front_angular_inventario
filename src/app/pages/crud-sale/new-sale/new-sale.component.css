@@ -91,11 +91,7 @@ t.css
 
   color: rgb(70, 2, 80);
 
-  background: linear-gradient(
-    135deg,
-    #603e72 0%,
-    #5f00a3 100%
-  );
+  background: linear-gradient(135deg, #603e72 0%, #5f00a3 100%);
 
   box-shadow: var(--shadow);
 }
@@ -135,6 +131,92 @@ t.css
 
   min-width: 0;
   flex-shrink: 0;
+}
+
+.facturacion-selector {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 40px;
+  padding: 4px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 11px;
+  color: #fff;
+  background: rgba(20, 7, 31, 0.18);
+}
+.facturacion-label {
+  padding: 0 4px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+.mode-option {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 78px;
+  padding: 5px 7px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #efe7f6;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.15s;
+}
+.mode-option:hover:not(.disabled) {
+  background: rgba(255, 255, 255, 0.12);
+}
+.mode-option:active:not(.disabled) {
+  transform: scale(0.98);
+}
+.mode-option.active {
+  border-color: rgba(255, 255, 255, 0.65);
+  color: #40205d;
+  background: #fff;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.16);
+}
+.mode-option.arca-option.active {
+  color: #155f47;
+  background: #e9fff6;
+}
+.mode-option.disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+.mode-option mat-icon {
+  width: 17px;
+  height: 17px;
+  font-size: 17px;
+}
+.mode-option span {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+.mode-option strong {
+  font-size: 11px;
+}
+.mode-option small {
+  margin-top: 2px;
+  font-size: 8px;
+  white-space: nowrap;
+  opacity: 0.72;
+}
+.facturacion-selector .homologacion {
+  padding: 4px 6px;
+  border-radius: 6px;
+  color: #604000;
+  background: #ffda87;
+  font-size: 9px;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .estado-caja {
@@ -308,8 +390,7 @@ t.css
 .search-input:focus {
   border-color: var(--primary);
 
-  box-shadow:
-    0 0 0 3px rgba(25, 118, 210, 0.12);
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.12);
 }
 
 .btn-buscar {
@@ -336,8 +417,7 @@ t.css
   border: 1px solid #e0e0e0;
   border-radius: 10px;
 
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
 
   overflow: hidden;
 }
@@ -805,12 +885,7 @@ t.css
 
   border-radius: 50%;
 
-  background:
-    linear-gradient(
-      135deg,
-      #1976d2,
-      #0d47a1
-    );
+  background: linear-gradient(135deg, #1976d2, #0d47a1);
 
   color: #ffffff;
 
@@ -818,8 +893,7 @@ t.css
 
   font-weight: 700;
 
-  box-shadow:
-    0 3px 8px rgba(25, 118, 210, 0.22);
+  box-shadow: 0 3px 8px rgba(25, 118, 210, 0.22);
 }
 
 /* Datos */
@@ -1014,8 +1088,7 @@ t.css
 
   letter-spacing: 0.4px;
 
-  box-shadow:
-    0 6px 14px rgba(25, 118, 210, 0.25);
+  box-shadow: 0 6px 14px rgba(25, 118, 210, 0.25);
 }
 
 .btn-cobrar:hover {
@@ -1030,7 +1103,7 @@ t.css
 }
 
 .acciones-documento.con-whatsapp {
-  grid-template-columns: minmax(0, 1fr) minmax(170px, .78fr);
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 0.78fr);
 }
 
 .btn-whatsapp {
@@ -1083,7 +1156,9 @@ t.css
 }
 
 @media (max-width: 700px) {
-  .acciones-documento.con-whatsapp { grid-template-columns: 1fr; }
+  .acciones-documento.con-whatsapp {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ============================================================
@@ -1179,7 +1254,6 @@ t.css
    ============================================================ */
 
 @media (max-height: 750px) and (min-width: 1101px) {
-
   .ventas-container {
     grid-template-rows:
       50px
@@ -1283,7 +1357,6 @@ t.css
    ============================================================ */
 
 @media (max-width: 1100px) {
-
   :host {
     height: auto;
     max-height: none;
@@ -1337,7 +1410,6 @@ t.css
 }
 
 @media (max-width: 768px) {
-
   .header-ventas {
     flex-direction: column;
 
@@ -1380,7 +1452,6 @@ t.css
 }
 
 @media (max-width: 500px) {
-
   .ventas-container {
     padding: 6px;
     gap: 6px;
@@ -1405,7 +1476,6 @@ t.css
    ============================================================ */
 
 @media print {
-
   .header-ventas,
   .buscador-card,
   .btn-cobrar,
@@ -1437,4 +1507,10 @@ t.css
 
     margin-bottom: 10px;
   }
+}
+.product-detail {
+  display: block;
+  margin-top: 3px;
+  color: #786987;
+  font-size: 10px;
 }

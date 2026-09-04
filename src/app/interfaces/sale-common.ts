@@ -1,10 +1,18 @@
 import { Client } from './Client';
 
 export interface TicketDetail {
-
   id?: number;
 
   amount: number;
+  quantity?: number;
+  baseQuantity?: number;
+  presentationId?: number | null;
+  inputUnitId?: number | null;
+  variantId?: number | null;
+  unitSnapshot?: string | null;
+  presentationSnapshot?: string | null;
+  variantSnapshot?: string | null;
+  unitPriceAmount?: number | null;
 
   price: number;
 
@@ -27,9 +35,7 @@ export interface TicketDetail {
   unitProfit?: number | null;
 
   totalProfit?: number | null;
-
 }
-
 
 export interface Marca {
   id: number;
@@ -37,9 +43,13 @@ export interface Marca {
 }
 
 import { PagoTicketRequest, PagoTicketResponse } from './pago-ticket';
-
+import { FiscalAuthorizationStatus, ModoFacturacion } from './arca';
 
 export interface SaleCommon {
+  modoFacturacion?: ModoFacturacion;
+  fiscalStatus?: FiscalAuthorizationStatus;
+  originalTicketId?: number | null;
+  fiscalDocument?: import('./arca').ArcaFiscalDocumentResponse | null;
 
   // =========================================================
   // IDENTIFICACIÓN
@@ -62,7 +72,9 @@ export interface SaleCommon {
     | string;
 
   numero?: string;
-
+  number?: string;
+  numeroComprobante?: string;
+  state?: string;
 
   // =========================================================
   // CLIENTE
@@ -73,32 +85,25 @@ export interface SaleCommon {
 
   ctaCte: number | null;
 
-
   // =========================================================
   // CONDICIÓN DE VENTA
   // =========================================================
 
-  condicionVenta:
-    | 'CONTADO'
-    | 'CTA_CTE'
-    | string;
-
+  condicionVenta: 'CONTADO' | 'CTA_CTE' | string;
 
   // =========================================================
   // MEDIO DE PAGO
   // =========================================================
 
-medioPago?: string | null;
+  medioPago?: string | null;
 
   pagos?: PagoTicketRequest[];
-
 
   // =========================================================
   // OBSERVACIÓN
   // =========================================================
 
   observation: string;
-
 
   // =========================================================
   // IMPORTES
@@ -113,13 +118,11 @@ medioPago?: string | null;
   importeNoGravado?: number;
   desgloseIva?: unknown[];
 
-
   // =========================================================
   // DETALLES
   // =========================================================
 
   ticketDetails: TicketDetail[];
-
 
   // =========================================================
   // CAMPOS OPCIONALES DE RESPUESTA
@@ -138,5 +141,4 @@ medioPago?: string | null;
   saldoPendiente?: number;
 
   pagosRegistrados?: PagoTicketResponse[];
-
 }

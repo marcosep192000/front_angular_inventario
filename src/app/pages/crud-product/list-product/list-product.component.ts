@@ -5,7 +5,11 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import {
+  MatPaginator,
+  MatPaginatorModule,
+  PageEvent,
+} from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
@@ -23,6 +27,7 @@ import { BuscarProductoPorProveedorComponent } from '../buscar-producto-por-prov
 import { DialogRef } from '@angular/cdk/dialog';
 import { LicenseService } from '../../../services/license.service';
 import { ToastrService } from 'ngx-toastr';
+import { InventoryConfigComponent } from '../inventory-config/inventory-config.component';
 
 @Component({
   selector: 'app-list-product',
@@ -39,22 +44,20 @@ import { ToastrService } from 'ngx-toastr';
     MatInputModule,
     MatTooltipModule,
     IconComponent,
-    MatMenuModule
+    MatMenuModule,
   ],
   templateUrl: './list-product.component.html',
   styleUrl: './list-product.component.css',
 })
-export class ListProductComponent implements OnInit{
+export class ListProductComponent implements OnInit {
+  // busqueda
+  searchTerm = '';
+  private searchSubject = new Subject<string>();
 
-// busqueda 
-searchTerm = '';
-private searchSubject = new Subject<string>();
-
-
-form!: FormGroup;
-pageSize = 10;
-pageIndex = 0;  
-totalElements = 0;
+  form!: FormGroup;
+  pageSize = 10;
+  pageIndex = 0;
+  totalElements = 0;
   displayedColumns: string[] = [
     'barCode',
     'name',
@@ -67,76 +70,68 @@ totalElements = 0;
 
   dataSource = new MatTableDataSource<Product>([]);
 
-
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private productService: ProductService,
-    public dialog: MatDialog, public license: LicenseService, private toastr: ToastrService
+    public dialog: MatDialog,
+    public license: LicenseService,
+    private toastr: ToastrService,
   ) {}
 
-ngOnInit(): void {
-  this.getProducts(0, this.pageSize);
+  ngOnInit(): void {
+    this.getProducts(0, this.pageSize);
 
-  this.searchSubject
-    .pipe(
-      debounceTime(400),
-      distinctUntilChanged()
-    )
-    .subscribe(value => {
-      this.searchTerm = value;
-      this.pageIndex = 0;
-      this.getProducts(0, this.pageSize, this.searchTerm);
-    });
-}
-applyFilter(event: Event): void {
-  const input = event.target as HTMLInputElement;
-  const value = input.value.trim().toLowerCase();
+    this.searchSubject
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe((value) => {
+        this.searchTerm = value;
+        this.pageIndex = 0;
+        this.getProducts(0, this.pageSize, this.searchTerm);
+      });
+  }
+  applyFilter(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value.trim().toLowerCase();
 
-  // ⚠️ IMPORTANTE: con paginación BACKEND
-  // acá deberías llamar al backend
-  this.getProducts(0, this.pageSize /*, value */);
-}
-
+    // ⚠️ IMPORTANTE: con paginación BACKEND
+    // acá deberías llamar al backend
+    this.getProducts(0, this.pageSize /*, value */);
+  }
 
   // ============================
   // 📦 CARGA CON PAGINACIÓN BACKEND
   // ============================
- getProducts(
-  page: number = 0,
-  size: number = 10,
-  search: string = ''
-): void {
-  this.productService.getProducts(page, size, search).subscribe({
-    next: (res) => {
-      this.dataSource.data = res.content;
-      this.totalElements = res.totalElements;
-      this.pageIndex = page;
-    },
-    error: (err) => {
-      console.error('Error al cargar productos', err);
-    }
-  });
-}
+  getProducts(page: number = 0, size: number = 10, search: string = ''): void {
+    this.productService.getProducts(page, size, search).subscribe({
+      next: (res) => {
+        this.dataSource.data = res.content;
+        this.totalElements = res.totalElements;
+        this.pageIndex = page;
+      },
+      error: (err) => {
+        console.error('Error al cargar productos', err);
+      },
+    });
+  }
 
+  onPageChange(event: PageEvent): void {
+    this.pageSize = event.pageSize;
+    this.pageIndex = event.pageIndex;
 
-onPageChange(event: PageEvent): void {
-  this.pageSize = event.pageSize;
-  this.pageIndex = event.pageIndex;
-
-  this.getProducts(
-    this.pageIndex,
-    this.pageSize,
-    this.searchTerm
-  );
-}
-
+    this.getProducts(this.pageIndex, this.pageSize, this.searchTerm);
+  }
 
   // ============================
   // ➕ CREAR
   // ============================
   createProduct(): void {
-    if (this.limiteProductosAlcanzado) { this.toastr.warning('Alcanzaste el límite de productos permitido por tu plan.'); return; }
+    if (this.limiteProductosAlcanzado) {
+      this.toastr.warning(
+        'Alcanzaste el límite de productos permitido por tu plan.',
+      );
+      return;
+    }
     const dialogRef = this.dialog.open(FormProductComponent, {
       disableClose: true,
       autoFocus: true,
@@ -144,8 +139,9 @@ onPageChange(event: PageEvent): void {
       data: { tipo: 'createProduct' },
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.getProducts(this.paginator.pageIndex, this.paginator.pageSize);
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.saved)
+        this.getProducts(this.paginator.pageIndex, this.paginator.pageSize);
     });
   }
 
@@ -163,9 +159,32 @@ onPageChange(event: PageEvent): void {
       },
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.getProducts(this.paginator.pageIndex, this.paginator.pageSize);
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.saved)
+        this.getProducts(this.paginator.pageIndex, this.paginator.pageSize);
     });
+  }
+
+  configureInventory(product: Product): void {
+    if (!product.id) return;
+    this.dialog
+      .open(InventoryConfigComponent, {
+        width: '900px',
+        maxWidth: '97vw',
+        autoFocus: false,
+        disableClose: true,
+        data: {
+          productId: product.id,
+          productName: product.name,
+          stock: Number(product.stock || 0),
+          stockMin: Number(product.stockMin || 0),
+        },
+      })
+      .afterClosed()
+      .subscribe((result) => {
+        if (result?.changed)
+          this.getProducts(this.pageIndex, this.pageSize, this.searchTerm);
+      });
   }
 
   // ============================
@@ -186,7 +205,7 @@ onPageChange(event: PageEvent): void {
   // 🔍 ACCIONES
   // ============================
   accionesProduct(): void {
-const dialogRef = this.dialog.open(BuscarProductoPorProveedorComponent, {
+    const dialogRef = this.dialog.open(BuscarProductoPorProveedorComponent, {
       autoFocus: true,
       hasBackdrop: true,
       width: '1180px',
@@ -194,11 +213,11 @@ const dialogRef = this.dialog.open(BuscarProductoPorProveedorComponent, {
       maxHeight: '92vh',
       panelClass: 'dialogo-precios-productos',
     });
-  dialogRef.afterClosed().subscribe(result => {
-    if (result === true) {
-      this.getProducts(this.pageIndex, this.pageSize, this.searchTerm);
-    }
-   })
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === true) {
+        this.getProducts(this.pageIndex, this.pageSize, this.searchTerm);
+      }
+    });
   }
   // ============================
   // 🗑️ ELIMINAR
@@ -215,7 +234,7 @@ const dialogRef = this.dialog.open(BuscarProductoPorProveedorComponent, {
       },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result === true) {
         this.productService.delete(id).subscribe(() => {
           this.getProducts(this.paginator.pageIndex, this.paginator.pageSize);
@@ -224,43 +243,58 @@ const dialogRef = this.dialog.open(BuscarProductoPorProveedorComponent, {
     });
   }
 
-onSearchChange(value: string): void {
-  this.filterValue = value;
-  this.searchSubject.next(value.trim());
-}
-
-claseStock(producto: Product): string {
-  if (producto.stock <= 0) {
-    return 'sin-stock';
-  }
-  if (producto.stock <= producto.stockMin) {
-    return 'stock-bajo';
+  onSearchChange(value: string): void {
+    this.filterValue = value;
+    this.searchSubject.next(value.trim());
   }
 
-  return 'stock-ok';
-}
+  claseStock(producto: Product): string {
+    if (producto.stock <= 0) {
+      return 'sin-stock';
+    }
+    if (producto.stock <= producto.stockMin) {
+      return 'stock-bajo';
+    }
 
-get limiteProductosAlcanzado(): boolean { const s=this.license.snapshot; return Boolean(s && s.maxProducts !== -1 && s.currentProducts >= s.maxProducts); }
-get resumenLicenciaProductos(): string { const s=this.license.snapshot; return !s ? '' : `Productos: ${s.currentProducts} / ${s.maxProducts === -1 ? 'Ilimitados' : s.maxProducts.toLocaleString('es-AR')}`; }
+    return 'stock-ok';
+  }
 
-iconoStock(producto: Product): string {
-  return producto.stock <= producto.stockMin ? 'warning_amber' : 'check_circle';
-}
+  get limiteProductosAlcanzado(): boolean {
+    const s = this.license.snapshot;
+    return Boolean(
+      s && s.maxProducts !== -1 && s.currentProducts >= s.maxProducts,
+    );
+  }
+  get resumenLicenciaProductos(): string {
+    const s = this.license.snapshot;
+    return !s
+      ? ''
+      : `Productos: ${s.currentProducts} / ${s.maxProducts === -1 ? 'Ilimitados' : s.maxProducts.toLocaleString('es-AR')}`;
+  }
 
-textoStock(producto: Product): string {
-  return producto.stock > 0 ? `${producto.stock} unidades` : 'Sin stock';
-}
+  iconoStock(producto: Product): string {
+    return producto.stock <= producto.stockMin
+      ? 'warning_amber'
+      : 'check_circle';
+  }
 
-filterValue: string = '';
+  textoStock(producto: Product): string {
+    if (producto.stock <= 0) return 'Sin stock';
+    const cantidad = new Intl.NumberFormat('es-AR', {
+      maximumFractionDigits: 6,
+    }).format(Number(producto.stock));
+    return `${cantidad} ${producto.baseUnit?.symbol || 'un.'}`;
+  }
 
-onFilter(event: Event): void {
-  const value = (event.target as HTMLInputElement).value;
-  this.filterValue = value;
+  filterValue: string = '';
 
-  // Siempre volver a la primera página
-  this.pageIndex = 0;
+  onFilter(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.filterValue = value;
 
-  this.getProducts(0, this.pageSize, this.filterValue);
-}
- 
+    // Siempre volver a la primera página
+    this.pageIndex = 0;
+
+    this.getProducts(0, this.pageSize, this.filterValue);
+  }
 }

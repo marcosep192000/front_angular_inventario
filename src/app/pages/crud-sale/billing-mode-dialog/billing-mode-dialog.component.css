@@ -1,0 +1,97 @@
+.mode-dialog {
+  width: min(520px, 92vw);
+  overflow: hidden;
+  color: #342541;
+  background: #fff;
+}
+.mode-dialog header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 22px;
+  color: #fff;
+  background: linear-gradient(135deg, #4c2a72, #7445ad);
+}
+.mode-dialog[data-mode="ARCA"] header {
+  background: linear-gradient(135deg, #155f47, #248b68);
+}
+.icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.16);
+}
+.icon mat-icon {
+  width: 28px;
+  height: 28px;
+  font-size: 28px;
+}
+.mode-dialog header p {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  opacity: 0.8;
+}
+.mode-dialog h2 {
+  margin: 3px 0 0;
+  font-size: 21px;
+}
+.mode-dialog mat-dialog-content {
+  padding: 20px 22px;
+}
+.homologation {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding: 12px;
+  border: 1px solid #efd189;
+  border-radius: 10px;
+  color: #76510b;
+  background: #fff4d6;
+}
+.homologation div {
+  display: flex;
+  flex-direction: column;
+}
+.homologation span {
+  margin-top: 2px;
+  font-size: 12px;
+}
+.description {
+  margin: 0;
+  color: #62576a;
+  line-height: 1.55;
+}
+.result {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 17px;
+  padding: 12px;
+  border-radius: 10px;
+  color: #4e316e;
+  background: #f4eff9;
+  font-size: 12px;
+  font-weight: 700;
+}
+.mode-dialog[data-mode="ARCA"] .result {
+  color: #176248;
+  background: #eaf7f1;
+}
+.mode-dialog mat-dialog-actions {
+  gap: 8px;
+  padding: 14px 22px 20px;
+}
+@media (max-width: 480px) {
+  .mode-dialog mat-dialog-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+  .mode-dialog mat-dialog-actions button {
+    width: 100%;
+  }
+}

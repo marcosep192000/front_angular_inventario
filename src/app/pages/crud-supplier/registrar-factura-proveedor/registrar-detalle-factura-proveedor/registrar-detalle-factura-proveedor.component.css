@@ -749,6 +749,21 @@ h4 {
   font-weight: 600;
 }
 
+.descuento-detectado {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 16px;
+  padding: 14px 16px;
+  color: #155d38;
+  background: #eaf8f0;
+  border: 1px solid #a9dfbf;
+  border-radius: 10px;
+}
+
+.descuento-detectado div { display: grid; gap: 3px; }
+.descuento-detectado span { font-size: 13px; line-height: 1.4; }
+
 .control-cantidad {
   display: inline-flex;
   align-items: center;

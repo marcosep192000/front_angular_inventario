@@ -1,0 +1,110 @@
+<section class="sale-config">
+  <header>
+    <div>
+      <p>CONFIGURAR PRODUCTO</p>
+      <h2>{{ data.config.productName }}</h2>
+    </div>
+    <button mat-icon-button mat-dialog-close><mat-icon>close</mat-icon></button>
+  </header>
+  <mat-dialog-content>
+    <div class="stock">
+      <span>Disponible</span
+      ><strong>{{ available }} {{ data.config.unit?.symbol || "un." }}</strong>
+    </div>
+    <div class="grid">
+      <mat-form-field appearance="outline" *ngIf="presentations.length"
+        ><mat-label>Presentación</mat-label
+        ><mat-select [(ngModel)]="presentationId"
+          ><mat-option [value]="null">{{
+            data.config.unit?.name || "Unidad base"
+          }}</mat-option
+          ><mat-option *ngFor="let p of presentations" [value]="p.id"
+            >{{ p.name }} · 1 = {{ p.conversionFactor }}
+            {{ data.config.unit?.symbol }}</mat-option
+          ></mat-select
+        ></mat-form-field
+      >
+      <mat-form-field appearance="outline" *ngFor="let attribute of attributes"
+        ><mat-label>{{ attribute }}</mat-label
+        ><mat-select
+          [ngModel]="selectedAttributes[attribute]"
+          (ngModelChange)="selectAttribute(attribute, $event)"
+          ><mat-option
+            *ngFor="let value of values(attribute)"
+            [value]="value"
+            >{{ value }}</mat-option
+          ></mat-select
+        ></mat-form-field
+      >
+      <mat-form-field appearance="outline" *ngIf="!presentation && allowedUnits.length"
+        ><mat-label>Unidad</mat-label
+        ><mat-select [(ngModel)]="selectedUnitId"
+          ><mat-option *ngFor="let unit of allowedUnits" [value]="unit.id"
+            >{{ unit.name }} ({{ unit.symbol }})</mat-option
+          ></mat-select
+        ></mat-form-field
+      >
+      <mat-form-field appearance="outline"
+        ><mat-label>Cantidad</mat-label
+        ><input
+          matInput
+          type="text"
+          [(ngModel)]="quantity"
+          inputmode="decimal"
+          autocomplete="off"
+        /><span matTextSuffix>{{
+          presentation?.unit?.symbol || selectedUnit?.symbol || data.config.unit?.symbol
+        }}</span></mat-form-field
+      >
+    </div>
+    <div class="quick-section" *ngIf="quickOptions.length">
+      <span>Atajos rápidos</span>
+      <div class="quick-options">
+        <button
+          type="button"
+          *ngFor="let option of quickOptions"
+          [class.selected]="isQuickSelected(option)"
+          [disabled]="isQuickDisabled(option)"
+          (click)="selectQuickQuantity(option)">
+          {{ option.label }}
+        </button>
+      </div>
+    </div>
+    <div class="variant" *ngIf="variant">
+      <span>{{ variant.attributes | keyvalue | json }}</span
+      ><small>SKU {{ variant.sku }} · Stock {{ variant.stock }}</small>
+    </div>
+    <div class="preview">
+      <div>
+        <span>Equivalencia</span><strong>{{ equivalence }}</strong>
+      </div>
+      <div>
+        <span>Total estimado</span
+        ><strong>{{ total | currency: "ARS" }}</strong>
+      </div>
+    </div>
+    <p class="error" *ngIf="requestedBase > available">
+      <mat-icon>warning</mat-icon>Stock insuficiente. Solicitás
+      {{ requestedBase }} y hay {{ available }} {{ data.config.unit?.symbol }}.
+    </p>
+    <p class="error" *ngIf="!quantityIsValid">
+      <mat-icon>warning</mat-icon>{{ data.config.fractionable
+        ? 'Ingresá una cantidad mayor que cero. Podés usar coma o punto decimal.'
+        : 'Este producto solo admite cantidades enteras mayores que cero.' }}
+    </p>
+    <p class="help">
+      El backend validará definitivamente la conversión, el precio y el stock.
+    </p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end"
+    ><button mat-stroked-button mat-dialog-close>Cancelar</button
+    ><button
+      mat-raised-button
+      color="primary"
+      [disabled]="!valid"
+      (click)="confirm()"
+    >
+      <mat-icon>add_shopping_cart</mat-icon>Agregar al carrito
+    </button></mat-dialog-actions
+  >
+</section>

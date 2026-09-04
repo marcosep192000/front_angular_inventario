@@ -420,9 +420,7 @@ export class FormSupplierComponent
             'Proveedor guardado correctamente.'
           );
 
-          this.dialogRef.close(
-            data
-          );
+          this.dialogRef.close({ saved: true, data });
 
         },
 
@@ -503,9 +501,7 @@ export class FormSupplierComponent
             'Proveedor actualizado correctamente.'
           );
 
-          this.dialogRef.close(
-            data
-          );
+          this.dialogRef.close({ saved: true, data });
 
         },
 

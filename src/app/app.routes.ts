@@ -22,6 +22,7 @@ import { PurchaseOrderDetailComponent } from './pages/purchase-orders/purchase-o
 import { LicenseComponent } from './pages/license/license.component';
 import { LicenseInfoComponent } from './pages/license/license-info.component';
 import { licenseGuard } from './auth/guard/license.guard';
+import { ArcaConfigurationComponent } from './pages/administracion/arca-configuration.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -48,6 +49,7 @@ export const routes: Routes = [
       { path:'administracion', component: AdministracionComponent, canActivate: [permissionGuard], data: { permission: 'EMPRESA_CONFIGURAR' } }
       ,{ path:'administracion/permisos', component: PermisosComponent, canActivate: [permissionGuard], data: { permission: 'PERMISOS_GESTIONAR' } }
       ,{ path:'administracion/licencia', component: LicenseInfoComponent, canActivate: [permissionGuard], data: { permission: 'EMPRESA_CONFIGURAR' } }
+      ,{ path:'administracion/arca', component: ArcaConfigurationComponent, canActivate: [permissionGuard], data: { permission: 'ARCA_CONFIGURAR' } }
       ,{ path:'empleados', component: EmpleadosComponent, canActivate: [permissionGuard], data: { permission: 'EMPLEADOS_GESTIONAR' } }
       ,{ path:'reportes', component: ReportesComponent, canActivate: [permissionGuard], data: { permission: 'REPORTES_VER' } }
       ,{ path:'reportes/:area/:reporte', component: ReporteDetalleComponent, canActivate: [permissionGuard], data:{permission:'REPORTES_VER',area:'Reportes',titulo:'Reporte',descripcion:'Consulta de información',endpoint:''} }

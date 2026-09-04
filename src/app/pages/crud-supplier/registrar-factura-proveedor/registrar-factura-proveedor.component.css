@@ -57,6 +57,19 @@
     font-size: 1.06rem;
 }
 
+.alerta-diferencia {
+    display: grid;
+    gap: .2rem;
+    margin: .65rem 0;
+    padding: .7rem .8rem;
+    border-radius: 9px;
+    font-size: .82rem;
+}
+
+.alerta-diferencia span { line-height: 1.35; }
+.alerta-diferencia.descuento { background: rgba(35, 180, 105, .22); }
+.alerta-diferencia.recargo { background: rgba(255, 174, 45, .22); }
+
 .btn-crear-factura {
     width: 100%;
     border: 0;

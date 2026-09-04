@@ -172,6 +172,18 @@ export class RegistrarFacturaProveedorComponent
 
   }
 
+  get descuentoFacturaDetectado(): number {
+    return this.ajusteRedondeo < -0.01 ? Math.abs(this.ajusteRedondeo) : 0;
+  }
+
+  get diferenciaFacturaPositiva(): number {
+    return this.ajusteRedondeo > 0.01 ? this.ajusteRedondeo : 0;
+  }
+
+  get diferenciaEsRedondeo(): boolean {
+    return Math.abs(this.ajusteRedondeo) <= 0.01;
+  }
+
 
   // =========================================================
   // ESTADO

@@ -4,40 +4,26 @@ import {
   ElementRef,
   HostListener,
   OnInit,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormBuilder
-} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import {
-  MatDialog,
-  MatDialogModule
-} from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { MatOption } from '@angular/material/core';
-import {
-  MatFormField,
-  MatLabel
-} from '@angular/material/form-field';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatSelect } from '@angular/material/select';
 
-import {
-  Subject,
-  of,
-  firstValueFrom
-} from 'rxjs';
+import { Subject, of, firstValueFrom } from 'rxjs';
 
 import {
   debounceTime,
   distinctUntilChanged,
   switchMap,
-  catchError
+  catchError,
 } from 'rxjs/operators';
 
 import { ToastrService } from 'ngx-toastr';
@@ -47,7 +33,10 @@ import autoTable from 'jspdf-autotable';
 import { CompanyDocumentConfig } from '../../../config/company-document.config';
 import { TicketService } from '../../../services/ticket.service';
 import { AdministracionService } from '../../../services/administracion.service';
-import { CondicionIvaEmpresa, Empresa } from '../../../interfaces/administracion';
+import {
+  CondicionIvaEmpresa,
+  Empresa,
+} from '../../../interfaces/administracion';
 
 import { ProductService } from '../../../services/product.service';
 import { ProductItemSale } from '../../../interfaces/ProductItemSale';
@@ -59,28 +48,35 @@ import { ClientService } from '../../../services/client.service';
 
 import { TotalSaleComponent } from '../total-sale/total-sale.component';
 import { SaldoInsuficienteDialogComponent } from '../total-sale/saldo-insuficiente-dialog.component';
-
+import { ArcaService } from '../../../services/arca.service';
+import { ArcaStatusResponse, ModoFacturacion } from '../../../interfaces/arca';
+import { FiscalStatusComponent } from '../fiscal-status/fiscal-status.component';
+import { TokenService } from '../../../services/token.service';
+import { arcaAvailable } from '../fiscal-status/fiscal-status.utils';
+import { BillingModeDialogComponent } from '../billing-mode-dialog/billing-mode-dialog.component';
+import { InventoryService } from '../../../services/inventory.service';
+import { InventorySaleSelection } from '../../../interfaces/inventory';
+import { SaleConfigurationComponent } from '../sale-configuration/sale-configuration.component';
 import {
-  registrarDeudaCtaCteCliente
-} from '../../../interfaces/registrarDeudaCtaCteCliente';
+  cartIdentity,
+  isAdvancedProduct,
+  saleDetailPayload,
+} from '../sale-configuration/sale-configuration.utils';
+
+import { registrarDeudaCtaCteCliente } from '../../../interfaces/registrarDeudaCtaCteCliente';
 
 import { SaleCommon } from '../../../interfaces/sale-common';
 import { PagoTicketRequest } from '../../../interfaces/pago-ticket';
 
-import {
-  SearchClientByDniComponent
-} from '../../crud-client/search-client-by-dni/search-client-by-dni.component';
+import { SearchClientByDniComponent } from '../../crud-client/search-client-by-dni/search-client-by-dni.component';
 
 import { IconComponent } from '../../../shared/dasboard/icon/icon.component';
-
-
 
 import {
   ConfirmDocumentComponent,
   ConfirmDocumentData,
-  ConfirmDocumentAction
+  ConfirmDocumentAction,
 } from '../confirm-document/confirm-document.component';
-
 
 @Component({
   selector: 'app-new-sale',
@@ -100,15 +96,14 @@ import {
     MatOption,
     MatFormField,
     MatLabel,
-    MatSelect
+    MatSelect,
   ],
 
   templateUrl: './new-sale.component.html',
 
-  styleUrl: './new-sale.component.css'
+  styleUrl: './new-sale.component.css',
 })
 export class NewSaleComponent implements OnInit {
-
   // =====================================================
   // CLIENTES
   // =====================================================
@@ -119,12 +114,15 @@ export class NewSaleComponent implements OnInit {
 
   selectedClient: any;
 
-
   // =====================================================
   // DOCUMENTO
   // =====================================================
 
   tipoDocumento: string = 'FACTURA_C';
+  modoFacturacion: ModoFacturacion = 'INTERNA';
+  arcaStatus: ArcaStatusResponse | null = null;
+  consultandoArca = true;
+  originalTicketId: number | null = null;
   private condicionIvaEmisor: CondicionIvaEmpresa = 'RESPONSABLE_INSCRIPTO';
   private generarPdfAlGuardar = true;
   private empresaDocumento: Partial<Empresa> = {
@@ -140,7 +138,6 @@ export class NewSaleComponent implements OnInit {
 
   medioPago: string | null = 'EFECTIVO';
 
-
   // =====================================================
   // PRODUCTOS
   // =====================================================
@@ -153,13 +150,11 @@ export class NewSaleComponent implements OnInit {
 
   errorMessage?: string;
 
-
   // =====================================================
   // BUSCADOR
   // =====================================================
 
-  private busquedaProducto$ =
-    new Subject<string>();
+  private busquedaProducto$ = new Subject<string>();
 
   productosEncontrados: ProductItemSale[] = [];
 
@@ -169,14 +164,12 @@ export class NewSaleComponent implements OnInit {
 
   indiceSeleccionado = -1;
 
-
   // =====================================================
   // INPUT BUSCADOR
   // =====================================================
 
   @ViewChild('buscadorProducto')
   buscadorProducto?: ElementRef<HTMLInputElement>;
-
 
   // =====================================================
   // VENTA
@@ -186,13 +179,11 @@ export class NewSaleComponent implements OnInit {
 
   today: Date = new Date();
 
-
   // =====================================================
   // CONSTRUCTOR
   // =====================================================
 
   constructor(
-
     fb: FormBuilder,
 
     private productService: ProductService,
@@ -208,20 +199,99 @@ export class NewSaleComponent implements OnInit {
     private clienteService: ClientService,
     private ticketService: TicketService,
     private administracionService: AdministracionService,
-
+    private arcaService: ArcaService,
+    private tokenService: TokenService,
+    private inventoryService: InventoryService,
   ) {}
-
 
   // =====================================================
   // INIT
   // =====================================================
 
   ngOnInit(): void {
-
     this.inicializarBuscador();
     this.seleccionarConsumidorFinal();
     this.cargarCondicionIvaEmisor();
+    this.cargarEstadoArca();
+  }
 
+  cargarEstadoArca(): void {
+    this.consultandoArca = true;
+    this.arcaService.getStatus().subscribe({
+      next: (s) => {
+        this.arcaStatus = s;
+        this.consultandoArca = false;
+        if (!this.arcaDisponible) this.modoFacturacion = 'INTERNA';
+      },
+      error: () => {
+        this.consultandoArca = false;
+        this.arcaStatus = null;
+        this.modoFacturacion = 'INTERNA';
+      },
+    });
+  }
+  get arcaDisponible(): boolean {
+    return arcaAvailable(
+      this.arcaStatus,
+      this.tokenService.hasPermission('COMPROBANTES_FISCALES_EMITIR'),
+    );
+  }
+  get esComprobanteFiscal(): boolean {
+    return /^(FACTURA|NOTA_CREDITO|NOTA_DEBITO)_/.test(this.tipoDocumento);
+  }
+  get esNotaFiscal(): boolean {
+    return /^(NOTA_CREDITO|NOTA_DEBITO)_/.test(this.tipoDocumento);
+  }
+
+  get motivoArcaNoDisponible(): string {
+    if (this.consultandoArca) return 'Verificando configuración fiscal…';
+    if (!this.esComprobanteFiscal)
+      return 'ARCA sólo está disponible para facturas y notas fiscales.';
+    if (!this.tokenService.hasPermission('COMPROBANTES_FISCALES_EMITIR'))
+      return 'No tenés permiso para emitir comprobantes fiscales.';
+    return 'Completá y habilitá la configuración ARCA para utilizarlo.';
+  }
+
+  solicitarCambioModo(mode: ModoFacturacion): void {
+    if (mode === this.modoFacturacion) return;
+    if (
+      mode === 'ARCA' &&
+      (!this.arcaDisponible || !this.esComprobanteFiscal)
+    ) {
+      this.toastr.warning(this.motivoArcaNoDisponible);
+      return;
+    }
+    this.dialog
+      .open(BillingModeDialogComponent, {
+        width: '520px',
+        maxWidth: '94vw',
+        autoFocus: false,
+        restoreFocus: true,
+        data: {
+          mode,
+          homologation: this.arcaStatus?.environment === 'HOMOLOGACION',
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (confirmed) {
+          this.modoFacturacion = mode;
+          this.toastr.success(
+            mode === 'ARCA'
+              ? 'Facturación ARCA seleccionada.'
+              : 'Comprobante interno seleccionado.',
+          );
+        }
+      });
+  }
+
+  validarModoParaDocumento(): void {
+    if (this.modoFacturacion === 'ARCA' && !this.esComprobanteFiscal) {
+      this.modoFacturacion = 'INTERNA';
+      this.toastr.info(
+        'Este documento se genera internamente. ARCA sólo admite facturas y notas fiscales.',
+      );
+    }
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -240,65 +310,73 @@ export class NewSaleComponent implements OnInit {
 
   private seleccionarConsumidorFinal(): void {
     this.clienteService.getClientByCuit('0').subscribe({
-      next: (cliente) => { this.selectedClient = cliente; this.actualizarTipoFactura(cliente); },
-      error: () => this.toastr.warning('No se encontró el cliente Consumidor Final (CUIT 0).'),
+      next: (cliente) => {
+        this.selectedClient = cliente;
+        this.actualizarTipoFactura(cliente);
+      },
+      error: () =>
+        this.toastr.warning(
+          'No se encontró el cliente Consumidor Final (CUIT 0).',
+        ),
     });
   }
 
   private cargarCondicionIvaEmisor(): void {
     this.administracionService.obtenerEmpresa().subscribe({
-      next: empresa => {
+      next: (empresa) => {
         this.empresaDocumento = empresa;
-        this.condicionIvaEmisor = empresa.condicionIva || 'RESPONSABLE_INSCRIPTO';
-        if (this.selectedClient) this.actualizarTipoFactura(this.selectedClient);
-      }
+        this.condicionIvaEmisor =
+          empresa.condicionIva || 'RESPONSABLE_INSCRIPTO';
+        if (this.selectedClient)
+          this.actualizarTipoFactura(this.selectedClient);
+      },
     });
   }
 
   /** Regla fiscal local; el backend conserva la validación final. */
   private actualizarTipoFactura(cliente: Client): void {
-    if (this.condicionIvaEmisor === 'MONOTRIBUTISTA' || this.condicionIvaEmisor === 'EXENTO') {
+    if (
+      this.condicionIvaEmisor === 'MONOTRIBUTISTA' ||
+      this.condicionIvaEmisor === 'EXENTO'
+    ) {
       this.tipoDocumento = 'FACTURA_C';
       return;
     }
 
-    this.tipoDocumento = ['RESPONSABLE_INSCRIPTO', 'MONOTRIBUTISTA'].includes(cliente.condicionIva || '')
+    this.tipoDocumento = ['RESPONSABLE_INSCRIPTO', 'MONOTRIBUTISTA'].includes(
+      cliente.condicionIva || '',
+    )
       ? 'FACTURA_A'
       : 'FACTURA_B';
 
     this.ticketService.obtenerTipoDocumentoSugerido(cliente.id).subscribe({
-      next: tipo => this.tipoDocumento = tipo,
-      error: () => { /* La regla local ya asignó un tipo válido. */ }
+      next: (tipo) => (this.tipoDocumento = tipo),
+      error: () => {
+        /* La regla local ya asignó un tipo válido. */
+      },
     });
   }
-
 
   // =====================================================
   // INICIALIZAR BUSCADOR
   // =====================================================
 
   private inicializarBuscador(): void {
-
     this.busquedaProducto$
 
       .pipe(
-
         debounceTime(300),
 
         distinctUntilChanged(),
 
         switchMap((query: string) => {
-
-          const texto =
-            query.trim();
-
+          const texto = query.trim();
 
           // =============================================
           // BUSCADOR VACÍO
           // =============================================
 
           if (!texto) {
-
             this.productosEncontrados = [];
 
             this.mostrarResultados = false;
@@ -306,9 +384,7 @@ export class NewSaleComponent implements OnInit {
             this.buscandoProductos = false;
 
             return of([]);
-
           }
-
 
           // =============================================
           // BUSCANDO
@@ -321,72 +397,46 @@ export class NewSaleComponent implements OnInit {
             .searchForSale(texto)
 
             .pipe(
-
               catchError((error: any) => {
+                console.error('Error buscando productos:', error);
 
-                console.error(
-                  'Error buscando productos:',
-                  error
-                );
-
-                this.toastr.error(
-                  'No se pudieron buscar los productos.'
-                );
+                this.toastr.error('No se pudieron buscar los productos.');
 
                 return of([]);
-
-              })
-
+              }),
             );
-
-        })
-
+        }),
       )
 
       .subscribe((productos) => {
+        this.productosEncontrados = productos;
 
-        this.productosEncontrados =
-          productos;
+        this.mostrarResultados = productos.length > 0;
 
-        this.mostrarResultados =
-          productos.length > 0;
+        this.buscandoProductos = false;
 
-        this.buscandoProductos =
-          false;
-
-        this.indiceSeleccionado =
-          -1;
-
+        this.indiceSeleccionado = -1;
       });
-
   }
-
 
   // =====================================================
   // CAMBIO DEL INPUT
   // =====================================================
 
   buscarProductos(texto: string): void {
-
     this.busquedaProducto$.next(texto);
-
   }
-
 
   // =====================================================
   // TECLADO BUSCADOR
   // =====================================================
 
-  manejarTeclado(
-    event: KeyboardEvent
-  ): void {
-
+  manejarTeclado(event: KeyboardEvent): void {
     // =============================================
     // ESC
     // =============================================
 
     if (event.key === 'Escape') {
-
       event.preventDefault();
 
       this.mostrarResultados = false;
@@ -394,157 +444,99 @@ export class NewSaleComponent implements OnInit {
       this.indiceSeleccionado = -1;
 
       return;
-
     }
-
 
     // =============================================
     // ENTER
     // =============================================
 
     if (event.key === 'Enter') {
-
       event.preventDefault();
 
-      const query =
-        this.code.trim();
-
+      const query = this.code.trim();
 
       // =============================================
       // SI ESTÁ BUSCANDO
       // =============================================
 
       if (this.buscandoProductos) {
-
         return;
-
       }
-
 
       // =============================================
       // SI HAY RESULTADOS
       // =============================================
 
-      if (
-        this.productosEncontrados.length > 0
-      ) {
-
+      if (this.productosEncontrados.length > 0) {
         const indice =
-          this.indiceSeleccionado >= 0
-            ? this.indiceSeleccionado
-            : 0;
+          this.indiceSeleccionado >= 0 ? this.indiceSeleccionado : 0;
 
-        const producto =
-          this.productosEncontrados[indice];
+        const producto = this.productosEncontrados[indice];
 
         if (producto) {
-
-          this.seleccionarProducto(
-            producto
-          );
-
+          this.seleccionarProducto(producto);
         }
 
         return;
-
       }
-
 
       // =============================================
       // SIN RESULTADOS
       // =============================================
 
       if (query) {
-
-        this.toastr.warning(
-          'No se encontró ningún producto.'
-        );
-
+        this.toastr.warning('No se encontró ningún producto.');
       }
 
       return;
-
     }
-
 
     // =============================================
     // SI NO HAY RESULTADOS
     // =============================================
 
-    if (
-      !this.mostrarResultados ||
-      this.productosEncontrados.length === 0
-    ) {
-
+    if (!this.mostrarResultados || this.productosEncontrados.length === 0) {
       return;
-
     }
-
 
     // =============================================
     // FLECHA ABAJO
     // =============================================
 
     if (event.key === 'ArrowDown') {
-
       event.preventDefault();
 
-      if (
-        this.indiceSeleccionado <
-        this.productosEncontrados.length - 1
-      ) {
-
+      if (this.indiceSeleccionado < this.productosEncontrados.length - 1) {
         this.indiceSeleccionado++;
-
       } else {
-
         this.indiceSeleccionado = 0;
-
       }
 
       return;
-
     }
-
 
     // =============================================
     // FLECHA ARRIBA
     // =============================================
 
     if (event.key === 'ArrowUp') {
-
       event.preventDefault();
 
-      if (
-        this.indiceSeleccionado > 0
-      ) {
-
+      if (this.indiceSeleccionado > 0) {
         this.indiceSeleccionado--;
-
       } else {
-
-        this.indiceSeleccionado =
-          this.productosEncontrados.length - 1;
-
+        this.indiceSeleccionado = this.productosEncontrados.length - 1;
       }
 
       return;
-
     }
-
   }
-
 
   // =====================================================
   // SELECCIONAR PRODUCTO
   // =====================================================
 
-  seleccionarProducto(
-    producto: ProductItemSale
-  ): void {
-
-    this.agregarProducto(producto);
-
+  seleccionarProducto(producto: ProductItemSale): void {
     this.code = '';
 
     this.productosEncontrados = [];
@@ -553,85 +545,133 @@ export class NewSaleComponent implements OnInit {
 
     this.indiceSeleccionado = -1;
 
+    this.inventoryService.getSaleConfiguration(producto.id).subscribe({
+      next: (config) => {
+        if (!isAdvancedProduct(config)) {
+          this.agregarProducto(producto);
+          this.enfocarBuscador();
+          return;
+        }
+        this.dialog
+          .open(SaleConfigurationComponent, {
+            width: '620px',
+            maxWidth: '95vw',
+            autoFocus: false,
+            data: { product: producto, config },
+          })
+          .afterClosed()
+          .subscribe((selection: InventorySaleSelection | undefined) => {
+            if (selection)
+              this.agregarProductoConfigurado(producto, config, selection);
+            this.enfocarBuscador();
+          });
+      },
+      error: () => {
+        // Compatibilidad: un producto anterior conserva el flujo tradicional.
+        this.agregarProducto(producto);
+        this.enfocarBuscador();
+      },
+    });
 
     // =============================================
     // VOLVER AL BUSCADOR
     // =============================================
-
-    setTimeout(() => {
-
-      this.buscadorProducto
-        ?.nativeElement
-        .focus();
-
-    });
-
   }
 
+  private enfocarBuscador(): void {
+    setTimeout(() => this.buscadorProducto?.nativeElement.focus());
+  }
+
+  private agregarProductoConfigurado(
+    producto: ProductItemSale,
+    config: import('../../../interfaces/inventory').ProductSaleConfiguration,
+    selection: InventorySaleSelection,
+  ): void {
+    const key = cartIdentity(
+      producto.id,
+      selection.presentationId,
+      selection.variantId,
+      selection.inputUnitId,
+    );
+    const factor = selection.conversionFactor || 1;
+    const existing = this.products.find((p) => p.cartKey === key);
+    if (existing) {
+      const nextBase =
+        (existing.baseQuantity || 0) + selection.baseQuantity;
+      if (nextBase > selection.available) {
+        this.toastr.warning(
+          'No hay stock suficiente para agregar esa cantidad.',
+        );
+        return;
+      }
+      existing.quantity += selection.quantity;
+      existing.baseQuantity = nextBase;
+      existing.displayQuantity = `${existing.quantity} ${config.presentations.find((p) => p.id === selection.presentationId)?.name || config.allowedUnits?.find((unit) => unit.id === selection.inputUnitId)?.symbol || config.unit?.symbol || 'un.'}`;
+      return;
+    }
+    const variant = config.variants.find((v) => v.id === selection.variantId);
+    this.products.push({
+      ...producto,
+      quantity: selection.quantity,
+      salePrice: selection.unitPrice,
+      stock: selection.available,
+      totalStock: selection.available,
+      presentationId: selection.presentationId,
+      inputUnitId: selection.inputUnitId,
+      variantId: selection.variantId,
+      baseQuantity: selection.baseQuantity,
+      conversionFactor: factor,
+      displayQuantity: selection.displayQuantity,
+      variantLabel: variant
+        ? Object.values(variant.attributes).join(' · ')
+        : '',
+      cartKey: key,
+      advancedSale: true,
+    });
+  }
 
   // =====================================================
   // AGREGAR PRODUCTO
   // =====================================================
 
-  private agregarProducto(
-    data: ProductItemSale
-  ): void {
-
+  private agregarProducto(data: ProductItemSale): void {
     // =============================================
     // CONTROL STOCK
     // =============================================
 
     if (data.stock <= 0) {
-
       this.toastr.warning(
-        `El producto "${data.name}" no tiene stock disponible.`
+        `El producto "${data.name}" no tiene stock disponible.`,
       );
 
       return;
-
     }
-
 
     // =============================================
     // BUSCAR EXISTENTE
     // =============================================
 
-    const existingProduct =
-      this.products.find(
-        (product) =>
-          product.id === data.id
-      );
-
+    const existingProduct = this.products.find(
+      (product) => product.id === data.id,
+    );
 
     // =============================================
     // PRODUCTO EXISTENTE
     // =============================================
 
     if (existingProduct) {
-
-      if (
-        existingProduct.quantity <
-        existingProduct.stock
-      ) {
-
+      if (existingProduct.quantity < existingProduct.stock) {
         existingProduct.quantity += 1;
 
         this.toastr.success(
-          `${existingProduct.name} x${existingProduct.quantity}`
+          `${existingProduct.name} x${existingProduct.quantity}`,
         );
-
       } else {
-
-        this.toastr.error(
-          'Excede al stock disponible.'
-        );
-
+        this.toastr.error('Excede al stock disponible.');
       }
 
       return;
-
     }
-
 
     // =============================================
     // PRODUCTO NUEVO
@@ -640,55 +680,34 @@ export class NewSaleComponent implements OnInit {
     data.quantity = 1;
 
     this.products.push(data);
-
   }
-
 
   // =====================================================
   // BÚSQUEDA MANUAL
   // =====================================================
 
   onSubmit(): void {
-
-    const query =
-      this.code.trim();
-
+    const query = this.code.trim();
 
     if (!query) {
-
       return;
-
     }
-
 
     // =============================================
     // SI YA HAY RESULTADOS
     // =============================================
 
-    if (
-      this.productosEncontrados.length > 0
-    ) {
+    if (this.productosEncontrados.length > 0) {
+      const indice = this.indiceSeleccionado >= 0 ? this.indiceSeleccionado : 0;
 
-      const indice =
-        this.indiceSeleccionado >= 0
-          ? this.indiceSeleccionado
-          : 0;
-
-      const producto =
-        this.productosEncontrados[indice];
+      const producto = this.productosEncontrados[indice];
 
       if (producto) {
-
-        this.seleccionarProducto(
-          producto
-        );
-
+        this.seleccionarProducto(producto);
       }
 
       return;
-
     }
-
 
     // =============================================
     // BÚSQUEDA MANUAL
@@ -701,42 +720,27 @@ export class NewSaleComponent implements OnInit {
       .searchForSale(query)
 
       .pipe(
-
         catchError((error: any) => {
-
-          console.error(
-            'Error buscando producto:',
-            error
-          );
+          console.error('Error buscando producto:', error);
 
           this.buscandoProductos = false;
 
-          this.toastr.error(
-            'No se pudo realizar la búsqueda.'
-          );
+          this.toastr.error('No se pudo realizar la búsqueda.');
 
           return of([]);
-
-        })
-
+        }),
       )
 
       .subscribe((productos) => {
-
         this.buscandoProductos = false;
-
 
         // =============================================
         // NO ENCONTRADO
         // =============================================
 
-        if (
-          !productos ||
-          productos.length === 0
-        ) {
-
+        if (!productos || productos.length === 0) {
           this.toastr.warning(
-            `No se encontró ningún producto para "${query}".`
+            `No se encontró ningún producto para "${query}".`,
           );
 
           this.productosEncontrados = [];
@@ -744,214 +748,155 @@ export class NewSaleComponent implements OnInit {
           this.mostrarResultados = false;
 
           return;
-
         }
-
 
         // =============================================
         // RESULTADOS
         // =============================================
 
-        this.productosEncontrados =
-          productos;
+        this.productosEncontrados = productos;
 
-        this.mostrarResultados =
-          true;
+        this.mostrarResultados = true;
 
-        this.indiceSeleccionado =
-          0;
-
+        this.indiceSeleccionado = 0;
 
         // =============================================
         // UN ÚNICO RESULTADO
         // =============================================
 
-        if (
-          productos.length === 1
-        ) {
-
-          this.seleccionarProducto(
-            productos[0]
-          );
-
+        if (productos.length === 1) {
+          this.seleccionarProducto(productos[0]);
         }
-
       });
-
   }
-
 
   // =====================================================
   // ELIMINAR PRODUCTO
   // =====================================================
 
-  deleteProduct(id: number): void {
-
-    this.products =
-      this.products.filter(
-        (product) =>
-          product.id !== id
-      );
-
+  deleteProduct(target: number | ProductItemSale): void {
+    const selected = typeof target === 'number' ? null : target;
+    this.products = this.products.filter((product) =>
+      selected ? product !== selected : product.id !== target,
+    );
   }
-
 
   // =====================================================
   // CANTIDAD TOTAL
   // =====================================================
 
   getTotalQuantity(): number {
-
     return this.products.reduce(
+      (total, product) => total + product.quantity,
 
-      (total, product) =>
-        total + product.quantity,
-
-      0
-
+      0,
     );
-
   }
-
 
   // =====================================================
   // PRECIO TOTAL
   // =====================================================
 
   getTotalPrice(): number {
-
     return this.products.reduce(
+      (total, product) => total + product.salePrice * product.quantity,
 
-      (total, product) =>
-        total +
-        product.salePrice *
-        product.quantity,
-
-      0
-
+      0,
     );
-
   }
-
 
   // =====================================================
   // BUSCAR CLIENTE
   // =====================================================
 
   getClient(): void {
+    const dialogRef = this.dialog.open(SearchClientByDniComponent, {
+      disableClose: true,
 
-    const dialogRef =
-      this.dialog.open(
-        SearchClientByDniComponent,
-        {
+      autoFocus: true,
 
-          disableClose: true,
+      hasBackdrop: true,
 
-          autoFocus: true,
+      closeOnNavigation: false,
 
-          hasBackdrop: true,
+      data: {
+        tipo: 'createProduct',
+      },
+      width: '780px',
+      maxWidth: '96vw',
+      maxHeight: '94vh',
+      panelClass: 'pixels-client-dialog',
+    });
 
-          closeOnNavigation: false,
-
-          data: {
-            tipo: 'createProduct'
-          }, width: '780px', maxWidth: '96vw', maxHeight: '94vh', panelClass: 'pixels-client-dialog'
-
-        }
-      );
-
-
-    dialogRef
-      .afterClosed()
-      .subscribe((result) => {
-
-        if (result) {
-
-          this.selectedClient =
-            result;
-          this.actualizarTipoFactura(result);
-
-        }
-
-      });
-
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.selectedClient = result;
+        this.actualizarTipoFactura(result);
+      }
+    });
   }
-
 
   // =====================================================
   // DOCUMENTOS SIN COBRO
   // =====================================================
 
   private esDocumentoSinCobro(): boolean {
-
     return (
-
-      this.tipoDocumento ===
-      'PRESUPUESTO' ||
-
-      this.tipoDocumento ===
-      'REMITO' ||
-
-      this.tipoDocumento ===
-      'NOTA_CREDITO_A' ||
-
-      this.tipoDocumento ===
-      'NOTA_CREDITO_B' ||
-
-      this.tipoDocumento ===
-      'NOTA_CREDITO_C' ||
-
-      this.tipoDocumento ===
-      'NOTA_DEBITO_A' ||
-
-      this.tipoDocumento ===
-      'NOTA_DEBITO_B' ||
-
-      this.tipoDocumento ===
-      'NOTA_DEBITO_C'
-
+      this.tipoDocumento === 'PRESUPUESTO' ||
+      this.tipoDocumento === 'REMITO' ||
+      this.tipoDocumento === 'NOTA_CREDITO_A' ||
+      this.tipoDocumento === 'NOTA_CREDITO_B' ||
+      this.tipoDocumento === 'NOTA_CREDITO_C' ||
+      this.tipoDocumento === 'NOTA_DEBITO_A' ||
+      this.tipoDocumento === 'NOTA_DEBITO_B' ||
+      this.tipoDocumento === 'NOTA_DEBITO_C'
     );
-
   }
-
 
   // =====================================================
   // NUEVA VENTA / NUEVO DOCUMENTO
   // =====================================================
 
   async newSale(): Promise<void> {
+    if (
+      this.modoFacturacion === 'ARCA' &&
+      (!this.arcaDisponible || !this.esComprobanteFiscal)
+    ) {
+      this.toastr.warning(
+        'ARCA no está disponible para este comprobante. Se mantiene la facturación interna.',
+      );
+      this.modoFacturacion = 'INTERNA';
+    }
+    if (
+      this.modoFacturacion === 'ARCA' &&
+      this.esNotaFiscal &&
+      !this.originalTicketId
+    ) {
+      this.toastr.warning(
+        'La nota fiscal debe crearse desde el comprobante original autorizado.',
+      );
+      return;
+    }
 
     // =============================================
     // VALIDAR PRODUCTOS
     // =============================================
 
-    if (
-      this.products.length === 0
-    ) {
-
-      this.toastr.warning(
-        'No hay artículos seleccionados.'
-      );
+    if (this.products.length === 0) {
+      this.toastr.warning('No hay artículos seleccionados.');
 
       return;
-
     }
-
 
     // =============================================
     // VALIDAR CLIENTE
     // =============================================
 
     if (!this.selectedClient) {
-
-      this.toastr.warning(
-        'Debe seleccionar un cliente.'
-      );
+      this.toastr.warning('Debe seleccionar un cliente.');
 
       return;
-
     }
-
 
     // =============================================
     // DOCUMENTOS SIN COBRO
@@ -968,613 +913,428 @@ export class NewSaleComponent implements OnInit {
     // Primero mostramos confirmación.
     // =============================================
 
-    if (
-      this.esDocumentoSinCobro()
-    ) {
-
+    if (this.esDocumentoSinCobro()) {
       this.confirmarGeneracionDocumento();
 
       return;
-
     }
-
 
     // =============================================
     // DOCUMENTOS QUE REQUIEREN COBRO
     // =============================================
 
-    const estadoCuentaCorriente = await this.obtenerEstadoCuentaCorriente(this.selectedClient.id);
+    const estadoCuentaCorriente = await this.obtenerEstadoCuentaCorriente(
+      this.selectedClient.id,
+    );
 
-    const dialogRef =
-      this.dialog.open(
-        TotalSaleComponent,
-        {
+    const dialogRef = this.dialog.open(TotalSaleComponent, {
+      disableClose: true,
 
-          disableClose: true,
+      autoFocus: true,
 
-          autoFocus: true,
+      hasBackdrop: true,
 
-          hasBackdrop: true,
+      closeOnNavigation: false,
 
-          closeOnNavigation: false,
+      data: {
+        tipoDocumento: this.tipoDocumento,
 
-          data: {
+        client: this.selectedClient.id,
 
-            tipoDocumento:
-              this.tipoDocumento,
+        clienteNombre:
+          `${this.selectedClient.name} ${this.selectedClient.lastName || ''}`.trim(),
 
-            client:
-              this.selectedClient.id,
+        totalPrice: this.getTotalPrice(),
 
-            clienteNombre:
-              `${this.selectedClient.name} ${this.selectedClient.lastName || ''}`.trim(),
+        cuentaCorriente: estadoCuentaCorriente,
+      },
+    });
 
-            totalPrice:
-              this.getTotalPrice(),
+    dialogRef.afterClosed().subscribe(async (result) => {
+      // =============================================
+      // CANCELÓ
+      // =============================================
 
-            cuentaCorriente: estadoCuentaCorriente
+      if (!result?.pagos?.length) {
+        this.toastr.warning('La venta no fue completada.');
 
-          }
+        return;
+      }
 
-        }
+      const pagos = result.pagos as PagoTicketRequest[];
+      const usaCuentaCorriente = pagos.some(
+        (pago) => pago.medioPago === 'CUENTA_CORRIENTE',
       );
-
-
-    dialogRef
-      .afterClosed()
-      .subscribe(
-        async (result) => {
-
-          // =============================================
-          // CANCELÓ
-          // =============================================
-
-          if (!result?.pagos?.length) {
-
-            this.toastr.warning(
-              'La venta no fue completada.'
-            );
-
-            return;
-
-          }
-
-
-          const pagos = result.pagos as PagoTicketRequest[];
-          const usaCuentaCorriente = pagos.some(
-            pago => pago.medioPago === 'CUENTA_CORRIENTE'
-          );
-          const soloCuentaCorriente = pagos.every(
-            pago => pago.medioPago === 'CUENTA_CORRIENTE'
-          );
-          const montoCuentaCorriente = pagos
-            .filter(pago => pago.medioPago === 'CUENTA_CORRIENTE')
-            .reduce((total, pago) => total + (Number(pago.monto) || 0), 0);
-
-
-          try {
-
-            const estadoActual = usaCuentaCorriente
-              ? await this.obtenerEstadoCuentaCorriente(this.selectedClient.id)
-              : null;
-            const idCtaCte = estadoActual?.id ?? null;
-
-            if (usaCuentaCorriente && (!estadoActual?.habilitada || montoCuentaCorriente > estadoActual.disponible + 0.009)) {
-              this.mostrarSaldoCuentaCorriente(montoCuentaCorriente, estadoActual);
-              return;
-            }
-
-            const sale = this.buildSaleCommon(
-              soloCuentaCorriente ? 'CTA_CTE' : 'CONTADO',
-              idCtaCte,
-              null,
-              pagos,
-            );
-
-            this.saveCommonSale(sale);
-
-          } catch (error) {
-
-            console.error(
-              'Error al procesar el documento:',
-              error
-            );
-
-            this.toastr.error(
-              'Error al procesar el documento.'
-            );
-
-          }
-
-        }
+      const soloCuentaCorriente = pagos.every(
+        (pago) => pago.medioPago === 'CUENTA_CORRIENTE',
       );
+      const montoCuentaCorriente = pagos
+        .filter((pago) => pago.medioPago === 'CUENTA_CORRIENTE')
+        .reduce((total, pago) => total + (Number(pago.monto) || 0), 0);
 
+      try {
+        const estadoActual = usaCuentaCorriente
+          ? await this.obtenerEstadoCuentaCorriente(this.selectedClient.id)
+          : null;
+        const idCtaCte = estadoActual?.id ?? null;
+
+        if (
+          usaCuentaCorriente &&
+          (!estadoActual?.habilitada ||
+            montoCuentaCorriente > estadoActual.disponible + 0.009)
+        ) {
+          this.mostrarSaldoCuentaCorriente(montoCuentaCorriente, estadoActual);
+          return;
+        }
+
+        const sale = this.buildSaleCommon(
+          soloCuentaCorriente ? 'CTA_CTE' : 'CONTADO',
+          idCtaCte,
+          null,
+          pagos,
+        );
+
+        this.saveCommonSale(sale);
+      } catch (error) {
+        console.error('Error al procesar el documento:', error);
+
+        this.toastr.error('Error al procesar el documento.');
+      }
+    });
   }
-
 
   // =====================================================
   // CONFIRMAR DOCUMENTO
   // =====================================================
 
   private confirmarGeneracionDocumento(): void {
+    const data: ConfirmDocumentData = {
+      tipoDocumento: this.tipoDocumento,
 
-    const data:
-      ConfirmDocumentData = {
+      nombreDocumento: this.getNombreDocumento(),
 
-      tipoDocumento:
-        this.tipoDocumento,
+      cliente: this.obtenerNombreCliente(),
 
-      nombreDocumento:
-        this.getNombreDocumento(),
+      cantidadProductos: this.getTotalQuantity(),
 
-      cliente:
-        this.obtenerNombreCliente(),
+      total: this.getTotalPrice(),
 
-      cantidadProductos:
-        this.getTotalQuantity(),
+      mensaje: this.obtenerMensajeConfirmacion(),
 
-      total:
-        this.getTotalPrice(),
+      whatsappDisponible: this.puedeEnviarPresupuestoWhatsapp,
 
-      mensaje:
-        this.obtenerMensajeConfirmacion(),
-
-      whatsappDisponible:
-        this.puedeEnviarPresupuestoWhatsapp,
-
-      motivoWhatsappNoDisponible:
-        this.motivoWhatsappNoDisponible
-
+      motivoWhatsappNoDisponible: this.motivoWhatsappNoDisponible,
     };
 
+    const dialogRef = this.dialog.open(ConfirmDocumentComponent, {
+      width: '620px',
 
-    const dialogRef =
-      this.dialog.open(
-        ConfirmDocumentComponent,
-        {
+      maxWidth: '95vw',
 
-          width: '620px',
+      disableClose: true,
 
-          maxWidth: '95vw',
+      autoFocus: false,
 
-          disableClose: true,
+      hasBackdrop: true,
 
-          autoFocus: false,
+      closeOnNavigation: false,
 
-          hasBackdrop: true,
-
-          closeOnNavigation: false,
-
-          data
-
-        }
-      );
-
+      data,
+    });
 
     dialogRef
       .afterClosed()
-      .subscribe(
-        (accion: ConfirmDocumentAction | null) => {
+      .subscribe((accion: ConfirmDocumentAction | null) => {
+        // =========================================
+        // CANCELÓ
+        // =========================================
 
-          // =========================================
-          // CANCELÓ
-          // =========================================
+        if (!accion) {
+          console.log('Generación de documento cancelada.');
 
-          if (!accion) {
-
-            console.log(
-              'Generación de documento cancelada.'
-            );
-
-            return;
-
-          }
-
-
-          // =========================================
-          // CONFIRMÓ
-          // =========================================
-          //
-          // RECIÉN ACÁ SE CONSTRUYE
-          // Y SE GUARDA EL DOCUMENTO.
-          // =========================================
-
-          this.generarPdfAlGuardar = accion === 'pdf';
-
-          if (accion === 'whatsapp') {
-            this.enviarPresupuestoWhatsapp();
-          }
-
-          const sale =
-            this.buildSaleCommon(
-
-              'CONTADO',
-
-              null,
-
-              this.medioPago
-
-            );
-
-
-          console.log(
-            '=========================================='
-          );
-
-          console.log(
-            'CONFIRMACIÓN ACEPTADA'
-          );
-
-          console.log(
-            'GENERANDO DOCUMENTO:',
-            this.tipoDocumento
-          );
-
-          console.log(
-            '=========================================='
-          );
-
-
-          this.saveCommonSale(
-            sale
-          );
-
+          return;
         }
-      );
 
+        // =========================================
+        // CONFIRMÓ
+        // =========================================
+        //
+        // RECIÉN ACÁ SE CONSTRUYE
+        // Y SE GUARDA EL DOCUMENTO.
+        // =========================================
+
+        this.generarPdfAlGuardar = accion === 'pdf';
+
+        if (accion === 'whatsapp') {
+          this.enviarPresupuestoWhatsapp();
+        }
+
+        const sale = this.buildSaleCommon(
+          'CONTADO',
+
+          null,
+
+          this.medioPago,
+        );
+
+        console.log('==========================================');
+
+        console.log('CONFIRMACIÓN ACEPTADA');
+
+        console.log('GENERANDO DOCUMENTO:', this.tipoDocumento);
+
+        console.log('==========================================');
+
+        this.saveCommonSale(sale);
+      });
   }
-
 
   // =====================================================
   // MENSAJE DE CONFIRMACIÓN
   // =====================================================
 
   private obtenerMensajeConfirmacion(): string {
-
     switch (this.tipoDocumento) {
-
       case 'PRESUPUESTO':
-
-        return (
-          'El presupuesto no afectará la caja ni descontará stock.'
-        );
-
+        return 'El presupuesto no afectará la caja ni descontará stock.';
 
       case 'REMITO':
-
-        return (
-          'El remito registrará la salida de los productos y descontará el stock correspondiente.'
-        );
-
+        return 'El remito registrará la salida de los productos y descontará el stock correspondiente.';
 
       case 'NOTA_CREDITO_A':
       case 'NOTA_CREDITO_B':
       case 'NOTA_CREDITO_C':
-
-        return (
-          'La nota de crédito será registrada y se aplicarán las operaciones correspondientes al documento.'
-        );
-
+        return 'La nota de crédito será registrada y se aplicarán las operaciones correspondientes al documento.';
 
       case 'NOTA_DEBITO_A':
       case 'NOTA_DEBITO_B':
       case 'NOTA_DEBITO_C':
-
-        return (
-          'La nota de débito será registrada y se aplicarán las operaciones correspondientes al documento.'
-        );
-
+        return 'La nota de débito será registrada y se aplicarán las operaciones correspondientes al documento.';
 
       default:
-
-        return (
-          'El documento será registrado en el sistema.'
-        );
-
+        return 'El documento será registrado en el sistema.';
     }
-
   }
-
 
   // =====================================================
   // CUENTA CORRIENTE
   // =====================================================
 
-  private async obtenerEstadoCuentaCorriente(id: number): Promise<{ id: number | null; habilitada: boolean; disponible: number }> {
+  private async obtenerEstadoCuentaCorriente(
+    id: number,
+  ): Promise<{ id: number | null; habilitada: boolean; disponible: number }> {
     try {
-      const cliente = await firstValueFrom(this.clienteService.obtenerClientePorId(id));
+      const cliente = await firstValueFrom(
+        this.clienteService.obtenerClientePorId(id),
+      );
       const cuenta = cliente.cuentaCorriente;
-      if (!cuenta?.id || cuenta.estado === false) return { id: cuenta?.id ?? null, habilitada: false, disponible: 0 };
+      if (!cuenta?.id || cuenta.estado === false)
+        return { id: cuenta?.id ?? null, habilitada: false, disponible: 0 };
       try {
-        const historial = await firstValueFrom(this.ctaCteService.obtenerHistorialCuenta(id));
-        return { id: cuenta.id, habilitada: true, disponible: Math.max(0, Number(historial.saldoDisponible) || 0) };
+        const historial = await firstValueFrom(
+          this.ctaCteService.obtenerHistorialCuenta(id),
+        );
+        return {
+          id: cuenta.id,
+          habilitada: true,
+          disponible: Math.max(0, Number(historial.saldoDisponible) || 0),
+        };
       } catch {
-        return { id: cuenta.id, habilitada: true, disponible: Math.max(0, Number(cuenta.saldo) || 0) };
+        return {
+          id: cuenta.id,
+          habilitada: true,
+          disponible: Math.max(0, Number(cuenta.saldo) || 0),
+        };
       }
     } catch {
       const cuenta = this.selectedClient?.cuentaCorriente;
-      return { id: cuenta?.id ?? null, habilitada: Boolean(cuenta?.id && cuenta.estado !== false), disponible: Math.max(0, Number(cuenta?.saldo) || 0) };
+      return {
+        id: cuenta?.id ?? null,
+        habilitada: Boolean(cuenta?.id && cuenta.estado !== false),
+        disponible: Math.max(0, Number(cuenta?.saldo) || 0),
+      };
     }
   }
 
-  private mostrarSaldoCuentaCorriente(solicitado: number, estado: { habilitada: boolean; disponible: number } | null): void {
+  private mostrarSaldoCuentaCorriente(
+    solicitado: number,
+    estado: { habilitada: boolean; disponible: number } | null,
+  ): void {
     this.dialog.open(SaldoInsuficienteDialogComponent, {
-      width: '480px', maxWidth: '94vw', autoFocus: false,
-      data: { cliente: `${this.selectedClient?.name || 'Cliente'} ${this.selectedClient?.lastName || ''}`.trim(), disponible: estado?.disponible ?? 0, solicitado, sinCuenta: !estado?.habilitada },
+      width: '480px',
+      maxWidth: '94vw',
+      autoFocus: false,
+      data: {
+        cliente:
+          `${this.selectedClient?.name || 'Cliente'} ${this.selectedClient?.lastName || ''}`.trim(),
+        disponible: estado?.disponible ?? 0,
+        solicitado,
+        sinCuenta: !estado?.habilitada,
+      },
     });
   }
 
-  buscarCuentaIdCorrienteCliente(
-    id: number
-  ): Promise<number | null> {
+  buscarCuentaIdCorrienteCliente(id: number): Promise<number | null> {
+    return new Promise((resolve, reject) => {
+      this.clienteService.obtenerClientePorId(id).subscribe({
+        next: (data) => {
+          const idCuenta = data.cuentaCorriente?.id ?? null;
 
-    return new Promise(
-      (resolve, reject) => {
+          console.log('✅ ID cuenta corriente:', idCuenta);
 
-        this.clienteService
-          .obtenerClientePorId(id)
-          .subscribe({
+          resolve(idCuenta);
+        },
 
-            next: (data) => {
+        error: (err: any) => {
+          console.error('Error obteniendo cuenta corriente:', err);
 
-              const idCuenta =
-                data.cuentaCorriente?.id ??
-                null;
-
-              console.log(
-                '✅ ID cuenta corriente:',
-                idCuenta
-              );
-
-              resolve(idCuenta);
-
-            },
-
-            error: (err: any) => {
-
-              console.error(
-                'Error obteniendo cuenta corriente:',
-                err
-              );
-
-              reject(err);
-
-            }
-
-          });
-
-      }
-    );
-
+          reject(err);
+        },
+      });
+    });
   }
-
 
   // =====================================================
   // ACTUALIZAR CUENTA CORRIENTE
   // =====================================================
 
-  saveCtaCteSale(
-    idCliente: number,
-    precioTotal: number
-  ): void {
+  saveCtaCteSale(idCliente: number, precioTotal: number): void {
+    const payload: registrarDeudaCtaCteCliente = {
+      registrarDeudaCtaCte: precioTotal,
 
-    const payload:
-      registrarDeudaCtaCteCliente = {
-
-      registrarDeudaCtaCte:
-        precioTotal,
-
-      ticketIds: []
-
+      ticketIds: [],
     };
 
+    this.ctaCteService.updateCtaCte(idCliente, payload).subscribe({
+      next: (response) => {
+        console.log('Actualización exitosa', response);
+      },
 
-    this.ctaCteService
-      .updateCtaCte(
-        idCliente,
-        payload
-      )
-      .subscribe({
-
-        next: (response) => {
-
-          console.log(
-            'Actualización exitosa',
-            response
-          );
-
-        },
-
-        error: (error: any) => {
-
-          console.error(
-            'Error al actualizar:',
-            error
-          );
-
-        }
-
-      });
-
+      error: (error: any) => {
+        console.error('Error al actualizar:', error);
+      },
+    });
   }
-
 
   // =====================================================
   // GENERAR PDF
   // =====================================================
 
-  generatePDF(
-    saleCommon: SaleCommon
-  ): void {
-
+  generatePDF(saleCommon: SaleCommon): void {
     void this.generarPdfProfesional(saleCommon);
     return;
 
-    const doc =
-      new jsPDF();
-
+    const doc = new jsPDF();
 
     doc.setFontSize(18);
 
-    doc.text(
-      this.getNombreDocumento(),
-      14,
-      20
-    );
-
+    doc.text(this.getNombreDocumento(), 14, 20);
 
     doc.setFontSize(12);
 
-    doc.text(
-      `Cliente: ${this.selectedClient.name}`,
-      14,
-      30
-    );
+    doc.text(`Cliente: ${this.selectedClient.name}`, 14, 30);
 
-    doc.text(
-      `Dirección: ${this.selectedClient.address}`,
-      14,
-      40
-    );
+    doc.text(`Dirección: ${this.selectedClient.address}`, 14, 40);
 
-    doc.text(
-      `Número de comprobante: ${saleCommon.numero}`,
-      14,
-      50
-    );
+    doc.text(`Número de comprobante: ${saleCommon.numero}`, 14, 50);
 
-    doc.text(
-      `Fecha: ${new Date().toLocaleDateString()}`,
-      14,
-      60
-    );
-
+    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 60);
 
     let yPosition = 70;
 
-
     doc.setFontSize(10);
 
+    doc.text('Descripción', 14, yPosition);
 
-    doc.text(
-      'Descripción',
-      14,
-      yPosition
-    );
+    doc.text('Cantidad', 100, yPosition);
 
-    doc.text(
-      'Cantidad',
-      100,
-      yPosition
-    );
+    doc.text('Precio', 140, yPosition);
 
-    doc.text(
-      'Precio',
-      140,
-      yPosition
-    );
-
-    doc.text(
-      'Total',
-      180,
-      yPosition
-    );
-
+    doc.text('Total', 180, yPosition);
 
     yPosition += 10;
 
+    saleCommon.ticketDetails.forEach((item) => {
+      doc.text(item.productName, 14, yPosition);
 
-    saleCommon.ticketDetails
-      .forEach((item) => {
+      doc.text(item.amount.toString(), 100, yPosition);
 
-        doc.text(
-          item.productName,
-          14,
-          yPosition
-        );
+      doc.text(item.salePrice.toFixed(2), 140, yPosition);
 
-        doc.text(
-          item.amount.toString(),
-          100,
-          yPosition
-        );
+      doc.text((item.salePrice * item.amount).toFixed(2), 180, yPosition);
 
-        doc.text(
-          item.salePrice.toFixed(2),
-          140,
-          yPosition
-        );
-
-        doc.text(
-          (
-            item.salePrice *
-            item.amount
-          ).toFixed(2),
-          180,
-          yPosition
-        );
-
-        yPosition += 10;
-
-      });
-
+      yPosition += 10;
+    });
 
     yPosition += 10;
 
-
-    doc.text(
-      `Subtotal: $${saleCommon.subTotal.toFixed(2)}`,
-      14,
-      yPosition
-    );
-
+    doc.text(`Subtotal: $${saleCommon.subTotal.toFixed(2)}`, 14, yPosition);
 
     yPosition += 10;
 
+    doc.text(`Total: $${saleCommon.total.toFixed(2)}`, 14, yPosition);
 
-    doc.text(
-      `Total: $${saleCommon.total.toFixed(2)}`,
-      14,
-      yPosition
-    );
+    doc.save(`${this.getNombreDocumento()}_${saleCommon.numero}.pdf`);
+  }
 
-
-    doc.save(
-      `${this.getNombreDocumento()}_${saleCommon.numero}.pdf`
-    );
-
+  private abrirPdfBackend(ticketId: number): void {
+    this.arcaService.getTicketPdf(ticketId).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank', 'noopener');
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      },
+      error: (error) => {
+        console.error('Error obteniendo PDF desde el backend:', error);
+        this.toastr.warning(
+          'El comprobante fue guardado, pero no se pudo abrir el PDF.',
+        );
+      },
+    });
   }
 
   get puedeEnviarPresupuestoWhatsapp(): boolean {
     const cuit = String(this.selectedClient?.cuit ?? '').trim();
     const telefono = this.telefonoCliente.replace(/\D/g, '');
-    return cuit !== '' && cuit !== '0' && telefono.length >= 8 && this.products.length > 0;
+    return (
+      cuit !== '' &&
+      cuit !== '0' &&
+      telefono.length >= 8 &&
+      this.products.length > 0
+    );
   }
 
   get telefonoCliente(): string {
     return String(
       this.selectedClient?.tel ??
-      this.selectedClient?.telefono ??
-      this.selectedClient?.phone ??
-      ''
+        this.selectedClient?.telefono ??
+        this.selectedClient?.phone ??
+        '',
     ).trim();
   }
 
   get motivoWhatsappNoDisponible(): string {
-    if (String(this.selectedClient?.cuit ?? '').trim() === '0') return 'Seleccioná un cliente registrado.';
-    if (this.telefonoCliente.replace(/\D/g, '').length < 8) return 'El cliente no tiene un celular válido.';
+    if (String(this.selectedClient?.cuit ?? '').trim() === '0')
+      return 'Seleccioná un cliente registrado.';
+    if (this.telefonoCliente.replace(/\D/g, '').length < 8)
+      return 'El cliente no tiene un celular válido.';
     return '';
   }
 
   enviarPresupuestoWhatsapp(): void {
     if (!this.puedeEnviarPresupuestoWhatsapp) {
-      this.toastr.warning('El cliente debe estar registrado y tener un celular válido.');
+      this.toastr.warning(
+        'El cliente debe estar registrado y tener un celular válido.',
+      );
       return;
     }
 
     const telefono = this.normalizarTelefonoWhatsapp(this.telefonoCliente);
     const detalle = this.products
-      .map(producto => `• ${producto.name} x${producto.quantity}: $${(producto.salePrice * producto.quantity).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`)
+      .map(
+        (producto) =>
+          `• ${producto.name} x${producto.quantity}: $${(producto.salePrice * producto.quantity).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+      )
       .join('\n');
     const mensaje = [
       `Hola ${this.obtenerNombreCliente()}, te enviamos el presupuesto de ${this.nombreEmpresaDocumento}:`,
@@ -1582,10 +1342,14 @@ export class NewSaleComponent implements OnInit {
       detalle,
       '',
       `Total: $${this.getTotalPrice().toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
-      `Presupuesto generado el ${new Date().toLocaleDateString('es-AR')}.`
+      `Presupuesto generado el ${new Date().toLocaleDateString('es-AR')}.`,
     ].join('\n');
 
-    window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank', 'noopener,noreferrer');
+    window.open(
+      `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
   }
 
   private normalizarTelefonoWhatsapp(valor: string): string {
@@ -1603,7 +1367,8 @@ export class NewSaleComponent implements OnInit {
     const alto = doc.internal.pageSize.getHeight();
     const nombreDocumento = this.getNombreDocumento();
     const fecha = new Date(saleCommon.fechaEmision || new Date());
-    const moneda = (valor: number) => `$ ${Number(valor || 0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const moneda = (valor: number) =>
+      `$ ${Number(valor || 0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
     doc.setFillColor(64, 46, 114);
     doc.rect(0, 0, ancho, 42, 'F');
@@ -1617,16 +1382,28 @@ export class NewSaleComponent implements OnInit {
     doc.text(this.nombreEmpresaDocumento, logo ? 43 : 14, 18);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
-    doc.text(`CUIT ${this.empresaDocumento.cuit || '-'} · Comprobante interno`, logo ? 43 : 14, 25);
-    doc.text(this.contactoEmpresaDocumento || 'Sistema de gestión comercial', logo ? 43 : 14, 30);
+    doc.text(
+      `CUIT ${this.empresaDocumento.cuit || '-'} · Comprobante interno`,
+      logo ? 43 : 14,
+      25,
+    );
+    doc.text(
+      this.contactoEmpresaDocumento || 'Sistema de gestión comercial',
+      logo ? 43 : 14,
+      30,
+    );
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
     doc.text(nombreDocumento.toUpperCase(), ancho - 14, 17, { align: 'right' });
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
-    doc.text(`Nº ${saleCommon.numero || 'S/N'}`, ancho - 14, 24, { align: 'right' });
-    doc.text(fecha.toLocaleDateString('es-AR'), ancho - 14, 30, { align: 'right' });
+    doc.text(`Nº ${saleCommon.numero || 'S/N'}`, ancho - 14, 24, {
+      align: 'right',
+    });
+    doc.text(fecha.toLocaleDateString('es-AR'), ancho - 14, 30, {
+      align: 'right',
+    });
 
     doc.setTextColor(39, 45, 58);
     doc.setDrawColor(225, 228, 235);
@@ -1641,9 +1418,17 @@ export class NewSaleComponent implements OnInit {
     doc.setFontSize(10);
     doc.text(this.obtenerNombreCliente(), 18, 64);
     doc.setFontSize(8.5);
-    doc.text(`CUIT/DNI: ${this.selectedClient?.cuit || '0'} · ${this.selectedClient?.address || 'Consumidor Final'}`, 18, 70);
+    doc.text(
+      `CUIT/DNI: ${this.selectedClient?.cuit || '0'} · ${this.selectedClient?.address || 'Consumidor Final'}`,
+      18,
+      70,
+    );
     doc.setFontSize(10);
-    doc.text(saleCommon.condicionVenta === 'CTA_CTE' ? 'CUENTA CORRIENTE' : 'CONTADO', 118, 64);
+    doc.text(
+      saleCommon.condicionVenta === 'CTA_CTE' ? 'CUENTA CORRIENTE' : 'CONTADO',
+      118,
+      64,
+    );
     doc.setFontSize(8.5);
     doc.text(`Emisión: ${fecha.toLocaleString('es-AR')}`, 118, 70);
 
@@ -1651,14 +1436,31 @@ export class NewSaleComponent implements OnInit {
       startY: 85,
       head: [['DESCRIPCIÓN', 'CÓDIGO', 'CANT.', 'PRECIO UNIT.', 'IMPORTE']],
       body: saleCommon.ticketDetails.map((item) => [
-        item.productName || 'Producto', item.barCode || '-', String(item.amount),
-        moneda(item.salePrice), moneda(item.salePrice * item.amount),
+        item.productName || 'Producto',
+        item.barCode || '-',
+        String(item.amount),
+        moneda(item.salePrice),
+        moneda(item.salePrice * item.amount),
       ]),
       theme: 'plain',
       margin: { left: 14, right: 14 },
-      styles: { font: 'helvetica', fontSize: 8.5, cellPadding: 3, textColor: [49, 56, 70] },
-      headStyles: { fillColor: [64, 46, 114], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'left' },
-      columnStyles: { 2: { halign: 'center' }, 3: { halign: 'right' }, 4: { halign: 'right' } },
+      styles: {
+        font: 'helvetica',
+        fontSize: 8.5,
+        cellPadding: 3,
+        textColor: [49, 56, 70],
+      },
+      headStyles: {
+        fillColor: [64, 46, 114],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        halign: 'left',
+      },
+      columnStyles: {
+        2: { halign: 'center' },
+        3: { halign: 'right' },
+        4: { halign: 'right' },
+      },
       alternateRowStyles: { fillColor: [248, 247, 251] },
     });
 
@@ -1684,52 +1486,74 @@ export class NewSaleComponent implements OnInit {
       doc.setDrawColor(225, 228, 235);
       doc.line(14, alto - 17, ancho - 14, alto - 17);
       doc.setTextColor(120, 125, 135);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
-      doc.text(`${this.nombreEmpresaDocumento} · Documento generado por el sistema`, 14, alto - 11);
-      doc.text(`Página ${pagina} de ${paginas}`, ancho - 14, alto - 11, { align: 'right' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.text(
+        `${this.nombreEmpresaDocumento} · Documento generado por el sistema`,
+        14,
+        alto - 11,
+      );
+      doc.text(`Página ${pagina} de ${paginas}`, ancho - 14, alto - 11, {
+        align: 'right',
+      });
     }
 
-    doc.save(`${nombreDocumento.replace(/\s+/g, '-').toLowerCase()}-${saleCommon.numero || 'sin-numero'}.pdf`);
+    doc.save(
+      `${nombreDocumento.replace(/\s+/g, '-').toLowerCase()}-${saleCommon.numero || 'sin-numero'}.pdf`,
+    );
   }
 
   private obtenerLogoPdf(): Promise<string | null> {
     return firstValueFrom(this.administracionService.obtenerLogo())
-      .then((blob) => new Promise<string>((resolve, reject) => {
-        const lector = new FileReader();
-        lector.onloadend = () => resolve(String(lector.result));
-        lector.onerror = () => reject();
-        lector.readAsDataURL(blob);
-      }))
-      .catch(() => fetch(CompanyDocumentConfig.logoUrl)
-        .then(respuesta => respuesta.blob())
-        .then(blob => new Promise<string>((resolve, reject) => {
-          const lector = new FileReader();
-          lector.onloadend = () => resolve(String(lector.result));
-          lector.onerror = () => reject();
-          lector.readAsDataURL(blob);
-        }))
-        .catch(() => null));
+      .then(
+        (blob) =>
+          new Promise<string>((resolve, reject) => {
+            const lector = new FileReader();
+            lector.onloadend = () => resolve(String(lector.result));
+            lector.onerror = () => reject();
+            lector.readAsDataURL(blob);
+          }),
+      )
+      .catch(() =>
+        fetch(CompanyDocumentConfig.logoUrl)
+          .then((respuesta) => respuesta.blob())
+          .then(
+            (blob) =>
+              new Promise<string>((resolve, reject) => {
+                const lector = new FileReader();
+                lector.onloadend = () => resolve(String(lector.result));
+                lector.onerror = () => reject();
+                lector.readAsDataURL(blob);
+              }),
+          )
+          .catch(() => null),
+      );
   }
 
   private get nombreEmpresaDocumento(): string {
-    return this.empresaDocumento.nombreFantasia || this.empresaDocumento.name || CompanyDocumentConfig.tradeName;
+    return (
+      this.empresaDocumento.nombreFantasia ||
+      this.empresaDocumento.name ||
+      CompanyDocumentConfig.tradeName
+    );
   }
 
   private get contactoEmpresaDocumento(): string {
-    return [this.empresaDocumento.address, this.empresaDocumento.phone, this.empresaDocumento.email]
+    return [
+      this.empresaDocumento.address,
+      this.empresaDocumento.phone,
+      this.empresaDocumento.email,
+    ]
       .filter(Boolean)
       .join(' · ');
   }
-
 
   // =====================================================
   // NOMBRE DOCUMENTO
   // =====================================================
 
   private getNombreDocumento(): string {
-
     switch (this.tipoDocumento) {
-
       case 'FACTURA_A':
         return 'Factura A';
 
@@ -1765,18 +1589,15 @@ export class NewSaleComponent implements OnInit {
 
       default:
         return 'Comprobante';
-
     }
-
   }
-
 
   // =====================================================
   // NORMALIZAR MEDIO DE PAGO
   // =====================================================
 
   private normalizarMedioPago(
-    medioPago: string | null | undefined
+    medioPago: string | null | undefined,
   ): NonNullable<SaleCommon['medioPago']> {
     switch (medioPago) {
       case 'EFECTIVO':
@@ -1795,13 +1616,11 @@ export class NewSaleComponent implements OnInit {
     }
   }
 
-
   // =====================================================
   // CONSTRUIR VENTA
   // =====================================================
 
   buildSaleCommon(
-
     tipoCuenta: string,
 
     ctaCte: number | null,
@@ -1809,18 +1628,12 @@ export class NewSaleComponent implements OnInit {
     paymentMethod?: string | null,
 
     pagos?: PagoTicketRequest[],
-
   ): SaleCommon {
-
     // =============================================
     // CONDICIÓN DE VENTA
     // =============================================
 
-    const condicionVenta =
-      tipoCuenta === 'CTA_CTE'
-        ? 'CTA_CTE'
-        : 'CONTADO';
-
+    const condicionVenta = tipoCuenta === 'CTA_CTE' ? 'CTA_CTE' : 'CONTADO';
 
     // =============================================
     // MEDIO DE PAGO
@@ -1831,48 +1644,43 @@ export class NewSaleComponent implements OnInit {
         ? null
         : condicionVenta === 'CONTADO'
           ? this.normalizarMedioPago(
-              pagos?.[0]?.medioPago ?? paymentMethod ?? this.medioPago
+              pagos?.[0]?.medioPago ?? paymentMethod ?? this.medioPago,
             )
           : null;
-
 
     // =============================================
     // CONSTRUIR DOCUMENTO
     // =============================================
 
     const sale: SaleCommon = {
+      modoFacturacion: this.modoFacturacion,
+      ...(this.modoFacturacion === 'ARCA' && this.originalTicketId
+        ? { originalTicketId: this.originalTicketId }
+        : {}),
 
       // ===========================================
       // TIPO DOCUMENTO
       // ===========================================
 
-      tipoDocumento:
-        this.tipoDocumento,
-
+      tipoDocumento: this.tipoDocumento,
 
       // ===========================================
       // CLIENTE
       // ===========================================
 
-      client:
-        this.selectedClient.id,
-
+      client: this.selectedClient.id,
 
       // ===========================================
       // CUENTA CORRIENTE
       // ===========================================
 
-      ctaCte:
-        ctaCte,
-
+      ctaCte: ctaCte,
 
       // ===========================================
       // CONDICIÓN
       // ===========================================
 
-      condicionVenta:
-        condicionVenta,
-
+      condicionVenta: condicionVenta,
 
       // ===========================================
       // MEDIO DE PAGO
@@ -1880,10 +1688,7 @@ export class NewSaleComponent implements OnInit {
 
       ...(pagos && pagos.length > 1 ? {} : { medioPago }),
 
-
-      pagos:
-        pagos,
-
+      pagos: pagos,
 
       // ===========================================
       // NÚMERO
@@ -1894,469 +1699,307 @@ export class NewSaleComponent implements OnInit {
 
       numero: '',
 
-
       // ===========================================
       // OBSERVACIÓN
       // ===========================================
 
-      observation:
-        'Observación de la venta',
-
+      observation: 'Observación de la venta',
 
       // ===========================================
       // IMPORTES
       // ===========================================
 
-      subTotal:
-        this.getTotalPrice(),
+      subTotal: this.getTotalPrice(),
 
-      total:
-        this.getTotalPrice(),
-
+      total: this.getTotalPrice(),
 
       // ===========================================
       // DETALLES
       // ===========================================
 
-      ticketDetails:
+      ticketDetails: this.products.map((product) => ({
+        amount: product.quantity,
 
-        this.products.map(
-          (product) => ({
+        ...(product.advancedSale
+          ? {
+              quantity: product.quantity,
+              presentationId: product.presentationId ?? null,
+              inputUnitId: product.inputUnitId ?? null,
+              variantId: product.variantId ?? null,
+            }
+          : {}),
 
-            amount:
-              product.quantity,
+        price: product.price,
 
-            price:
-              product.price,
+        idProduct: product.id,
 
-            idProduct:
-              product.id,
+        productName: product.name,
 
-            productName:
-              product.name,
+        barCode: product.barCode,
 
-            barCode:
-              product.barCode,
+        salePrice: product.salePrice,
 
-            salePrice:
-              product.salePrice,
+        marca: product.marca?.marca ?? '',
 
-            marca:
-              product.marca?.marca ?? '',
+        iva: product.iva,
 
-            iva:
-              product.iva,
-
-            subTotal:
-              product.salePrice *
-              product.quantity
-
-          })
-        )
-
+        subTotal: product.salePrice * product.quantity,
+      })),
     };
 
+    console.log('==========================================');
 
-    console.log(
-      '=========================================='
-    );
+    console.log('DOCUMENTO A ENVIAR');
 
-    console.log(
-      'DOCUMENTO A ENVIAR'
-    );
+    console.log(sale);
 
-    console.log(
-      sale
-    );
-
-    console.log(
-      '=========================================='
-    );
-
+    console.log('==========================================');
 
     return sale;
-
   }
-
 
   // =====================================================
   // GUARDAR DOCUMENTO
   // =====================================================
 
-  saveCommonSale(
-    saleCommon: SaleCommon
-  ): void {
-
+  saveCommonSale(saleCommon: SaleCommon): void {
     if (!this.selectedClient) {
-
-      this.toastr.error(
-        'Debe seleccionar un cliente.'
-      );
+      this.toastr.error('Debe seleccionar un cliente.');
 
       return;
-
     }
 
+    console.log('==========================================');
 
-    console.log(
-      '=========================================='
-    );
+    console.log('GUARDANDO DOCUMENTO');
 
-    console.log(
-      'GUARDANDO DOCUMENTO'
-    );
+    console.log('==========================================');
 
-    console.log(
-      '=========================================='
-    );
+    console.log('Tipo documento:', this.tipoDocumento);
 
-    console.log(
-      'Tipo documento:',
-      this.tipoDocumento
-    );
+    console.log('Número:', saleCommon.numero);
 
-    console.log(
-      'Número:',
-      saleCommon.numero
-    );
+    console.log('Cliente:', saleCommon.client);
 
-    console.log(
-      'Cliente:',
-      saleCommon.client
-    );
+    console.log('Condición:', saleCommon.condicionVenta);
 
-    console.log(
-      'Condición:',
-      saleCommon.condicionVenta
-    );
+    console.log('Medio pago:', saleCommon.medioPago);
 
-    console.log(
-      'Medio pago:',
-      saleCommon.medioPago
-    );
+    console.log('Total:', saleCommon.total);
 
-    console.log(
-      'Total:',
-      saleCommon.total
-    );
-
-    console.log(
-      '=========================================='
-    );
-
+    console.log('==========================================');
 
     const { numero: _numeroLocal, ...ventaSinNumero } = saleCommon;
     const requestVenta = {
       ...ventaSinNumero,
-      ticketDetails: saleCommon.ticketDetails.map(({ idProduct, amount }) => ({ idProduct, amount })),
+      ticketDetails: this.products.map(saleDetailPayload),
     };
 
-    this.commonSale
-      .saveCommon(requestVenta as SaleCommon)
-      .subscribe({
+    this.commonSale.saveCommon(requestVenta as SaleCommon).subscribe({
+      // =============================================
+      // ÉXITO
+      // =============================================
+
+      next: (response: SaleCommon) => {
+        console.log('==========================================');
+
+        console.log('DOCUMENTO GENERADO CORRECTAMENTE');
+
+        console.log('==========================================');
+
+        console.log('Respuesta backend:', response);
 
         // =============================================
-        // ÉXITO
+        // NÚMERO BACKEND
         // =============================================
 
-        next: (response: any) => {
+        const numeroGenerado =
+          response?.numero ??
+          response?.number ??
+          response?.numeroComprobante ??
+          'Sin número asignado';
 
-          console.log(
-            '=========================================='
-          );
+        // =============================================
+        // ESTADO
+        // =============================================
 
-          console.log(
-            'DOCUMENTO GENERADO CORRECTAMENTE'
-          );
+        const estadoGenerado =
+          response?.estado ?? response?.state ?? this.obtenerEstadoDocumento();
 
-          console.log(
-            '=========================================='
-          );
+        const numeroFinal =
+          response?.numero ??
+          response?.number ??
+          response?.numeroComprobante ??
+          numeroGenerado;
 
-          console.log(
-            'Respuesta backend:',
-            response
-          );
+        const estadoFinal =
+          response?.estado ?? response?.state ?? this.obtenerEstadoDocumento();
 
+        console.log('==========================================');
+        console.log('DOCUMENTO GENERADO CORRECTAMENTE');
+        console.log('Tipo:', this.getNombreDocumento());
+        console.log('Número:', numeroFinal);
+        console.log('Estado:', estadoFinal);
+        console.log('==========================================');
 
-          // =============================================
-          // NÚMERO BACKEND
-          // =============================================
+        this.toastr.success(
+          this.modoFacturacion === 'ARCA'
+            ? `Venta N° ${numeroFinal} registrada. Completá ahora la autorización fiscal.`
+            : `${this.getNombreDocumento()} N° ${numeroFinal} generado correctamente.`,
+        );
 
-          const numeroGenerado =
-            response?.numero ??
-            response?.number ??
-            response?.numeroComprobante ??
-            'Sin número asignado';
+        // =============================================
+        // GENERAR PDF
+        // =============================================
+        // El documento ya fue guardado correctamente
+        // en el backend. Recién ahora generamos el PDF.
+        // Usamos saleCommon porque contiene exactamente
+        // los productos y totales que fueron enviados.
+        // =============================================
 
-
-          // =============================================
-          // ESTADO
-          // =============================================
-
-          const estadoGenerado =
-            response?.estado ??
-            response?.state ??
-            this.obtenerEstadoDocumento();
-
-          const numeroFinal =
-            response?.numero ??
-            response?.number ??
-            response?.numeroComprobante ??
-            numeroGenerado;
-
-          const estadoFinal =
-            response?.estado ??
-            response?.state ??
-            this.obtenerEstadoDocumento();
-
-          console.log('==========================================');
-          console.log('DOCUMENTO GENERADO CORRECTAMENTE');
-          console.log('Tipo:', this.getNombreDocumento());
-          console.log('Número:', numeroFinal);
-          console.log('Estado:', estadoFinal);
-          console.log('==========================================');
-
-          this.toastr.success(
-            `${this.getNombreDocumento()} N° ${numeroFinal} generado correctamente.`
-          );
-
-          // =============================================
-          // GENERAR PDF
-          // =============================================
-          // El documento ya fue guardado correctamente
-          // en el backend. Recién ahora generamos el PDF.
-          // Usamos saleCommon porque contiene exactamente
-          // los productos y totales que fueron enviados.
-          // =============================================
-
-          try {
-
-            if (this.generarPdfAlGuardar) {
-              this.generatePDF({ ...saleCommon, numero: numeroFinal });
-            }
-
-          } catch (pdfError: any) {
-
-            console.error(
-              'Error generando PDF:',
-              pdfError
-            );
-
-            this.toastr.warning(
-              'El documento fue guardado, pero no se pudo generar el PDF.'
-            );
-
+        try {
+          if (
+            this.modoFacturacion === 'INTERNA' &&
+            this.generarPdfAlGuardar &&
+            response.id
+          ) {
+            this.abrirPdfBackend(response.id);
           }
+        } catch (pdfError: any) {
+          console.error('Error generando PDF:', pdfError);
 
-          // =============================================
-          // LIMPIAR FORMULARIO
-          // =============================================
+          this.toastr.warning(
+            'El documento fue guardado, pero no se pudo generar el PDF.',
+          );
+        }
 
-          this.limpiarVenta();
-          this.generarPdfAlGuardar = true;
-
-
-          // =============================================
-          // ERROR
+        // =============================================
+        // LIMPIAR FORMULARIO
         // =============================================
 
-        error: (error: any) => {
-
-          this.generarPdfAlGuardar = true;
-
-          console.error(
-            '=========================================='
-          );
-
-          console.error(
-            'ERROR GUARDANDO DOCUMENTO'
-          );
-
-          console.error(
-            error
-          );
-
-          console.error(
-            '=========================================='
-          );
-
-
-          const mensaje =
-            error?.error?.message ??
-            error?.error?.error ??
-            'Hubo un error al guardar el documento.';
-
-
-          this.toastr.error(
-            mensaje
-          );
-
+        if (this.modoFacturacion === 'ARCA' && response.id) {
+          const initialFiscal =
+            response.fiscalDocument ||
+            (response.fiscalStatus
+              ? {
+                  ticketId: response.id,
+                  fiscalStatus: response.fiscalStatus,
+                  modoFacturacion: 'ARCA' as const,
+                }
+              : undefined);
+          this.dialog.open(FiscalStatusComponent, {
+            width: '700px',
+            maxWidth: '96vw',
+            disableClose: true,
+            data: { ticketId: response.id, document: initialFiscal },
+          });
         }
-}
-      });
-
+        this.limpiarVenta();
+        this.generarPdfAlGuardar = true;
+      },
+      error: (error: any) => {
+        this.generarPdfAlGuardar = true;
+        const mensaje =
+          error?.error?.message ??
+          error?.error?.error ??
+          'No se pudo registrar la venta. Revisá los datos e intentá nuevamente.';
+        this.toastr.error(mensaje);
+      },
+    });
   }
-
 
   // =====================================================
   // NOMBRE CLIENTE
   // =====================================================
 
   private obtenerNombreCliente(): string {
-
     if (!this.selectedClient) {
-
       return 'Consumidor Final';
-
     }
 
+    const nombre = this.selectedClient.name ?? '';
 
-    const nombre =
-      this.selectedClient.name ??
-      '';
+    const apellido = this.selectedClient.lastName ?? '';
 
+    const nombreCompleto = `${nombre} ${apellido}`.trim();
 
-    const apellido =
-      this.selectedClient.lastName ??
-      '';
-
-
-    const nombreCompleto =
-      `${nombre} ${apellido}`.trim();
-
-
-    return (
-      nombreCompleto ||
-      'Consumidor Final'
-    );
-
+    return nombreCompleto || 'Consumidor Final';
   }
-
 
   // =====================================================
   // ESTADO DOCUMENTO
   // =====================================================
 
   private obtenerEstadoDocumento(): string {
-
     switch (this.tipoDocumento) {
-
       case 'PRESUPUESTO':
-
         return 'BORRADOR';
 
-
       case 'REMITO':
-
         return 'EMITIDO';
-
 
       case 'NOTA_CREDITO_A':
       case 'NOTA_CREDITO_B':
       case 'NOTA_CREDITO_C':
-
         return 'EMITIDO';
-
 
       case 'NOTA_DEBITO_A':
       case 'NOTA_DEBITO_B':
       case 'NOTA_DEBITO_C':
-
         return 'EMITIDO';
-
 
       case 'FACTURA_A':
       case 'FACTURA_B':
       case 'FACTURA_C':
-
         return 'PAGADO';
 
-
       default:
-
         return 'EMITIDO';
-
     }
-
   }
-
 
   // =====================================================
   // MENSAJE DOCUMENTO
   // =====================================================
 
   private obtenerMensajeDocumento(): string {
-
     switch (this.tipoDocumento) {
-
       case 'PRESUPUESTO':
-
-        return (
-          'El presupuesto fue generado. No afecta caja ni stock.'
-        );
-
+        return 'El presupuesto fue generado. No afecta caja ni stock.';
 
       case 'REMITO':
-
-        return (
-          'El remito fue generado correctamente.'
-        );
-
+        return 'El remito fue generado correctamente.';
 
       case 'NOTA_CREDITO_A':
       case 'NOTA_CREDITO_B':
       case 'NOTA_CREDITO_C':
-
-        return (
-          'La nota de crédito fue generada correctamente.'
-        );
-
+        return 'La nota de crédito fue generada correctamente.';
 
       case 'NOTA_DEBITO_A':
       case 'NOTA_DEBITO_B':
       case 'NOTA_DEBITO_C':
-
-        return (
-          'La nota de débito fue generada correctamente.'
-        );
-
+        return 'La nota de débito fue generada correctamente.';
 
       case 'FACTURA_A':
       case 'FACTURA_B':
       case 'FACTURA_C':
-
-        return (
-          'La factura fue generada y procesada correctamente.'
-        );
-
+        return 'La factura fue generada y procesada correctamente.';
 
       default:
-
-        return (
-          'El documento fue generado correctamente.'
-        );
-
+        return 'El documento fue generado correctamente.';
     }
-
   }
-
 
   // =====================================================
   // ¿ACTUALIZA CAJA?
   // =====================================================
 
-  private documentoActualizaCaja():
-    boolean | undefined {
-
+  private documentoActualizaCaja(): boolean | undefined {
     switch (this.tipoDocumento) {
-
       case 'FACTURA_A':
       case 'FACTURA_B':
       case 'FACTURA_C':
-
         return true;
-
 
       case 'PRESUPUESTO':
       case 'REMITO':
@@ -2366,45 +2009,32 @@ export class NewSaleComponent implements OnInit {
       case 'NOTA_DEBITO_A':
       case 'NOTA_DEBITO_B':
       case 'NOTA_DEBITO_C':
-
         return undefined;
-
 
       default:
-
         return undefined;
-
     }
-
   }
-
 
   // =====================================================
   // ¿ACTUALIZA STOCK?
   // =====================================================
 
-  private documentoActualizaStock():
-    boolean | undefined {
-
+  private documentoActualizaStock(): boolean | undefined {
     switch (this.tipoDocumento) {
-
       // =============================================
       // PRESUPUESTO
       // =============================================
 
       case 'PRESUPUESTO':
-
         return false;
-
 
       // =============================================
       // REMITO
       // =============================================
 
       case 'REMITO':
-
         return true;
-
 
       // =============================================
       // NOTA CRÉDITO
@@ -2413,9 +2043,7 @@ export class NewSaleComponent implements OnInit {
       case 'NOTA_CREDITO_A':
       case 'NOTA_CREDITO_B':
       case 'NOTA_CREDITO_C':
-
         return true;
-
 
       // =============================================
       // NOTA DÉBITO
@@ -2424,9 +2052,7 @@ export class NewSaleComponent implements OnInit {
       case 'NOTA_DEBITO_A':
       case 'NOTA_DEBITO_B':
       case 'NOTA_DEBITO_C':
-
         return true;
-
 
       // =============================================
       // FACTURAS
@@ -2435,25 +2061,18 @@ export class NewSaleComponent implements OnInit {
       case 'FACTURA_A':
       case 'FACTURA_B':
       case 'FACTURA_C':
-
         return true;
 
-
       default:
-
         return undefined;
-
     }
-
   }
-
 
   // =====================================================
   // LIMPIAR VENTA
   // =====================================================
 
   private limpiarVenta(): void {
-
     this.products = [];
 
     this.code = '';
@@ -2470,19 +2089,13 @@ export class NewSaleComponent implements OnInit {
     this.seleccionarConsumidorFinal();
 
     this.buscandoProductos = false;
-
   }
-
 
   // =====================================================
   // IMPRIMIR TICKET
   // =====================================================
 
-  printTicket(
-    saleCommon: SaleCommon,
-    formato: 'A4' | 'TERMICA' = 'A4'
-  ): void {
-
+  printTicket(saleCommon: SaleCommon, formato: 'A4' | 'TERMICA' = 'A4'): void {
     const styles = `
 
       <style>
@@ -2499,18 +2112,10 @@ export class NewSaleComponent implements OnInit {
 
           padding: 10px;
 
-          ${
-            formato === 'TERMICA'
-              ? 'width: 58mm;'
-              : 'width: auto;'
-          }
+          ${formato === 'TERMICA' ? 'width: 58mm;' : 'width: auto;'}
 
           font-size:
-            ${
-              formato === 'TERMICA'
-                ? '12px'
-                : '14px'
-            };
+            ${formato === 'TERMICA' ? '12px' : '14px'};
 
         }
 
@@ -2549,11 +2154,7 @@ export class NewSaleComponent implements OnInit {
             collapse;
 
           font-size:
-            ${
-              formato === 'TERMICA'
-                ? '11px'
-                : '14px'
-            };
+            ${formato === 'TERMICA' ? '11px' : '14px'};
 
         }
 
@@ -2574,7 +2175,6 @@ export class NewSaleComponent implements OnInit {
       </style>
 
     `;
-
 
     const itemsHTML = `
 
@@ -2609,7 +2209,6 @@ export class NewSaleComponent implements OnInit {
           ${saleCommon.ticketDetails
 
             .map(
-
               (d) => `
 
                 <tr>
@@ -2632,8 +2231,7 @@ export class NewSaleComponent implements OnInit {
 
                 </tr>
 
-              `
-
+              `,
             )
 
             .join('')}
@@ -2643,7 +2241,6 @@ export class NewSaleComponent implements OnInit {
       </table>
 
     `;
-
 
     const content = `
 
@@ -2774,174 +2371,115 @@ export class NewSaleComponent implements OnInit {
 
     `;
 
-
-    const popupWin =
-      window.open(
-        '',
-        '_blank',
-        'width=250,height=600'
-      );
-
+    const popupWin = window.open('', '_blank', 'width=250,height=600');
 
     if (popupWin) {
-
       popupWin.document.open();
 
-      popupWin.document.write(
-        content
-      );
+      popupWin.document.write(content);
 
       popupWin.document.close();
-
     }
-
   }
-
 
   // =====================================================
   // AUMENTAR CANTIDAD
   // =====================================================
 
-  increaseQuantity(
-    product: ProductItemSale
-  ): void {
-
-    if (
-      product.quantity <
-      product.stock
-    ) {
-
+  increaseQuantity(product: ProductItemSale): void {
+    const factor = product.conversionFactor || 1;
+    if ((product.baseQuantity ?? product.quantity) + factor <= product.stock) {
       product.quantity++;
-
+      if (product.advancedSale) {
+        product.baseQuantity = (product.baseQuantity || 0) + factor;
+        product.displayQuantity =
+          `${product.quantity} ${product.displayQuantity?.replace(/^\S+\s*/, '') || ''}`.trim();
+      }
     } else {
-
-      this.toastr.warning(
-        'No hay más stock disponible.'
-      );
-
+      this.toastr.warning('No hay más stock disponible.');
     }
-
   }
-
 
   // =====================================================
   // DISMINUIR CANTIDAD
   // =====================================================
 
-  decreaseQuantity(
-    product: ProductItemSale
-  ): void {
-
-    if (
-      product.quantity > 1
-    ) {
-
+  decreaseQuantity(product: ProductItemSale): void {
+    if (product.quantity > (product.advancedSale ? 0.001 : 1)) {
       product.quantity--;
+      if (product.advancedSale)
+        product.baseQuantity = Math.max(
+          0,
+          (product.baseQuantity || 0) - (product.conversionFactor || 1),
+        );
 
       return;
-
     }
 
-    this.deleteProduct(
-      product.id
-    );
-
+    this.deleteProduct(product);
   }
-
 
   // =====================================================
   // TEXTO BOTÓN
   // =====================================================
 
   get textoAccionDocumento(): string {
-
     switch (this.tipoDocumento) {
-
       case 'FACTURA_A':
       case 'FACTURA_B':
       case 'FACTURA_C':
-
         return 'Cobrar venta';
 
-
       case 'PRESUPUESTO':
-
         return 'Generar presupuesto';
 
-
       case 'REMITO':
-
         return 'Generar remito';
-
 
       case 'NOTA_CREDITO_A':
       case 'NOTA_CREDITO_B':
       case 'NOTA_CREDITO_C':
-
         return 'Generar nota de crédito';
-
 
       case 'NOTA_DEBITO_A':
       case 'NOTA_DEBITO_B':
       case 'NOTA_DEBITO_C':
-
         return 'Generar nota de débito';
 
-
       default:
-
         return 'Generar documento';
-
     }
-
   }
-
 
   // =====================================================
   // ICONO BOTÓN
   // =====================================================
 
   get iconoAccionDocumento(): string {
-
     switch (this.tipoDocumento) {
-
       case 'FACTURA_A':
       case 'FACTURA_B':
       case 'FACTURA_C':
-
         return 'payments';
 
-
       case 'PRESUPUESTO':
-
         return 'request_quote';
 
-
       case 'REMITO':
-
         return 'local_shipping';
-
 
       case 'NOTA_CREDITO_A':
       case 'NOTA_CREDITO_B':
       case 'NOTA_CREDITO_C':
-
         return 'assignment_return';
-
 
       case 'NOTA_DEBITO_A':
       case 'NOTA_DEBITO_B':
       case 'NOTA_DEBITO_C':
-
         return 'request_quote';
 
-
       default:
-
         return 'description';
-
     }
-
   }
-
 }

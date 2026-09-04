@@ -51,8 +51,10 @@ export class TicketService {
       ticketDetails: detalles.map((detalle: any) => ({
         ...detalle,
         productName: detalle.productName ?? detalle.nombreProducto ?? detalle.product?.name ?? detalle.producto?.name ?? detalle.producto?.nombre ?? 'Producto sin nombre',
-        amount: Number(detalle.amount ?? detalle.quantity ?? detalle.cantidad ?? 0),
-        salePrice: Number(detalle.salePrice ?? detalle.price ?? detalle.precio ?? detalle.precioUnitario ?? 0),
+        amount: Number(detalle.quantity ?? detalle.amount ?? detalle.cantidad ?? 0),
+        quantity: Number(detalle.quantity ?? detalle.amount ?? detalle.cantidad ?? 0),
+        baseQuantity: Number(detalle.baseQuantity ?? detalle.quantity ?? detalle.amount ?? 0),
+        salePrice: Number(detalle.unitPriceAmount ?? detalle.salePrice ?? detalle.price ?? detalle.precio ?? detalle.precioUnitario ?? 0),
         subTotal: Number(detalle.subTotal ?? detalle.subtotal ?? detalle.importe ?? detalle.total ?? 0),
       })),
       pagos: ticket?.pagos ?? response?.pagos ?? [],
