@@ -45,6 +45,7 @@ import {
   ImpuestosFacturaComponent,
   ImpuestoFacturaProveedor
 } from './impuestos-factura/impuestos-factura.component';
+import { supplierInvoiceErrorMessage } from './supplier-invoice-loading.utils';
 
 
 @Component({
@@ -104,6 +105,10 @@ export class RegistrarFacturaProveedorComponent
   // =========================================================
 
   datosProveedor: any = null;
+
+  private previousProviderId: number | null = null;
+
+  private confirmingProviderChange = false;
 
 
   // =========================================================
@@ -234,8 +239,41 @@ export class RegistrarFacturaProveedorComponent
     datos: any
   ): void {
 
+    const nextProviderId = datos?.provider ? Number(datos.provider) : null;
+
+    if (
+      !this.confirmingProviderChange &&
+      this.previousProviderId &&
+      nextProviderId &&
+      nextProviderId !== this.previousProviderId &&
+      this.productos.length > 0
+    ) {
+      const previousProviderId = this.previousProviderId;
+      this.confirmingProviderChange = true;
+      this.dialog.open(DialogGenericComponent, {
+        disableClose: true,
+        width: '460px',
+        data: {
+          component: '', data: 'Cambiar proveedor', state: 'Cambiar proveedor', icon: '',
+          message: 'Al cambiar el proveedor se eliminarán los artículos cargados de esta factura. ¿Deseás continuar?',
+        },
+      }).afterClosed().subscribe(confirmed => {
+        this.confirmingProviderChange = false;
+        if (confirmed === true) {
+          this.previousProviderId = nextProviderId;
+          this.datosProveedor = datos;
+          this.datosDetallesProveedorComponent?.resetListaProductos();
+        } else {
+          this.datosProveedorComponent?.formInvoice.patchValue({ provider: previousProviderId });
+        }
+      });
+      return;
+    }
+
     this.datosProveedor =
       datos;
+
+    this.previousProviderId = nextProviderId;
 
     console.log(
       'Datos proveedor:',
@@ -1047,10 +1085,7 @@ export class RegistrarFacturaProveedorComponent
 
 
             const mensaje =
-
-              error?.error?.message ??
-
-              'No se pudo registrar la factura.';
+              this.mensajeErrorFactura(error);
 
 
             this.toast.error(
@@ -1129,6 +1164,10 @@ export class RegistrarFacturaProveedorComponent
 
   }
 
+  private mensajeErrorFactura(error: any): string {
+    return supplierInvoiceErrorMessage(error, 'No se pudo registrar la factura.');
+  }
+
 
   // =========================================================
   // RESET COMPLETO
@@ -1138,6 +1177,8 @@ export class RegistrarFacturaProveedorComponent
 
     this.datosProveedor =
       null;
+
+    this.previousProviderId = null;
 
 
     this.productos =

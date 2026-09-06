@@ -41,6 +41,8 @@ export const routes: Routes = [
       { path: 'client-list', component: ListClientComponent, canActivate: [permissionGuard], data: { permission: 'CLIENTES_VER' } },
       { path: 'new-sale', component: NewSaleComponent, canActivate: [permissionGuard], data: { permission: 'VENTAS_CREAR' } },
       { path: 'supplier-list', component: ListSupplierComponent, canActivate: [permissionGuard], data: { permission: 'PROVEEDORES_VER' } },
+      { path: 'proveedores/listas-precios', loadComponent: () => import('./modules/supplier-price-lists/supplier-price-lists.component').then(m => m.SupplierPriceListsComponent), canActivate: [permissionGuard], data: { permission: 'REPORTES_VER', allowAdmin: true } },
+      { path: 'proveedores/listas-precios/:id', loadComponent: () => import('./modules/supplier-price-lists/supplier-price-list-detail.component').then(m => m.SupplierPriceListDetailComponent), canActivate: [permissionGuard], data: { permission: 'REPORTES_VER', allowAdmin: true } },
       { path: 'purchase-orders', component: PurchaseOrderListComponent, canActivate: [permissionGuard], data: { permission: 'COMPRAS_REGISTRAR' } },
       { path: 'purchase-orders/new', component: PurchaseOrderFormComponent, canActivate: [permissionGuard], data: { permission: 'COMPRAS_REGISTRAR' } },
       { path: 'purchase-orders/:id/edit', component: PurchaseOrderFormComponent, canActivate: [permissionGuard], data: { permission: 'COMPRAS_REGISTRAR' } },
@@ -51,7 +53,8 @@ export const routes: Routes = [
       ,{ path:'administracion/licencia', component: LicenseInfoComponent, canActivate: [permissionGuard], data: { permission: 'EMPRESA_CONFIGURAR' } }
       ,{ path:'administracion/arca', component: ArcaConfigurationComponent, canActivate: [permissionGuard], data: { permission: 'ARCA_CONFIGURAR' } }
       ,{ path:'empleados', component: EmpleadosComponent, canActivate: [permissionGuard], data: { permission: 'EMPLEADOS_GESTIONAR' } }
-      ,{ path:'reportes', component: ReportesComponent, canActivate: [permissionGuard], data: { permission: 'REPORTES_VER' } }
+      ,{ path:'reportes', component: ReportesComponent, canActivate: [permissionGuard], data: { permission: 'REPORTES_VER', allowAdmin: true } }
+      ,{ path:'reportes/proveedores', loadComponent: () => import('./modules/reportes/supplier-reports.component').then(m => m.SupplierReportsComponent), canActivate: [permissionGuard], data: { permission: 'REPORTES_VER', allowAdmin: true } }
       ,{ path:'reportes/:area/:reporte', component: ReporteDetalleComponent, canActivate: [permissionGuard], data:{permission:'REPORTES_VER',area:'Reportes',titulo:'Reporte',descripcion:'Consulta de información',endpoint:''} }
     ],
   },

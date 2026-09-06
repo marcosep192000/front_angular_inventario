@@ -8,6 +8,8 @@
 
   <app-registrar-detalle-factura-proveedor
     #childRefDetalle
+    [providerId]="datosProveedor?.provider || null"
+    [providerName]="datosProveedor?.providerName || ''"
     (productosEmitidos)="datosHijo2Change($event)"
     (limpiarTotal)="limpiarTotal($event)">
   </app-registrar-detalle-factura-proveedor>

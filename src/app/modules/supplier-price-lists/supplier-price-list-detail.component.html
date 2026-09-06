@@ -1,0 +1,425 @@
+<section class="detail">
+  <header>
+    <div>
+      <a mat-button routerLink="/dashboard/proveedores/listas-precios"
+        ><mat-icon>arrow_back</mat-icon>Listas</a
+      >
+      <p>LISTA DE PRECIOS</p>
+      <h1>{{ detail?.list?.name || "Cargando…" }}</h1>
+      <span>{{ detail?.list?.providerName }}</span>
+    </div>
+    <div class="actions" *ngIf="detail">
+      <button
+        *ngIf="editable"
+        mat-raised-button
+        color="primary"
+        (click)="importExcel()"
+      >
+        <mat-icon>upload_file</mat-icon>Importar Excel
+      </button>
+      <button
+        *ngIf="editable"
+        mat-raised-button
+        color="primary"
+        (click)="addItem()"
+      >
+        <mat-icon>add</mat-icon>Agregar item</button
+      ><button
+        *ngIf="editable"
+        mat-stroked-button
+        color="primary"
+        (click)="review()"
+        [disabled]="changingStatus"
+      >
+        Marcar como revisada</button
+      ><button
+        *ngIf="canWrite && detail.list.status === 'REVIEWED'"
+        mat-stroked-button
+        color="warn"
+        (click)="archive()"
+        [disabled]="changingStatus"
+      >
+        Archivar
+      </button>
+    </div>
+  </header>
+  <div class="error" *ngIf="error">{{ error }}</div>
+  <ng-container *ngIf="detail as d"
+    ><div class="meta">
+      <span
+        ><small>Estado</small
+        ><b class="status" [class]="d.list.status.toLowerCase()">{{
+          statusLabel()
+        }}</b></span
+      ><span
+        ><small>Referencia</small
+        ><b>{{ d.list.referenceDate | date: "dd/MM/yyyy" }}</b></span
+      ><span
+        ><small>Vigencia</small
+        ><b
+          >{{
+            d.list.validFrom ? (d.list.validFrom | date: "dd/MM/yyyy") : "—"
+          }}
+          –
+          {{
+            d.list.validUntil ? (d.list.validUntil | date: "dd/MM/yyyy") : "—"
+          }}</b
+        ></span
+      ><span
+        ><small>Notas</small><b>{{ d.notes || "Sin notas" }}</b></span
+      >
+    </div>
+    <div class="archived" *ngIf="d.list.status === 'ARCHIVED'">
+      <mat-icon>archive</mat-icon>Lista archivada · modo de sólo lectura
+    </div>
+    <div class="stats">
+      <article>
+        <small>Total items</small><b>{{ d.statistics.totalItems }}</b>
+      </article>
+      <article>
+        <small>Reconocidos</small><b>{{ d.statistics.matchedItems }}</b>
+      </article>
+      <article>
+        <small>Sin reconocer</small><b>{{ d.statistics.unmatchedItems }}</b>
+      </article>
+      <article>
+        <small>Subieron</small><b>{{ d.statistics.increasedItems }}</b>
+      </article>
+      <article>
+        <small>Bajaron</small><b>{{ d.statistics.decreasedItems }}</b>
+      </article>
+      <article>
+        <small>Sin cambios</small><b>{{ d.statistics.unchangedItems }}</b>
+      </article>
+      <article class="best">
+        <small>Nuevas mejores ofertas</small
+        ><b>{{ d.statistics.newBestPriceItems }}</b>
+      </article>
+      <article>
+        <small>Sin comparación</small
+        ><b>{{ d.statistics.itemsWithoutComparison }}</b>
+      </article>
+    </div></ng-container
+  >
+  <mat-tab-group (selectedIndexChange)="tab($event)"
+    ><mat-tab label="Items"
+      ><section class="tab">
+        <div class="filters">
+          <button
+            *ngFor="
+              let f of [
+                'ALL',
+                'MATCHED',
+                'UNMATCHED',
+                'INCREASE',
+                'DECREASE',
+                'BEST',
+              ]
+            "
+            mat-stroked-button
+            [class.active]="filter === f"
+            (click)="filter = $any(f); loadItems()"
+          >
+            {{
+              f === "ALL"
+                ? "Todos"
+                : f === "MATCHED"
+                  ? "Reconocidos"
+                  : f === "UNMATCHED"
+                    ? "Sin reconocer"
+                    : f === "INCREASE"
+                      ? "Aumentos"
+                      : f === "DECREASE"
+                        ? "Bajas"
+                        : "Mejores ofertas"
+            }}</button
+          ><mat-form-field appearance="outline"
+            ><mat-label>Buscar</mat-label
+            ><input
+              matInput
+              [(ngModel)]="search"
+              (keyup.enter)="loadItems()"
+            /><mat-icon matSuffix>search</mat-icon></mat-form-field
+          >
+        </div>
+        <div class="table-wrap" *ngIf="items">
+          <table>
+            <thead>
+              <tr>
+                <th>Descripción proveedor</th>
+                <th>Producto interno</th>
+                <th>Código proveedor</th>
+                <th>Barcode proveedor</th>
+                <th>Precio ofrecido</th>
+                <th>Última compra</th>
+                <th>Costo comercial</th>
+                <th>Mejor costo</th>
+                <th>Dif. última</th>
+                <th>Dif. lista anterior</th>
+                <th>Dif. mejor costo</th>
+                <th>Matching</th>
+                <th>Indicadores</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let x of items.contenido">
+                <td>{{ x.descriptionSnapshot || "—" }}</td>
+                <td>
+                  <b>{{
+                    x.matched ? x.productName : "Producto no identificado"
+                  }}</b
+                  ><small *ngIf="x.productBarcode">{{
+                    x.productBarcode
+                  }}</small>
+                </td>
+                <td>{{ x.supplierProductCode || "—" }}</td>
+                <td>{{ x.supplierBarcode || "—" }}</td>
+                <td>
+                  {{ x.offeredPrice | currency: "ARS" : "symbol" : "1.2-4" }}
+                </td>
+                <td>
+                  {{
+                    x.lastPurchasePriceSnapshot == null
+                      ? "—"
+                      : (x.lastPurchasePriceSnapshot
+                        | currency: "ARS" : "symbol" : "1.2-4")
+                  }}
+                </td>
+                <td>
+                  {{
+                    x.purchasePriceSnapshot == null
+                      ? "—"
+                      : (x.purchasePriceSnapshot
+                        | currency: "ARS" : "symbol" : "1.2-4")
+                  }}
+                </td>
+                <td>
+                  {{
+                    x.bestKnownPriceSnapshot == null
+                      ? "—"
+                      : (x.bestKnownPriceSnapshot
+                        | currency: "ARS" : "symbol" : "1.2-4")
+                  }}
+                </td>
+                <td>
+                  {{
+                    x.differenceVsLastPurchase == null
+                      ? "—"
+                      : (x.differenceVsLastPurchase | currency: "ARS")
+                  }}<small>{{
+                    x.differencePercentageVsLastPurchase == null
+                      ? ""
+                      : (x.differencePercentageVsLastPurchase
+                          | number: "1.2-4") + "%"
+                  }}</small>
+                </td>
+                <td>
+                  {{
+                    x.differenceVsPreviousList == null
+                      ? "—"
+                      : (x.differenceVsPreviousList | currency: "ARS")
+                  }}<small>{{
+                    x.differencePercentageVsPreviousList == null
+                      ? ""
+                      : (x.differencePercentageVsPreviousList
+                          | number: "1.2-4") + "%"
+                  }}</small>
+                </td>
+                <td>
+                  {{
+                    x.differenceVsBestKnown == null
+                      ? "—"
+                      : (x.differenceVsBestKnown | currency: "ARS")
+                  }}<small>{{
+                    x.differencePercentageVsBestKnown == null
+                      ? ""
+                      : (x.differencePercentageVsBestKnown | number: "1.2-4") +
+                        "%"
+                  }}</small>
+                </td>
+                <td>
+                  <span class="chip">{{ matchLabel(x.matchType) }}</span>
+                </td>
+                <td>
+                  <span class="indicator up" *ngIf="x.priceIncreased"
+                    >↑ Aumentó</span
+                  ><span class="indicator down" *ngIf="x.priceDecreased"
+                    >↓ Bajó</span
+                  ><span class="indicator best" *ngIf="x.newBestPrice"
+                    >✓ Nueva mejor oferta</span
+                  ><span
+                    class="indicator warning"
+                    *ngIf="x.moreExpensiveThanBest"
+                    >⚠ Más caro</span
+                  ><span class="indicator" *ngIf="x.noComparison"
+                    >— Sin comparación</span
+                  >
+                </td>
+                <td>
+                  <button
+                    *ngIf="editable && !x.matched"
+                    mat-button
+                    color="primary"
+                    (click)="link(x)"
+                  >
+                    Vincular producto</button
+                  ><button
+                    *ngIf="canUnlink(x)"
+                    mat-button
+                    color="warn"
+                    (click)="unlink(x)"
+                  >
+                    Desvincular
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <mat-paginator
+            [length]="items.totalElementos"
+            [pageIndex]="items.pagina"
+            [pageSize]="items.tamanio"
+            [pageSizeOptions]="[20, 50, 100]"
+            (page)="itemsPage($event)"
+          ></mat-paginator>
+        </div></section
+    ></mat-tab>
+    <mat-tab label="Lista anterior"
+      ><section class="tab">
+        <div class="state" *ngIf="loadingComparison">Cargando comparación…</div>
+        <div class="table-wrap" *ngIf="comparison">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Código proveedor</th>
+                <th>Precio anterior</th>
+                <th>Precio actual</th>
+                <th>Diferencia</th>
+                <th>%</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let x of comparison.contenido">
+                <td>
+                  {{
+                    x.productName ||
+                      x.descriptionSnapshot ||
+                      "Producto no identificado"
+                  }}
+                </td>
+                <td>{{ x.supplierProductCode || "—" }}</td>
+                <td>
+                  {{
+                    x.previousListPrice == null
+                      ? "—"
+                      : (x.previousListPrice
+                        | currency: "ARS" : "symbol" : "1.2-4")
+                  }}
+                </td>
+                <td>
+                  {{ x.offeredPrice | currency: "ARS" : "symbol" : "1.2-4" }}
+                </td>
+                <td>
+                  {{
+                    x.differenceVsPreviousList == null
+                      ? "—"
+                      : (x.differenceVsPreviousList | currency: "ARS")
+                  }}
+                </td>
+                <td>
+                  {{
+                    x.differencePercentageVsPreviousList == null
+                      ? "—"
+                      : (x.differencePercentageVsPreviousList
+                          | number: "1.2-4") + "%"
+                  }}
+                </td>
+                <td>
+                  <span class="chip">{{
+                    comparisonLabel(x.listComparisonStatus)
+                  }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <mat-paginator
+            [length]="comparison.totalElementos"
+            [pageIndex]="comparison.pagina"
+            [pageSize]="comparison.tamanio"
+            (page)="loadComparison($event.pageIndex, $event.pageSize)"
+          ></mat-paginator>
+        </div></section
+    ></mat-tab>
+    <mat-tab label="Otros proveedores"
+      ><section class="tab">
+        <div class="explain">
+          <mat-icon>info</mat-icon>El mejor costo conocido se basa en compras
+          reales registradas, no en otras listas nuevas.
+        </div>
+        <div class="state" *ngIf="loadingMarket">
+          Cargando comparación de mercado…
+        </div>
+        <div class="table-wrap" *ngIf="market">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Proveedor lista</th>
+                <th>Precio ofrecido</th>
+                <th>Mejor costo real</th>
+                <th>Proveedor mejor costo</th>
+                <th>Diferencia</th>
+                <th>%</th>
+                <th>Resultado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let x of market.contenido">
+                <td>{{ x.productName }}</td>
+                <td>{{ x.listProviderName }}</td>
+                <td>
+                  {{ x.offeredPrice | currency: "ARS" : "symbol" : "1.2-4" }}
+                </td>
+                <td>
+                  {{
+                    x.bestKnownPrice == null
+                      ? "—"
+                      : (x.bestKnownPrice
+                        | currency: "ARS" : "symbol" : "1.2-4")
+                  }}
+                </td>
+                <td>{{ x.bestKnownProviderName || "—" }}</td>
+                <td>
+                  {{
+                    x.differenceVsBest == null
+                      ? "—"
+                      : (x.differenceVsBest | currency: "ARS")
+                  }}
+                </td>
+                <td>
+                  {{
+                    x.differencePercentageVsBest == null
+                      ? "—"
+                      : (x.differencePercentageVsBest | number: "1.2-4") + "%"
+                  }}
+                </td>
+                <td>
+                  <span class="indicator best" *ngIf="x.newBestPrice"
+                    >✓ Nueva mejor oferta</span
+                  ><span *ngIf="!x.newBestPrice">—</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <mat-paginator
+            [length]="market.totalElementos"
+            [pageIndex]="market.pagina"
+            [pageSize]="market.tamanio"
+            (page)="loadMarket($event.pageIndex, $event.pageSize)"
+          ></mat-paginator>
+        </div></section></mat-tab
+  ></mat-tab-group>
+</section>

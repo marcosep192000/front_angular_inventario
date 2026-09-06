@@ -52,6 +52,10 @@
       </button>
 
       <mat-menu #menu="matMenu">
+        <button mat-menu-item type="button" (click)="importProviderProducts()">
+          <mat-icon>drive_folder_upload</mat-icon>
+          Importar productos de proveedor
+        </button>
         <button mat-menu-item type="button" (click)="addExcelListProduct()">
           <mat-icon>upload_file</mat-icon>
           Importar precios

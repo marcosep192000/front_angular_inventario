@@ -424,8 +424,9 @@ export class FormFacturaDatosProveedorComponent
     const datos =
       this.formInvoice.getRawValue();
 
+    const provider = this.suppliers.find(item => item.id === Number(datos.provider));
 
-    this.datosEmitidos.emit(datos);
+    this.datosEmitidos.emit({ ...datos, providerName: provider?.name ?? '' });
   }
 
 

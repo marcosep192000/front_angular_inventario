@@ -221,8 +221,9 @@ export class ProductService {
 
   /** Recuperación administrativa: incluye productos sin stock y no vendibles. */
   findAdministrativeByBarcode(barCode: string): Observable<Product> {
-    const normalized = barCode.trim().toLocaleLowerCase();
-    return this.getProducts(0, 20, barCode).pipe(
+    const trimmed = barCode.trim();
+    const normalized = trimmed.toLocaleLowerCase();
+    return this.getProducts(0, 20, trimmed).pipe(
       map((page) => {
         const products: Product[] = page?.content ?? [];
         const product = products.find(

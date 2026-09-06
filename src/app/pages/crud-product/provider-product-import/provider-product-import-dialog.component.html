@@ -1,0 +1,357 @@
+<section class="wizard">
+  <header>
+    <div>
+      <small>PRODUCTOS · IMPORTACIÓN DE PROVEEDOR</small>
+      <h2>Importar productos de proveedor</h2>
+      <p>Creá productos y relaciones comerciales de forma controlada.</p>
+    </div>
+    <button mat-icon-button (click)="close()" [disabled]="loading">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+  <nav>
+    <span
+      *ngFor="let n of [1, 2, 3, 4, 5, 6, 7]"
+      [class.active]="step === n"
+      [class.done]="step > n"
+      >{{ n }}</span
+    >
+  </nav>
+  <mat-dialog-content
+    ><div class="error" *ngIf="error">
+      <mat-icon>error_outline</mat-icon>{{ error }}
+    </div>
+    <section *ngIf="step === 1">
+      <h3>1. Proveedor y archivo</h3>
+      <mat-form-field appearance="outline"
+        ><mat-label>Proveedor *</mat-label
+        ><mat-select
+          [(ngModel)]="providerId"
+          (selectionChange)="providerChanged()"
+          ><mat-option *ngFor="let s of suppliers" [value]="s.id">{{
+            s.name
+          }}</mat-option></mat-select
+        ></mat-form-field
+      >
+      <div class="drop">
+        <mat-icon>upload_file</mat-icon
+        ><b>{{ file?.name || "Elegí el Excel del proveedor" }}</b
+        ><small *ngIf="file">{{ file.size / 1024 | number: "1.0-1" }} KB</small
+        ><label
+          ><input
+            type="file"
+            accept=".xls,.xlsx"
+            (change)="choose($event)"
+            [disabled]="!providerId"
+          /><span>Seleccionar Excel</span></label
+        >
+      </div>
+    </section>
+    <section *ngIf="step === 2 && preview">
+      <h3>2. Revisá la estructura</h3>
+      <div class="grid">
+        <mat-form-field appearance="outline"
+          ><mat-label>Hoja</mat-label
+          ><mat-select
+            [(ngModel)]="mapping.sheet"
+            (selectionChange)="structureChanged()"
+            ><mat-option
+              *ngFor="let s of preview.availableSheets"
+              [value]="s"
+              >{{ s }}</mat-option
+            ></mat-select
+          ></mat-form-field
+        ><mat-form-field appearance="outline"
+          ><mat-label>Fila de encabezados</mat-label
+          ><input
+            matInput
+            type="number"
+            min="1"
+            [(ngModel)]="uiHeaderRow"
+            (change)="structureChanged()"
+          /><mat-hint>La primera fila es 1</mat-hint></mat-form-field
+        >
+      </div>
+      <p>{{ preview.totalRowsDetected }} filas detectadas</p>
+      <div class="table">
+        <table>
+          <thead>
+            <tr>
+              <th *ngFor="let h of preview.headers">{{ h }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of preview.sampleRows">
+              <td *ngFor="let h of preview.headers">{{ r[h] || "—" }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section *ngIf="step === 3 && preview">
+      <h3>3. Asigná las columnas</h3>
+      <p>El código del proveedor nunca se copiará como barcode principal.</p>
+      <div class="mapping">
+        <mat-form-field
+          *ngFor="
+            let f of [
+              { k: 'supplierProductCodeColumn', l: 'Código proveedor *' },
+              { k: 'nameColumn', l: 'Nombre *' },
+              { k: 'purchasePriceColumn', l: 'Costo *' },
+              { k: 'supplierBarcodeColumn', l: 'Barcode proveedor' },
+              { k: 'productBarcodeColumn', l: 'Barcode producto' },
+              { k: 'ivaColumn', l: 'IVA' },
+              { k: 'profitPercentageColumn', l: 'Ganancia %' },
+            ]
+          "
+          appearance="outline"
+          ><mat-label>{{ f.l }}</mat-label
+          ><mat-select
+            [(ngModel)]="$any(mapping)[f.k]"
+            (selectionChange)="mappingChanged()"
+            ><mat-option [value]="null">No usar</mat-option
+            ><mat-option *ngFor="let h of preview.headers" [value]="h">{{
+              h
+            }}</mat-option></mat-select
+          ></mat-form-field
+        >
+      </div>
+      <p class="warn" *ngIf="!mappingValid">
+        Código, nombre y costo son obligatorios y deben usar columnas
+        diferentes.
+      </p>
+    </section>
+    <section *ngIf="step === 4 && analysis">
+      <h3>4. Resultado del análisis</h3>
+      <div class="cards">
+        <span
+          ><b>{{ analysis.totalRows }}</b
+          >Total</span
+        ><span
+          ><b>{{ analysis.validRows }}</b
+          >Válidas</span
+        ><span class="new"
+          ><b>{{ analysis.newProducts }}</b
+          >Nuevos</span
+        ><span class="linked"
+          ><b>{{ analysis.alreadyLinked }}</b
+          >Vinculados</span
+        ><span class="review"
+          ><b>{{ analysis.requiresReview }}</b
+          >Revisión</span
+        ><span class="bad"
+          ><b>{{ analysis.invalidRows }}</b
+          >Errores</span
+        >
+      </div>
+      <div class="notice">
+        El análisis vence el {{ analysis.expiresAt | date: "short" }}. La revisión usa las filas completas del servidor, no la muestra inicial.
+      </div>
+    </section>
+    <section *ngIf="step === 5 && analysis">
+      <h3>5. Revisá las decisiones</h3>
+      <div class="filters">
+        <button
+          mat-stroked-button
+          *ngFor="
+            let f of [
+              'ALL',
+              'NEW_PRODUCT',
+              'ALREADY_LINKED',
+              'LINK_EXISTING_REQUIRED',
+              'INVALID',
+            ]
+          "
+          (click)="filterChanged($any(f))"
+          [class.active-filter]="selectedStatus === f"
+        >
+          {{ f === "ALL" ? "Todos" : status($any(f)) }}
+        </button>
+      </div>
+      <mat-form-field appearance="outline" class="row-search">
+        <mat-label>Buscar en todo el análisis</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [ngModel]="searchTerm" (ngModelChange)="searchChanged($event)" placeholder="Código proveedor, barcode o nombre" />
+        <mat-hint>La búsqueda consulta todas las filas y conserva los ceros iniciales.</mat-hint>
+      </mat-form-field>
+      <div class="notice" *ngIf="pendingCount !== null">
+        Quedan {{ pendingCount }} productos que requieren vinculación manual.
+      </div>
+      <div class="table">
+        <div class="table-loading" *ngIf="loadingRows"><mat-icon>hourglass_top</mat-icon> Cargando filas…</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Fila</th>
+              <th>Estado</th>
+              <th>Código proveedor</th>
+              <th>Producto</th>
+              <th>Costo actual</th>
+              <th>Costo Excel</th>
+              <th>Ganancia</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of visibleRows; trackBy: track">
+              <td>{{ r.rowNumber }}</td>
+              <td>
+                <span class="chip" [class]="r.status">{{
+                  status(r.status)
+                }}</span>
+              </td>
+              <td>{{ r.supplierProductCode }}</td>
+              <td>{{ r.productName || r.name }}</td>
+              <td>{{ price(r.currentSupplierPrice) }}</td>
+              <td>{{ price(r.purchasePrice) }}</td>
+              <td>{{ profit(r.profitPercentage) }}</td>
+              <td>
+                <ng-container [ngSwitch]="r.status"
+                  ><span *ngSwitchCase="'ALREADY_LINKED'"
+                    >Actualizar costo del proveedor</span
+                  >
+                  <div *ngSwitchCase="'LINK_EXISTING_REQUIRED'">
+                    <button mat-button (click)="link(r)">
+                      Vincular existente</button
+                    ><button mat-button (click)="setAction(r, 'CREATE_NEW')">
+                      Crear nuevo</button
+                    ><button mat-button (click)="setAction(r, 'SKIP')">
+                      Omitir</button
+                    ><small *ngIf="decision(r)?.action === 'LINK_EXISTING'">
+                      Vincular a: {{ decision(r)?.productName || ('Producto #' + decision(r)?.productId) }}
+                      <button mat-button (click)="clearDecision(r)">Revertir</button>
+                    </small>
+                    <small *ngIf="decision(r)?.action === 'CREATE_NEW'">Crear producto nuevo <button mat-button (click)="clearDecision(r)">Revertir</button></small>
+                    <small *ngIf="decision(r)?.action === 'SKIP'">Fila omitida <button mat-button (click)="clearDecision(r)">Revertir</button></small>
+                  </div>
+                  <button
+                    *ngSwitchCase="'NEW_PRODUCT'"
+                    mat-button
+                    (click)="
+                      setAction(
+                        r,
+                        decision(r)?.action === 'SKIP' ? 'CREATE_NEW' : 'SKIP'
+                      )
+                    "
+                  >
+                    {{
+                      decision(r)?.action === "SKIP"
+                        ? "Crear producto"
+                        : "Omitir"
+                    }}</button
+                  ><span *ngSwitchCase="'INVALID'"
+                    >Se omitirá · {{ r.message }}</span
+                  ></ng-container
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <mat-paginator
+        [length]="totalElements"
+        [pageIndex]="pageIndex"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[25, 50, 100, 200]"
+        [disabled]="loadingRows"
+        (page)="pageChange($event)"
+      ></mat-paginator>
+      <p>
+        Actualizar un vínculo sólo cambia el costo comercial del proveedor. No
+        modifica el último costo comprado.
+      </p>
+    </section>
+    <section *ngIf="step === 6 && analysis">
+      <h3>6. Confirmar importación</h3>
+      <div class="summary">
+        <b>{{ supplierName() }}</b
+        ><span>{{ file?.name }}</span
+        ><span>{{ analysis.validRows }} filas válidas</span
+        ><span>{{ analysis.newProducts }} productos nuevos</span
+        ><span>{{ analysis.alreadyLinked }} relaciones a actualizar</span>
+      </div>
+      <div class="warn">
+        Esta operación puede crear productos y relaciones con el proveedor. Los
+        productos nuevos comienzan con stock 0.
+      </div>
+    </section>
+    <section *ngIf="step === 7 && result" class="success">
+      <mat-icon>task_alt</mat-icon>
+      <h3>Importación completada</h3>
+      <div class="cards">
+        <span
+          ><b>{{ result.createdProducts }}</b
+          >Creados</span
+        ><span
+          ><b>{{ result.linkedExistingProducts }}</b
+          >Vinculados</span
+        ><span
+          ><b>{{ result.updatedProductSuppliers }}</b
+          >Actualizados</span
+        ><span
+          ><b>{{ result.skippedRows }}</b
+          >Omitidos</span
+        >
+      </div>
+    </section></mat-dialog-content
+  >
+  <mat-dialog-actions align="end"
+    ><button mat-button *ngIf="step < 7" (click)="close()" [disabled]="loading">
+      Cancelar</button
+    ><button
+      mat-button
+      *ngIf="step > 1 && step < 7"
+      (click)="step = step - 1"
+      [disabled]="loading"
+    >
+      Atrás</button
+    ><button
+      mat-raised-button
+      color="primary"
+      *ngIf="step === 2"
+      (click)="step = 3"
+    >
+      Continuar</button
+    ><button
+      mat-raised-button
+      color="primary"
+      *ngIf="step === 3"
+      (click)="analyze()"
+      [disabled]="!mappingValid || loading"
+    >
+      {{ loading ? "Analizando…" : "Analizar archivo" }}</button
+    ><button
+      mat-raised-button
+      color="primary"
+      *ngIf="step === 4"
+      (click)="step = 5"
+    >
+      Revisar filas</button
+    ><button
+      mat-raised-button
+      color="primary"
+      *ngIf="step === 5"
+      (click)="step = 6"
+      [disabled]="!canConfirm"
+    >
+      Continuar</button
+    ><button
+      mat-raised-button
+      color="primary"
+      *ngIf="step === 6"
+      (click)="confirm()"
+      [disabled]="!canConfirm || loading"
+    >
+      {{ loading ? "Importando productos…" : "Confirmar importación" }}</button
+    ><button mat-button *ngIf="step === 7" (click)="newImport()">
+      Nueva importación</button
+    ><button
+      mat-raised-button
+      color="primary"
+      *ngIf="step === 7"
+      (click)="finish()"
+    >
+      Ver productos
+    </button></mat-dialog-actions
+  >
+</section>

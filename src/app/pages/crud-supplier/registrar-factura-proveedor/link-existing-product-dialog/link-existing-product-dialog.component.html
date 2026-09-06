@@ -1,0 +1,27 @@
+<section class="link-dialog">
+  <header>
+    <div><small>VINCULAR CÓDIGO DEL PROVEEDOR</small><h2>Seleccionar producto existente</h2></div>
+    <button mat-icon-button mat-dialog-close><mat-icon>close</mat-icon></button>
+  </header>
+  <mat-dialog-content>
+    <div class="context"><mat-icon>link</mat-icon><span><b>{{ data.providerName }}</b><small>Código {{ data.supplierProductCode }}</small></span></div>
+    <div class="search-row">
+      <mat-form-field appearance="outline"><mat-label>Nombre o código de barras</mat-label>
+        <input matInput [(ngModel)]="query" (keyup.enter)="search()" autocomplete="off">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="search()" [disabled]="loading || !query.trim()">{{ loading ? 'Buscando…' : 'Buscar' }}</button>
+    </div>
+    <p class="empty" *ngIf="searched && !loading && !products.length">No se encontraron productos con ese nombre o código.</p>
+    <div class="results" *ngIf="products.length">
+      <button type="button" *ngFor="let product of products" (click)="select(product)" [class.selected]="selected?.id === product.id">
+        <span class="avatar">{{ product.name.charAt(0) }}</span><span><b>{{ product.name }}</b><small>{{ product.barCode || 'Sin código de barras' }} · Stock {{ product.stock }}</small></span><mat-icon>{{ selected?.id === product.id ? 'check_circle' : 'chevron_right' }}</mat-icon>
+      </button>
+    </div>
+    <div class="confirmation" *ngIf="selected">
+      <strong>Confirmar vínculo</strong>
+      <span>El código <b>{{ data.supplierProductCode }}</b> de {{ data.providerName }} se vinculará con <b>{{ selected.name }}</b> al guardar la factura.</span>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end"><button mat-button mat-dialog-close>Cancelar</button><button mat-raised-button color="primary" [disabled]="!selected" (click)="confirm()"><mat-icon>link</mat-icon>Vincular</button></mat-dialog-actions>
+</section>

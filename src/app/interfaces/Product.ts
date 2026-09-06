@@ -21,7 +21,7 @@ export interface Product {
   expiration: number;
   salePrice: Float32Array;
   productUsefulness: Float32Array;
-  barCode: string;
+  barCode: string | null;
   status: boolean ; 
   fechaUltimaActualizacion:string;
 }

@@ -15,12 +15,20 @@
 
   <div class="container__search">
 
+    <mat-form-field appearance="outline" class="search-mode">
+      <mat-label>Buscar por</mat-label>
+      <mat-select [(ngModel)]="searchMode" (selectionChange)="cancelarCodigoDesconocido()">
+        <mat-option value="supplier">Código del proveedor</mat-option>
+        <mat-option value="barcode">Código de barras</mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <mat-form-field
       appearance="outline"
       class="container_search">
 
       <mat-label>
-        Ingresa el código de barras
+        {{ searchMode === 'supplier' ? 'Código del proveedor' : 'Código de barras del producto' }}
       </mat-label>
 
       <input
@@ -30,6 +38,8 @@
         name="code"
         [(ngModel)]="code"
         (input)="onInputChange($event)"
+        (keyup.enter)="buscarArticulo()"
+        [disabled]="searchMode === 'supplier' && !providerId"
         autocomplete="off">
 
       <mat-icon matSuffix>
@@ -37,6 +47,12 @@
       </mat-icon>
 
     </mat-form-field>
+
+    <button mat-raised-button color="primary" class="search-button" type="button"
+      (click)="buscarArticulo()" [disabled]="searching || !code.trim() || (searchMode === 'supplier' && !providerId)">
+      <mat-icon>{{ searching ? 'hourglass_top' : 'search' }}</mat-icon>
+      {{ searching ? 'Buscando…' : 'Buscar' }}
+    </button>
 
 
     <div class="container_product">
@@ -55,6 +71,17 @@
 
     </div>
 
+  </div>
+
+  <div class="provider-required" *ngIf="searchMode === 'supplier' && !providerId">
+    <mat-icon>info</mat-icon>Seleccione primero un proveedor para buscar por su código interno.
+  </div>
+
+  <div class="unknown-code" *ngIf="unknownSupplierCode">
+    <mat-icon>warning_amber</mat-icon>
+    <div><strong>Código del proveedor no reconocido</strong><span>{{ providerName || 'Proveedor seleccionado' }} · Código {{ unknownSupplierCode }}</span></div>
+    <button mat-raised-button color="primary" type="button" (click)="vincularProductoExistente()"><mat-icon>link</mat-icon>Vincular a producto existente</button>
+    <button mat-button type="button" (click)="cancelarCodigoDesconocido()">Cancelar</button>
   </div>
 
 </div>
@@ -81,6 +108,16 @@
       ==================================================== -->
 
       <div class="container__productos">
+
+        <div class="resolved-product" *ngIf="selectedProductSupplier || linkExistingProduct">
+          <mat-icon>{{ linkExistingProduct ? 'link' : 'verified' }}</mat-icon>
+          <div>
+            <strong>{{ linkExistingProduct ? 'Vínculo pendiente de confirmar con la factura' : 'Artículo reconocido para este proveedor' }}</strong>
+            <span>Código proveedor: {{ code }}</span>
+            <span *ngIf="selectedProductSupplier?.productBarcode">Código producto: {{ selectedProductSupplier?.productBarcode }}</span>
+            <span *ngIf="selectedProductSupplier?.lastPurchasePrice != null">Último costo: {{ selectedProductSupplier?.lastPurchasePrice | currency:'ARS':'symbol':'1.2-4' }} (referencia)</span>
+          </div>
+        </div>
 
 
         <div class="productos__inputs">
@@ -156,7 +193,7 @@
               matInput
               type="number"
               min="0"
-              step="0.01"
+              step="0.0001"
               inputmode="decimal"
               data-money
               formControlName="price">
@@ -695,8 +732,10 @@
           <tr>
 
             <th>
-              Código
+              Código producto
             </th>
+
+            <th>Código proveedor</th>
 
             <th>
               Producto
@@ -753,6 +792,8 @@
 
             </td>
 
+            <td>{{ data.supplierProductCode || '—' }}</td>
+
 
 
             <!-- PRODUCTO -->
@@ -769,6 +810,8 @@
                 {{ data.description }}
 
               </small>
+
+              <small class="linked-badge" *ngIf="data.supplierLinked"><mat-icon>link</mat-icon>Vinculado</small>
 
             </td>
 

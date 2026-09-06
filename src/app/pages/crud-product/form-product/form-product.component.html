@@ -37,9 +37,8 @@
           <!-- CODIGO DE BARRAS -->
           <mat-form-field
             class="input codigo__barras"
-            hintLabel="Máximo 15 caracteres"
           >
-            <mat-label>Codigo de Barras</mat-label>
+            <mat-label>Código interno / Código de barras*</mat-label>
             <input
               matInput
               maxlength="15"
@@ -53,8 +52,9 @@
               >Ya existe un producto con ese código de barras.</mat-error
             >
             <mat-error *ngIf="formGroup.get('barCode')?.hasError('required')"
-              >Ingresá el código de barras.</mat-error
+              >Debe asignar un código interno o código de barras al producto antes de guardar.</mat-error
             >
+            <mat-hint>Identificador propio en Inventario Pixels. Máximo 15 caracteres.</mat-hint>
           </mat-form-field>
         </div>
         <!-- FIN CODIGO DE BARRAS  -->
@@ -315,6 +315,24 @@
           (click)="openInventoryConfig()"
         >
           <mat-icon>settings</mat-icon>Administrar stock
+        </button>
+      </section>
+
+      <section class="inventory-extension suppliers-extension" *ngIf="data.updateProduct">
+        <div>
+          <mat-icon>local_shipping</mat-icon>
+          <span>
+            <strong>Proveedores del producto</strong>
+            <small>Administrá proveedores, códigos propios, costos y el proveedor preferido.</small>
+          </span>
+        </div>
+        <button
+          mat-stroked-button
+          color="primary"
+          type="button"
+          (click)="openProductSuppliers()"
+        >
+          <mat-icon>tune</mat-icon>Configurar proveedores
         </button>
       </section>
     </fieldset>

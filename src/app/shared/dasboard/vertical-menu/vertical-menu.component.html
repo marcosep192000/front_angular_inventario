@@ -109,7 +109,7 @@
 
   <!-- PROVEEDORES -->
 
-  <div class="menu-item" *ngIf="puede('PROVEEDORES_VER') || puede('COMPRAS_REGISTRAR')">
+  <div class="menu-item" *ngIf="puede('PROVEEDORES_VER') || puede('COMPRAS_REGISTRAR') || puede('REPORTES_VER') || esAdmin">
 
     <div class="menu-title" (click)="toggleMenu('proveedores')">
 
@@ -137,6 +137,10 @@
       <div class="submenu-item" routerLink="purchase-orders" *ngIf="puede('COMPRAS_REGISTRAR')">
         <app-icon [iconSrc]="'assets/icons/store1.png'" [size]="'22px'"></app-icon>
         Pedidos de compra
+      </div>
+      <div class="submenu-item" routerLink="proveedores/listas-precios" *ngIf="puede('REPORTES_VER') || esAdmin">
+        <app-icon [iconSrc]="'assets/icons/monitoring.png'" [size]="'22px'"></app-icon>
+        Listas de precios
       </div>
     </div>
     }
@@ -240,7 +244,7 @@
 
   <!-- REPORTES -->
 
-  <div class="menu-item" routerLink="reportes" *ngIf="puede('REPORTES_VER')">
+  <div class="menu-item" routerLink="reportes" *ngIf="puede('REPORTES_VER') || esAdmin">
 
     <div class="menu-title">
 

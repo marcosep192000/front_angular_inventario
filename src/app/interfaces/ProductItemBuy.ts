@@ -8,6 +8,11 @@ export interface Marca {
 export interface ProductItemBuy {
   id: number;
   productId?: number;
+  productSupplierId?: number | null;
+  supplierProductCode?: string | null;
+  supplierBarcode?: string | null;
+  linkExistingProduct?: boolean;
+  supplierLinked?: boolean;
   barCode: string;
   name: string;
   description?: string;

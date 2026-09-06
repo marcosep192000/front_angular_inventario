@@ -418,6 +418,10 @@ mat-dialog-actions button {
   margin-top: 3px;
   color: #74687c;
 }
+.suppliers-extension {
+  margin-top: -4px;
+  background: linear-gradient(135deg, #f7f4fc, #eee6f8);
+}
 @media (max-width: 600px) {
   .inventory-extension {
     align-items: stretch;

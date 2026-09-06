@@ -28,6 +28,7 @@ import { DialogRef } from '@angular/cdk/dialog';
 import { LicenseService } from '../../../services/license.service';
 import { ToastrService } from 'ngx-toastr';
 import { InventoryConfigComponent } from '../inventory-config/inventory-config.component';
+import { ProviderProductImportDialogComponent } from '../provider-product-import/provider-product-import-dialog.component';
 
 @Component({
   selector: 'app-list-product',
@@ -198,6 +199,14 @@ export class ListProductComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(() => {
       this.getProducts(this.paginator.pageIndex, this.paginator.pageSize);
+    });
+  }
+
+  importProviderProducts(): void {
+    this.dialog.open(ProviderProductImportDialogComponent, {
+      width: '1160px', maxWidth: '98vw', maxHeight: '95vh', autoFocus: false, disableClose: true,
+    }).afterClosed().subscribe((result) => {
+      if (result?.imported) this.getProducts(0, this.pageSize, this.searchTerm);
     });
   }
 

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   EventEmitter,
+  Input,
   OnInit,
   Output
 } from '@angular/core';
@@ -70,6 +71,12 @@ import {
 import {
   FormProductComponent
 } from '../../../crud-product/form-product/form-product.component';
+import { finalize } from 'rxjs';
+import { Product } from '../../../../interfaces/Product';
+import { ProductSupplier } from '../../../../interfaces/product-supplier';
+import { ProductSupplierService } from '../../../../services/product-supplier.service';
+import { LinkExistingProductDialogComponent } from '../link-existing-product-dialog/link-existing-product-dialog.component';
+import { buildSupplierLineIdentity, supplierInvoiceErrorMessage } from '../supplier-invoice-loading.utils';
 
 
 /* =========================================================
@@ -173,6 +180,10 @@ export class RegistrarDetalleFacturaProveedorComponent
   limpiarTotal =
     new EventEmitter<boolean>();
 
+  @Input() providerId: number | null = null;
+
+  @Input() providerName = '';
+
 
   // =========================================================
   // PRODUCTOS
@@ -192,6 +203,16 @@ export class RegistrarDetalleFacturaProveedorComponent
 
 
   code = '';
+
+  searchMode: 'supplier' | 'barcode' = 'supplier';
+
+  searching = false;
+
+  unknownSupplierCode: string | null = null;
+
+  selectedProductSupplier: ProductSupplier | null = null;
+
+  linkExistingProduct = false;
 
   product:
     ProductItemBuy | null = null;
@@ -244,6 +265,9 @@ export class RegistrarDetalleFacturaProveedorComponent
 
     private productService:
       ProductService,
+
+    private productSupplierService:
+      ProductSupplierService,
 
     private inventoryService: InventoryService,
 
@@ -641,7 +665,8 @@ export class RegistrarDetalleFacturaProveedorComponent
       Math.max(
         precioActual,
         0
-      )
+      ),
+      4
     );
 
   }
@@ -834,75 +859,118 @@ export class RegistrarDetalleFacturaProveedorComponent
   // =========================================================
 
   onInputChange(event: Event): void {
+    this.code = (event.target as HTMLInputElement).value;
+  }
 
-    const input =
-      event.target as HTMLInputElement;
+  buscarArticulo(): void {
+    const code = this.code.trim();
+    if (this.searching) return;
+    if (!code) {
+      this.toastr.info('Ingrese un código para buscar.');
+      return;
+    }
+    this.unknownSupplierCode = null;
+    this.selectedProductSupplier = null;
+    this.linkExistingProduct = false;
 
-    this.code =
-      input.value.trim();
-
-    if (!this.code) {
-
-      this.resetForm();
-
+    if (this.searchMode === 'supplier') {
+      if (!this.providerId) {
+        this.toastr.info('Seleccione primero un proveedor.');
+        return;
+      }
+      this.buscarCodigoProveedor(this.providerId, code);
       return;
     }
 
-    this.productService
-      .searchProductBuy(this.code)
-      .subscribe({
+    this.buscarCodigoBarras(code);
+  }
 
-        next: (data: ProductItemBuy) => {
-
-          console.log(
-            '========== PRODUCTO ENCONTRADO =========='
-          );
-
-          console.log(
-            'Producto:',
-            data.name
-          );
-
-          console.log(
-            'Precio recibido:',
-            data.price
-          );
-
-          console.log(
-            'IVA:',
-            data.iva
-          );
-
-          console.log(
-            'Stock:',
-            data.stock
-          );
-
-          console.log(
-            '=========================================='
-          );
-
-          this.product = data;
-
-          this.loadProduct(data);
-
-          this.cargarConfiguracionCompra(data.id);
-
-          this.showForm = true;
-        },
-
-        error: () => {
-
+  private buscarCodigoProveedor(providerId: number, code: string): void {
+    this.searching = true;
+    this.productSupplierService.search(providerId, code).pipe(
+      finalize(() => (this.searching = false)),
+    ).subscribe({
+      next: relation => {
+        if (!relation.found || !relation.productId) {
           this.product = null;
-
           this.showForm = false;
-
-          this.toastr.warning(
-            'No se encontró un producto con ese código de barras.'
-          );
+          this.unknownSupplierCode = code;
+          return;
         }
+        this.selectedProductSupplier = relation;
+        this.cargarProductoAdministrativo(relation.productId, relation, false);
+      },
+      error: error => this.mostrarErrorBusqueda(error),
+    });
+  }
 
-      });
+  private buscarCodigoBarras(code: string): void {
+    this.searching = true;
+    this.productService.findAdministrativeByBarcode(code).pipe(
+      finalize(() => (this.searching = false)),
+    ).subscribe({
+      next: data => this.prepararProducto(this.mapProductToBuy(data), null, false),
+      error: error => {
+        this.product = null;
+        this.showForm = false;
+        this.mostrarErrorBusqueda(error, 'No se encontró un producto con ese código de barras.');
+      },
+    });
+  }
+
+  private cargarProductoAdministrativo(productId: number, relation: ProductSupplier | null, link: boolean): void {
+    this.searching = true;
+    this.productService.findById(productId).pipe(
+      finalize(() => (this.searching = false)),
+    ).subscribe({
+      next: product => this.prepararProducto(this.mapProductToBuy(product), relation, link),
+      error: error => this.mostrarErrorBusqueda(error, 'No se pudo cargar el producto seleccionado.'),
+    });
+  }
+
+  private mapProductToBuy(product: Product): ProductItemBuy {
+    const data = product as any;
+    return {
+      id: Number(product.id), productId: Number(product.id), barCode: product.barCode ?? '',
+      name: product.name, description: data.description ?? '', price: Number(product.price) || 0,
+      stock: Number(product.stock) || 0, stockMin: Number(product.stockMin) || 0,
+      iva: Number(product.iva) || 0, quantity: 1, totalStock: Number(product.stock) || 0,
+      precioTotal: 0,
+      marca: product.marca?.id == null ? undefined : { id: product.marca.id, marca: product.marca.marca },
+    };
+  }
+
+  private prepararProducto(data: ProductItemBuy, relation: ProductSupplier | null, link: boolean): void {
+    this.product = data;
+    this.selectedProductSupplier = relation;
+    this.linkExistingProduct = link;
+    this.unknownSupplierCode = null;
+    this.loadProduct(data);
+    this.cargarConfiguracionCompra(data.id);
+    this.showForm = true;
+    setTimeout(() => document.querySelector<HTMLInputElement>('.producto-form input[formControlName="quantity"]')?.focus());
+  }
+
+  vincularProductoExistente(): void {
+    if (!this.unknownSupplierCode || !this.providerId) return;
+    const supplierProductCode = this.unknownSupplierCode;
+    this.dialog.open(LinkExistingProductDialogComponent, {
+      width: '680px', maxWidth: '96vw', disableClose: true,
+      data: { providerName: this.providerName || 'Proveedor seleccionado', supplierProductCode },
+    }).afterClosed().subscribe((product: Product | undefined) => {
+      if (!product?.id) return;
+      this.code = supplierProductCode;
+      this.prepararProducto(this.mapProductToBuy(product), null, true);
+    });
+  }
+
+  cancelarCodigoDesconocido(): void {
+    this.unknownSupplierCode = null;
+    this.code = '';
+  }
+
+  private mostrarErrorBusqueda(error: any, fallback = 'No se pudo buscar el artículo.'): void {
+    this.toastr.error(supplierInvoiceErrorMessage(error, fallback));
   }
 
 
@@ -1297,8 +1365,12 @@ export class RegistrarDetalleFacturaProveedorComponent
       id:
         this.product.id,
 
-      productId:
+      ...buildSupplierLineIdentity(
         this.product.id,
+        this.searchMode === 'supplier' ? this.code : null,
+        this.selectedProductSupplier,
+        this.linkExistingProduct,
+      ),
 
 
       barCode:
@@ -1321,7 +1393,8 @@ export class RegistrarDetalleFacturaProveedorComponent
 
       price:
         this.redondear(
-          precioNeto
+          precioNeto,
+          4
         ),
 
 
@@ -1331,7 +1404,8 @@ export class RegistrarDetalleFacturaProveedorComponent
 
       precioLista:
         this.redondear(
-          precio
+          precio,
+          4
         ),
 
 
@@ -1855,6 +1929,12 @@ export class RegistrarDetalleFacturaProveedorComponent
 
     this.product =
       null;
+
+    this.selectedProductSupplier = null;
+
+    this.linkExistingProduct = false;
+
+    this.unknownSupplierCode = null;
 
 
     this.showForm =

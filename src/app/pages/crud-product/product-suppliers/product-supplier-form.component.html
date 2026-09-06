@@ -1,0 +1,19 @@
+<section class="supplier-form">
+  <header><div><p>PROVEEDOR DEL PRODUCTO</p><h2>{{ data.relation ? 'Editar datos comerciales' : 'Agregar proveedor' }}</h2></div>
+    <button mat-icon-button mat-dialog-close [disabled]="saving"><mat-icon>close</mat-icon></button></header>
+  <mat-dialog-content [formGroup]="form">
+    <mat-form-field appearance="outline" class="full"><mat-label>Proveedor</mat-label>
+      <mat-select formControlName="providerId"><mat-option *ngFor="let supplier of suppliers" [value]="supplier.id" [disabled]="isAssociated(supplier.id)">
+        {{ supplier.name }}{{ isAssociated(supplier.id) ? ' · Ya asociado' : '' }}</mat-option></mat-select>
+      <mat-hint *ngIf="data.relation">El proveedor de una relación existente no puede cambiarse.</mat-hint></mat-form-field>
+    <div class="grid">
+      <mat-form-field appearance="outline"><mat-label>Código interno del proveedor</mat-label><input matInput formControlName="supplierProductCode" maxlength="100"></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Código de barras del proveedor</mat-label><input matInput formControlName="supplierBarcode" maxlength="100"></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Precio de compra</mat-label><span matTextPrefix>$&nbsp;</span><input matInput type="number" step="0.0001" min="0" formControlName="purchasePrice"></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Último precio de compra</mat-label><span matTextPrefix>$&nbsp;</span><input matInput type="number" step="0.0001" min="0" formControlName="lastPurchasePrice"></mat-form-field>
+    </div>
+    <mat-slide-toggle formControlName="preferred"><strong>Proveedor preferido</strong></mat-slide-toggle>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end"><button mat-stroked-button mat-dialog-close [disabled]="saving">Cancelar</button>
+    <button mat-raised-button color="primary" [disabled]="saving || loadingSuppliers" (click)="save()"><mat-icon>save</mat-icon>{{ saving ? 'Guardando…' : 'Guardar' }}</button></mat-dialog-actions>
+</section>

@@ -38,10 +38,12 @@ import {
 } from '../../../interfaces/tipo-iva';
 import { applyDuplicateResourceError } from '../../../shared/forms/duplicate-resource-error';
 import { InventoryConfigComponent } from '../inventory-config/inventory-config.component';
+import { ProductSuppliersDialogComponent } from '../product-suppliers/product-suppliers-dialog.component';
 import { DialogGenericComponent } from '../../../shared/genericsComponents/dialog-generic/dialog-generic.component';
 import { finalize, map, of, switchMap } from 'rxjs';
 import { InventoryService } from '../../../services/inventory.service';
 import { UnitOfMeasure } from '../../../interfaces/inventory';
+import { normalizeOptionalBarcode } from './product-form.utils';
 
 @Component({
   selector: 'app-form-product',
@@ -130,23 +132,31 @@ export class FormProductComponent implements OnInit {
       this.productService
         .findById(this.data.updateProduct)
         .pipe(finalize(() => (this.loadingProduct = false)))
-        .subscribe((datos) => {
-          console.log(datos);
-          this.formGroup.patchValue({
-            category: datos.category.id,
-            marca: datos.marca.id,
-            provider: datos.provider.id,
-            barCode: datos.barCode,
-            name: datos.name,
-            price: datos.price,
-            tipoIva: resolverTipoIva(datos),
-            stock: datos.stock,
-            stockMin: datos.stockMin,
-            salePrice: datos.salePrice,
-            productUsefulness: datos.productUsefulness,
-          });
-          this.calculatedSalePrice = Number(datos.salePrice || 0);
-          this.precioVentaManual = true;
+        .subscribe({
+          next: (datos) => {
+            this.formGroup.patchValue({
+              category:
+                datos.category?.id ?? this.formGroup.get('category')?.value,
+              marca: datos.marca?.id ?? this.formGroup.get('marca')?.value,
+              provider:
+                datos.provider?.id ?? this.formGroup.get('provider')?.value,
+              barCode: datos.barCode ?? '',
+              name: datos.name,
+              price: datos.price,
+              tipoIva: resolverTipoIva(datos),
+              stock: datos.stock,
+              stockMin: datos.stockMin,
+              salePrice: datos.salePrice,
+              productUsefulness: datos.productUsefulness,
+            });
+            this.calculatedSalePrice = Number(datos.salePrice || 0);
+            this.precioVentaManual = true;
+          },
+          error: (error: HttpErrorResponse) => {
+            this.toastr.error(
+              error.error?.message || 'No se pudieron cargar los datos del producto.',
+            );
+          },
         });
     }
 
@@ -220,19 +230,25 @@ export class FormProductComponent implements OnInit {
     if (this.saving) return;
     if (this.formGroup.valid) {
       this.saving = true;
-      const { baseUnitId, ...productPayload } = this.formGroup.getRawValue();
+      const { baseUnitId, ...rawProductPayload } = this.formGroup.getRawValue();
+      const productPayload = this.normalizeProductPayload(rawProductPayload);
       this.productService
         .save(productPayload)
         .pipe(
-          // El endpoint legado de alta responde { message } aunque el producto
-          // haya sido creado. Recuperamos el registro por su codigo para poder
-          // configurar la unica fuente de stock sin mostrar un falso error.
+          // Conserva compatibilidad con versiones anteriores del backend que
+          // no devolvían el producto creado.
           switchMap((product) =>
             product?.id
               ? of(product)
-              : this.productService.findAdministrativeByBarcode(
-                  String(productPayload.barCode),
-                ),
+              : productPayload.barCode
+                ? this.productService.findAdministrativeByBarcode(
+                    productPayload.barCode,
+                  )
+                : (() => {
+                    throw new Error(
+                      'El producto se creó, pero el servidor no devolvió su identificador.',
+                    );
+                  })(),
           ),
           switchMap((product) => {
             const productId = product.id;
@@ -280,8 +296,11 @@ export class FormProductComponent implements OnInit {
       return;
     }
     this.saving = true;
+    const productPayload = this.normalizeProductPayload(
+      this.formGroup.getRawValue(),
+    );
     this.productService
-      .update(this.data.updateProduct, this.formGroup.value)
+      .update(this.data.updateProduct, productPayload)
       .pipe(finalize(() => (this.saving = false)))
       .subscribe({
         next: (data) => {
@@ -300,6 +319,10 @@ export class FormProductComponent implements OnInit {
         error.error?.error ||
         'No se pudo guardar el producto.',
     );
+  }
+
+  private normalizeProductPayload(payload: any): any {
+    return { ...payload, barCode: normalizeOptionalBarcode(payload.barCode) };
   }
 
   /* nueva marca */
@@ -475,6 +498,20 @@ export class FormProductComponent implements OnInit {
           });
         }
       });
+  }
+
+  openProductSuppliers(): void {
+    if (!this.data.updateProduct) return;
+    this.dialog.open(ProductSuppliersDialogComponent, {
+      width: '820px',
+      maxWidth: '97vw',
+      autoFocus: false,
+      disableClose: true,
+      data: {
+        productId: this.data.updateProduct,
+        productName: this.formGroup.get('name')?.value || 'Producto',
+      },
+    });
   }
   private focusFirstInvalid(): void {
     setTimeout(() =>

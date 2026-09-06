@@ -1,0 +1,12 @@
+export type ProviderProductImportStatus='ALREADY_LINKED'|'NEW_PRODUCT'|'LINK_EXISTING_REQUIRED'|'INVALID';
+export type ProviderProductImportAction='CREATE_NEW'|'LINK_EXISTING'|'UPDATE_LINKED'|'SKIP';
+export interface ProviderProductImportMapping{sheet:string|null;headerRow:number;supplierProductCodeColumn:string;supplierBarcodeColumn:string|null;productBarcodeColumn:string|null;nameColumn:string;ivaColumn:string|null;purchasePriceColumn:string;profitPercentageColumn:string|null;}
+export interface ProviderProductImportDefaults{categoryId:number|null;brandId:number|null;baseUnitId:number|null;fractionable:boolean;}
+export interface ProviderProductImportPreview{sheetName:string;availableSheets:string[];headerRow:number;headers:string[];sampleRows:Record<string,string>[];totalRowsDetected:number;}
+export interface ProviderProductImportRow{rowNumber:number;status:ProviderProductImportStatus;supplierProductCode:string;supplierBarcode:string|null;productBarcode:string|null;name:string;iva:number|null;purchasePrice:number|null;profitPercentage:number|null;productId:number|null;productName:string|null;productSupplierId:number|null;currentSupplierPrice:number|null;message:string|null;}
+export interface ProviderProductImportAnalysis{analysisId:string;providerId:number;expiresAt:string;totalRows:number;validRows:number;alreadyLinked:number;newProducts:number;requiresReview:number;invalidRows:number;sample:ProviderProductImportRow[];}
+export interface ProviderProductImportRowsPage{content:ProviderProductImportRow[];page:number;size:number;totalElements:number;totalPages:number;}
+export interface ProviderProductImportDecision{rowNumber:number;action:ProviderProductImportAction;productId?:number|null;productName?:string|null;}
+export type ProviderProductImportRowOverride=ProviderProductImportDecision;
+export interface ProviderProductImportConfirmRequest{analysisId:string;providerId:number;defaultAction:'CREATE_NEW';overrides:ProviderProductImportDecision[];}
+export interface ProviderProductImportResult{totalRows:number;createdProducts:number;linkedExistingProducts:number;updatedProductSuppliers:number;skippedRows:number;errors:string[];}

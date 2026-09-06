@@ -26,7 +26,10 @@ export const permissionGuard: CanActivateFn = (route) => {
   const router = inject(Router);
   const tokenService = inject(TokenService);
   const permission = route.data?.['permission'] as string | undefined;
-  if (!permission || tokenService.hasPermission(permission)) return true;
+  const allowAdmin = route.data?.['allowAdmin'] === true;
+  const isAdmin = allowAdmin && tokenService.getAuthorities()
+    .some((role: string) => role === 'ADMIN' || role === 'ROLE_ADMIN');
+  if (!permission || tokenService.hasPermission(permission) || isAdmin) return true;
   return router.parseUrl(tokenService.getDefaultRoute());
 };
 

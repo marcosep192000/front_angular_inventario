@@ -1,0 +1,256 @@
+<section class="importer">
+  <header>
+    <div>
+      <small>IMPORTACIÓN INTELIGENTE</small>
+      <h2>Importar lista desde Excel</h2>
+      <p>{{ data.listName }}</p>
+    </div>
+    <button mat-icon-button mat-dialog-close [disabled]="busy">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+  <nav>
+    <span
+      *ngFor="let n of [1, 2, 3, 4]"
+      [class.active]="step === n"
+      [class.done]="step > n"
+      >{{ n
+      }}<b>{{
+        n === 1
+          ? "Archivo"
+          : n === 2
+            ? "Estructura"
+            : n === 3
+              ? "Columnas"
+              : "Validar"
+      }}</b></span
+    >
+  </nav>
+  <mat-dialog-content>
+    <div class="error" *ngIf="error">
+      <mat-icon>error_outline</mat-icon>{{ error }}
+    </div>
+    <section *ngIf="step === 1" class="drop">
+      <mat-icon>upload_file</mat-icon>
+      <h3>Seleccioná la lista del proveedor</h3>
+      <p>Formatos admitidos: Excel .xlsx y .xls</p>
+      <label
+        ><input
+          type="file"
+          accept=".xlsx,.xls"
+          (change)="choose($event)"
+        /><span>Elegir archivo</span></label
+      >
+    </section>
+    <section *ngIf="step === 2 && preview">
+      <h3>Revisá la estructura</h3>
+      <div class="grid">
+        <mat-form-field appearance="outline"
+          ><mat-label>Hoja</mat-label
+          ><mat-select
+            [(ngModel)]="mapping.sheet"
+            (selectionChange)="structureChanged()"
+            ><mat-option
+              *ngFor="let s of preview.availableSheets"
+              [value]="s"
+              >{{ s }}</mat-option
+            ></mat-select
+          ></mat-form-field
+        ><mat-form-field appearance="outline"
+          ><mat-label>Fila de encabezados</mat-label
+          ><input
+            matInput
+            type="number"
+            min="1"
+            [(ngModel)]="uiHeaderRow"
+            (change)="structureChanged()"
+          /><mat-hint>La primera fila es 1</mat-hint></mat-form-field
+        >
+      </div>
+      <p class="detected">
+        <b>{{ preview.totalRowsDetected }}</b> filas detectadas ·
+        <b>{{ preview.headers.length }}</b> columnas
+      </p>
+      <div class="table">
+        <table>
+          <thead>
+            <tr>
+              <th *ngFor="let h of preview.headers">{{ h }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of preview.sampleRows">
+              <td *ngFor="let h of preview.headers">{{ r[h] || "—" }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section *ngIf="step === 3 && preview">
+      <h3>Indicá qué contiene cada columna</h3>
+      <p>
+        El precio es obligatorio. Además elegí código del proveedor o código de
+        barras.
+      </p>
+      <div class="mapping">
+        <mat-form-field appearance="outline"
+          ><mat-label>Código del proveedor</mat-label
+          ><mat-select
+            [(ngModel)]="mapping.supplierProductCodeColumn"
+            (selectionChange)="mappingChanged()"
+            ><mat-option [value]="null">No usar</mat-option
+            ><mat-option *ngFor="let h of preview.headers" [value]="h">{{
+              h
+            }}</mat-option></mat-select
+          ></mat-form-field
+        ><mat-form-field appearance="outline"
+          ><mat-label>Código de barras</mat-label
+          ><mat-select
+            [(ngModel)]="mapping.supplierBarcodeColumn"
+            (selectionChange)="mappingChanged()"
+            ><mat-option [value]="null">No usar</mat-option
+            ><mat-option *ngFor="let h of preview.headers" [value]="h">{{
+              h
+            }}</mat-option></mat-select
+          ></mat-form-field
+        ><mat-form-field appearance="outline"
+          ><mat-label>Descripción</mat-label
+          ><mat-select
+            [(ngModel)]="mapping.descriptionColumn"
+            (selectionChange)="mappingChanged()"
+            ><mat-option [value]="null">No usar</mat-option
+            ><mat-option *ngFor="let h of preview.headers" [value]="h">{{
+              h
+            }}</mat-option></mat-select
+          ></mat-form-field
+        ><mat-form-field appearance="outline"
+          ><mat-label>Precio ofrecido *</mat-label
+          ><mat-select
+            [(ngModel)]="mapping.offeredPriceColumn"
+            (selectionChange)="mappingChanged()"
+            ><mat-option *ngFor="let h of preview.headers" [value]="h">{{
+              h
+            }}</mat-option></mat-select
+          ></mat-form-field
+        >
+      </div>
+      <div class="hint" *ngIf="!mappingValid">
+        Elegí el precio y al menos código del proveedor o código de barras.
+      </div>
+    </section>
+    <section *ngIf="step === 4 && validation">
+      <h3>
+        {{
+          validation.valid
+            ? "Archivo listo para importar"
+            : "Hay filas que necesitan corrección"
+        }}
+      </h3>
+      <div class="cards">
+        <span
+          ><b>{{ validation.totalRows }}</b
+          >Total</span
+        ><span class="ok"
+          ><b>{{ validation.validRows }}</b
+          >Válidas</span
+        ><span class="bad"
+          ><b>{{ validation.invalidRows }}</b
+          >Inválidas</span
+        ><span class="warn"
+          ><b>{{ validation.duplicateRows }}</b
+          >Duplicadas</span
+        >
+      </div>
+      <div *ngIf="validation.errors.length">
+        <div class="filters">
+          <button mat-stroked-button (click)="errorFilter = 'ALL'">Todos</button
+          ><button
+            mat-stroked-button
+            *ngFor="let f of errorFilters"
+            (click)="errorFilter = f"
+          >
+            {{ f }}
+          </button>
+        </div>
+        <div class="errors">
+          <div *ngFor="let e of filteredErrors">
+            <b>Fila {{ row(e.rowNumber) }}</b
+            ><span>{{ describe(e) }}</span
+            ><small>{{ e.field }}</small>
+          </div>
+        </div>
+      </div>
+      <div class="confirm" *ngIf="canImport">
+        <mat-icon>check_circle</mat-icon>
+        <div>
+          <b>La validación terminó sin errores</b>
+          <p>
+            Se importarán {{ validation.validRows }} filas. El stock y los
+            costos internos no se modificarán.
+          </p>
+        </div>
+      </div>
+    </section>
+    <section *ngIf="step === 5 && result" class="success">
+      <mat-icon>task_alt</mat-icon>
+      <h3>Importación completada</h3>
+      <div class="cards">
+        <span
+          ><b>{{ result.importedRows }}</b
+          >Importadas</span
+        ><span class="ok"
+          ><b>{{ result.matchedRows }}</b
+          >Reconocidas</span
+        ><span class="warn"
+          ><b>{{ result.unmatchedRows }}</b
+          >Sin reconocer</span
+        >
+      </div>
+    </section> </mat-dialog-content
+  ><mat-dialog-actions align="end"
+    ><ng-container *ngIf="step < 5"
+      ><button mat-button mat-dialog-close [disabled]="busy">Cancelar</button
+      ><button
+        mat-button
+        *ngIf="step > 1"
+        (click)="step = step - 1"
+        [disabled]="busy"
+      >
+        Atrás</button
+      ><button
+        mat-raised-button
+        color="primary"
+        *ngIf="step === 2"
+        (click)="step = 3"
+      >
+        Continuar</button
+      ><button
+        mat-raised-button
+        color="primary"
+        *ngIf="step === 3"
+        (click)="validate()"
+        [disabled]="!mappingValid || busy"
+      >
+        {{ validating ? "Validando…" : "Validar archivo" }}</button
+      ><button
+        mat-raised-button
+        color="primary"
+        *ngIf="step === 4"
+        (click)="import()"
+        [disabled]="!canImport || busy"
+      >
+        {{ importing ? "Importando…" : "Confirmar e importar" }}
+      </button></ng-container
+    ><ng-container *ngIf="step === 5"
+      ><button mat-button (click)="finish(false)">Ver lista</button
+      ><button
+        mat-raised-button
+        color="primary"
+        *ngIf="result!.unmatchedRows > 0"
+        (click)="finish(true)"
+      >
+        Revisar sin reconocer
+      </button></ng-container
+    ></mat-dialog-actions
+  >
+</section>
