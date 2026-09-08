@@ -18,7 +18,7 @@ import { PurchaseOrderService } from '../../services/purchase-order.service';
 import { SupplierService } from '../../services/supplier.service';
 import { PurchaseOrderReceiveDialogComponent } from './purchase-order-receive-dialog.component';
 
-@Component({ selector: 'app-purchase-order-list', standalone: true, imports: [CommonModule, FormsModule, RouterLink, MatButtonModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatPaginatorModule, MatSelectModule], templateUrl: './purchase-order-list.component.html', styleUrl: './purchase-orders.css' })
+@Component({ selector: 'app-purchase-order-list', standalone: true, imports: [CommonModule, FormsModule, RouterLink, MatButtonModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatPaginatorModule, MatSelectModule], templateUrl: './purchase-order-list.component.html', styleUrls: ['./purchase-orders.css', './purchase-order-list.polish.css'] })
 export class PurchaseOrderListComponent implements OnInit {
   readonly statuses: PurchaseOrderStatus[] = ['DRAFT','PENDING_APPROVAL','SENT','PARTIALLY_RECEIVED','RECEIVED','CANCELLED'];
   orders: PurchaseOrderSummary[] = []; suppliers: Supplier[] = []; loading = false; processingId: number | null = null;
@@ -36,5 +36,6 @@ export class PurchaseOrderListComponent implements OnInit {
   receive(order: PurchaseOrderSummary): void { this.dialog.open(PurchaseOrderReceiveDialogComponent, { width: '850px', maxWidth: '95vw', data: { orderId: order.id } }).afterClosed().subscribe(ok => { if (ok) this.load(); }); }
   canEdit(s: PurchaseOrderStatus): boolean { return s === 'DRAFT'; } canSend(s: PurchaseOrderStatus): boolean { return s === 'DRAFT' || s === 'PENDING_APPROVAL'; } canReceive(s: PurchaseOrderStatus): boolean { return s === 'SENT' || s === 'PARTIALLY_RECEIVED'; } canCancel(s: PurchaseOrderStatus): boolean { return !['RECEIVED','CANCELLED'].includes(s); }
   statusLabel(s: PurchaseOrderStatus): string { return ({DRAFT:'Borrador',PENDING_APPROVAL:'Pendiente de aprobación',SENT:'Enviado',PARTIALLY_RECEIVED:'Recepción parcial',RECEIVED:'Recibido',CANCELLED:'Cancelado'} as Record<PurchaseOrderStatus,string>)[s]; }
+  statusIcon(s: PurchaseOrderStatus): string { return ({DRAFT:'edit_note',PENDING_APPROVAL:'schedule',SENT:'send',PARTIALLY_RECEIVED:'inventory',RECEIVED:'check_circle',CANCELLED:'cancel'} as Record<PurchaseOrderStatus,string>)[s]; }
   private error(error: unknown): void { const e = error as { error?: { message?: string } }; this.toastr.error(e.error?.message || 'No se pudo completar la operación.'); }
 }

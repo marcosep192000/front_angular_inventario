@@ -11,14 +11,16 @@
       <tr>
         <th>✔</th>
         <th>Producto</th>
-        <th>Stock minimo </th>
+        <th>Stock disponible</th>
+        <th>Stock mínimo</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor = "let product of provider.products">
         <td><input type="checkbox" [(ngModel)]= "product.selected"/></td>
         <td>{{ product.name }}</td>
-        <td>{{ product.stock }}</td>
+        <td>{{ product.availableStock | number: '1.0-6' }}</td>
+        <td>{{ product.minimumStock | number: '1.0-6' }}</td>
       </tr>
     </tbody>
   </table>

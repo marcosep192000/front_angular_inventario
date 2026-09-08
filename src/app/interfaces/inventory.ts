@@ -72,7 +72,10 @@ export interface ProductSaleConfiguration {
   productName: string;
   unit: UnitOfMeasure | null;
   allowedUnits: UnitOfMeasure[];
+  /** @deprecated Compatibility only. */
   stock: number;
+  availableStock: number;
+  minimumStock: number;
   fractionable: boolean;
   variantStockManaged: boolean;
   presentations: ProductPresentation[];

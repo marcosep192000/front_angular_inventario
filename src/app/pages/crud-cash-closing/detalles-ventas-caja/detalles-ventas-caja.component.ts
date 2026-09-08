@@ -11,9 +11,11 @@ import { SaleCommon } from '../../../interfaces/sale-common';
 import { CajaService } from '../../../services/caja.service';
 import { ClientService } from '../../../services/client.service';
 import { TicketService } from '../../../services/ticket.service';
+import { PagoTicketRequest } from '../../../interfaces/pago-ticket';
 import { DetallesIngresosCajaPorFacturaComponent } from '../detalles-ingresos-caja-por-factura/detalles-ingresos-caja-por-factura.component';
 
 interface VentaEmitida { movimiento: detalleCajaTipoContado; movimientos: detalleCajaTipoContado[]; montoCaja: number; ticket?: SaleCommon; cliente?: Client; }
+interface PagoVisible { medio: string; monto: number; }
 
 @Component({
   selector: 'app-detalles-ventas-caja', standalone: true,
@@ -71,8 +73,21 @@ export class DetallesVentasCajaComponent implements OnInit {
   }
   nombreCliente(cliente?: Client): string { return cliente ? `${cliente.name || ''} ${cliente.lastName || ''}`.trim() || 'Cliente sin nombre' : 'Cliente no informado'; }
   numeroFactura(movimiento: detalleCajaTipoContado): string { return movimiento.referenciaPago || String(movimiento.numeroComprobante || '').replace(/-\d{2}$/, ''); }
-  movimientoNumero(movimiento: detalleCajaTipoContado): string { const match = String(movimiento.numeroComprobante || '').match(/-(\d{2})$/); return match?.[1] || '01'; }
-  resumenPagos(venta: VentaEmitida): string { return venta.movimientos.map(movimiento => `${movimiento.medioPago || 'Pago'} · ${this.movimientoNumero(movimiento)}`).join(' / '); }
+  pagosVisibles(venta: VentaEmitida): PagoVisible[] {
+    const pagos = venta.ticket?.pagos;
+    if (pagos?.length) return pagos.map(pago => this.pagoVisible(pago));
+    return venta.movimientos.map(movimiento => ({ medio: this.etiquetaMedioPago(movimiento.medioPago), monto: Number(movimiento.monto || 0) }));
+  }
+  private pagoVisible(pago: PagoTicketRequest): PagoVisible {
+    return { medio: this.etiquetaMedioPago(pago.medioPago), monto: Number(pago.monto || 0) };
+  }
+  private etiquetaMedioPago(medio: unknown): string {
+    const etiquetas: Record<string, string> = {
+      EFECTIVO: 'Efectivo', TRANSFERENCIA: 'Transferencia', DEBITO: 'Débito', CREDITO: 'Crédito',
+      MERCADO_PAGO: 'Mercado Pago', CHEQUE: 'Cheque', CUENTA_CORRIENTE: 'Cta. Cte.', OTRO: 'Otro',
+    };
+    return etiquetas[String(medio || '').toUpperCase()] || 'Pago';
+  }
   verDetalle(venta: VentaEmitida): void {
     this.dialog.open(DetallesIngresosCajaPorFacturaComponent, { width: '900px', maxWidth: '96vw', data: { id: venta.movimiento.id, categoriaMovimiento: 'VENTA', numeroComprobante: this.numeroFactura(venta.movimiento), tipo: 'INGRESO' } });
   }

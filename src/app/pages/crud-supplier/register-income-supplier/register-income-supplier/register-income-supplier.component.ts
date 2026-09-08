@@ -74,6 +74,7 @@ const CUSTOM_DATE_FORMATS = {
   templateUrl: './register-income-supplier.component.html',
   styleUrls: ['./register-income-supplier.component.css'],
 })
+/** @deprecated Historical component without route or consumers. Use supplier invoice registration. */
 export class RegisterIncomeSupplierComponent implements OnInit {
   idProveedorRecibido: number | null = null;
 

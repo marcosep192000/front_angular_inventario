@@ -334,6 +334,7 @@
                         mat-icon-button
                         matSuffix
                         type="button"
+                        aria-label="Mostrar u ocultar contraseña"
                         (click)="hidePassword = !hidePassword">
 
                         <mat-icon>
@@ -374,15 +375,16 @@
                     mat-raised-button
                     color="primary"
                     class="login-button"
-                    type="submit">
+                    type="submit"
+                    [disabled]="isLoading">
 
                     <mat-icon>
 
-                        login
+                        {{ isLoading ? 'hourglass_top' : 'login' }}
 
                     </mat-icon>
 
-                    Ingresar
+                    {{ isLoading ? 'Ingresando…' : 'Ingresar' }}
 
                 </button>
 

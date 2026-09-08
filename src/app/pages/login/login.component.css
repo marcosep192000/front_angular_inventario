@@ -981,3 +981,30 @@ body{
     }
 
 }
+
+/* Pulido comercial: ritmo más sereno, producto protagonista y controles centrados. */
+.branding-content{max-width:680px}
+.modules-grid{gap:12px;margin-bottom:20px}
+.module-card{min-height:70px;padding:13px 15px;border-radius:14px;cursor:default}
+.module-card:hover{transform:none;box-shadow:none}
+.developer-card{grid-template-columns:52px 1fr;gap:14px;padding:13px 15px;border-radius:15px;background:rgba(255,255,255,.10);box-shadow:none}
+.developer-logo{width:48px;height:48px;border-radius:11px;padding:6px}
+.developer-right h2{font-size:17px}.developer-right p{margin-bottom:7px;font-size:12px}.developer-label{font-size:9px;margin-bottom:3px}
+.tech-stack{gap:5px;margin-bottom:7px}.tech-stack span{padding:4px 8px;font-size:10px}.portfolio{gap:6px;padding:5px 8px;font-size:11px;opacity:.82}.portfolio mat-icon{width:16px;height:16px;font-size:16px}
+.login-card{max-width:440px;padding:34px;border:1px solid #e8e3ef;box-shadow:0 22px 55px rgba(54,36,78,.13)}
+.login-card:hover{transform:none;box-shadow:0 22px 55px rgba(54,36,78,.13)}
+.login-header{margin-bottom:26px}.login-logo{width:78px;height:78px;margin-bottom:12px}.login-header h2{font-size:30px}
+.full-width{margin-bottom:14px}
+.full-width mat-icon,.full-width button{display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.login-button{height:52px;display:flex;align-items:center;justify-content:center;gap:7px;transition:filter .18s ease,box-shadow .18s ease}
+.login-button:hover{transform:none;filter:brightness(1.05);box-shadow:0 16px 34px rgba(82,46,146,.34)}
+.login-button:focus-visible{outline:3px solid rgba(82,46,146,.25);outline-offset:3px}
+.login-button:disabled{box-shadow:none;filter:saturate(.6)}
+.login-button mat-icon{margin:0;display:inline-flex;align-items:center;justify-content:center}
+.security{margin-top:20px}.security mat-icon{display:inline-flex;align-items:center;justify-content:center}
+
+@media(max-height:800px) and (min-width:1101px){
+  .branding{padding:24px 34px}.brand-header{margin-bottom:14px}.brand-logo{width:60px;height:60px}.branding h1{font-size:43px}.branding h1 span{font-size:21px}
+  .brand-description{margin:13px 0 18px;font-size:14px}.modules-grid{gap:9px;margin-bottom:14px}.module-card{min-height:60px;padding:10px 13px}.module-card mat-icon{width:40px;height:40px;min-width:40px;font-size:22px}
+  .login-panel{padding:24px}.login-card{padding:28px}.login-logo{width:66px;height:66px}.login-header{margin-bottom:20px}.login-header h2{font-size:27px}.full-width{margin-bottom:10px}.login-options{margin-bottom:18px}.security{margin-top:16px}.login-footer{margin-top:16px}
+}

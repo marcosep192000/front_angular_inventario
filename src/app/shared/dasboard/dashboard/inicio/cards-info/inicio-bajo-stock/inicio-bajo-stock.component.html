@@ -9,6 +9,7 @@
                 <th>Producto</th>
 
                 <th class="text-center">Stock</th>
+                <th class="text-center">Mínimo</th>
 
             </tr>
 
@@ -16,7 +17,7 @@
 
         <tbody>
 
-            @for(product of productos; track product.id){
+            @for(product of productos; track product.productId){
 
                 <tr>
 
@@ -32,19 +33,20 @@
                             class="badge"
                             [ngClass]="{
 
-                                'danger': product.stock <= 2,
+                                'danger': stockStatus(product) === 'sin-stock',
 
-                                'warning': product.stock > 2 && product.stock <= product.stockMin,
+                                'warning': stockStatus(product) === 'stock-bajo',
 
-                                'success': product.stock > product.stockMin
+                                'success': stockStatus(product) === 'stock-ok'
 
                             }">
 
-                            {{product.stock}}
+                            {{ product.availableStock | number: '1.0-6' }}
 
                         </span>
 
                     </td>
+                    <td class="text-center">{{ product.minimumStock | number: '1.0-6' }}</td>
 
                 </tr>
 
@@ -52,7 +54,7 @@
 
                 <tr>
 
-                    <td colspan="2" class="empty">
+                    <td colspan="3" class="empty">
 
                         No existen productos con bajo stock
 
@@ -68,9 +70,9 @@
 
     <div class="footer">
 
-        <button mat-button color="primary">
+        <button mat-button color="primary" routerLink="/dashboard/reportes/inventario/bajo-stock">
 
-            Ver todos
+            Ver reporte completo
 
         </button>
 

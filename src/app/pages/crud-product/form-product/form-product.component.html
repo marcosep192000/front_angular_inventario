@@ -82,11 +82,11 @@
           </div>
 
           <!-- PRODUCTO -->
-          <mat-form-field class="input" hintLabel="Máximo 50 caracteres">
+          <mat-form-field class="input" hintLabel="Máximo 120 caracteres">
             <mat-label>Producto</mat-label>
-            <input matInput maxlength="50" formControlName="name" />
+            <input matInput maxlength="120" formControlName="name" />
             <mat-hint align="end"
-              >{{ formGroup.get("name")?.value?.length }}/50</mat-hint
+              >{{ formGroup.get("name")?.value?.length }}/120</mat-hint
             >
             <mat-error *ngIf="formGroup.get('name')?.hasError('required')"
               >Ingresá el nombre del producto.</mat-error

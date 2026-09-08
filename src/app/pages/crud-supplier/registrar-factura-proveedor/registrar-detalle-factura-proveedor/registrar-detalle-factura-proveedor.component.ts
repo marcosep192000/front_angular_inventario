@@ -933,8 +933,9 @@ export class RegistrarDetalleFacturaProveedorComponent
     return {
       id: Number(product.id), productId: Number(product.id), barCode: product.barCode ?? '',
       name: product.name, description: data.description ?? '', price: Number(product.price) || 0,
-      stock: Number(product.stock) || 0, stockMin: Number(product.stockMin) || 0,
-      iva: Number(product.iva) || 0, quantity: 1, totalStock: Number(product.stock) || 0,
+      availableStock: product.availableStock, minimumStock: product.minimumStock, variantStockManaged: product.variantStockManaged,
+      stock: Number(product.availableStock) || 0, stockMin: Number(product.minimumStock) || 0,
+      iva: Number(product.iva) || 0, quantity: 1, totalStock: Number(product.availableStock) || 0,
       precioTotal: 0,
       marca: product.marca?.id == null ? undefined : { id: product.marca.id, marca: product.marca.marca },
     };
@@ -1045,7 +1046,7 @@ export class RegistrarDetalleFacturaProveedorComponent
 
     const stock =
       Number(
-        data.stock
+        data.availableStock
       ) || 0;
 
 
@@ -1176,7 +1177,11 @@ export class RegistrarDetalleFacturaProveedorComponent
         this.inventoryConfig = config;
         this.purchasePresentations = (config.presentations ?? [])
           .filter(p => p.active && p.purchaseEnabled);
-        this.formProduct.patchValue({ stock: Number(config.stock) || 0 }, { emitEvent: false });
+        if (this.product) {
+          this.product.availableStock = config.availableStock;
+          this.product.minimumStock = config.minimumStock;
+        }
+        this.formProduct.patchValue({ stock: Number(config.availableStock) || 0 }, { emitEvent: false });
         this.calcularTotalesProducto();
       },
       error: () => this.calcularTotalesProducto()
@@ -1361,6 +1366,9 @@ export class RegistrarDetalleFacturaProveedorComponent
 
     const productData:
       ProductItemBuyFactura = {
+      availableStock: this.product.availableStock,
+      minimumStock: this.product.minimumStock,
+      variantStockManaged: this.product.variantStockManaged,
 
       id:
         this.product.id,
@@ -1425,7 +1433,7 @@ export class RegistrarDetalleFacturaProveedorComponent
 
 
       stockMin:
-        this.product.stockMin ??
+        this.product.minimumStock ??
         0,
 
 
@@ -1630,7 +1638,7 @@ export class RegistrarDetalleFacturaProveedorComponent
             ...item,
             quantity: cantidad,
             baseQuantity: this.redondear(cantidad * (Number(item.conversionFactor) || 1), 6),
-            totalStock: (Number(item.stock) || 0) + cantidad * (Number(item.conversionFactor) || 1),
+            totalStock: (Number(item.availableStock) || 0) + cantidad * (Number(item.conversionFactor) || 1),
             subtotalNeto,
             importeIva,
             precioTotal: this.redondear(subtotalNeto + importeIva)

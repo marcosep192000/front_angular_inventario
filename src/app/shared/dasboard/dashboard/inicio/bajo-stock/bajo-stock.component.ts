@@ -99,19 +99,19 @@ async downloadPDF(): Promise<void> {
       autoTable(doc, {
         startY: 55,
         head: [['Producto', 'Stock']],
-        body: selected.map((p: Product) => [p.name, p.stock.toString()]),
+        body: selected.map((p: Product) => [p.name, new Intl.NumberFormat('es-AR', { maximumFractionDigits: 6 }).format(p.availableStock)]),
         margin: { left: 10, right: 10 }
       });
 
       // calcular totales
       const totalProductos = selected.length;
-      const totalStock = selected.reduce((sum, p) => sum + p.stock, 0);
+      const totalStock = selected.reduce((sum, p) => sum + p.availableStock, 0);
 
       // escribir totales debajo de la tabla
       const finalY = (doc as any).lastAutoTable.finalY;
       doc.setFontSize(11);
       doc.text(`TOTAL productos: ${totalProductos}`, 10, finalY + 10);
-      doc.text(`TOTAL stock a reponer: ${totalStock}`, 10, finalY + 17);
+      doc.text(`TOTAL stock disponible: ${new Intl.NumberFormat('es-AR', { maximumFractionDigits: 6 }).format(totalStock)}`, 10, finalY + 17);
 
       // guardar el PDF con nombre del proveedor
       const fileName = `pedido_${provider.name.replace(/\s+/g, '_')}.pdf`;

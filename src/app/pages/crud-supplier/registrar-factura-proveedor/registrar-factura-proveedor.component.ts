@@ -863,7 +863,7 @@ export class RegistrarFacturaProveedorComponent
 
               (
                 Number(
-                  producto.stock
+                  producto.availableStock
                 ) || 0
               ) + cantidad,
 

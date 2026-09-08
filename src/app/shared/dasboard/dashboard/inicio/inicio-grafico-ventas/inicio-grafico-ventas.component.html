@@ -1,6 +1,12 @@
 <div class="chart-container">
-
+    <div class="chart-state" *ngIf="loading">Cargando ventas…</div>
+    <div class="chart-state" *ngIf="!loading && !error && !barChartData.datasets.length">
+      <mat-icon>insights</mat-icon>
+      Todavía no hay ventas registradas en este período.
+    </div>
+    <div class="chart-state error" *ngIf="error">No pudimos cargar las ventas. Intentá nuevamente.</div>
     <canvas
+        *ngIf="!loading && !error && barChartData.datasets.length"
         baseChart
         [datasets]="barChartData.datasets"
         [labels]="barChartData.labels"

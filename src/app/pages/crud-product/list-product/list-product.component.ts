@@ -1,3 +1,4 @@
+import { stockStatus } from './product-stock.utils';
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -177,8 +178,8 @@ export class ListProductComponent implements OnInit {
         data: {
           productId: product.id,
           productName: product.name,
-          stock: Number(product.stock || 0),
-          stockMin: Number(product.stockMin || 0),
+          availableStock: Number(product.availableStock),
+          minimumStock: Number(product.minimumStock),
         },
       })
       .afterClosed()
@@ -258,14 +259,7 @@ export class ListProductComponent implements OnInit {
   }
 
   claseStock(producto: Product): string {
-    if (producto.stock <= 0) {
-      return 'sin-stock';
-    }
-    if (producto.stock <= producto.stockMin) {
-      return 'stock-bajo';
-    }
-
-    return 'stock-ok';
+    return stockStatus(producto);
   }
 
   get limiteProductosAlcanzado(): boolean {
@@ -282,17 +276,17 @@ export class ListProductComponent implements OnInit {
   }
 
   iconoStock(producto: Product): string {
-    return producto.stock <= producto.stockMin
+    return stockStatus(producto) !== 'stock-ok'
       ? 'warning_amber'
       : 'check_circle';
   }
 
   textoStock(producto: Product): string {
-    if (producto.stock <= 0) return 'Sin stock';
+    if (stockStatus(producto) === 'sin-stock') return 'Sin stock';
     const cantidad = new Intl.NumberFormat('es-AR', {
       maximumFractionDigits: 6,
-    }).format(Number(producto.stock));
-    return `${cantidad} ${producto.baseUnit?.symbol || 'un.'}`;
+    }).format(Number(producto.availableStock));
+    return `${cantidad} ${producto.baseUnit?.symbol || 'un.'}${producto.variantStockManaged ? ' en variantes' : ''}`;
   }
 
   filterValue: string = '';

@@ -3,18 +3,18 @@ import {
   ProductSaleConfiguration,
 } from '../../../interfaces/inventory';
 
-export interface InventoryBaseFormState extends Omit<BaseUnitRequest, 'unitId'> {
+export interface InventoryBaseFormState extends Omit<BaseUnitRequest, 'unitId' | 'stock'> {
   unitId: number | null;
+  stockQuantity: number;
 }
 
 export function inventoryBaseFormState(
   config: ProductSaleConfiguration,
-  fallback: { stock: number; stockMin: number },
 ): InventoryBaseFormState {
   return {
     unitId: config.unit?.id != null ? Number(config.unit.id) : null,
-    stock: config.stock ?? fallback.stock,
-    minimumStock: fallback.stockMin,
+    stockQuantity: config.availableStock,
+    minimumStock: config.minimumStock,
     fractionable: config.fractionable === true,
     variantStockManaged: config.variantStockManaged === true,
   };
@@ -26,7 +26,7 @@ export function baseUnitRequest(
   if (state.unitId == null) return null;
   return {
     unitId: Number(state.unitId),
-    stock: Number(state.stock),
+    stock: Number(state.stockQuantity),
     minimumStock: Number(state.minimumStock),
     fractionable: state.fractionable === true,
     variantStockManaged: state.variantStockManaged === true,

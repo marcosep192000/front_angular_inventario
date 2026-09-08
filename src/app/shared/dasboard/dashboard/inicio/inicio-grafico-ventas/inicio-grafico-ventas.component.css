@@ -15,3 +15,23 @@ canvas{
     height:100% !important;
 
 }
+
+.chart-state {
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #756b80;
+    text-align: center;
+}
+
+.chart-state mat-icon {
+    width: 42px;
+    height: 42px;
+    color: #8b6fbd;
+    font-size: 42px;
+}
+
+.chart-state.error { color: #a33b48; }

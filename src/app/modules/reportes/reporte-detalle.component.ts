@@ -1,3 +1,4 @@
+import { inventoryQuantityField, inventoryColumns, formatInventoryQuantity } from './inventory-report.utils';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -28,8 +29,8 @@ const ETIQUETAS_CORTAS: Record<string, string> = {
   costoMercaderiaVendida: 'Costo mercadería', margenPorcentaje: 'Margen %', porcentajeParticipacion: 'Participación %',
   gananciaPotencial: 'Ganancia potencial', capitalInmovilizado: 'Capital inmóvil', productosInmovilizados: 'Productos inmóviles',
   unidadesInmovilizadas: 'Unidades inmóviles', valorStockCosto: 'Valor costo', valorStockVenta: 'Valor venta',
-  costoUnitario: 'Costo unit.', precioVenta: 'Precio venta', unidadesStock: 'Unidades', stockActual: 'Stock',
-  stockMinimo: 'Stock mín.', ventasUltimos30Dias: 'Ventas 30 días', fechaUltimaVenta: 'Última venta',
+  costoUnitario: 'Costo unit.', precioVenta: 'Precio venta', unidadesStock: 'Unidades', availableStock: 'Stock',
+  minimumStock: 'Stock mín.', variantStockManaged: 'Stock por variantes', ventasUltimos30Dias: 'Ventas 30 días', fechaUltimaVenta: 'Última venta',
   ultimaVenta: 'Última venta', ultimaCompra: 'Última compra', limiteCredito: 'Límite crédito',
   proximoVencimiento: 'Próx. vencimiento', variacionPorcentaje: 'Variación %',
   movimientosPorMedioPago: 'Movimientos por pago', medioPago: 'Medio de pago',
@@ -55,7 +56,7 @@ const CONFIG: Record<string, ConfigReporte> = {
   'clientes/antiguedad-deuda': { titulo: 'Antigüedad de deuda', descripcion: 'Deuda agrupada por tramos de antigüedad.', filtros: [] },
   'inventario/stock-valorizado': { titulo: 'Stock valorizado', descripcion: 'Valor de costo, venta y ganancia potencial del inventario.', filtros: [
     { campo: 'categoriaId', etiqueta: 'ID categoría', tipo: 'number', min: 1 }, { campo: 'marcaId', etiqueta: 'ID marca', tipo: 'number', min: 1 }, { campo: 'proveedorId', etiqueta: 'ID proveedor', tipo: 'number', min: 1 }] },
-  'inventario/bajo-stock': { titulo: 'Productos con bajo stock', descripcion: 'Productos por debajo del stock mínimo.', paginado: true, filtros: [...PAGINA] },
+  'inventario/bajo-stock': { titulo: 'Productos con bajo stock', descripcion: 'Productos en el mínimo o por debajo, incluidos los agotados marcados como críticos.', paginado: true, filtros: [...PAGINA] },
   'inventario/sin-stock': { titulo: 'Productos sin stock', descripcion: 'Productos agotados y su actividad reciente.', paginado: true, filtros: [...PAGINA] },
   'inventario/inmovilizado': { titulo: 'Inventario inmovilizado', descripcion: 'Capital detenido en productos sin ventas recientes.', filtros: [{ campo: 'diasSinVenta', etiqueta: 'Días sin venta', tipo: 'number', min: 1, max: 3650 }] },
   'proveedores/compras': { titulo: 'Compras a proveedores', descripcion: 'Compras, pagos y saldos del período.', filtros: [...FECHAS,
@@ -97,17 +98,17 @@ export class ReporteDetalleComponent implements OnInit {
     if (this.endpoint !== 'proveedores/evolucion-costos') this.consultar(); }
   consultar(): void { if (this.endpoint === 'proveedores/evolucion-costos' && !this.filtros.productoId) { this.toast.info('Ingresá el ID del producto'); return; } this.cargando = true; this.consultado = true; this.errorMensaje = '';
     const pedido = this.endpoint === 'proveedores/evolucion-costos' ? this.service.getEvolucionCostos(Number(this.filtros.productoId)) : this.service.consultar(this.endpoint, this.filtros);
-    pedido.subscribe({ next: datos => { this.datos = datos; this.cargando = false; }, error: e => { this.cargando = false; const mensaje = String(e.error?.error || e.error?.message || ''); this.errorMensaje = e.status === 403 ? 'No tenés permiso para ver este reporte. Cerrá sesión e ingresá nuevamente si tus permisos cambiaron.' : mensaje || `No se pudo consultar el reporte (HTTP ${e.status || 0}).`; this.toast.error(this.errorMensaje); } }); }
+    pedido.subscribe({ next: datos => { this.datos = datos; this.cargando = false; }, error: e => { this.cargando = false; const mensaje = String(e.error?.message || ''); this.errorMensaje = e.status === 403 ? 'No tenés permiso para ver este reporte. Cerrá sesión e ingresá nuevamente si tus permisos cambiaron.' : mensaje || 'No pudimos cargar el reporte. Intentá nuevamente.'; this.toast.error(this.errorMensaje); } }); }
   limpiar(): void { this.filtros = { page: this.config.paginado ? 0 : undefined, size: this.config.paginado ? 50 : undefined }; this.datos = null; this.consultado = false; }
   cambiarPagina(delta: number): void { this.filtros.page = Math.max(0, this.pagina + delta); this.consultar(); }
   get pagina(): number { return Number((this.datos as ResumenReporte)?.['pagina'] ?? this.filtros.page ?? 0); }
   get totalPaginas(): number { return Number((this.datos as ResumenReporte)?.['totalPaginas'] ?? 0); }
   get lista(): ResumenReporte[] { if (Array.isArray(this.datos)) return this.datos; const d = this.datos as ResumenReporte | null; for (const clave of ['contenido','detalle','evolucion','historial']) if (Array.isArray(d?.[clave])) return d[clave] as ResumenReporte[]; if (d?.['movimientosPorMedioPago'] && typeof d['movimientosPorMedioPago'] === 'object') return Object.entries(d['movimientosPorMedioPago'] as object).map(([medioPago,total]) => ({ medioPago, total })); return []; }
-  get columnas(): string[] { return this.lista.length ? Object.keys(this.lista[0]) : []; }
+  get columnas(): string[] { return this.lista.length ? (this.endpoint.startsWith('inventario/') ? inventoryColumns(this.lista[0]) : Object.keys(this.lista[0])) : []; }
   get tarjetas(): Array<[string, unknown]> { if (!this.datos || Array.isArray(this.datos)) return []; const resumen = this.datos['resumen']; const origen = resumen && typeof resumen === 'object' ? resumen as ResumenReporte : this.datos; return Object.entries(origen).filter(([k,v]) => !['contenido','detalle','evolucion','historial','movimientosPorMedioPago','pagina','tamanio','totalPaginas'].includes(k) && ['string','number'].includes(typeof v)); }
   get sinDatos(): boolean { return !this.datos || (!this.lista.length && !this.tarjetas.length); }
   etiqueta(campo: string): string { return ETIQUETAS_CORTAS[campo] ?? campo.replace(/([A-Z])/g, ' $1').replaceAll('_',' ').replace(/^./, c => c.toUpperCase()); }
-  formatearCelda(campo: string, valor: unknown): string { if (valor === null || valor === undefined || valor === '') return '-'; if (typeof valor === 'boolean') return valor ? 'Sí' : 'No'; const moneda = /total|venta|facturacion|costo|precio|ganancia|saldo|deuda|importe|pagado|capital|limite|disponible|iva|impuesto|monto|subtotal|retiro|aporte|ingreso|egreso|efectivo/i.test(campo); if (moneda && typeof valor === 'number') return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS'}).format(valor); if (/porcentaje|margen/i.test(campo) && typeof valor === 'number') return `${new Intl.NumberFormat('es-AR',{maximumFractionDigits:2}).format(valor)} %`; if (typeof valor === 'number') return new Intl.NumberFormat('es-AR',{maximumFractionDigits:2}).format(valor); return String(valor).replaceAll('_',' '); }
+  formatearCelda(campo: string, valor: unknown): string { if (valor === null || valor === undefined || valor === '') return '-'; if (this.endpoint.startsWith('inventario/') && inventoryQuantityField(campo) && typeof valor === 'number') return formatInventoryQuantity(valor); if (typeof valor === 'boolean') return valor ? 'Sí' : 'No'; const moneda = /total|venta|facturacion|costo|precio|ganancia|saldo|deuda|importe|pagado|capital|limite|disponible|iva|impuesto|monto|subtotal|retiro|aporte|ingreso|egreso|efectivo/i.test(campo); if (moneda && typeof valor === 'number') return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS'}).format(valor); if (/porcentaje|margen/i.test(campo) && typeof valor === 'number') return `${new Intl.NumberFormat('es-AR',{maximumFractionDigits:2}).format(valor)} %`; if (typeof valor === 'number') return new Intl.NumberFormat('es-AR',{maximumFractionDigits:2}).format(valor); return String(valor).replaceAll('_',' '); }
   async descargarPdf(): Promise<void> {
     if (!this.datos || this.generandoPdf) return; this.generandoPdf = true;
     try {

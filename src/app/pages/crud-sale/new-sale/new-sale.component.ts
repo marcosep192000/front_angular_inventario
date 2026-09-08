@@ -1,10 +1,13 @@
+import { effectiveCartStock, reservedBaseStock, canAddBaseStock } from '../sale-configuration/cart-stock.utils';
 import { CommonModule } from '@angular/common';
 import {
   Component,
   ElementRef,
   HostListener,
   OnInit,
+  QueryList,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 
 import { FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
@@ -55,6 +58,7 @@ import { TokenService } from '../../../services/token.service';
 import { arcaAvailable } from '../fiscal-status/fiscal-status.utils';
 import { BillingModeDialogComponent } from '../billing-mode-dialog/billing-mode-dialog.component';
 import { InventoryService } from '../../../services/inventory.service';
+import { CajaService } from '../../../services/caja.service';
 import { InventorySaleSelection } from '../../../interfaces/inventory';
 import { SaleConfigurationComponent } from '../sale-configuration/sale-configuration.component';
 import {
@@ -104,6 +108,8 @@ import {
   styleUrl: './new-sale.component.css',
 })
 export class NewSaleComponent implements OnInit {
+  @ViewChildren('resultadoProducto', { read: ElementRef })
+  private resultadosProducto!: QueryList<ElementRef<HTMLElement>>;
   // =====================================================
   // CLIENTES
   // =====================================================
@@ -178,6 +184,8 @@ export class NewSaleComponent implements OnInit {
   saleCommon?: SaleCommon;
 
   today: Date = new Date();
+  cajaAbierta: boolean | null = null;
+  consultandoCaja = true;
 
   // =====================================================
   // CONSTRUCTOR
@@ -202,6 +210,7 @@ export class NewSaleComponent implements OnInit {
     private arcaService: ArcaService,
     private tokenService: TokenService,
     private inventoryService: InventoryService,
+    private cajaService: CajaService,
   ) {}
 
   // =====================================================
@@ -213,6 +222,20 @@ export class NewSaleComponent implements OnInit {
     this.seleccionarConsumidorFinal();
     this.cargarCondicionIvaEmisor();
     this.cargarEstadoArca();
+    this.cargarEstadoCaja();
+  }
+
+  cargarEstadoCaja(): void {
+    this.consultandoCaja = true;
+    this.cajaService.getCajas().subscribe({
+      next: () => { this.cajaAbierta = true; this.consultandoCaja = false; },
+      error: () => { this.cajaAbierta = false; this.consultandoCaja = false; },
+    });
+  }
+
+  get requiereCajaAbierta(): boolean { return !this.esDocumentoSinCobro(); }
+  get cobroBloqueadoPorCaja(): boolean {
+    return this.requiereCajaAbierta && this.cajaAbierta !== true;
   }
 
   cargarEstadoArca(): void {
@@ -512,6 +535,8 @@ export class NewSaleComponent implements OnInit {
         this.indiceSeleccionado = 0;
       }
 
+      this.mantenerResultadoSeleccionadoVisible();
+
       return;
     }
 
@@ -528,8 +553,18 @@ export class NewSaleComponent implements OnInit {
         this.indiceSeleccionado = this.productosEncontrados.length - 1;
       }
 
+      this.mantenerResultadoSeleccionadoVisible();
+
       return;
     }
+  }
+
+  private mantenerResultadoSeleccionadoVisible(): void {
+    queueMicrotask(() => {
+      this.resultadosProducto
+        ?.get(this.indiceSeleccionado)
+        ?.nativeElement.scrollIntoView({ block: 'nearest' });
+    });
   }
 
   // =====================================================
@@ -548,7 +583,7 @@ export class NewSaleComponent implements OnInit {
     this.inventoryService.getSaleConfiguration(producto.id).subscribe({
       next: (config) => {
         if (!isAdvancedProduct(config)) {
-          this.agregarProducto(producto);
+          this.agregarProducto({ ...producto, availableStock: config.availableStock, minimumStock: config.minimumStock, variantStockManaged: config.variantStockManaged });
           this.enfocarBuscador();
           return;
         }
@@ -567,8 +602,7 @@ export class NewSaleComponent implements OnInit {
           });
       },
       error: () => {
-        // Compatibilidad: un producto anterior conserva el flujo tradicional.
-        this.agregarProducto(producto);
+        this.toastr.error('No se pudo obtener la disponibilidad del producto. Reintent? la selecci?n.');
         this.enfocarBuscador();
       },
     });
@@ -594,27 +628,33 @@ export class NewSaleComponent implements OnInit {
       selection.inputUnitId,
     );
     const factor = selection.conversionFactor || 1;
+    const variant = config.variants.find(v => v.active && v.id === selection.variantId);
+    const candidate = { ...producto, availableStock: config.availableStock,
+      variantStockManaged: config.variantStockManaged, variantId: selection.variantId,
+      variantStock: variant?.stock };
+    if ((config.variantStockManaged && !variant) ||
+        !canAddBaseStock(this.products, candidate, selection.baseQuantity)) {
+      this.toastr.warning('No hay stock suficiente para agregar esa cantidad.');
+      return;
+    }
     const existing = this.products.find((p) => p.cartKey === key);
     if (existing) {
       const nextBase =
         (existing.baseQuantity || 0) + selection.baseQuantity;
-      if (nextBase > selection.available) {
-        this.toastr.warning(
-          'No hay stock suficiente para agregar esa cantidad.',
-        );
-        return;
-      }
+      existing.availableStock = config.availableStock;
+      existing.variantStock = variant?.stock;
       existing.quantity += selection.quantity;
       existing.baseQuantity = nextBase;
       existing.displayQuantity = `${existing.quantity} ${config.presentations.find((p) => p.id === selection.presentationId)?.name || config.allowedUnits?.find((unit) => unit.id === selection.inputUnitId)?.symbol || config.unit?.symbol || 'un.'}`;
       return;
     }
-    const variant = config.variants.find((v) => v.id === selection.variantId);
     this.products.push({
       ...producto,
       quantity: selection.quantity,
       salePrice: selection.unitPrice,
-      stock: selection.available,
+      availableStock: config.availableStock,
+      variantStockManaged: config.variantStockManaged,
+      variantStock: variant?.stock,
       totalStock: selection.available,
       presentationId: selection.presentationId,
       inputUnitId: selection.inputUnitId,
@@ -639,7 +679,7 @@ export class NewSaleComponent implements OnInit {
     // CONTROL STOCK
     // =============================================
 
-    if (data.stock <= 0) {
+    if (data.variantStockManaged || !canAddBaseStock(this.products, data, 1)) {
       this.toastr.warning(
         `El producto "${data.name}" no tiene stock disponible.`,
       );
@@ -652,7 +692,7 @@ export class NewSaleComponent implements OnInit {
     // =============================================
 
     const existingProduct = this.products.find(
-      (product) => product.id === data.id,
+      (product) => product.id === data.id && !product.advancedSale,
     );
 
     // =============================================
@@ -660,15 +700,9 @@ export class NewSaleComponent implements OnInit {
     // =============================================
 
     if (existingProduct) {
-      if (existingProduct.quantity < existingProduct.stock) {
-        existingProduct.quantity += 1;
-
-        this.toastr.success(
-          `${existingProduct.name} x${existingProduct.quantity}`,
-        );
-      } else {
-        this.toastr.error('Excede al stock disponible.');
-      }
+      existingProduct.availableStock = data.availableStock;
+      existingProduct.quantity += 1;
+      this.toastr.success(existingProduct.name + ' x' + existingProduct.quantity);
 
       return;
     }
@@ -917,6 +951,20 @@ export class NewSaleComponent implements OnInit {
       this.confirmarGeneracionDocumento();
 
       return;
+    }
+
+    // El backend exige una caja activa para registrar movimientos de cobro.
+    // Se consulta nuevamente justo antes de abrir el diálogo para evitar estado viejo.
+    this.consultandoCaja = true;
+    try {
+      await firstValueFrom(this.cajaService.getCajas());
+      this.cajaAbierta = true;
+    } catch {
+      this.cajaAbierta = false;
+      this.toastr.warning('La caja está cerrada. Debés abrirla para registrar una venta.');
+      return;
+    } finally {
+      this.consultandoCaja = false;
     }
 
     // =============================================
@@ -2386,9 +2434,13 @@ export class NewSaleComponent implements OnInit {
   // AUMENTAR CANTIDAD
   // =====================================================
 
+  remainingStock(product: ProductItemSale): number {
+    return effectiveCartStock(product) - reservedBaseStock(this.products, product);
+  }
+
   increaseQuantity(product: ProductItemSale): void {
     const factor = product.conversionFactor || 1;
-    if ((product.baseQuantity ?? product.quantity) + factor <= product.stock) {
+    if (canAddBaseStock(this.products, product, factor)) {
       product.quantity++;
       if (product.advancedSale) {
         product.baseQuantity = (product.baseQuantity || 0) + factor;
@@ -2405,7 +2457,7 @@ export class NewSaleComponent implements OnInit {
   // =====================================================
 
   decreaseQuantity(product: ProductItemSale): void {
-    if (product.quantity > (product.advancedSale ? 0.001 : 1)) {
+    if (product.quantity > 1) {
       product.quantity--;
       if (product.advancedSale)
         product.baseQuantity = Math.max(

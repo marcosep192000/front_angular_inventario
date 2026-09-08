@@ -249,6 +249,11 @@ t.css
   color: #69f0ae;
 }
 
+.estado-caja.cerrada { color: #ffd2d7; }
+.estado-caja.cerrada mat-icon { color: #ff8b98; }
+.estado-caja.consultando { opacity: .72; }
+.caja-warning{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:10px 14px;border:1px solid #f0abb4;border-radius:10px;background:#fff0f2;color:#922f3c;font-weight:600}.caja-warning mat-icon{color:#c44454}
+
 /* ============================================================
    COMPROBANTE
    ============================================================ */
@@ -423,8 +428,11 @@ t.css
 }
 
 .resultados-productos {
-  max-height: 350px;
+  max-height: min(350px, calc(100dvh - 190px));
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scroll-padding-block: 8px;
 }
 
 .resultado-producto {
@@ -440,6 +448,7 @@ t.css
   cursor: pointer;
 
   border-bottom: 1px solid #f0f0f0;
+  scroll-margin-block: 8px;
 }
 
 .resultado-producto:hover,

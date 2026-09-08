@@ -11,11 +11,17 @@ export interface Product {
   provider: Supplier;
   name: string;
   price: Float32Array;
+  availableStock: number;
+  minimumStock: number;
+  variantStockManaged?: boolean;
+  fractionable?: boolean;
+  /** @deprecated Compatibility only. */
   stock: number;
   baseUnit?: UnitOfMeasure | null;
   iva: number;
   stateIva: boolean;
   tipoIva?: TipoIva;
+  /** @deprecated Compatibility only. */
   stockMin: number;
   image: string;
   expiration: number;

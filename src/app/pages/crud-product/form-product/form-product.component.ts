@@ -144,8 +144,8 @@ export class FormProductComponent implements OnInit {
               name: datos.name,
               price: datos.price,
               tipoIva: resolverTipoIva(datos),
-              stock: datos.stock,
-              stockMin: datos.stockMin,
+              stock: datos.availableStock,
+              stockMin: datos.minimumStock,
               salePrice: datos.salePrice,
               productUsefulness: datos.productUsefulness,
             });
@@ -233,7 +233,10 @@ export class FormProductComponent implements OnInit {
       const { baseUnitId, ...rawProductPayload } = this.formGroup.getRawValue();
       const productPayload = this.normalizeProductPayload(rawProductPayload);
       this.productService
-        .save(productPayload)
+        // Initial quantities are canonical; zero aliases keep old HTTP clients compatible.
+        .save({ ...productPayload, stock: 0, stockMin: 0,
+          stockQuantity: Number(productPayload.stock),
+          minimumStockQuantity: Number(productPayload.stockMin) })
         .pipe(
           // Conserva compatibilidad con versiones anteriores del backend que
           // no devolvían el producto creado.
@@ -299,6 +302,8 @@ export class FormProductComponent implements OnInit {
     const productPayload = this.normalizeProductPayload(
       this.formGroup.getRawValue(),
     );
+    delete productPayload.stock;
+    delete productPayload.stockMin;
     this.productService
       .update(this.data.updateProduct, productPayload)
       .pipe(finalize(() => (this.saving = false)))
@@ -485,16 +490,14 @@ export class FormProductComponent implements OnInit {
         data: {
           productId: this.data.updateProduct,
           productName: this.formGroup.get('name')?.value || 'Producto',
-          stock: Number(this.formGroup.get('stock')?.value || 0),
-          stockMin: Number(this.formGroup.get('stockMin')?.value || 0),
         },
       })
       .afterClosed()
       .subscribe((result) => {
         if (result?.changed) {
           this.formGroup.patchValue({
-            stock: Math.max(0, Number(result.stock)),
-            stockMin: Math.max(0, Number(result.stockMin)),
+            stock: Math.max(0, Number(result.availableStock)),
+            stockMin: Math.max(0, Number(result.minimumStock)),
           });
         }
       });

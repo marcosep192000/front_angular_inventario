@@ -1,6 +1,8 @@
 <div class="ventas-list">
+    <div class="empty" *ngIf="loading">Cargando ventas…</div>
+    <div class="empty error" *ngIf="error">No pudimos cargar las ventas. Intentá nuevamente.</div>
 
-    @for (venta of ventas; track venta.numero) {
+    @for (venta of (!loading && !error ? ventas : []); track venta.numero) {
 
         <div class="venta-item">
 
@@ -32,10 +34,13 @@
 
         <div class="empty">
 
-            No hay ventas registradas.
+            No hay ventas registradas todavía.
 
         </div>
 
     }
 
+</div>
+<div class="footer" *ngIf="!loading && !error && ventas.length">
+  <a mat-button color="primary" routerLink="/dashboard/reportes/ventas/resumen">Ver todas</a>
 </div>

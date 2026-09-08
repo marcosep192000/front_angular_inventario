@@ -34,6 +34,7 @@ import { LICENSE_USABLE } from '../../interfaces/license';
 })
 export class LoginComponent {
   hidePassword = true;
+  isLoading = false;
   private accesoService = inject(AccessoService);
   private route = inject(Router);
   private formBuild = inject(FormBuilder);
@@ -46,7 +47,8 @@ export class LoginComponent {
   });
 
   iniciarSession() {
-    if (this.formGroup.invalid) return;
+    if (this.formGroup.invalid || this.isLoading) return;
+    this.isLoading = true;
 
     const objeto: Login = {
       email: this.formGroup.value.email!,
@@ -62,10 +64,12 @@ export class LoginComponent {
             error: () => this.route.navigate(['/activacion'], { queryParams: { connectionError: 1 } }),
           });
         } else {
+          this.isLoading = false;
           alert('Credenciales incorrectas');
         }
       },
       error: (error) => {
+        this.isLoading = false;
         console.error(error);
         alert('Error al iniciar sesión. Intente nuevamente.');
       },

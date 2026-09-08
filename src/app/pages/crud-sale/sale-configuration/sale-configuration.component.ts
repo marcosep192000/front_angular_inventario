@@ -141,6 +141,7 @@ export class SaleConfigurationComponent {
     }
   }
   get variant(): ProductVariant | null {
+    if (!this.data.config.variantStockManaged) return null;
     return (
       this.data.config.variants.find(
         (v) =>
@@ -153,12 +154,13 @@ export class SaleConfigurationComponent {
   }
   get variantRequired() {
     return (
-      this.data.config.variantStockManaged ||
-      this.data.config.variants.length > 0
+      this.data.config.variantStockManaged
     );
   }
   get available() {
-    return Number(this.variant?.stock ?? this.data.config.stock);
+    return this.data.config.variantStockManaged
+      ? Number(this.variant?.stock ?? 0)
+      : this.data.config.availableStock;
   }
   get requestedBase() {
     const factor = this.conversionFactor;

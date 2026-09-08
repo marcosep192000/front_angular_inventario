@@ -18,7 +18,9 @@ describe('FormProductComponent imported products', () => {
     price: 404.09,
     salePrice: 525.32,
     productUsefulness: 30,
-    stock: 0,
+    availableStock: 0,
+    minimumStock: 0,
+    stock: 999,
     stockMin: 0,
     iva: 21,
     tipoIva: 'IVA_21',
@@ -33,8 +35,9 @@ describe('FormProductComponent imported products', () => {
   let toastr: jasmine.SpyObj<ToastrService>;
 
   beforeEach(async () => {
-    productService = jasmine.createSpyObj('ProductService', ['findById', 'update']);
+    productService = jasmine.createSpyObj('ProductService', ['findById', 'update', 'save']);
     productService.findById.and.returnValue(of(importedProduct));
+    productService.save.and.returnValue(of(importedProduct));
     productService.update.and.returnValue(of('ok') as any);
     toastr = jasmine.createSpyObj('ToastrService', ['success', 'error', 'warning']);
 
@@ -49,7 +52,7 @@ describe('FormProductComponent imported products', () => {
         { provide: CategoryService, useValue: { getCategories: () => of([]) } },
         { provide: MarcaService, useValue: { allMarca: () => of([]) } },
         { provide: SupplierService, useValue: { getAllSuppliers: () => of([]) } },
-        { provide: InventoryService, useValue: { getUnits: () => of([]) } },
+        { provide: InventoryService, useValue: { getUnits: () => of([]), updateBaseUnit: jasmine.createSpy('updateBaseUnit').and.returnValue(of({})) } },
       ],
     }).compileComponents();
 
@@ -70,6 +73,24 @@ describe('FormProductComponent imported products', () => {
       stockMin: 0,
       provider: 7,
     }));
+  });
+
+  it('does not send inventory fields when saving general product data', () => {
+    component.formGroup.get('barCode')?.setValue('INT-0047');
+    component.update();
+    const payload = productService.update.calls.mostRecent().args[1];
+    expect(Object.prototype.hasOwnProperty.call(payload, 'stock')).toBeFalse();
+    expect(Object.prototype.hasOwnProperty.call(payload, 'stockMin')).toBeFalse();
+  });
+
+  it('sends initial decimal quantities in the modern creation contract', () => {
+    component.formGroup.patchValue({ barCode: 'NEW', stock: 10.125, stockMin: 2.75, baseUnitId: 1 });
+    component.save();
+    expect(productService.save).toHaveBeenCalledWith(jasmine.objectContaining({
+      stockQuantity: 10.125, minimumStockQuantity: 2.75, stock: 0, stockMin: 0,
+    }));
+    expect(TestBed.inject(InventoryService).updateBaseUnit).toHaveBeenCalledWith(47,
+      jasmine.objectContaining({ stock: 10.125, minimumStock: 2.75 }));
   });
 
   it('blocks manual save until an internal barcode is assigned', () => {

@@ -29,10 +29,10 @@
          CAJA
     ================================================== -->
 
-      <div class="estado-caja">
+      <div class="estado-caja" [class.cerrada]="cajaAbierta === false" [class.consultando]="consultandoCaja">
         <mat-icon> point_of_sale </mat-icon>
 
-        <span> Caja Abierta </span>
+        <span>{{ consultandoCaja ? 'Consultando caja…' : (cajaAbierta ? 'Caja Abierta' : 'Caja Cerrada') }}</span>
       </div>
 
       <!-- =================================================
@@ -119,6 +119,11 @@
     </div>
   </div>
 
+  <div class="caja-warning" *ngIf="cajaAbierta === false">
+    <mat-icon>warning</mat-icon>
+    <span>La caja está cerrada. Debés abrirla para registrar una venta.</span>
+  </div>
+
   <!-- ============================================================
        BUSCADOR DE PRODUCTOS
        ============================================================ -->
@@ -165,6 +170,7 @@
           *ngIf="mostrarResultados && productosEncontrados.length > 0"
         >
           <div
+            #resultadoProducto
             class="resultado-producto"
             *ngFor="let producto of productosEncontrados; let i = index"
             [class.seleccionado]="i === indiceSeleccionado"
@@ -196,9 +202,9 @@
                 {{ producto.salePrice | currency: "ARS" }}
               </strong>
 
-              <span [class.sin-stock]="producto.stock <= 0">
+              <span [class.sin-stock]="producto.availableStock <= 0">
                 Stock:
-                {{ producto.stock }}
+                {{ producto.availableStock }}
               </span>
             </div>
           </div>
@@ -371,23 +377,21 @@
               <span
                 [ngClass]="{
                   'stock-ok':
-                    product.stock - (product.baseQuantity || product.quantity) >
+                    remainingStock(product) >
                     10,
 
                   'stock-warning':
-                    product.stock -
-                      (product.baseQuantity || product.quantity) <=
+                    remainingStock(product) <=
                       10 &&
-                    product.stock - (product.baseQuantity || product.quantity) >
+                    remainingStock(product) >
                       3,
 
                   'stock-danger':
-                    product.stock -
-                      (product.baseQuantity || product.quantity) <=
+                    remainingStock(product) <=
                     3,
                 }"
               >
-                {{ product.stock - (product.baseQuantity || product.quantity) }}
+                {{ remainingStock(product) | number: '1.0-6' }}
               </span>
             </td>
 
@@ -550,7 +554,8 @@
           color="primary"
           class="btn-cobrar"
           type="button"
-          [disabled]="products.length === 0"
+          [disabled]="products.length === 0 || cobroBloqueadoPorCaja"
+          [attr.title]="cobroBloqueadoPorCaja ? 'Abrí la caja para cobrar la venta' : null"
           (click)="newSale()"
         >
           <mat-icon>

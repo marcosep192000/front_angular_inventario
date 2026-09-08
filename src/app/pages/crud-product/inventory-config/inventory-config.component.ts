@@ -15,7 +15,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ToastrService } from 'ngx-toastr';
-import { finalize, forkJoin, of, switchMap } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import {
   ProductPresentationRequest,
   ProductSaleConfiguration,
@@ -24,7 +24,6 @@ import {
   VariantAttributeValue,
 } from '../../../interfaces/inventory';
 import { InventoryService } from '../../../services/inventory.service';
-import { ProductService } from '../../../services/product.service';
 import {
   baseUnitRequest,
   inventoryBaseFormState,
@@ -59,7 +58,7 @@ export class InventoryConfigComponent implements OnInit {
   saving = false;
   base: InventoryBaseFormState = {
     unitId: null as number | null,
-    stock: 0,
+    stockQuantity: 0,
     minimumStock: 0,
     fractionable: false,
     variantStockManaged: false,
@@ -90,11 +89,8 @@ export class InventoryConfigComponent implements OnInit {
     public data: {
       productId: number;
       productName: string;
-      stock: number;
-      stockMin: number;
     },
     private api: InventoryService,
-    private productApi: ProductService,
     private toast: ToastrService,
     public ref: MatDialogRef<InventoryConfigComponent>,
   ) {}
@@ -112,7 +108,7 @@ export class InventoryConfigComponent implements OnInit {
         this.units = r.units.map((unit) => ({ ...unit, id: Number(unit.id) }));
         this.config = r.config;
         this.attributes = r.attributes;
-        this.base = inventoryBaseFormState(r.config, this.data);
+        this.base = inventoryBaseFormState(r.config);
         this.loadValues();
         this.loading = false;
       },
@@ -135,33 +131,13 @@ export class InventoryConfigComponent implements OnInit {
     this.saving = true;
     this.api
       .updateBaseUnit(this.data.productId, request)
-      .pipe(
-        switchMap(() => this.productApi.findById(this.data.productId)),
-        switchMap((product) => {
-          const stock = Number(this.base.stock);
-          const stockMin = Number(this.base.minimumStock);
-          // El DTO legado sólo admite enteros. Para stock fraccionable,
-          // updateBaseUnit es la fuente definitiva y no debe degradarse.
-          if (!Number.isInteger(stock) || !Number.isInteger(stockMin)) {
-            return of(product);
-          }
-          return this.productApi.update(this.data.productId, {
-            ...product,
-            category: product.category.id,
-            marca: product.marca.id,
-            provider: product.provider.id,
-            stock: Math.max(0, stock),
-            stockMin: Math.max(0, stockMin),
-          } as any);
-        }),
-      )
       .pipe(finalize(() => (this.saving = false)))
       .subscribe({
         next: () => {
-          const stock = Math.max(0, Number(this.base.stock));
+          const stock = Math.max(0, Number(this.base.stockQuantity));
           const stockMin = Math.max(0, Number(this.base.minimumStock));
           this.toast.success('Unidad y stock actualizados correctamente.');
-          this.ref.close({ changed: true, stock, stockMin });
+          this.ref.close({ changed: true, availableStock: stock, minimumStock: stockMin });
         },
         error: (e) => {
           this.showError(e, 'No se pudo guardar la unidad base.');

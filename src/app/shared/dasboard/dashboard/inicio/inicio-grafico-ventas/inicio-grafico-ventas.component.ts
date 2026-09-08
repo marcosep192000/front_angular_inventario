@@ -10,8 +10,8 @@ import {
   registerables,
 } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
-import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 
 Chart.register(...registerables);
@@ -19,11 +19,13 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-inicio-grafico-ventas',
   standalone: true,
-  imports: [NgChartsModule, CommonModule],
+  imports: [NgChartsModule, CommonModule, MatIconModule],
   templateUrl: './inicio-grafico-ventas.component.html',
   styleUrl: './inicio-grafico-ventas.component.css',
 })
 export class InicioGraficoVentasComponent {
+  loading = true;
+  error = false;
   public barChartOptions: ChartOptions<'bar'> = {
   responsive: true,
   maintainAspectRatio: false,
@@ -57,45 +59,26 @@ export class InicioGraficoVentasComponent {
   constructor(private dashboardService: DashboardService) {}
 
   ngOnInit(): void {
-    this.dashboardService.getVentasPorDia().subscribe((data) => {
-      console.log('Datos recibidos:', data); // 🛠️ Verificar la estructura
+    this.dashboardService.getVentasPorDia().subscribe({ next: (data) => {
 
-      const labelsSet = new Set<string>();
-      const datasetsMap: {
-        [anio: number]: {
-          label: string;
-          data: number[];
-          backgroundColor: string;
-        };
-      } = {};
-
-      data.forEach((v) => {
-        // ✅ Usa solo el día si `mes` no existe
-        const label = v.mes ? `${v.dia}/${v.mes}` : `${v.dia}`;
-        labelsSet.add(label);
-
-        if (!datasetsMap[v.anio]) {
-          datasetsMap[v.anio] = {
-            label: `Año ${v.anio}`,
-            data: [],
-            backgroundColor:
-              v.anio === new Date().getFullYear()
-                ? 'rgba(75, 192, 192, 0.5)'
-                : 'rgba(255, 99, 132, 0.5)',
-          };
-        }
-
-        datasetsMap[v.anio].data.push(v.ventas);
-      });
+      const rows = data ?? [];
+      const labels = [...new Set(rows.map(v => `${v.dia}/${v.mes}`))]
+        .sort((a, b) => Number(a.split('/')[0]) - Number(b.split('/')[0]));
+      const years = [...new Set(rows.map(v => v.anio))].sort();
 
       this.barChartData = {
-        labels: Array.from(labelsSet),
-        datasets: Object.values(datasetsMap),
+        labels,
+        datasets: years.map(anio => ({
+          label: `Año ${anio}`,
+          data: labels.map(label => rows.find(v => v.anio === anio && `${v.dia}/${v.mes}` === label)?.ventas ?? 0),
+          backgroundColor: anio === new Date().getFullYear()
+            ? 'rgba(75, 192, 192, 0.5)'
+            : 'rgba(255, 99, 132, 0.5)',
+        })),
       };
 
-      console.log('Etiquetas:', this.barChartData.labels); // 🛠️ Verificar etiquetas
-      console.log('Datos del gráfico:', this.barChartData.datasets);
-    });
+      this.loading = false;
+    }, error: () => { this.loading = false; this.error = true; } });
   }
 
 

@@ -15,7 +15,7 @@
     <p class="empty" *ngIf="searched && !loading && !products.length">No se encontraron productos con ese nombre o código.</p>
     <div class="results" *ngIf="products.length">
       <button type="button" *ngFor="let product of products" (click)="select(product)" [class.selected]="selected?.id === product.id">
-        <span class="avatar">{{ product.name.charAt(0) }}</span><span><b>{{ product.name }}</b><small>{{ product.barCode || 'Sin código de barras' }} · Stock {{ product.stock }}</small></span><mat-icon>{{ selected?.id === product.id ? 'check_circle' : 'chevron_right' }}</mat-icon>
+        <span class="avatar">{{ product.name.charAt(0) }}</span><span><b>{{ product.name }}</b><small>{{ product.barCode || 'Sin código de barras' }} · Stock {{ product.availableStock }}</small></span><mat-icon>{{ selected?.id === product.id ? 'check_circle' : 'chevron_right' }}</mat-icon>
       </button>
     </div>
     <div class="confirmation" *ngIf="selected">

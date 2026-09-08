@@ -55,7 +55,8 @@
                 type="number"
                 step="any"
                 min="0"
-                [(ngModel)]="base.stock"
+                [(ngModel)]="base.stockQuantity"
+                [disabled]="base.variantStockManaged"
               /><mat-hint>Acepta cantidades decimales</mat-hint></mat-form-field
             >
             <mat-form-field appearance="outline"

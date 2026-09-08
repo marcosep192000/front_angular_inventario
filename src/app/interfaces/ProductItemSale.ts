@@ -9,8 +9,14 @@ export interface ProductItemSale {
   name: string;
   description: string;
   price: number;
-  stock: number;
-  stockMin: number;
+  availableStock: number;
+  minimumStock: number;
+  variantStockManaged?: boolean;
+  fractionable?: boolean;
+  /** @deprecated Compatibility only. */
+  stock?: number;
+  /** @deprecated Compatibility only. */
+  stockMin?: number;
   iva: number;
   tipoIva?: import('./tipo-iva').TipoIva;
   salePrice: number;
@@ -18,6 +24,7 @@ export interface ProductItemSale {
   quantity: number;
   precioTotal: number;
   totalStock: number;
+  variantStock?: number;
   presentationId?: number | null;
   inputUnitId?: number | null;
   variantId?: number | null;

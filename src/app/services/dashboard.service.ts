@@ -1,13 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, forkJoin, Observable, of } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environments } from '../../environments/environments';
-import { ReturnStatement } from '@angular/compiler';
-import { error } from 'console';
 import { dashboardInfoGeneral, dataDashboard } from '../interfaces/dashboard';
 import { VentasPorDia } from '../interfaces/VentasPorDia';
 import { UltimaVenta } from '../interfaces/UltimaVenta';
-import { LowStockByProvider } from '../interfaces/producto-bajo-stock';
+import { LowStockProduct, LowStockPage } from '../interfaces/producto-bajo-stock';
 
 @Injectable({
   providedIn: 'root'
@@ -30,9 +28,9 @@ getUltimasVentas(): Observable<UltimaVenta[]>{
    );
 
 }
-getProductosBajoStock(): Observable<LowStockByProvider[]> {
+getProductosBajoStock(): Observable<LowStockProduct[]> {
 
-  return this.http.get<LowStockByProvider[]>(`${this.apiUrl}supermarket/get-all-low-stock`);
+  return this.http.get<LowStockPage>(`${this.apiUrl}supermarket/low-stock`, { params: { page: 0, size: 10 } }).pipe(map(page => page.content));
 }
 getDashboardInfoGeneral(): Observable<dashboardInfoGeneral> {
   return this.http.get<dashboardInfoGeneral>(

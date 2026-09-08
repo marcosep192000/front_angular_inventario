@@ -22,7 +22,13 @@ export interface ProductItemBuy {
 
 
 
+  availableStock: number;
+  minimumStock: number;
+  variantStockManaged?: boolean;
+  fractionable?: boolean;
+  /** @deprecated Compatibility only. */
   stock: number;
+  /** @deprecated Compatibility only. */
   stockMin: number;
 descuentos?: DescuentoDetalleProveedor[];
 
