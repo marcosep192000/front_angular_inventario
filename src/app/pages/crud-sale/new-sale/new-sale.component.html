@@ -25,6 +25,13 @@
   ====================================================== -->
 
     <div class="header-actions">
+      <label class="punto-caja-selector" *ngIf="puntosCaja.length > 1">
+        <span>Punto de caja</span>
+        <select [(ngModel)]="puntoCajaId" name="puntoCaja" (ngModelChange)="cambiarPuntoCaja()">
+          <option [ngValue]="null">Seleccionar…</option>
+          <option *ngFor="let punto of puntosCaja" [ngValue]="punto.id">{{ punto.nombre }}</option>
+        </select>
+      </label>
       <!-- =================================================
          CAJA
     ================================================== -->
@@ -223,6 +230,10 @@
         <mat-icon> search </mat-icon>
 
         <span> Buscar </span>
+      </button>
+      <button mat-stroked-button color="primary" class="btn-scanner" type="button" [disabled]="creandoScanner" (click)="iniciarLectorCelular()">
+        <mat-icon>{{ creandoScanner ? 'hourglass_top' : 'smartphone' }}</mat-icon>
+        <span>{{ creandoScanner ? 'Creando sesión…' : 'Usar celular como lector' }}</span>
       </button>
     </div>
   </section>

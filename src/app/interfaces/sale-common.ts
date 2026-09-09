@@ -46,6 +46,7 @@ import { PagoTicketRequest, PagoTicketResponse } from './pago-ticket';
 import { FiscalAuthorizationStatus, ModoFacturacion } from './arca';
 
 export interface SaleCommon {
+  puntoCajaId?: number | null;
   modoFacturacion?: ModoFacturacion;
   fiscalStatus?: FiscalAuthorizationStatus;
   originalTicketId?: number | null;

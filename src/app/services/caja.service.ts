@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { cajaSaldoApertura } from '../interfaces/cajaSaldoApertura';
 import { detalleCajaTipoContado } from '../interfaces/detalleCajaTipoContado';
 import { CajaArqueo } from '../interfaces/caja-arqueo';
+import { PuntoCaja } from '../interfaces/punto-caja';
 
 @Injectable({
   providedIn: 'root',
@@ -21,8 +22,13 @@ export class CajaService {
 
 
 
-  getCajas(): Observable<Caja> {
-    return this.httpClient.get<Caja>(`${this.baseUrl}cajas/abierta`);
+  getPuntosActivos(): Observable<PuntoCaja[]> {
+    return this.httpClient.get<PuntoCaja[]>(`${this.baseUrl}puntos-caja/activos`);
+  }
+
+  getCajas(puntoCajaId?: number | null): Observable<Caja> {
+    const query = puntoCajaId ? `?puntoCajaId=${puntoCajaId}` : '';
+    return this.httpClient.get<Caja>(`${this.baseUrl}cajas/abierta${query}`);
   }
 closeCaja(
   cajaId: number,
@@ -70,10 +76,21 @@ abrirCaja(cajaId: number) {
     {}
   );
 
-}getCajaPendiente(): Observable<Caja | null> {
+}
 
+abrirPunto(puntoCajaId: number, saldoApertura: number) {
+  return this.httpClient.post<Caja>(`${this.baseUrl}cajas/apertura`, { puntoCajaId, saldoApertura });
+}
+
+cerrarPunto(puntoCajaId: number, efectivoContado: number, efectivoParaProximaCaja: number) {
+  return this.httpClient.put<Caja>(`${this.baseUrl}cajas/punto/${puntoCajaId}/cierre`, { efectivoContado, efectivoParaProximaCaja });
+}
+
+getCajaPendiente(puntoCajaId?: number | null): Observable<Caja | null> {
+
+  const query = puntoCajaId ? `?puntoCajaId=${puntoCajaId}` : '';
   return this.httpClient.get<Caja | null>(
-    `${this.baseUrl}cajas/pendiente`
+    `${this.baseUrl}cajas/pendiente${query}`
   );
 
 }

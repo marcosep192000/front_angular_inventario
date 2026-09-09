@@ -10,6 +10,16 @@ describe('NewSaleComponent cash state', () => {
     expect(component.consultandoCaja).toBeFalse();
   });
 
+  it('consulta el PuntoCaja seleccionado y no envía una caja histórica', () => {
+    const component: any = Object.create(NewSaleComponent.prototype);
+    const getCajas = jasmine.createSpy().and.returnValue(of({ id: 99 }));
+    component.cajaService = { getCajas };
+    component.puntosCaja = [{ id: 2, nombre: 'Caja 2', activo: true }];
+    component.puntoCajaId = 2;
+    component.cargarEstadoCaja();
+    expect(getCajas).toHaveBeenCalledOnceWith(2);
+  });
+
   it('trata la ausencia de caja activa como caja cerrada', () => {
     const component: any = Object.create(NewSaleComponent.prototype);
     component.cajaService = { getCajas: () => throwError(() => new Error('sin caja')) };

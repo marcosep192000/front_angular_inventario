@@ -6,7 +6,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ToastrModule, ToastrService } from 'ngx-toastr';import { MatDialogRef } from '@angular/material/dialog';
+import { ToastrModule, ToastrService } from 'ngx-toastr';import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Inject } from '@angular/core';
 import { MovimientoCajaService } from '../../../services/movimiento-caja.service';
 import { EmpleadoService } from '../../../services/empleado.service';
 import { CommonModule } from '@angular/common';
@@ -17,6 +18,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
+
+export function mensajeErrorMovimiento(err: any): string {
+  const message = err?.error?.message ?? err?.error?.error?.message ?? err?.error?.error;
+  return typeof message === 'string' && message.trim() ? message.trim() : 'No se pudo registrar el movimiento.';
+}
+
+export function mensajeErrorEmpleados(err: any): string {
+  const message = err?.error?.message ?? err?.error?.error?.message ?? err?.error?.error;
+  return typeof message === 'string' && message.trim() ? message.trim() : 'No se pudieron cargar los empleados.';
+}
 
 @Component({
   selector: 'app-movimiento-form',
@@ -40,6 +51,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class MovimientoFormComponent implements OnInit {
   movimientoForm!: FormGroup;
   empleados: any[] = [];
+  empleadosCargados = false;
+  cargandoEmpleados = false;
 
   tipoMovimientoOptions = ['INGRESO', 'EGRESO'];
   categoriaOptions: string[] = [];
@@ -61,7 +74,8 @@ formaPagoOptions = [
     private movimientoService: MovimientoCajaService,
     private empleadoService: EmpleadoService,
     private toastr: ToastrService,
-    private dialogRef: MatDialogRef<MovimientoFormComponent>
+    private dialogRef: MatDialogRef<MovimientoFormComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { puntoCajaId?: number | null }
   ) {}
 
   ngOnInit(): void {
@@ -84,10 +98,6 @@ medioPago: [null ],
       proveedorId: [null],
     });
 
-    this.empleadoService.getAll().subscribe({
-      next: (data) => (this.empleados = data),
-      error: () => this.toastr.error('Error cargando empleados'),
-    });
   }
 
   onTipoChange(): void {
@@ -96,6 +106,8 @@ medioPago: [null ],
     if (tipo === 'EGRESO') {
       this.categoriaOptions = [
         'GASTO_MENOR',
+        'PAGO_SUELDO',
+        'ADELANTO',
         'AJUSTE_NEGATIVO',
       ];
     } else if (tipo === 'INGRESO') {
@@ -120,6 +132,7 @@ medioPago: [null ],
   }
 
   onCategoriaChange(): void {
+    const categoria = this.movimientoForm.get('categoriaMovimiento')?.value;
     this.movimientoForm.patchValue({
       descripcion: '',
       empleadoId: null,
@@ -128,11 +141,43 @@ medioPago: [null ],
       numeroFactura: '',
       proveedorId: null,
     });
+    const empleadoControl = this.movimientoForm.get('empleadoId');
+    if (this.requiereEmpleado(categoria)) {
+      empleadoControl?.setValidators(Validators.required);
+      this.cargarEmpleados();
+    } else {
+      empleadoControl?.clearValidators();
+    }
+    empleadoControl?.updateValueAndValidity();
+  }
+
+  requiereEmpleado(categoria = this.movimientoForm.get('categoriaMovimiento')?.value): boolean {
+    return categoria === 'PAGO_SUELDO' || categoria === 'ADELANTO';
+  }
+
+  private cargarEmpleados(): void {
+    if (this.empleadosCargados || this.cargandoEmpleados) return;
+    this.cargandoEmpleados = true;
+    this.empleadoService.getAll().subscribe({
+      next: data => {
+        this.empleados = Array.isArray(data) ? data : [];
+        this.empleadosCargados = true;
+        this.cargandoEmpleados = false;
+      },
+      error: err => {
+        this.cargandoEmpleados = false;
+        this.toastr.error(mensajeErrorEmpleados(err));
+      },
+    });
   }
 
   cancelar(): void { this.dialogRef.close(); }
 
   guardar(): void {
+    if (this.requiereEmpleado() && !this.movimientoForm.get('empleadoId')?.value) {
+      this.toastr.warning('Seleccioná un empleado para registrar el pago de sueldo.');
+      return;
+    }
     if (this.movimientoForm.invalid) {
       this.toastr.warning('Completa los campos obligatorios');
       return;
@@ -140,6 +185,7 @@ medioPago: [null ],
 
     const movimiento: any = {
       ...this.movimientoForm.value,
+      puntoCajaId: this.data?.puntoCajaId ?? null,
     };
 
     // ====================================================
@@ -198,7 +244,7 @@ medioPago: [null ],
       error: (err) => {
         console.error(err);
 
-        this.toastr.error(err.error?.message ?? 'Error al guardar movimiento');
+        this.toastr.error(mensajeErrorMovimiento(err));
       },
     });
   }

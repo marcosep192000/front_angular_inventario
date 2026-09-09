@@ -41,4 +41,19 @@ describe('carrito de NewSaleComponent', () => {
     expect(scrollIntoView).toHaveBeenCalledWith({block:'nearest'});
     expect(c.productosEncontrados.length).toBe(12);
   }));
+  it('una lectura móvil reutiliza onSubmit y no crea otra búsqueda', () => {
+    c.code='';c.productosEncontrados=[product()];c.mostrarResultados=true;c.indiceSeleccionado=0;
+    spyOn(c,'onSubmit');
+    c.procesarBarcodeMovil('7791234567890');
+    expect(c.code).toBe('7791234567890');
+    expect(c.productosEncontrados).toEqual([]);
+    expect(c.onSubmit).toHaveBeenCalledTimes(1);
+  });
+  it('al destruir Nueva Venta desconecta y cierra la sesión activa', () => {
+    c.scannerSession={sessionId:'scanner-1'};c.scannerWebsocket=jasmine.createSpyObj('ws',['disconnect']);
+    c.scannerService=jasmine.createSpyObj('scanner',['closeSession']);c.scannerService.closeSession.and.returnValue({subscribe:()=>undefined});
+    c.ngOnDestroy();
+    expect(c.scannerWebsocket.disconnect).toHaveBeenCalled();
+    expect(c.scannerService.closeSession).toHaveBeenCalledWith('scanner-1');
+  });
 });

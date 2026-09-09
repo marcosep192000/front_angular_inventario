@@ -1,0 +1,13 @@
+<section class="scanner-dialog">
+  <header><div class="header-icon"><mat-icon>smartphone</mat-icon></div><div><p>NUEVA VENTA</p><h2>Lector Pixels</h2><span>Usá tu celular como lector inalámbrico</span></div><button mat-icon-button type="button" aria-label="Finalizar lector" (click)="finish()"><mat-icon>close</mat-icon></button></header>
+  <mat-dialog-content>
+    <div class="status" [attr.data-state]="state"><span class="status-dot"></span><strong>{{ statusText }}</strong></div>
+    <div class="qr-frame"><img *ngIf="qrDataUrl; else loadingQr" [src]="qrDataUrl" width="240" height="240" alt="QR para conectar Lector Pixels"><ng-template #loadingQr><mat-icon>hourglass_top</mat-icon></ng-template></div>
+    <h3>Escaneá este QR con tu celular.</h3>
+    <p>El celular y esta computadora deben estar conectados a la misma red.</p>
+    <a class="scanner-link" [href]="session.scannerUrl" target="_blank" rel="noopener">Abrir enlace <mat-icon>open_in_new</mat-icon></a>
+    <div class="received" *ngIf="lastBarcode"><mat-icon>check_circle</mat-icon><div><strong>Código recibido</strong><span>{{ lastBarcode }}</span></div></div>
+    <button *ngIf="state==='EXPIRED'" mat-stroked-button color="primary" type="button" (click)="regenerate()"><mat-icon>qr_code_2</mat-icon>Generar nuevo QR</button>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end"><button mat-raised-button color="primary" type="button" (click)="finish()"><mat-icon>link_off</mat-icon>Finalizar lector</button></mat-dialog-actions>
+</section>

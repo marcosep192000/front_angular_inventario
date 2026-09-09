@@ -16,6 +16,8 @@ import {
 } from '../../../interfaces/arca';
 import { ArcaService } from '../../../services/arca.service';
 import { TokenService } from '../../../services/token.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ImptimirTicketComponent } from '../imprimir-ticket/imptimir-ticket/imptimir-ticket.component';
 @Component({
   selector: 'app-fiscal-status',
   standalone: true,
@@ -39,6 +41,7 @@ export class FiscalStatusComponent implements OnInit {
     private api: ArcaService,
     private token: TokenService,
     private toast: ToastrService,
+    private dialog: MatDialog,
   ) {
     this.document = data.document || {
       ticketId: data.ticketId,
@@ -138,14 +141,8 @@ export class FiscalStatusComponent implements OnInit {
   }
   print() {
     if (this.loading || this.status !== 'AUTHORIZED') return;
-    this.loading = true;
-    this.api
-      .getTicketPdf(this.document.ticketId)
-      .pipe(finalize(() => (this.loading = false)))
-      .subscribe({
-        next: (blob) => this.openPdf(blob),
-        error: (e) => this.error(e, 'No se pudo generar el comprobante PDF.'),
-      });
+    this.dialog.open(ImptimirTicketComponent, { width: '560px', maxWidth: '96vw', disableClose: true,
+      data: { tipo: 'VENTA', id: this.document.ticketId, numero: this.document.comprobanteCompleto } });
   }
   downloadQr() {
     if (this.loading || this.status !== 'AUTHORIZED') return;
@@ -167,11 +164,6 @@ export class FiscalStatusComponent implements OnInit {
   }
   close() {
     this.ref.close(this.document);
-  }
-  private openPdf(blob: Blob) {
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank', 'noopener');
-    setTimeout(() => URL.revokeObjectURL(url), 60_000);
   }
   private run(op: ReturnType<ArcaService['authorize']>, success: string) {
     if (this.loading) return;

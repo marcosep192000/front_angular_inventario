@@ -1769,3 +1769,4 @@
   display: table-cell !important;
 }
 }
+.selector-punto{display:flex;align-items:center;gap:12px;margin:0 0 16px;padding:12px 16px;border:1px solid #ded7e6;border-radius:12px;background:#fff}.selector-punto label{font-weight:700}.selector-punto select{min-width:190px;padding:9px 11px;border:1px solid #cfc5d9;border-radius:9px;background:#fff}

@@ -4,6 +4,7 @@ import {
   Component,
   ElementRef,
   HostListener,
+  OnDestroy,
   OnInit,
   QueryList,
   ViewChild,
@@ -20,11 +21,11 @@ import { MatOption } from '@angular/material/core';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatSelect } from '@angular/material/select';
 
-import { Subject, of, firstValueFrom } from 'rxjs';
+import { EMPTY, Subject, Subscription, of, firstValueFrom } from 'rxjs';
 
 import {
+  filter,
   debounceTime,
-  distinctUntilChanged,
   switchMap,
   catchError,
 } from 'rxjs/operators';
@@ -54,11 +55,13 @@ import { SaldoInsuficienteDialogComponent } from '../total-sale/saldo-insuficien
 import { ArcaService } from '../../../services/arca.service';
 import { ArcaStatusResponse, ModoFacturacion } from '../../../interfaces/arca';
 import { FiscalStatusComponent } from '../fiscal-status/fiscal-status.component';
+import { ImptimirTicketComponent } from '../imprimir-ticket/imptimir-ticket/imptimir-ticket.component';
 import { TokenService } from '../../../services/token.service';
 import { arcaAvailable } from '../fiscal-status/fiscal-status.utils';
 import { BillingModeDialogComponent } from '../billing-mode-dialog/billing-mode-dialog.component';
 import { InventoryService } from '../../../services/inventory.service';
 import { CajaService } from '../../../services/caja.service';
+import { PuntoCaja } from '../../../interfaces/punto-caja';
 import { InventorySaleSelection } from '../../../interfaces/inventory';
 import { SaleConfigurationComponent } from '../sale-configuration/sale-configuration.component';
 import {
@@ -75,6 +78,10 @@ import { PagoTicketRequest } from '../../../interfaces/pago-ticket';
 import { SearchClientByDniComponent } from '../../crud-client/search-client-by-dni/search-client-by-dni.component';
 
 import { IconComponent } from '../../../shared/dasboard/icon/icon.component';
+import { ScannerConnectDialogComponent } from '../../../scanner/scanner-connect-dialog.component';
+import { ScannerSession } from '../../../scanner/scanner.models';
+import { ScannerService } from '../../../scanner/scanner.service';
+import { ScannerWebSocketService } from '../../../scanner/scanner-websocket.service';
 
 import {
   ConfirmDocumentComponent,
@@ -107,7 +114,7 @@ import {
 
   styleUrl: './new-sale.component.css',
 })
-export class NewSaleComponent implements OnInit {
+export class NewSaleComponent implements OnInit, OnDestroy {
   @ViewChildren('resultadoProducto', { read: ElementRef })
   private resultadosProducto!: QueryList<ElementRef<HTMLElement>>;
   // =====================================================
@@ -169,6 +176,10 @@ export class NewSaleComponent implements OnInit {
   buscandoProductos = false;
 
   indiceSeleccionado = -1;
+  scannerSession: ScannerSession | null = null;
+  creandoScanner = false;
+  private scannerBarcodeSubscription?: Subscription;
+  private scannerExpiryTimer?: ReturnType<typeof setTimeout>;
 
   // =====================================================
   // INPUT BUSCADOR
@@ -186,6 +197,8 @@ export class NewSaleComponent implements OnInit {
   today: Date = new Date();
   cajaAbierta: boolean | null = null;
   consultandoCaja = true;
+  puntosCaja: PuntoCaja[] = [];
+  puntoCajaId: number | null = null;
 
   // =====================================================
   // CONSTRUCTOR
@@ -211,6 +224,8 @@ export class NewSaleComponent implements OnInit {
     private tokenService: TokenService,
     private inventoryService: InventoryService,
     private cajaService: CajaService,
+    private scannerService: ScannerService,
+    private scannerWebsocket: ScannerWebSocketService,
   ) {}
 
   // =====================================================
@@ -222,15 +237,100 @@ export class NewSaleComponent implements OnInit {
     this.seleccionarConsumidorFinal();
     this.cargarCondicionIvaEmisor();
     this.cargarEstadoArca();
+    this.cargarPuntosCaja();
+  }
+
+  cargarPuntosCaja(): void {
+    this.cajaService.getPuntosActivos().subscribe({
+      next: puntos => {
+        this.puntosCaja = puntos;
+        const guardado = Number(localStorage.getItem('inventario-punto-caja'));
+        this.puntoCajaId = puntos.find(p => p.id === guardado)?.id ?? (puntos.length === 1 ? puntos[0].id : null);
+        this.cargarEstadoCaja();
+      },
+      error: () => { this.puntosCaja = []; this.puntoCajaId = null; this.cajaAbierta = false; this.consultandoCaja = false; },
+    });
+  }
+
+  cambiarPuntoCaja(): void {
+    if (this.puntoCajaId) localStorage.setItem('inventario-punto-caja', String(this.puntoCajaId));
     this.cargarEstadoCaja();
   }
 
   cargarEstadoCaja(): void {
     this.consultandoCaja = true;
-    this.cajaService.getCajas().subscribe({
+    if ((this.puntosCaja?.length ?? 0) > 1 && !this.puntoCajaId) { this.cajaAbierta = false; this.consultandoCaja = false; return; }
+    this.cajaService.getCajas(this.puntoCajaId).subscribe({
       next: () => { this.cajaAbierta = true; this.consultandoCaja = false; },
       error: () => { this.cajaAbierta = false; this.consultandoCaja = false; },
     });
+  }
+
+  iniciarLectorCelular(): void {
+    if (this.creandoScanner) return;
+    if (this.scannerSession) { this.abrirDialogoScanner(this.scannerSession); return; }
+    this.creandoScanner = true;
+    this.scannerService.createSession().subscribe({
+      next: session => {
+        this.creandoScanner = false;
+        this.scannerSession = session;
+        this.conectarScanner(session);
+        this.abrirDialogoScanner(session);
+      },
+      error: error => {
+        this.creandoScanner = false;
+        this.toastr.error([401,403].includes(error?.status) ? 'No tenés autorización para iniciar Lector Pixels.' : 'No se pudo crear la sesión del lector. Verificá la conexión con el servidor.');
+      },
+    });
+  }
+
+  private conectarScanner(session: ScannerSession): void {
+    const jwt = this.tokenService.getToken();
+    if (!jwt) { this.toastr.error('La sesión de usuario venció. Volvé a iniciar sesión.'); return; }
+    this.scannerBarcodeSubscription?.unsubscribe();
+    this.scannerBarcodeSubscription = this.scannerWebsocket.barcode$.subscribe(event => this.procesarBarcodeMovil(event.barcode));
+    this.scannerWebsocket.connect(session.sessionId, jwt);
+    if (this.scannerExpiryTimer) clearTimeout(this.scannerExpiryTimer);
+    const delay = Math.max(0, new Date(session.expiresAt).getTime() - Date.now());
+    this.scannerExpiryTimer = setTimeout(() => this.scannerWebsocket.markExpired(), delay);
+  }
+
+  private procesarBarcodeMovil(barcode: string): void {
+    this.code = barcode;
+    this.productosEncontrados = [];
+    this.mostrarResultados = false;
+    this.indiceSeleccionado = -1;
+    this.onSubmit();
+  }
+
+  private abrirDialogoScanner(session: ScannerSession): void {
+    this.dialog.open(ScannerConnectDialogComponent, { width:'520px', maxWidth:'94vw', maxHeight:'94vh', autoFocus:false, disableClose:true, data:session })
+      .afterClosed().subscribe(action => this.finalizarLector(action === 'regenerate'));
+  }
+
+  private finalizarLector(regenerar = false): void {
+    const sessionId = this.scannerSession?.sessionId;
+    this.limpiarConexionScanner();
+    if (!sessionId) { if (regenerar) this.iniciarLectorCelular(); return; }
+    this.scannerService.closeSession(sessionId).subscribe({
+      next: () => { if (regenerar) this.iniciarLectorCelular(); },
+      error: () => { this.toastr.warning('El lector se cerró localmente, pero el servidor no confirmó el cierre de la sesión.'); if (regenerar) this.iniciarLectorCelular(); },
+    });
+  }
+
+  private limpiarConexionScanner(): void {
+    if (this.scannerExpiryTimer) clearTimeout(this.scannerExpiryTimer);
+    this.scannerExpiryTimer = undefined;
+    this.scannerBarcodeSubscription?.unsubscribe();
+    this.scannerBarcodeSubscription = undefined;
+    this.scannerWebsocket.disconnect();
+    this.scannerSession = null;
+  }
+
+  ngOnDestroy(): void {
+    const sessionId = this.scannerSession?.sessionId;
+    this.limpiarConexionScanner();
+    if (sessionId) this.scannerService.closeSession(sessionId).subscribe({ error: () => undefined });
   }
 
   get requiereCajaAbierta(): boolean { return !this.esDocumentoSinCobro(); }
@@ -390,10 +490,9 @@ export class NewSaleComponent implements OnInit {
       .pipe(
         debounceTime(300),
 
-        distinctUntilChanged(),
-
         switchMap((query: string) => {
           const texto = query.trim();
+          if (texto !== this.code.trim()) return EMPTY;
 
           // =============================================
           // BUSCADOR VACÍO
@@ -421,12 +520,14 @@ export class NewSaleComponent implements OnInit {
 
             .pipe(
               catchError((error: any) => {
+                if (this.code.trim() !== texto) return EMPTY;
                 console.error('Error buscando productos:', error);
 
                 this.toastr.error('No se pudieron buscar los productos.');
 
                 return of([]);
               }),
+              filter(() => this.code.trim() === texto),
             );
         }),
       )
@@ -447,6 +548,10 @@ export class NewSaleComponent implements OnInit {
   // =====================================================
 
   buscarProductos(texto: string): void {
+    this.productosEncontrados = [];
+    this.mostrarResultados = false;
+    this.indiceSeleccionado = -1;
+    this.buscandoProductos = false;
     this.busquedaProducto$.next(texto);
   }
 
@@ -476,47 +581,9 @@ export class NewSaleComponent implements OnInit {
     if (event.key === 'Enter') {
       event.preventDefault();
 
-      const query = this.code.trim();
-
-      // =============================================
-      // SI ESTÁ BUSCANDO
-      // =============================================
-
-      if (this.buscandoProductos) {
-        return;
-      }
-
-      // =============================================
-      // SI HAY RESULTADOS
-      // =============================================
-
-      if (this.productosEncontrados.length > 0) {
-        const indice =
-          this.indiceSeleccionado >= 0 ? this.indiceSeleccionado : 0;
-
-        const producto = this.productosEncontrados[indice];
-
-        if (producto) {
-          this.seleccionarProducto(producto);
-        }
-
-        return;
-      }
-
-      // =============================================
-      // SIN RESULTADOS
-      // =============================================
-
-      if (query) {
-        this.toastr.warning('No se encontró ningún producto.');
-      }
-
+      this.onSubmit();
       return;
     }
-
-    // =============================================
-    // SI NO HAY RESULTADOS
-    // =============================================
 
     if (!this.mostrarResultados || this.productosEncontrados.length === 0) {
       return;
@@ -766,6 +833,7 @@ export class NewSaleComponent implements OnInit {
       )
 
       .subscribe((productos) => {
+        if (this.code.trim() !== query) return;
         this.buscandoProductos = false;
 
         // =============================================
@@ -957,7 +1025,7 @@ export class NewSaleComponent implements OnInit {
     // Se consulta nuevamente justo antes de abrir el diálogo para evitar estado viejo.
     this.consultandoCaja = true;
     try {
-      await firstValueFrom(this.cajaService.getCajas());
+      await firstValueFrom(this.cajaService.getCajas(this.puntoCajaId));
       this.cajaAbierta = true;
     } catch {
       this.cajaAbierta = false;
@@ -1326,18 +1394,9 @@ export class NewSaleComponent implements OnInit {
   }
 
   private abrirPdfBackend(ticketId: number): void {
-    this.arcaService.getTicketPdf(ticketId).subscribe({
-      next: (blob) => {
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank', 'noopener');
-        setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      },
-      error: (error) => {
-        console.error('Error obteniendo PDF desde el backend:', error);
-        this.toastr.warning(
-          'El comprobante fue guardado, pero no se pudo abrir el PDF.',
-        );
-      },
+    this.dialog.open(ImptimirTicketComponent, {
+      width: '560px', maxWidth: '96vw', disableClose: true,
+      data: { tipo: 'VENTA', id: ticketId },
     });
   }
 
@@ -1840,6 +1899,7 @@ export class NewSaleComponent implements OnInit {
     const { numero: _numeroLocal, ...ventaSinNumero } = saleCommon;
     const requestVenta = {
       ...ventaSinNumero,
+      puntoCajaId: this.puntoCajaId,
       ticketDetails: this.products.map(saleDetailPayload),
     };
 
@@ -1911,7 +1971,10 @@ export class NewSaleComponent implements OnInit {
             this.generarPdfAlGuardar &&
             response.id
           ) {
-            this.abrirPdfBackend(response.id);
+            this.dialog.open(ImptimirTicketComponent, {
+              width: '560px', maxWidth: '96vw', disableClose: true,
+              data: { tipo: 'VENTA', id: response.id, numero: String(numeroFinal) },
+            });
           }
         } catch (pdfError: any) {
           console.error('Error generando PDF:', pdfError);

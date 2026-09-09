@@ -20,6 +20,7 @@ import { CajaService } from '../../../services/caja.service';
 import { CajaArqueo } from '../../../interfaces/caja-arqueo';
 
 import { ConfirmarCierreCajaComponent } from '../dialogs/confirmar-cierre-caja/confirmar-cierre-caja.component';
+import { ImptimirTicketComponent } from '../../crud-sale/imprimir-ticket/imptimir-ticket/imptimir-ticket.component';
 
 @Component({
   selector: 'app-arqueo-caja',
@@ -569,8 +570,8 @@ export class ArqueoCajaComponent implements OnInit {
 
     this.cajaService
 
-      .closeCaja(
-        this.arqueo.cajaId,
+      .cerrarPunto(
+        this.data.puntoCajaId,
         this.efectivoContado,
         efectivoProximaCaja
       )
@@ -589,7 +590,8 @@ export class ArqueoCajaComponent implements OnInit {
            * la caja que acabamos de cerrar.
            */
 
-          this.exportarPdf();
+          this.dialog.open(ImptimirTicketComponent, { width: '560px', maxWidth: '96vw', disableClose: true,
+            data: { tipo: 'CAJA', id: this.arqueo!.cajaId } });
 
 
           /*

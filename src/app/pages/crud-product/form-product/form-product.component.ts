@@ -40,7 +40,7 @@ import { applyDuplicateResourceError } from '../../../shared/forms/duplicate-res
 import { InventoryConfigComponent } from '../inventory-config/inventory-config.component';
 import { ProductSuppliersDialogComponent } from '../product-suppliers/product-suppliers-dialog.component';
 import { DialogGenericComponent } from '../../../shared/genericsComponents/dialog-generic/dialog-generic.component';
-import { finalize, map, of, switchMap } from 'rxjs';
+import { finalize, map, of, switchMap, timeout } from 'rxjs';
 import { InventoryService } from '../../../services/inventory.service';
 import { UnitOfMeasure } from '../../../interfaces/inventory';
 import { normalizeOptionalBarcode } from './product-form.utils';
@@ -99,7 +99,7 @@ export class FormProductComponent implements OnInit {
       category: [1],
       marca: [1],
       provider: [1],
-      barCode: ['', Validators.required],
+      barCode: [''],
       name: ['', Validators.required],
       price: [
         '',
@@ -306,7 +306,10 @@ export class FormProductComponent implements OnInit {
     delete productPayload.stockMin;
     this.productService
       .update(this.data.updateProduct, productPayload)
-      .pipe(finalize(() => (this.saving = false)))
+      .pipe(
+        timeout(20000),
+        finalize(() => (this.saving = false)),
+      )
       .subscribe({
         next: (data) => {
           this.toastr.success('Producto actualizado correctamente.');
@@ -319,7 +322,7 @@ export class FormProductComponent implements OnInit {
   private handleSaveError(error: HttpErrorResponse): void {
     const duplicate = applyDuplicateResourceError(error, this.formGroup);
     this.toastr.error(
-      duplicate ||
+      (duplicate ? 'El código de barras ya está siendo utilizado por otro producto.' : null) ||
         error.error?.message ||
         error.error?.error ||
         'No se pudo guardar el producto.',

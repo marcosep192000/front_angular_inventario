@@ -20,7 +20,7 @@
             <td><div class="pagos-venta"><span *ngFor="let pago of pagosVisibles(venta)"><strong>{{ pago.medio }}</strong> {{ pago.monto | currency:'ARS' }}</span></div></td>
             <td>{{ (venta.ticket?.total ?? venta.montoCaja) | currency:'ARS' }}</td>
             <td>{{ ganancia(venta.ticket) | currency:'ARS' }}</td>
-            <td><button mat-icon-button class="accion-ver" matTooltip="Ver detalle completo" (click)="verDetalle(venta)"><mat-icon>visibility</mat-icon></button></td>
+            <td><div class="acciones-fila"><button mat-icon-button class="accion-imprimir" matTooltip="Reimprimir comprobante" [disabled]="!venta.ticket?.id" (click)="reimprimir(venta)"><mat-icon>print</mat-icon></button><button mat-icon-button class="accion-ver" matTooltip="Ver detalle completo" (click)="verDetalle(venta)"><mat-icon>visibility</mat-icon></button></div></td>
           </tr></tbody>
         </table>
       </div>

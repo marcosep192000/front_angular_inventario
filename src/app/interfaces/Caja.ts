@@ -28,4 +28,11 @@ export interface Caja {
 
   retiroEfectivo?: boolean;
 
+  puntoCaja?: import('./punto-caja').PuntoCaja | null;
+  puntoCajaNombre?: string;
+  usuarioAperturaNombre?: string;
+  usuarioCierreNombre?: string;
+  fechaApertura?: string | null;
+  fechaCierre?: string | null;
+
 }

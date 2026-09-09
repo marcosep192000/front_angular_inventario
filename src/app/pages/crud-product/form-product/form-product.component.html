@@ -38,7 +38,7 @@
           <mat-form-field
             class="input codigo__barras"
           >
-            <mat-label>Código interno / Código de barras*</mat-label>
+            <mat-label>Código interno / Código de barras</mat-label>
             <input
               matInput
               maxlength="15"
@@ -51,10 +51,7 @@
             <mat-error *ngIf="formGroup.get('barCode')?.hasError('duplicate')"
               >Ya existe un producto con ese código de barras.</mat-error
             >
-            <mat-error *ngIf="formGroup.get('barCode')?.hasError('required')"
-              >Debe asignar un código interno o código de barras al producto antes de guardar.</mat-error
-            >
-            <mat-hint>Identificador propio en Inventario Pixels. Máximo 15 caracteres.</mat-hint>
+            <mat-hint>Opcional. Máximo 15 caracteres; conserva ceros iniciales.</mat-hint>
           </mat-form-field>
         </div>
         <!-- FIN CODIGO DE BARRAS  -->

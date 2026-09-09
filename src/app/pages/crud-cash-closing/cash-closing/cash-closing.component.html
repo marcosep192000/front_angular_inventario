@@ -24,6 +24,14 @@
 
   </section>
 
+  <section class="selector-punto" *ngIf="puntosCaja.length > 1">
+    <label for="puntoCaja">Punto de caja</label>
+    <select id="puntoCaja" [(ngModel)]="puntoCajaId" (ngModelChange)="refrescarPunto()">
+      <option [ngValue]="null">Seleccionar…</option>
+      <option *ngFor="let punto of puntosCaja" [ngValue]="punto.id">{{ punto.nombre }}</option>
+    </select>
+  </section>
+
 
   <!-- =====================================================
        CAJA ABIERTA
@@ -50,12 +58,13 @@
           </span>
 
           <h2>
-            Caja #{{ caja.id }}
+            {{ caja.puntoCajaNombre || caja.puntoCaja?.nombre || 'Punto no registrado' }} · Sesión #{{ caja.id }}
           </h2>
 
           <span class="fecha-caja">
-            {{ caja.fecha | date:'dd/MM/yyyy' }}
+            {{ caja.fechaApertura ? (caja.fechaApertura | date:'dd/MM/yyyy HH:mm') : (caja.fecha | date:'dd/MM/yyyy') }}
           </span>
+          <span class="fecha-caja">Abierta por: {{ caja.usuarioAperturaNombre || 'Usuario no registrado' }}</span>
 
         </div>
 
@@ -405,6 +414,11 @@
       No existe una caja abierta ni una caja pendiente
       de apertura.
     </p>
+
+    <button mat-raised-button class="btn-nueva" *ngIf="puntoCajaId" (click)="abrirPrimeraSesion()" [disabled]="abriendoCaja">
+      <mat-icon>lock_open</mat-icon>
+      {{ abriendoCaja ? 'Abriendo…' : 'Abrir sesión con saldo $0' }}
+    </button>
 
   </section>
 

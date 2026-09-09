@@ -13,6 +13,7 @@ import { ClientService } from '../../../services/client.service';
 import { TicketService } from '../../../services/ticket.service';
 import { PagoTicketRequest } from '../../../interfaces/pago-ticket';
 import { DetallesIngresosCajaPorFacturaComponent } from '../detalles-ingresos-caja-por-factura/detalles-ingresos-caja-por-factura.component';
+import { ImptimirTicketComponent } from '../../crud-sale/imprimir-ticket/imptimir-ticket/imptimir-ticket.component';
 
 interface VentaEmitida { movimiento: detalleCajaTipoContado; movimientos: detalleCajaTipoContado[]; montoCaja: number; ticket?: SaleCommon; cliente?: Client; }
 interface PagoVisible { medio: string; monto: number; }
@@ -90,6 +91,11 @@ export class DetallesVentasCajaComponent implements OnInit {
   }
   verDetalle(venta: VentaEmitida): void {
     this.dialog.open(DetallesIngresosCajaPorFacturaComponent, { width: '900px', maxWidth: '96vw', data: { id: venta.movimiento.id, categoriaMovimiento: 'VENTA', numeroComprobante: this.numeroFactura(venta.movimiento), tipo: 'INGRESO' } });
+  }
+  reimprimir(venta: VentaEmitida): void {
+    if (!venta.ticket?.id) return;
+    this.dialog.open(ImptimirTicketComponent, { width: '560px', maxWidth: '96vw', disableClose: true,
+      data: { tipo: 'VENTA', id: venta.ticket.id, numero: venta.ticket.numero } });
   }
   cerrar(): void { this.dialogRef.close(); }
 }

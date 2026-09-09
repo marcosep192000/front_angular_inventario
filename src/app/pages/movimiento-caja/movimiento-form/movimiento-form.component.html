@@ -139,6 +139,8 @@
             {{ e.nombre }} {{ e.apellido }}
           </option>
         </select>
+        <small class="estado-carga" *ngIf="cargandoEmpleados">Cargando empleados…</small>
+        <small class="estado-carga" *ngIf="empleadosCargados && !empleados.length">No hay empleados registrados.</small>
       </div>
 
       <!--======================

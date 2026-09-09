@@ -1,7 +1,8 @@
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { NEVER, of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { CategoryService } from '../../../services/category.service';
 import { InventoryService } from '../../../services/inventory.service';
@@ -33,6 +34,7 @@ describe('FormProductComponent imported products', () => {
   let component: FormProductComponent;
   let productService: jasmine.SpyObj<ProductService>;
   let toastr: jasmine.SpyObj<ToastrService>;
+  let dialogRef: jasmine.SpyObj<MatDialogRef<FormProductComponent>>;
 
   beforeEach(async () => {
     productService = jasmine.createSpyObj('ProductService', ['findById', 'update', 'save']);
@@ -40,12 +42,13 @@ describe('FormProductComponent imported products', () => {
     productService.save.and.returnValue(of(importedProduct));
     productService.update.and.returnValue(of('ok') as any);
     toastr = jasmine.createSpyObj('ToastrService', ['success', 'error', 'warning']);
+    dialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
       imports: [FormProductComponent, NoopAnimationsModule],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: { tipo: 'updateProduct', updateProduct: 47 } },
-        { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close']) },
+        { provide: MatDialogRef, useValue: dialogRef },
         { provide: MatDialog, useValue: jasmine.createSpyObj('MatDialog', ['open']) },
         { provide: ProductService, useValue: productService },
         { provide: ToastrService, useValue: toastr },
@@ -93,12 +96,19 @@ describe('FormProductComponent imported products', () => {
       jasmine.objectContaining({ stock: 10.125, minimumStock: 2.75 }));
   });
 
-  it('blocks manual save until an internal barcode is assigned', () => {
+  it('envia el proveedor seleccionado en alta y edicion antes de cerrar', () => {
+    component.formGroup.patchValue({ barCode: '0101', provider: 2, baseUnitId: 1 });
+    component.save();
+    expect(productService.save).toHaveBeenCalledWith(jasmine.objectContaining({ provider: 2, barCode: '0101' }));
+    expect(dialogRef.close).toHaveBeenCalledWith(jasmine.objectContaining({ saved: true }));
+    component.formGroup.patchValue({ provider: 3 });
     component.update();
+    expect(productService.update).toHaveBeenCalledWith(47, jasmine.objectContaining({ provider: 3, barCode: '0101' }));
+  });
 
-    expect(component.formGroup.get('barCode')?.hasError('required')).toBeTrue();
-    expect(productService.update).not.toHaveBeenCalled();
-    expect(toastr.warning).toHaveBeenCalledWith('Revisá los campos marcados antes de guardar.');
+  it('allows an optional barcode and preserves leading zeroes when present', () => {
+    component.update();
+    expect(productService.update).toHaveBeenCalledWith(47, jasmine.objectContaining({ barCode: null }));
 
     component.formGroup.get('barCode')?.setValue('  INT-0047  ');
     component.update();
@@ -108,4 +118,31 @@ describe('FormProductComponent imported products', () => {
       jasmine.objectContaining({ barCode: 'INT-0047' }),
     );
   });
+
+  it('shows a human duplicate-barcode message and keeps the edited form open', () => {
+    productService.update.and.returnValue(throwError(() => new HttpErrorResponse({
+      status: 409,
+      error: { error: 'DUPLICATE_RESOURCE', field: 'barCode', message: 'detalle técnico' },
+    })));
+    component.formGroup.patchValue({ name: 'Datos conservados', barCode: '001234567890' });
+
+    component.update();
+
+    expect(toastr.error).toHaveBeenCalledWith('El código de barras ya está siendo utilizado por otro producto.');
+    expect(component.formGroup.get('barCode')?.hasError('duplicate')).toBeTrue();
+    expect(component.formGroup.get('name')?.value).toBe('Datos conservados');
+    expect(dialogRef.close).not.toHaveBeenCalled();
+  });
+
+  it('releases saving when an update exceeds the defensive timeout', fakeAsync(() => {
+    productService.update.and.returnValue(NEVER);
+    component.formGroup.get('barCode')?.setValue('INT-0047');
+
+    component.update();
+    expect(component.saving).toBeTrue();
+
+    tick(20001);
+    expect(component.saving).toBeFalse();
+    expect(toastr.error).toHaveBeenCalled();
+  }));
 });

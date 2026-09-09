@@ -11,6 +11,8 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 
 import { MatIconModule } from '@angular/material/icon';
+import { FormsModule } from '@angular/forms';
+import { PuntoCaja } from '../../../interfaces/punto-caja';
 
 import { CajaService } from '../../../services/caja.service';
 
@@ -40,6 +42,7 @@ import { ArqueoCajaComponent } from '../arqueo-caja/arqueo-caja.component';
     MatDialogModule,
 
     MatIconModule,
+    FormsModule,
   ],
 
   templateUrl: './cash-closing.component.html',
@@ -64,6 +67,8 @@ export class CashClosingComponent implements OnInit {
   // =====================================================
 
   cajaPendiente?: Caja;
+  puntosCaja: PuntoCaja[] = [];
+  puntoCajaId: number | null = null;
 
   // =====================================================
   // CONTROL DE APERTURA
@@ -127,9 +132,22 @@ export class CashClosingComponent implements OnInit {
 
     this.getAllCash();
 
-    this.getCashOpen();
+    this.cargarPuntosCaja();
+  }
 
-    this.getCashPending();
+  cargarPuntosCaja(): void {
+    this.cajaService.getPuntosActivos().subscribe({ next: puntos => {
+      this.puntosCaja = puntos;
+      const guardado = Number(localStorage.getItem('inventario-punto-caja'));
+      this.puntoCajaId = puntos.find(p => p.id === guardado)?.id ?? (puntos.length === 1 ? puntos[0].id : null);
+      this.refrescarPunto();
+    }});
+  }
+
+  refrescarPunto(): void {
+    if (this.puntoCajaId) localStorage.setItem('inventario-punto-caja', String(this.puntoCajaId));
+    this.caja = undefined; this.cajaPendiente = undefined;
+    if (this.puntoCajaId || this.puntosCaja.length === 1) { this.getCashOpen(); this.getCashPending(); }
   }
 
   // =====================================================
@@ -202,7 +220,7 @@ export class CashClosingComponent implements OnInit {
   // =====================================================
 
   getCashOpen(): void {
-    this.cajaService.getCajas().subscribe({
+    this.cajaService.getCajas(this.puntoCajaId).subscribe({
       next: (data: Caja) => {
         console.log('========== RESPUESTA CAJA ==========');
 
@@ -244,7 +262,7 @@ export class CashClosingComponent implements OnInit {
   // =====================================================
 
   getCashPending(): void {
-    this.cajaService.getCajaPendiente().subscribe({
+    this.cajaService.getCajaPendiente(this.puntoCajaId).subscribe({
       next: (data: Caja | null) => {
         console.log('========== CAJA PENDIENTE ==========');
 
@@ -309,6 +327,7 @@ export class CashClosingComponent implements OnInit {
 
       data: {
         id: this.caja.id,
+        puntoCajaId: this.caja.puntoCaja?.id ?? this.puntoCajaId,
       },
     });
 
@@ -406,6 +425,7 @@ export class CashClosingComponent implements OnInit {
 
       data: {
         id: id,
+        puntoCajaId: this.puntoCajaId,
       },
     });
 
@@ -468,7 +488,8 @@ export class CashClosingComponent implements OnInit {
     // LLAMAR BACKEND
     // ===================================================
 
-    this.cajaService.abrirCaja(this.cajaPendiente.id).subscribe({
+    if (!this.puntoCajaId) { this.abriendoCaja = false; return; }
+    this.cajaService.abrirPunto(this.puntoCajaId, this.cajaPendiente.saldoApertura || 0).subscribe({
       // ===============================================
       // ÉXITO
       // ===============================================
@@ -516,6 +537,15 @@ export class CashClosingComponent implements OnInit {
 
         this.abriendoCaja = false;
       },
+    });
+  }
+
+  abrirPrimeraSesion(): void {
+    if (!this.puntoCajaId || this.abriendoCaja) return;
+    this.abriendoCaja = true;
+    this.cajaService.abrirPunto(this.puntoCajaId, 0).subscribe({
+      next: caja => { this.caja = caja; this.abriendoCaja = false; this.getAllCash(); },
+      error: () => { this.abriendoCaja = false; },
     });
   }
 }
