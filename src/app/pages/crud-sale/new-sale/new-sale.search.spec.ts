@@ -70,4 +70,18 @@ describe('Nueva Venta: busqueda comercial', () => {
     expect(c.productService.searchForSale).toHaveBeenCalledTimes(2);
     expect(c.productosEncontrados).toEqual([coca]);
   }));
+
+  ['coca cola zero', 'coca "cola"', 'coca-zero', 'coca   cola   zero'].forEach(query => {
+    it(`envia al backend la busqueda permisiva: ${query}`, fakeAsync(() => {
+      input(query); tick(300);
+      expect(c.productService.searchForSale).toHaveBeenCalledWith(query);
+    }));
+  });
+
+  it('muestra el nombre original devuelto por el backend', fakeAsync(() => {
+    const original = { ...coca, name: 'Coca Cola "Zero" 1,5L' };
+    c.productService.searchForSale.and.returnValue(of([original]));
+    input('coca zero'); tick(300);
+    expect(c.productosEncontrados[0].name).toBe('Coca Cola "Zero" 1,5L');
+  }));
 });

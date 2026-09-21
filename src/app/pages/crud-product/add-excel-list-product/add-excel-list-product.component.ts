@@ -72,7 +72,7 @@ dataSuplier: Supplier[] = [];
         },
         (error) => {
           console.error('Error al subir el archivo:', error);
-          this.toast.error('Error al subir el archivo');
+          this.toast.error(error?.error?.message || 'Error al subir el archivo');
         }
       );
     } else {

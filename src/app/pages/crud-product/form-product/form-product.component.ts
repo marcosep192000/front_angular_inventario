@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, signal } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   FormBuilder,
@@ -40,10 +40,13 @@ import { applyDuplicateResourceError } from '../../../shared/forms/duplicate-res
 import { InventoryConfigComponent } from '../inventory-config/inventory-config.component';
 import { ProductSuppliersDialogComponent } from '../product-suppliers/product-suppliers-dialog.component';
 import { DialogGenericComponent } from '../../../shared/genericsComponents/dialog-generic/dialog-generic.component';
-import { finalize, map, of, switchMap, timeout } from 'rxjs';
+import { catchError, finalize, forkJoin, map, of, switchMap, timeout } from 'rxjs';
 import { InventoryService } from '../../../services/inventory.service';
 import { UnitOfMeasure } from '../../../interfaces/inventory';
 import { normalizeOptionalBarcode } from './product-form.utils';
+import { ProductImage } from '../../../interfaces/product-image';
+import { GastronomyGroup, GastronomyOption, GastronomySelectionType } from '../../../interfaces/gastronomy';
+import { GastronomyService } from '../../../services/gastronomy.service';
 
 @Component({
   selector: 'app-form-product',
@@ -64,7 +67,7 @@ import { normalizeOptionalBarcode } from './product-form.utils';
   templateUrl: './form-product.component.html',
   styleUrl: './form-product.component.css',
 })
-export class FormProductComponent implements OnInit {
+export class FormProductComponent implements OnInit, OnDestroy {
   protected readonly value = signal('');
   calculatedSalePrice: number = 0;
   precioVentaManual = false;
@@ -74,6 +77,20 @@ export class FormProductComponent implements OnInit {
   loadingProduct = false;
   saving = false;
   units: UnitOfMeasure[] = [];
+  productImages: ProductImage[] = [];
+  loadingImages = false;
+  uploadingImage = false;
+  readonly acceptedImageTypes = 'image/jpeg,image/png,image/webp';
+  readonly maxImageSizeBytes = 5 * 1024 * 1024;
+  gastronomyGroups: GastronomyGroup[] = [];
+  loadingGastronomy = false;
+  showGroupEditor = false;
+  editingGroup: GastronomyGroup | null = null;
+  editingOptionGroup: GastronomyGroup | null = null;
+  editingOption: GastronomyOption | null = null;
+  readonly gastronomyTypes: { value: GastronomySelectionType; label: string }[] = [{ value: 'SINGLE', label: 'Selección única' }, { value: 'MULTIPLE', label: 'Selección múltiple' }];
+  groupForm = this.fb.group({ name: ['', Validators.required], description: [''], selectionType: ['MULTIPLE' as GastronomySelectionType, Validators.required], minSelections: [0, [Validators.required, Validators.min(0)]], maxSelections: [1, [Validators.required, Validators.min(1)]], required: [false], sortOrder: [0, [Validators.required, Validators.min(0)]] });
+  optionForm = this.fb.group({ name: ['', Validators.required], description: [''], priceAdjustment: [0, [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)]], sortOrder: [0, [Validators.required, Validators.min(0)]] });
 
   protected onInput(event: Event) {
     this.value.set((event.target as HTMLInputElement).value);
@@ -94,6 +111,7 @@ export class FormProductComponent implements OnInit {
     private marcaService: MarcaService,
     private supplierService: SupplierService,
     private inventoryService: InventoryService,
+    private gastronomyService: GastronomyService,
   ) {
     this.formGroup = this.fb.group({
       category: [1],
@@ -115,6 +133,7 @@ export class FormProductComponent implements OnInit {
         this.data.tipo === 'createProduct' ? Validators.required : [],
       ],
       status: [true],
+      cloudPublished: [false],
       tipoIva: ['IVA_21' as TipoIva, Validators.required],
       salePrice: [null, Validators.required],
       productUsefulness: ['', Validators.required],
@@ -148,6 +167,7 @@ export class FormProductComponent implements OnInit {
               stockMin: datos.minimumStock,
               salePrice: datos.salePrice,
               productUsefulness: datos.productUsefulness,
+              cloudPublished: datos.cloudPublished === true,
             });
             this.calculatedSalePrice = Number(datos.salePrice || 0);
             this.precioVentaManual = true;
@@ -158,6 +178,8 @@ export class FormProductComponent implements OnInit {
             );
           },
         });
+      this.loadImages();
+      this.loadGastronomy();
     }
 
     ['price', 'productUsefulness', 'tipoIva'].forEach((controlName) => {
@@ -202,6 +224,134 @@ export class FormProductComponent implements OnInit {
         this.toastr.error(
           'No se pudieron cargar las unidades. No es posible crear el producto.',
         ),
+    });
+  }
+
+  loadImages(): void {
+    const productId = Number(this.data.updateProduct);
+    if (!productId) return;
+    this.loadingImages = true;
+    this.productService.getImages(productId)
+      .pipe(
+        switchMap((images) =>
+          forkJoin(
+            images.map((image) =>
+              this.productService.getImageContent(productId, image.id).pipe(
+                map((blob) => {
+                  if (!blob.size) throw new Error('Imagen vacía');
+                  return { ...image, previewUrl: URL.createObjectURL(blob) };
+                }),
+                // Una miniatura fallida no debe impedir mostrar las demás.
+                catchError(() => of({ ...image, previewUrl: undefined })),
+              ),
+            ),
+          ),
+        ),
+      )
+      .pipe(finalize(() => (this.loadingImages = false)))
+      .subscribe({
+        next: (images) => {
+          this.releaseImageUrls();
+          this.productImages = [...images].sort((a, b) => a.sortOrder - b.sortOrder);
+        },
+        error: () => this.toastr.error('No se pudieron cargar las imágenes del producto.'),
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.releaseImageUrls();
+  }
+
+  private releaseImageUrls(): void {
+    this.productImages.forEach((image) => {
+      if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
+    });
+  }
+
+  loadGastronomy(): void {
+    const productId = Number(this.data.updateProduct); if (!productId) return;
+    this.loadingGastronomy = true;
+    this.gastronomyService.groups(productId).pipe(finalize(() => this.loadingGastronomy = false)).subscribe({ next: groups => this.gastronomyGroups = [...groups].sort((a, b) => a.sortOrder - b.sortOrder), error: () => this.toastr.error('No se pudo cargar la configuración gastronómica.') });
+  }
+  openGroup(group?: GastronomyGroup): void {
+    this.editingGroup = group ?? null;
+    this.showGroupEditor = true;
+    this.groupForm.reset(group ? { name: group.name, description: group.description || '', selectionType: group.selectionType, minSelections: group.minSelections, maxSelections: group.maxSelections, required: group.required, sortOrder: group.sortOrder } : { selectionType: 'MULTIPLE', minSelections: 0, maxSelections: 1, required: false, sortOrder: this.gastronomyGroups.length });
+  }
+  saveGroup(): void {
+    const value = this.groupForm.getRawValue();
+    if (this.groupForm.invalid || Number(value.minSelections) > Number(value.maxSelections) || (value.selectionType === 'SINGLE' && Number(value.maxSelections) > 1) || (value.required && Number(value.minSelections) < 1)) { this.groupForm.markAllAsTouched(); this.toastr.warning('Revisá las selecciones mínimas y máximas del grupo.'); return; }
+    const body = { ...value, description: value.description || null } as any;
+    const request = this.editingGroup ? this.gastronomyService.updateGroup(this.data.updateProduct, this.editingGroup.id, body) : this.gastronomyService.createGroup(this.data.updateProduct, body);
+    request.subscribe({ next: () => { this.editingGroup = null; this.showGroupEditor = false; this.loadGastronomy(); }, error: () => this.toastr.error('No se pudo guardar el grupo.') });
+  }
+  openOption(group: GastronomyGroup, option?: GastronomyOption): void { this.editingOptionGroup = group; this.editingOption = option ?? null; this.optionForm.reset(option ? { name: option.name, description: option.description || '', priceAdjustment: option.priceAdjustment, sortOrder: option.sortOrder } : { priceAdjustment: 0, sortOrder: group.options?.length || 0 }); }
+  saveOption(): void {
+    if (!this.editingOptionGroup || this.optionForm.invalid) { this.optionForm.markAllAsTouched(); return; }
+    const value = this.optionForm.getRawValue(); const body = { ...value, priceAdjustment: Number(value.priceAdjustment), description: value.description || null } as any;
+    const request = this.editingOption ? this.gastronomyService.updateOption(this.data.updateProduct, this.editingOptionGroup.id, this.editingOption.id, body) : this.gastronomyService.createOption(this.data.updateProduct, this.editingOptionGroup.id, body);
+    request.subscribe({ next: () => { this.editingOptionGroup = null; this.editingOption = null; this.loadGastronomy(); }, error: () => this.toastr.error('No se pudo guardar la opción.') });
+  }
+  deleteGroup(group: GastronomyGroup): void {
+    this.confirmGastronomyDeletion(`¿Eliminar el grupo “${group.name}” y sus opciones?`, () => this.gastronomyService.deleteGroup(this.data.updateProduct, group.id).subscribe({ next: () => this.loadGastronomy(), error: () => this.toastr.error('No se pudo eliminar el grupo.') }));
+  }
+  deleteOption(group: GastronomyGroup, option: GastronomyOption): void {
+    this.confirmGastronomyDeletion(`¿Eliminar la opción “${option.name}”?`, () => this.gastronomyService.deleteOption(this.data.updateProduct, group.id, option.id).subscribe({ next: () => this.loadGastronomy(), error: () => this.toastr.error('No se pudo eliminar la opción.') }));
+  }
+  private confirmGastronomyDeletion(message: string, confirmedAction: () => void): void {
+    this.dialog.open(DialogGenericComponent, { width: '430px', maxWidth: '94vw', data: { state: 'Eliminar', icon: 'warning', message } }).afterClosed().subscribe((confirmed) => { if (confirmed === true) confirmedAction(); });
+  }
+
+  uploadProductImage(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      this.toastr.warning('Elegí una imagen JPG, PNG o WEBP.');
+      return;
+    }
+    if (file.size > this.maxImageSizeBytes) {
+      this.toastr.warning('La imagen no puede superar los 5 MB.');
+      return;
+    }
+    this.uploadingImage = true;
+    this.productService.uploadImage(this.data.updateProduct, file)
+      .pipe(finalize(() => (this.uploadingImage = false)))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Imagen agregada correctamente.');
+          this.loadImages();
+        },
+        error: (error: HttpErrorResponse) => this.toastr.error(error.error?.message || 'No se pudo subir la imagen.'),
+      });
+  }
+
+  setPrincipalImage(image: ProductImage): void {
+    if (image.principal) return;
+    this.productService.setPrincipalImage(this.data.updateProduct, image.id).subscribe({
+      next: () => { this.toastr.success('Imagen principal actualizada.'); this.loadImages(); },
+      error: (error: HttpErrorResponse) => this.toastr.error(error.error?.message || 'No se pudo definir la imagen principal.'),
+    });
+  }
+
+  moveImage(image: ProductImage, direction: -1 | 1): void {
+    const index = this.productImages.findIndex((item) => item.id === image.id);
+    const neighbor = this.productImages[index + direction];
+    if (!neighbor) return;
+    this.productService.setImageOrder(this.data.updateProduct, image.id, neighbor.sortOrder).subscribe({
+      next: () => this.loadImages(),
+      error: () => this.toastr.error('No se pudo cambiar el orden de la imagen.'),
+    });
+  }
+
+  deleteProductImage(image: ProductImage): void {
+    this.productService.deleteImage(this.data.updateProduct, image.id).subscribe({
+      next: () => {
+        this.toastr.success('Imagen eliminada.');
+        this.loadImages();
+      },
+      error: (error: HttpErrorResponse) => this.toastr.error(error.error?.message || 'No se pudo eliminar la imagen.'),
     });
   }
 

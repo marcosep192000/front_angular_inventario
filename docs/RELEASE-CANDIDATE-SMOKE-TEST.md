@@ -8,7 +8,7 @@
 
 **B) APTO CON VALIDACIONES MANUALES PENDIENTES**
 
-No quedaron defectos críticos conocidos. Los dos defectos altos reproducidos durante este smoke test fueron corregidos y validados. Antes de instalar en un cliente deben completarse el recorrido visual/operativo del checklist y las tres resoluciones responsive. La instalación comercial debe activar el perfil `prod` y aportar sus variables de base de datos; ese perfil arranca con `ddl-auto=validate`.
+No quedaron defectos críticos conocidos en ese smoke test. Antes de instalar en un cliente deben completarse el recorrido visual/operativo del checklist. La instalación comercial activa `prod`, aporta la configuración externa y ejecuta las migraciones versionadas mediante el runner comercial; Hibernate no reemplaza ese proceso.
 
 ## Resumen ejecutivo
 
@@ -29,7 +29,7 @@ No quedaron defectos críticos conocidos. Los dos defectos altos reproducidos du
 - `mvn clean test` contra una base PostgreSQL 18 descartable: **340 pruebas, 0 fallos, 0 errores, 0 omitidas**.
 - `mvn package -DskipTests`: **BUILD SUCCESS**; se generó `target/inventario-pixels-0.0.1-SNAPSHOT.jar`.
 - El intento previo con H2 produjo errores de entorno: sintaxis y funciones propias de PostgreSQL (`to_regclass`), palabras reservadas y tipos incompatibles. La misma suite completa pasa en PostgreSQL. No se alteró producción para acomodar H2.
-- Arranque de producción probado en una base descartable: health HTTP 200 con `ddl-auto=validate` y licencia habilitada.
+- Arranque de producción probado en una base descartable: health HTTP 200 y licencia habilitada. Para upgrades, V8–V10 se aplican explícitamente antes del arranque.
 - Se repitió el arranque y los datos base permanecieron idempotentes: una empresa, un administrador, un PuntoCaja principal, una caja semilla, categoría/marca “Varios”, proveedor anónimo y consumidor final.
 
 ### Frontend y build

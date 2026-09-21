@@ -53,6 +53,19 @@ describe('configuración genérica de venta', () => {
       variantId: null,
       inputUnitId: null,
     }));
+  it('envía 50 con la unidad centímetro, sin sustituirlo por la equivalencia en metros', () =>
+    expect(saleDetailPayload({
+      id: 10,
+      quantity: 50,
+      advancedSale: true,
+      inputUnitId: 3,
+    })).toEqual({
+      idProduct: 10,
+      quantity: 50,
+      inputUnitId: 3,
+      presentationId: null,
+      variantId: null,
+    }));
   it('bloquea una variante sin stock', () =>
     expect(hasEnoughStock(1, 0)).toBeFalse());
   const unit = (id: number, symbol: string, dimension: any, factor: number) =>

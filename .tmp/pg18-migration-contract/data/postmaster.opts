@@ -1,0 +1,1 @@
+C:/Program Files/PostgreSQL/18/bin/postgres.exe "-D" "C:/Users/MARCO/OneDrive/Escritorio/sietemas de gestion/corralon ruta 89/frontend/front_angular_inventario/.tmp/pg18-migration-contract/data" "-p" "25432" "-h" "127.0.0.1"

@@ -49,6 +49,29 @@
 
 html, body { height: 100%; }
 
+/* Sistema visual compartido: superficies, jerarquía y controles de Inventario Pixels. */
+:root {
+  --ip-bg: #f4f5f8;
+  --ip-surface: #fff;
+  --ip-surface-raised: #fff;
+  --ip-primary: #593484;
+  --ip-primary-hover: #44266a;
+  --ip-secondary: #eae4f2;
+  --ip-success: #23734a;
+  --ip-warning: #a85d13;
+  --ip-danger: #b93d48;
+  --ip-text: #282334;
+  --ip-muted: #675f72;
+  --ip-border: #e3deea;
+  --ip-disabled: #a9a2b0;
+  --ip-radius: 10px;
+  --ip-card-radius: 18px;
+  --ip-space: 8px;
+  --ip-control-height: 44px;
+  --ip-shadow: 0 8px 24px rgba(39, 24, 59, .07);
+  --ip-shadow-raised: 0 16px 38px rgba(39, 24, 59, .12);
+}
+
 html {
   box-sizing: border-box;
   -webkit-text-size-adjust: 100%;
@@ -63,8 +86,8 @@ body {
   min-width: 320px;
   overflow-x: hidden;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  color: #312a3b;
-  background: #f4f6fa;
+  color: var(--ip-text);
+  background: var(--ip-bg);
 }
 
 img, svg, canvas, video {
@@ -81,7 +104,7 @@ button, a, input, select, textarea {
 }
 
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 3px solid rgba(121, 85, 187, .35);
+  outline: 3px solid #9a72cc;
   outline-offset: 2px;
 }
 
@@ -100,6 +123,21 @@ button:disabled {
 
 /* Tema oscuro global, persistente y compatible con componentes Material. */
 body.tema-oscuro {
+  --ip-bg: #111019;
+  --ip-surface: #1c1924;
+  --ip-surface-raised: #25212e;
+  --ip-primary: #b38ce6;
+  --ip-primary-hover: #c7a9ef;
+  --ip-secondary: #352c42;
+  --ip-success: #82d7a6;
+  --ip-warning: #f4c175;
+  --ip-danger: #ff9ca8;
+  --ip-text: #ece8f2;
+  --ip-muted: #b8afc4;
+  --ip-border: #403849;
+  --ip-disabled: #776e80;
+  --ip-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  --ip-shadow-raised: 0 16px 38px rgba(0, 0, 0, .38);
   color-scheme: dark;
   color: #ece8f2;
   background: #0f0d15;
@@ -763,4 +801,102 @@ body.tema-oscuro .panel-alertas .alertas-cabecera { color:#ffd392!important;back
 body.tema-oscuro .panel-alertas article { color:#e8ded1!important;border-color:#56432d!important;background:#292219!important; }
 body.tema-oscuro .panel-alertas article:hover { background:#34291d!important; }
 body.tema-oscuro .sin-alertas { color:#9addb8!important;background:#173124!important; }
+
+/* Patrones transversales para listados, formularios y diálogos. */
+.contenedor-global,
+.table-container,
+.mat-mdc-card,
+.mat-mdc-dialog-surface {
+  border-radius: var(--ip-card-radius);
+  border-color: var(--ip-border);
+  box-shadow: var(--ip-shadow);
+}
+
+.contenedor-global,
+.table-container {
+  background: var(--ip-surface);
+}
+
+.mat-mdc-table .mat-mdc-header-row,
+.table-container thead,
+.tabla-contenedor thead {
+  background: var(--ip-bg);
+}
+
+.mat-mdc-table .mat-mdc-header-cell,
+.table-container th,
+.tabla-contenedor th {
+  color: var(--ip-muted);
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .035em;
+}
+
+.mat-mdc-table .mat-mdc-row:hover,
+.table-container tbody tr:hover,
+.tabla-contenedor tbody tr:hover {
+  background: var(--ip-secondary);
+}
+
+.mat-mdc-table .mat-mdc-cell,
+.table-container td,
+.tabla-contenedor td {
+  border-bottom-color: var(--ip-border);
+}
+
+button.mat-mdc-raised-button,
+button.mat-mdc-unelevated-button,
+.actions__btn,
+.btn__new {
+  min-height: var(--ip-control-height);
+  border-radius: var(--ip-radius);
+  font-weight: 650;
+}
+
+button.mat-mdc-button,
+button.mat-mdc-outlined-button,
+button.mat-mdc-icon-button {
+  border-radius: var(--ip-radius);
+}
+
+button:disabled,
+.mat-mdc-button-disabled {
+  opacity: .58;
+  box-shadow: none !important;
+}
+
+.mat-mdc-dialog-surface {
+  background: var(--ip-surface-raised);
+}
+
+.mat-mdc-dialog-actions {
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--ip-border);
+}
+
+.mat-mdc-form-field-error,
+.error,
+.form-error {
+  font-weight: 550;
+}
+
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-container-shape: var(--ip-radius);
+}
+
+.mat-mdc-form-field-hint,
+.mat-mdc-form-field-subscript-wrapper {
+  color: var(--ip-muted);
+}
+
+.mat-mdc-form-field-error {
+  color: var(--ip-danger);
+}
+
+@media (max-width: 1024px) {
+  .contenedor-global,
+  .table-container { max-width: 100%; }
+  .mat-mdc-dialog-surface { border-radius: 14px; }
+}
 

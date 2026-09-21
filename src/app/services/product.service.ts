@@ -11,6 +11,7 @@ import { Observable, map } from 'rxjs';
 import { ProductItemSale } from '../interfaces/ProductItemSale';
 
 import { ProductItemBuy } from '../interfaces/ProductItemBuy';
+import { ProductImage } from '../interfaces/product-image';
 
 
 @Injectable({
@@ -66,12 +67,9 @@ export class ProductService {
     filter: string = ''
   ) {
 
-    return this.http.get<any>(
-      `${this.base}supermarket/products` +
-      `?page=${page}` +
-      `&size=${size}` +
-      `&filter=${filter}`
-    );
+    return this.http.get<any>(`${this.base}supermarket/products`, {
+      params: { page, size, filter: filter.trim() },
+    });
   }
 
 
@@ -216,6 +214,41 @@ export class ProductService {
 
     return this.http.get<ProductItemBuy>(
       `${this.base}supermarket/findByCode/${code.trim()}`
+    );
+  }
+
+  getImages(productId: number): Observable<ProductImage[]> {
+    return this.http.get<ProductImage[]>(`${this.base}products/${productId}/images`);
+  }
+
+  uploadImage(productId: number, file: File): Observable<ProductImage> {
+    const body = new FormData();
+    body.append('file', file);
+    return this.http.post<ProductImage>(`${this.base}products/${productId}/images`, body);
+  }
+
+  setPrincipalImage(productId: number, imageId: number): Observable<ProductImage> {
+    return this.http.patch<ProductImage>(
+      `${this.base}products/${productId}/images/${imageId}/principal`,
+      {},
+    );
+  }
+
+  setImageOrder(productId: number, imageId: number, sortOrder: number): Observable<ProductImage> {
+    return this.http.patch<ProductImage>(
+      `${this.base}products/${productId}/images/${imageId}/order`,
+      { sortOrder },
+    );
+  }
+
+  deleteImage(productId: number, imageId: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}products/${productId}/images/${imageId}`);
+  }
+
+  getImageContent(productId: number, imageId: number): Observable<Blob> {
+    return this.http.get(
+      `${this.base}products/${productId}/images/${imageId}/content`,
+      { responseType: 'blob' },
     );
   }
 

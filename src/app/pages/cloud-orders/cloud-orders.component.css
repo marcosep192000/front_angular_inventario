@@ -1,0 +1,37 @@
+.cloud-page{padding:24px;background:#f5f7fb;min-height:100%}.cloud-page header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.cloud-page h1{margin:2px 0;font-size:28px}.cloud-page header p{color:#536dfe;font-weight:800;margin:0}.cloud-page header span,small{display:block;color:#667085}.card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 3px 14px #172b4d18}.filters,.link,.actions,.conversion{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.filters mat-form-field{min-width:240px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:18px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #e7eaf0}tbody tr{cursor:pointer}tbody tr:hover,tbody tr.active{background:#eef2ff}.status{display:inline-block;padding:5px 9px;border-radius:14px;background:#fff0b8}.status[data-status=REVIEW_REQUIRED]{background:#ffd8a8}.status[data-status=ACCEPTED]{background:#c9f3d5}.status[data-status=REJECTED]{background:#ffd2d2}.status[data-status=CONVERTED_TO_SALE]{background:#cdeee8}aside{border-left:1px solid #e7eaf0;padding-left:18px}.item,.account{display:flex;flex-direction:column;gap:3px;padding:10px 0;border-bottom:1px solid #eee}.warning{color:#b42318}.actions{margin-top:18px}@media(max-width:1000px){.layout{grid-template-columns:1fr}aside{border-left:0;border-top:1px solid #ddd;padding:16px 0}}
+.pending-filter{display:flex;gap:7px;align-items:center}.status-line,.cloud-detail{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}.cloud-detail{flex-direction:column;align-items:flex-start;padding:10px;background:#f8fafc;border-radius:8px}.cloud-status{font-size:12px;padding:4px 7px;border-radius:12px;background:#fff0b8}.cloud-status[data-cloud=SYNCED]{background:#d6f5df}.cloud-status[data-cloud=ERROR]{background:#ffd2d2}.client-search{position:relative}.client-search mat-form-field{width:100%}.suggestions{position:absolute;z-index:5;width:100%;max-height:220px;overflow:auto;background:white;border:1px solid #ddd;box-shadow:0 8px 20px #0002}.suggestions button{display:flex;width:100%;padding:9px;border:0;border-bottom:1px solid #eee;background:white;text-align:left;flex-direction:column}.suggestions button:hover{background:#eef2ff}.variant mat-form-field{width:100%;margin-top:8px}
+.statusstatus{display:inline-block;padding:5px 9px;border-radius:14px;background:#fff0b8}.statusstatus[data-status=REVIEW_REQUIRED]{background:#ffd8a8}.statusstatus[data-status=ACCEPTED]{background:#c9f3d5}.statusstatus[data-status=REJECTED]{background:#ffd2d2}.statusstatus[data-status=CONVERTED_TO_SALE]{background:#cdeee8}.gastronomy-selections{display:grid;gap:3px;margin:5px 0 2px;padding:8px 10px;border-left:3px solid #cbb9de;background:#faf8fd}.gastronomy-selection-group{margin-top:4px;color:#56347d;font-size:.75rem}.gastronomy-selection{display:flex;gap:7px;padding-left:3px;color:#635876;font-size:.8rem}.gastronomy-selection em{margin-left:auto;color:#26704e;font-style:normal;font-weight:600}
+
+/* Lectura rápida de pedidos: total, estado comercial y resultado técnico separados. */
+.cloud-page { padding: clamp(14px, 2vw, 28px); color: var(--ip-text); background: var(--ip-bg); }
+.cloud-page header { gap: 16px; align-items: flex-start; }
+.cloud-page header p { color: var(--ip-primary); font-size: .72rem; letter-spacing: .09em; }
+.cloud-page header span { color: var(--ip-muted); }
+.card { border: 1px solid var(--ip-border); border-radius: var(--ip-card-radius); background: var(--ip-surface); box-shadow: var(--ip-shadow); }
+.filters { padding-bottom: 10px; border-bottom: 1px solid var(--ip-border); }
+.filters mat-form-field { flex: 1 1 220px; min-width: 190px; }
+.layout { margin-top: 14px; align-items: start; }
+.layout:not(:has(> aside)) { grid-template-columns: minmax(0, 1fr); }
+.table-wrap { border: 1px solid var(--ip-border); border-radius: 12px; }
+.table-wrap table { min-width: 760px; }
+th { color: var(--ip-muted); background: var(--ip-bg); font-size: .72rem; font-weight: 750; letter-spacing: .035em; }
+td { color: var(--ip-text); border-color: var(--ip-border); }
+td:nth-child(4), th:nth-child(4) { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td small { color: var(--ip-muted); }
+tbody tr:hover, tbody tr.active { background: var(--ip-secondary); }
+aside { min-width: 0; padding: 0 0 0 18px; border-color: var(--ip-border); }
+aside h2 { margin: 0 0 10px; font-size: 1.25rem; }
+aside h3 { margin: 18px 0 6px; font-size: .85rem; color: var(--ip-muted); text-transform: uppercase; letter-spacing: .04em; }
+.item, .account { border-color: var(--ip-border); }
+.status, .statusstatus, .cloud-status { border-radius: 999px; font-size: .72rem; font-weight: 750; white-space: nowrap; }
+.status[data-status=ACCEPTED], .statusstatus[data-status=ACCEPTED] { color: #17613d; background: #e2f3e9; }
+.status[data-status=CONVERTED_TO_SALE], .statusstatus[data-status=CONVERTED_TO_SALE] { color: #17613d; background: #d8f2e8; }
+.status[data-status=REJECTED], .statusstatus[data-status=REJECTED], .cloud-status[data-cloud=ERROR] { color: #9d2e3c; background: #fbe5e8; }
+.status[data-status=REVIEW_REQUIRED], .statusstatus[data-status=REVIEW_REQUIRED] { color: #8f5214; background: #fff0d8; }
+.cloud-status[data-cloud=SYNCED] { color: #28694b; background: #e4f2e9; }
+.suggestions { border-color: var(--ip-border); border-radius: 10px; background: var(--ip-surface-raised); box-shadow: var(--ip-shadow-raised); }
+.suggestions button { min-height: 44px; color: var(--ip-text); border-color: var(--ip-border); background: var(--ip-surface-raised); }
+.suggestions button:hover { background: var(--ip-secondary); }
+.actions { padding-top: 12px; border-top: 1px solid var(--ip-border); }
+@media (max-width: 1000px) { aside { padding: 18px 0 0; } }
+@media (max-width: 600px) { .cloud-page header { flex-wrap: wrap; } .card { padding: 12px; } .table-wrap table { min-width: 760px; } }

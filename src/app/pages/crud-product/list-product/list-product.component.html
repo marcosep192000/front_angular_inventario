@@ -90,7 +90,11 @@
               <span class="producto-avatar">{{
                 element.name?.charAt(0) || "?"
               }}</span>
-              <strong>{{ element.name }}</strong>
+              <div class="producto-copy">
+                <strong>{{ element.name }}</strong>
+                <small>{{ element.category?.name || "Sin categoría" }}</small>
+              </div>
+              <span class="cloud-badge" *ngIf="element.cloudPublished" title="Publicado en Pixels Pedidos">Publicado</span>
             </div>
           </td>
         </ng-container>
@@ -138,6 +142,7 @@
                 mat-icon-button
                 type="button"
                 class="accion-configurar"
+                [attr.aria-label]="'Configurar ' + element.name"
                 matTooltip="Configurar unidades, presentaciones y variantes"
                 (click)="configureInventory(element)"
               >
@@ -147,6 +152,7 @@
                 mat-icon-button
                 type="button"
                 class="accion-editar"
+                [attr.aria-label]="'Editar ' + element.name"
                 matTooltip="Editar producto"
                 (click)="updateProduct(element.id)"
               >
@@ -156,6 +162,7 @@
                 mat-icon-button
                 type="button"
                 class="accion-eliminar"
+                [attr.aria-label]="'Eliminar ' + element.name"
                 matTooltip="Eliminar producto"
                 (click)="deleteProduct(element.id)"
               >

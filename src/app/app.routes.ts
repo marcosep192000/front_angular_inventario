@@ -40,6 +40,7 @@ export const routes: Routes = [
       { path: 'product-list', component: ListProductComponent, canActivate: [permissionGuard], data: { permission: 'PRODUCTOS_VER' } },
       { path: 'client-list', component: ListClientComponent, canActivate: [permissionGuard], data: { permission: 'CLIENTES_VER' } },
       { path: 'new-sale', component: NewSaleComponent, canActivate: [permissionGuard], data: { permission: 'VENTAS_CREAR' } },
+      { path: 'cloud-orders', loadComponent: () => import('./pages/cloud-orders/cloud-orders.component').then(m => m.CloudOrdersComponent), canActivate: [permissionGuard], data: { permission: 'VENTAS_VER' } },
       { path: 'supplier-list', component: ListSupplierComponent, canActivate: [permissionGuard], data: { permission: 'PROVEEDORES_VER' } },
       { path: 'proveedores/listas-precios', loadComponent: () => import('./modules/supplier-price-lists/supplier-price-lists.component').then(m => m.SupplierPriceListsComponent), canActivate: [permissionGuard], data: { permission: 'REPORTES_VER', allowAdmin: true } },
       { path: 'proveedores/listas-precios/:id', loadComponent: () => import('./modules/supplier-price-lists/supplier-price-list-detail.component').then(m => m.SupplierPriceListDetailComponent), canActivate: [permissionGuard], data: { permission: 'REPORTES_VER', allowAdmin: true } },

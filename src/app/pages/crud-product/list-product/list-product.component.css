@@ -3,6 +3,23 @@
   min-height: 100%;
 }
 
+.producto-copy { display: grid; gap: 3px; min-width: 0; text-align: left; }
+.producto-copy strong { overflow-wrap: anywhere; }
+.producto-copy small { color: var(--ip-muted); font-size: .72rem; }
+.cloud-badge {
+  margin-left: auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: var(--ip-success);
+  background: #e7f5ed;
+  font-size: .68rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+:host-context(.tema-oscuro) .cloud-badge { background: #203d30; }
+.tabla-productos .mat-column-salePrice { text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 720px) { .producto-nombre { min-width: 200px; } }
+
 .productos-page {
   max-width: 1500px;
   margin: 0 auto;

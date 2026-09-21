@@ -1,6 +1,3 @@
-t.css
-
-
 /* ============================================================
    INVENTARIO PIXELS - NUEVA VENTA
    CSS COMPLETO - LAYOUT POS FIJO
@@ -9,25 +6,25 @@ t.css
 :host {
   display: block;
   width: 100%;
-  height: 100dvh;
-  max-height: 100dvh;
+  height: max(680px, calc(100dvh - 120px));
+  max-height: none;
   overflow: hidden;
 
-  --primary: #fd02f5;
-  --primary-dark: #0059de;
-  --success: #43a047;
-  --warning: #fb8c00;
-  --danger: #e53935;
+  --primary: var(--ip-primary);
+  --primary-dark: var(--ip-primary-hover);
+  --success: var(--ip-success);
+  --warning: var(--ip-warning);
+  --danger: var(--ip-danger);
 
-  --background: #edf2f7;
-  --card: #ffffff;
-  --border: #dce5ee;
+  --background: var(--ip-bg);
+  --card: var(--ip-surface);
+  --border: var(--ip-border);
 
-  --text: #263238;
-  --text-light: #78909c;
+  --text: var(--ip-text);
+  --text-light: var(--ip-muted);
 
-  --radius: 12px;
-  --shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  --radius: var(--ip-card-radius);
+  --shadow: var(--ip-shadow);
 
   font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
 }
@@ -45,7 +42,7 @@ t.css
 .ventas-container {
   width: 100%;
   height: 100%;
-  min-height: 0;
+  min-height: 680px;
 
   display: grid;
 
@@ -89,9 +86,9 @@ t.css
 
   border-radius: var(--radius);
 
-  color: rgb(70, 2, 80);
+  color: #fff;
 
-  background: linear-gradient(135deg, #603e72 0%, #5f00a3 100%);
+  background: linear-gradient(120deg, #3d2358 0%, #68468e 100%);
 
   box-shadow: var(--shadow);
 }
@@ -105,11 +102,16 @@ t.css
 }
 
 .header-info h1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 21px;
   font-weight: 700;
   line-height: 1.1;
   color: white;
 }
+
+.header-info h1 mat-icon { width: 22px; height: 22px; font-size: 22px; }
 
 .fecha {
   margin-top: 2px;
@@ -332,7 +334,8 @@ t.css
 
   padding: 6px 12px;
 
-  background: white;
+  background: var(--card);
+  border: 1px solid var(--border);
 
   border-radius: var(--radius);
 
@@ -368,7 +371,7 @@ t.css
 
   border-radius: 9px;
 
-  background: #edf6ff;
+  background: var(--ip-secondary);
 }
 
 .busqueda-wrapper {
@@ -379,7 +382,7 @@ t.css
 
 .search-input {
   width: 100%;
-  height: 42px;
+  height: 46px;
 
   padding: 0 14px;
 
@@ -388,7 +391,7 @@ t.css
 
   outline: none;
 
-  font-size: 14px;
+  font-size: 15px;
 
   transition: 0.2s;
 }
@@ -396,7 +399,7 @@ t.css
 .search-input:focus {
   border-color: var(--primary);
 
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.12);
+  box-shadow: 0 0 0 3px var(--ip-secondary);
 }
 
 .btn-buscar {
@@ -537,7 +540,8 @@ t.css
 
   overflow: hidden;
 
-  background: white;
+  background: var(--card);
+  border: 1px solid var(--border);
 
   border-radius: var(--radius);
 
@@ -555,7 +559,7 @@ t.css
 
   border-bottom: 1px solid var(--border);
 
-  background: #fafbfd;
+  background: var(--ip-bg);
 }
 
 .tabla-header h2 {
@@ -636,7 +640,7 @@ t.css
 
   color: var(--text);
 
-  border-bottom: 1px solid #edf2f6;
+  border-bottom: 1px solid var(--border);
 }
 
 .sale-row:nth-child(even) {
@@ -759,8 +763,8 @@ t.css
      Resumen compacto para que el botón siempre quede visible.
   */
   grid-template-rows:
-    145px
-    300px;
+    160px
+    330px;
 
   gap: 10px;
 
@@ -982,10 +986,10 @@ t.css
    ============================================================ */
 
 .resumen-card {
-  height: 300px;
+  height: 330px;
 
-  min-height: 300px;
-  max-height: 300px;
+  min-height: 330px;
+  max-height: 330px;
 
   display: flex;
   flex-direction: column;
@@ -1051,21 +1055,24 @@ t.css
 
   margin-top: 2px;
   margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--ip-secondary);
 }
 
 .total-final span {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 
   letter-spacing: 0.8px;
 
-  color: #607d8b;
+  color: var(--ip-muted);
 }
 
 .total-final h1 {
   margin: 0;
 
-  font-size: 30px;
+  font-size: clamp(32px, 2.4vw, 40px);
   font-weight: 800;
 
   line-height: 1;
@@ -1099,7 +1106,7 @@ t.css
 
   letter-spacing: 0.4px;
 
-  box-shadow: 0 6px 14px rgba(25, 118, 210, 0.25);
+  box-shadow: var(--ip-shadow-raised);
 }
 
 .btn-cobrar:hover {
@@ -1388,6 +1395,18 @@ t.css
   .header-ventas {
     min-height: 72px;
     flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-block: 12px;
+  }
+
+  .header-info { flex: 1 1 100%; }
+  .header-actions { justify-content: flex-start; flex-wrap: wrap; }
+
+  .resumen-card {
+    height: 330px;
+    min-height: 330px;
+    max-height: 330px;
   }
 
   .buscador-card {

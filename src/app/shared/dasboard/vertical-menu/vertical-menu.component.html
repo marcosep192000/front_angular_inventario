@@ -138,6 +138,11 @@
         <app-icon [iconSrc]="'assets/icons/store1.png'" [size]="'22px'"></app-icon>
         Pedidos de compra
       </div>
+
+      <div class="submenu-item" routerLink="cloud-orders" *ngIf="puede('VENTAS_VER')">
+        <app-icon [iconSrc]="'assets/icons/shopping_bag.png'" [size]="'22px'"></app-icon>
+        Pedidos Online
+      </div>
       <div class="submenu-item" routerLink="proveedores/listas-precios" *ngIf="puede('REPORTES_VER') || esAdmin">
         <app-icon [iconSrc]="'assets/icons/monitoring.png'" [size]="'22px'"></app-icon>
         Listas de precios

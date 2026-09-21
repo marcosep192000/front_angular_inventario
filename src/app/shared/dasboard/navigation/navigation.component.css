@@ -14,7 +14,7 @@
 
 .layout{
     display:grid;
-    grid-template-columns:260px 1fr;
+    grid-template-columns:248px minmax(0, 1fr);
     grid-template-rows:100vh;
     grid-template-rows:100dvh;
     width:100vw;
@@ -22,12 +22,12 @@
     min-width:0;
     height:100vh;
     height:100dvh;
-    background:#f5f6fa;
+    background:var(--ip-bg);
     transition:grid-template-columns .30s ease;
 }
 
 .layout.collapsed{
-    grid-template-columns:90px 1fr;
+    grid-template-columns:76px minmax(0, 1fr);
 }
 
 /* =====================================================
@@ -35,12 +35,12 @@
 ===================================================== */
 
 .sidebar{
-    background:#522e92;
+    background:#342049;
     color:#fff;
     overflow:hidden;
     display:flex;
     flex-direction:column;
-    box-shadow:8px 0 18px rgba(0,0,0,.18);
+    box-shadow:8px 0 24px rgba(31, 17, 46, .14);
     z-index:100;
 }
 
@@ -80,6 +80,19 @@
     top:0;
     z-index:20;
     height:64px;
+    background:var(--ip-surface);
+    color:var(--ip-text);
+    border-bottom:1px solid var(--ip-border);
+    box-shadow:0 4px 16px rgba(39,24,59,.04);
+}
+
+.workspace-brand{
+    flex:0 0 auto;
+    margin-left:8px;
+    color:var(--ip-text);
+    font-size:.86rem;
+    font-weight:750;
+    letter-spacing:.015em;
 }
 
 .container__barra{
@@ -94,7 +107,7 @@
     align-items:center;
     gap:9px;
     margin-left:auto;
-    color:#fff;
+    color:var(--ip-text);
 }
 
 .barra__usuario mat-icon{
@@ -147,7 +160,7 @@
 .router-content{
     flex:1;
     overflow:auto;
-    padding:18px;
+    padding:clamp(16px, 2vw, 28px);
     min-width:0;
     box-sizing:border-box;
     overscroll-behavior:contain;
@@ -245,6 +258,8 @@
     .router-content{
         padding:10px;
     }
+
+    .workspace-brand{font-size:.74rem;margin-left:0}
 
     .barra__usuario strong{
         max-width:34vw;

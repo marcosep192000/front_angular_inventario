@@ -13,7 +13,7 @@
   ====================================================== -->
 
     <div class="header-info">
-      <h1>🛒 Nueva Venta</h1>
+      <h1><mat-icon aria-hidden="true">point_of_sale</mat-icon> Nueva Venta</h1>
 
       <span class="fecha">
         {{ today | date: "EEEE dd/MM/yyyy HH:mm" }}
@@ -153,6 +153,7 @@
         <input
           #buscadorProducto
           class="search-input"
+          aria-label="Buscar productos por nombre, código o código de barras"
           type="text"
           autocomplete="off"
           placeholder="Buscar producto por nombre, código o código de barras..."
@@ -368,7 +369,7 @@
                 </button>
 
                 <span>
-                  {{ product.quantity }}
+                  {{ cartQuantity(product) | number: cartQuantityFormat(product): 'es-AR' }}{{ product.cartUnitSymbol ? ' ' + product.cartUnitSymbol : '' }}
                 </span>
 
                 <button
@@ -414,7 +415,7 @@
 
             <td class="precio-total">
               <span class="line-total">
-                {{ product.salePrice * product.quantity | currency: "ARS" }}
+                {{ lineSubtotal(product) | currency: "ARS" }}
               </span>
             </td>
 

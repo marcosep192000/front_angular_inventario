@@ -2,11 +2,11 @@
 
     width:100%;
     height:100%;
-    background:#512da8;
+    background:#342049;
     color:white;
-    border-radius:18px;
+    border-radius:0;
     overflow:hidden;
-    box-shadow:0 15px 35px rgba(0,0,0,.25);
+    box-shadow:none;
 
 }
 
@@ -20,7 +20,7 @@
 
     gap:15px;
 
-    padding:20px;
+    padding:22px 16px 20px;
 
     transition:.30s;
 
@@ -30,6 +30,7 @@
 
     width:55px;
     height:55px;
+    object-fit:contain;
 
 }
 
@@ -43,7 +44,7 @@
 
 .logo-text span{
 
-    color:#ffca28;
+    color:#e5b968;
     font-size:14px;
     letter-spacing:3px;
 
@@ -70,7 +71,10 @@
 
     gap:15px;
 
-    padding:16px 18px;
+    min-height:48px;
+    margin:2px 9px;
+    padding:11px 13px;
+    border-radius:10px;
 
     cursor:pointer;
 
@@ -80,7 +84,7 @@
 
 .menu-title:hover{
 
-    background:#673ab7;
+    background:rgba(255,255,255,.12);
 
 }
 
@@ -105,7 +109,7 @@
 
     height:0;
 
-    background:#ffca28;
+    background:#e5b968;
 
     border-radius:5px;
 
@@ -125,7 +129,7 @@
 
     transition:.3s;
 
-    color:#ffca28;
+    color:#e5b968;
 
 }
 
@@ -143,7 +147,7 @@
 
     transition:max-height .35s ease;
 
-    background:#5e35b1;
+    background:#402854;
 
 }
 
@@ -161,7 +165,10 @@
 
     gap:12px;
 
-    padding:12px 20px 12px 55px;
+    min-height:42px;
+    margin:2px 9px;
+    padding:10px 16px 10px 43px;
+    border-radius:9px;
 
     cursor:pointer;
 
@@ -173,9 +180,7 @@
 
 .submenu-item:hover{
 
-    background:#7e57c2;
-
-    padding-left:65px;
+    background:rgba(255,255,255,.12);
 
 }
 
@@ -187,7 +192,7 @@
 
 ::-webkit-scrollbar-thumb{
 
-    background:#7e57c2;
+    background:#785a91;
 
     border-radius:20px;
 

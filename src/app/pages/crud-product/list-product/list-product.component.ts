@@ -18,8 +18,8 @@ import { MatMenuModule } from '@angular/material/menu';
 
 import { ProductService } from '../../../services/product.service';
 import { Product } from '../../../interfaces/Product';
-import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { EMPTY, Subject } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
 import { FormProductComponent } from '../form-product/form-product.component';
 import { DialogGenericComponent } from '../../../shared/genericsComponents/dialog-generic/dialog-generic.component';
 import { IconComponent } from '../../../shared/dasboard/icon/icon.component';
@@ -85,11 +85,25 @@ export class ListProductComponent implements OnInit {
     this.getProducts(0, this.pageSize);
 
     this.searchSubject
-      .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe((value) => {
-        this.searchTerm = value;
+      .pipe(
+        map((value) => value.trim().replace(/\s+/g, ' ')),
+        debounceTime(400),
+        distinctUntilChanged(),
+        tap((value) => {
+          this.searchTerm = value;
+          this.pageIndex = 0;
+        }),
+        switchMap((value) => this.productService.getProducts(0, this.pageSize, value).pipe(
+          catchError((err) => {
+            console.error('Error al buscar productos', err);
+            return EMPTY;
+          }),
+        )),
+      )
+      .subscribe((res) => {
+        this.dataSource.data = res.content;
+        this.totalElements = res.totalElements;
         this.pageIndex = 0;
-        this.getProducts(0, this.pageSize, this.searchTerm);
       });
   }
   applyFilter(event: Event): void {
@@ -255,7 +269,7 @@ export class ListProductComponent implements OnInit {
 
   onSearchChange(value: string): void {
     this.filterValue = value;
-    this.searchSubject.next(value.trim());
+    this.searchSubject.next(value);
   }
 
   claseStock(producto: Product): string {

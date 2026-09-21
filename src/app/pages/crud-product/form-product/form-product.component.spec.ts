@@ -8,6 +8,7 @@ import { CategoryService } from '../../../services/category.service';
 import { InventoryService } from '../../../services/inventory.service';
 import { MarcaService } from '../../../services/marca.service';
 import { ProductService } from '../../../services/product.service';
+import { GastronomyService } from '../../../services/gastronomy.service';
 import { SupplierService } from '../../../services/supplier.service';
 import { FormProductComponent } from './form-product.component';
 
@@ -37,10 +38,11 @@ describe('FormProductComponent imported products', () => {
   let dialogRef: jasmine.SpyObj<MatDialogRef<FormProductComponent>>;
 
   beforeEach(async () => {
-    productService = jasmine.createSpyObj('ProductService', ['findById', 'update', 'save']);
+    productService = jasmine.createSpyObj('ProductService', ['findById', 'update', 'save', 'getImages']);
     productService.findById.and.returnValue(of(importedProduct));
     productService.save.and.returnValue(of(importedProduct));
     productService.update.and.returnValue(of('ok') as any);
+    productService.getImages.and.returnValue(of([]));
     toastr = jasmine.createSpyObj('ToastrService', ['success', 'error', 'warning']);
     dialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
 
@@ -56,6 +58,7 @@ describe('FormProductComponent imported products', () => {
         { provide: MarcaService, useValue: { allMarca: () => of([]) } },
         { provide: SupplierService, useValue: { getAllSuppliers: () => of([]) } },
         { provide: InventoryService, useValue: { getUnits: () => of([]), updateBaseUnit: jasmine.createSpy('updateBaseUnit').and.returnValue(of({})) } },
+        { provide: GastronomyService, useValue: { groups: () => of([]) } },
       ],
     }).compileComponents();
 
@@ -78,12 +81,28 @@ describe('FormProductComponent imported products', () => {
     }));
   });
 
+  it('shows the inline group editor when creating a gastronomic group', () => {
+    component.openGroup();
+    expect(component.showGroupEditor).toBeTrue();
+    expect(component.editingGroup).toBeNull();
+  });
+
   it('does not send inventory fields when saving general product data', () => {
     component.formGroup.get('barCode')?.setValue('INT-0047');
     component.update();
     const payload = productService.update.calls.mostRecent().args[1];
     expect(Object.prototype.hasOwnProperty.call(payload, 'stock')).toBeFalse();
     expect(Object.prototype.hasOwnProperty.call(payload, 'stockMin')).toBeFalse();
+  });
+
+  it('defaults Cloud publication to false and persists an explicit opt-in', () => {
+    expect(component.formGroup.get('cloudPublished')?.value).toBeFalse();
+    component.formGroup.get('cloudPublished')?.setValue(true);
+    component.update();
+    expect(productService.update).toHaveBeenCalledWith(
+      47,
+      jasmine.objectContaining({ cloudPublished: true }),
+    );
   });
 
   it('sends initial decimal quantities in the modern creation contract', () => {

@@ -28,6 +28,7 @@ export interface Product {
   salePrice: Float32Array;
   productUsefulness: Float32Array;
   barCode: string | null;
-  status: boolean ; 
+  status: boolean ;
+  cloudPublished?: boolean;
   fechaUltimaActualizacion:string;
 }

@@ -34,4 +34,7 @@ export interface ProductItemSale {
   variantLabel?: string;
   advancedSale?: boolean;
   conversionFactor?: number;
+  /** Commercial quantity shown in the cart when the base unit is length. */
+  cartQuantity?: number;
+  cartUnitSymbol?: string;
 }

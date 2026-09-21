@@ -404,3 +404,15 @@
   }
 
 }
+
+/* Listado de proveedores alineado con el sistema visual comercial. */
+.contenedor-global { margin: 12px 0; border: 1px solid var(--ip-border); border-radius: var(--ip-card-radius); background: var(--ip-surface); box-shadow: var(--ip-shadow); }
+.toolbar { gap: 14px; border-color: var(--ip-border); background: var(--ip-surface); }
+.header-listado h2 { color: var(--ip-text); }
+.header-listado p { color: var(--ip-muted); }
+.table-container { border: 1px solid var(--ip-border); border-radius: 12px; background: var(--ip-surface); }
+.table th { color: var(--ip-muted); background: var(--ip-bg); font-size: .73rem; letter-spacing: .035em; }
+.table td { color: var(--ip-text); border-color: var(--ip-border); }
+.table tr.mat-mdc-row:hover { background: var(--ip-secondary); }
+.actions-container button { min-height: var(--ip-control-height); border-radius: var(--ip-radius); }
+@media (max-width: 1024px) { .contenedor-global { margin: 8px 0; padding: 16px; } }

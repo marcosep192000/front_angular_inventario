@@ -294,6 +294,17 @@
         </div>
       </section>
 
+      <section class="inventory-extension">
+        <div>
+          <mat-icon>cloud_upload</mat-icon>
+          <span>
+            <strong>Pixels Pedidos</strong>
+            <small>El producto sólo se publicará en el catálogo Cloud si activás esta opción.</small>
+          </span>
+        </div>
+        <mat-slide-toggle formControlName="cloudPublished">Publicar en Pixels Pedidos</mat-slide-toggle>
+      </section>
+
       <section class="inventory-extension" *ngIf="data.updateProduct">
         <div>
           <mat-icon>straighten</mat-icon
@@ -331,6 +342,50 @@
         >
           <mat-icon>tune</mat-icon>Configurar proveedores
         </button>
+      </section>
+
+      <section class="gastronomy-extension" *ngIf="data.updateProduct">
+        <div class="gastronomy-heading"><div><mat-icon>restaurant_menu</mat-icon><span><strong>Configuración gastronómica</strong><small>Grupos y opciones para este producto.</small></span></div><button mat-stroked-button color="primary" type="button" (click)="openGroup()"><mat-icon>add</mat-icon>Agregar grupo</button></div>
+        <p class="image-empty" *ngIf="!loadingGastronomy && !gastronomyGroups.length">Este producto no tiene opciones gastronómicas configuradas.</p>
+        <div class="gastronomy-editor" *ngIf="showGroupEditor">
+          <mat-form-field><mat-label>Nombre</mat-label><input matInput [formControl]="$any(groupForm.get('name'))" /></mat-form-field>
+          <mat-form-field><mat-label>Descripción</mat-label><input matInput [formControl]="$any(groupForm.get('description'))" /></mat-form-field>
+          <mat-form-field><mat-label>Tipo</mat-label><mat-select [formControl]="$any(groupForm.get('selectionType'))"><mat-option *ngFor="let type of gastronomyTypes" [value]="type.value">{{ type.label }}</mat-option></mat-select></mat-form-field>
+          <mat-form-field><mat-label>Mínimas</mat-label><input matInput type="number" min="0" [formControl]="$any(groupForm.get('minSelections'))" /></mat-form-field><mat-form-field><mat-label>Máximas</mat-label><input matInput type="number" min="1" [formControl]="$any(groupForm.get('maxSelections'))" /></mat-form-field><mat-form-field><mat-label>Orden</mat-label><input matInput type="number" min="0" [formControl]="$any(groupForm.get('sortOrder'))" /></mat-form-field>
+          <mat-slide-toggle [formControl]="$any(groupForm.get('required'))">Obligatorio</mat-slide-toggle><div><button mat-button type="button" (click)="showGroupEditor = false; editingGroup = null">Cancelar</button><button mat-raised-button color="primary" type="button" (click)="saveGroup()">Guardar grupo</button></div>
+        </div>
+        <article class="gastronomy-group" *ngFor="let group of gastronomyGroups">
+          <div class="gastronomy-group__title"><div><strong>{{ group.name }}</strong><small>{{ group.selectionType === 'SINGLE' ? 'Selección única' : 'Selección múltiple' }} · {{ group.minSelections }} a {{ group.maxSelections }}</small></div><button mat-icon-button type="button" (click)="openGroup(group)"><mat-icon>edit</mat-icon></button><button mat-icon-button type="button" (click)="deleteGroup(group)"><mat-icon>delete</mat-icon></button></div>
+          <p *ngIf="group.description">{{ group.description }}</p><div class="gastronomy-option" *ngFor="let option of group.options"><span>{{ option.name }}</span><span>{{ option.priceAdjustment ? ('+' + (option.priceAdjustment | currency:'ARS':'symbol':'1.0-2')) : '$0' }}</span><button mat-icon-button type="button" (click)="openOption(group, option)"><mat-icon>edit</mat-icon></button><button mat-icon-button type="button" (click)="deleteOption(group, option)"><mat-icon>delete</mat-icon></button></div>
+          <button mat-button color="primary" type="button" (click)="openOption(group)"><mat-icon>add</mat-icon>Agregar opción</button>
+          <div class="gastronomy-editor" *ngIf="editingOptionGroup?.id === group.id"><mat-form-field><mat-label>Nombre</mat-label><input matInput [formControl]="$any(optionForm.get('name'))" /></mat-form-field><mat-form-field><mat-label>Descripción</mat-label><input matInput [formControl]="$any(optionForm.get('description'))" /></mat-form-field><mat-form-field><mat-label>Ajuste de precio</mat-label><input matInput inputmode="decimal" [formControl]="$any(optionForm.get('priceAdjustment'))" /></mat-form-field><mat-form-field><mat-label>Orden</mat-label><input matInput type="number" min="0" [formControl]="$any(optionForm.get('sortOrder'))" /></mat-form-field><div><button mat-button type="button" (click)="editingOptionGroup = null">Cancelar</button><button mat-raised-button color="primary" type="button" (click)="saveOption()">Guardar opción</button></div></div>
+        </article>
+      </section>
+
+      <section class="product-images" *ngIf="data.updateProduct">
+        <div class="product-images__heading">
+          <div>
+            <strong>Imágenes del producto</strong>
+            <small>JPG, PNG o WEBP. Máximo 5 MB por imagen.</small>
+          </div>
+          <label class="image-upload-button" [class.disabled]="uploadingImage">
+            <mat-icon>add_photo_alternate</mat-icon>{{ uploadingImage ? 'Subiendo…' : 'Agregar imagen' }}
+            <input type="file" [accept]="acceptedImageTypes" [disabled]="uploadingImage" (change)="uploadProductImage($event)" />
+          </label>
+        </div>
+        <p class="image-empty" *ngIf="!loadingImages && !productImages.length">Este producto todavía no tiene imágenes.</p>
+        <div class="image-grid" *ngIf="productImages.length">
+          <article class="image-card" *ngFor="let image of productImages; let index = index">
+            <img [src]="image.previewUrl || null" [alt]="image.originalFileName" />
+            <span class="principal-badge" *ngIf="image.principal">Principal</span>
+            <div class="image-card__actions">
+              <button mat-icon-button type="button" aria-label="Definir como principal" (click)="setPrincipalImage(image)" [disabled]="image.principal"><mat-icon>star</mat-icon></button>
+              <button mat-icon-button type="button" aria-label="Mover antes" (click)="moveImage(image, -1)" [disabled]="index === 0"><mat-icon>west</mat-icon></button>
+              <button mat-icon-button type="button" aria-label="Mover después" (click)="moveImage(image, 1)" [disabled]="index === productImages.length - 1"><mat-icon>east</mat-icon></button>
+              <button mat-icon-button type="button" aria-label="Eliminar imagen" title="Eliminar imagen" (click)="deleteProductImage(image)"><mat-icon>delete</mat-icon></button>
+            </div>
+          </article>
+        </div>
       </section>
     </fieldset>
   </mat-dialog-content>

@@ -1,5 +1,6 @@
 import { NewSaleComponent } from './new-sale.component';
 import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { Subject } from 'rxjs';
 describe('carrito de NewSaleComponent', () => {
   let c:any;
   beforeEach(() => {
@@ -32,6 +33,47 @@ describe('carrito de NewSaleComponent', () => {
     expect(c.products[0].baseQuantity).toBeCloseTo(.3,6);
     expect(c.toastr.warning).not.toHaveBeenCalled();
   });
+  it('factura gramos con cantidad base y conserva la cantidad ingresada para mostrar', () => {
+    const cfg=config({availableStock:20});
+    const cases=[
+      {input:500,base:.5,total:12772.20},
+      {input:1,base:1,total:25544.40},
+      {input:250,base:.25,total:6386.10},
+    ];
+    for(const value of cases){
+      c.products=[];
+      c.agregarProductoConfigurado(product({salePrice:25544.40}),cfg,selection({quantity:value.input,baseQuantity:value.base,conversionFactor:value.base/value.input,available:20,inputUnitId:2,unitPrice:25544.40,displayQuantity:`${value.input} g = ${value.base} kg`}));
+      expect(c.products[0].quantity).toBe(value.input);
+      expect(c.lineSubtotal(c.products[0])).toBeCloseTo(value.total,2);
+    }
+    c.products=[];
+    c.agregarProductoConfigurado(product({salePrice:25544.40}),cfg,selection({quantity:500,baseQuantity:.5,conversionFactor:.001,available:20,inputUnitId:2,unitPrice:25544.40}));
+    expect(c.remainingStock(c.products[0])).toBeCloseTo(19.5,6);
+  });
+  it('muestra metros comerciales sin cambiar el contrato centimetros + inputUnitId', () => {
+    const cfg=config({availableStock:52,unit:{id:4,symbol:'m',dimension:'LENGTH'},allowedUnits:[{id:3,symbol:'cm',dimension:'LENGTH'}]});
+    const cases=[
+      {input:10, base:.1, total:810000},
+      {input:25, base:.25, total:2025000},
+      {input:50, base:.5, total:4050000},
+      {input:1, base:1, total:8100000, unitId:4},
+      {input:2, base:2, total:16200000, unitId:4},
+    ];
+    for (const value of cases) {
+      c.products=[];
+      c.agregarProductoConfigurado(product({salePrice:8100000}),cfg,selection({
+        quantity:value.input,baseQuantity:value.base,conversionFactor:value.base/value.input,
+        inputUnitId:value.unitId ?? 3,unitPrice:8100000,available:52,
+      }));
+      const item=c.products[0];
+      expect(item.quantity).toBe(value.input);
+      expect(item.inputUnitId).toBe(value.unitId ?? 3);
+      expect(c.cartQuantity(item)).toBe(value.base);
+      expect(item.cartUnitSymbol).toBe('m');
+      expect(c.lineSubtotal(item)).toBe(value.total);
+      expect(c.remainingStock(item)).toBeCloseTo(52-value.base,6);
+    }
+  });
   it('mantiene visible el resultado activo al navegar una lista extensa', fakeAsync(() => {
     const scrollIntoView = jasmine.createSpy('scrollIntoView');
     c.resultadosProducto = { get: (index:number) => index === 7 ? { nativeElement: { scrollIntoView } } : undefined };
@@ -55,5 +97,17 @@ describe('carrito de NewSaleComponent', () => {
     c.ngOnDestroy();
     expect(c.scannerWebsocket.disconnect).toHaveBeenCalled();
     expect(c.scannerService.closeSession).toHaveBeenCalledWith('scanner-1');
+  });
+  it('bloquea doble envio y conserva requestId al reintentar un error', () => {
+    const first = new Subject<any>();
+    const second = new Subject<any>();
+    c.selectedClient={id:1};c.products=[];c.puntoCajaId=1;c.tipoDocumento='FACTURA_C';c.generarPdfAlGuardar=true;
+    c.commonSale={saveCommon:jasmine.createSpy('saveCommon').and.returnValues(first,second)};
+    const sale:any={client:1,ticketDetails:[],total:100,subTotal:100};
+    c.saveCommonSale(sale);c.saveCommonSale(sale);
+    expect(c.commonSale.saveCommon).toHaveBeenCalledTimes(1);
+    const requestId=c.commonSale.saveCommon.calls.argsFor(0)[0].requestId;
+    first.error({});c.saveCommonSale(sale);
+    expect(c.commonSale.saveCommon.calls.argsFor(1)[0].requestId).toBe(requestId);
   });
 });

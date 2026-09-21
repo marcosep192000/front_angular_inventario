@@ -33,6 +33,7 @@
     "@angular/ssr": "^17.3.0",
     "@auth0/angular-jwt": "^5.2.0",
     "@stomp/stompjs": "^7.3.0",
+    "@zxing/browser": "^0.2.1",
     "axios": "^1.8.4",
     "chart.js": "^3.9.1",
     "escpos": "^3.0.0-alpha.6",

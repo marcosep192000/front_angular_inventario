@@ -138,6 +138,8 @@ export class NewSaleComponent implements OnInit, OnDestroy {
   originalTicketId: number | null = null;
   private condicionIvaEmisor: CondicionIvaEmpresa = 'RESPONSABLE_INSCRIPTO';
   private generarPdfAlGuardar = true;
+  guardandoVenta = false;
+  private ventaRequestId: string | null = null;
   private empresaDocumento: Partial<Empresa> = {
     name: CompanyDocumentConfig.legalName,
     nombreFantasia: CompanyDocumentConfig.tradeName,
@@ -712,9 +714,11 @@ export class NewSaleComponent implements OnInit, OnDestroy {
       existing.variantStock = variant?.stock;
       existing.quantity += selection.quantity;
       existing.baseQuantity = nextBase;
+      if (existing.cartUnitSymbol) existing.cartQuantity = nextBase;
       existing.displayQuantity = `${existing.quantity} ${config.presentations.find((p) => p.id === selection.presentationId)?.name || config.allowedUnits?.find((unit) => unit.id === selection.inputUnitId)?.symbol || config.unit?.symbol || 'un.'}`;
       return;
     }
+    const isLength = config.unit?.dimension === 'LENGTH';
     this.products.push({
       ...producto,
       quantity: selection.quantity,
@@ -728,6 +732,8 @@ export class NewSaleComponent implements OnInit, OnDestroy {
       variantId: selection.variantId,
       baseQuantity: selection.baseQuantity,
       conversionFactor: factor,
+      cartQuantity: isLength ? selection.baseQuantity : undefined,
+      cartUnitSymbol: isLength ? config.unit?.symbol : undefined,
       displayQuantity: selection.displayQuantity,
       variantLabel: variant
         ? Object.values(variant.attributes).join(' · ')
@@ -901,10 +907,28 @@ export class NewSaleComponent implements OnInit, OnDestroy {
 
   getTotalPrice(): number {
     return this.products.reduce(
-      (total, product) => total + product.salePrice * product.quantity,
+      (total, product) => total + this.lineSubtotal(product),
 
       0,
     );
+  }
+
+  billableQuantity(product: ProductItemSale): number {
+    return product.advancedSale && product.presentationId == null
+      ? (product.baseQuantity ?? product.quantity)
+      : product.quantity;
+  }
+
+  lineSubtotal(product: ProductItemSale): number {
+    return product.salePrice * this.billableQuantity(product);
+  }
+
+  cartQuantity(product: ProductItemSale): number {
+    return product.cartQuantity ?? product.quantity;
+  }
+
+  cartQuantityFormat(product: ProductItemSale): string {
+    return product.cartUnitSymbol ? '1.2-2' : '1.0-6';
   }
 
   // =====================================================
@@ -1440,7 +1464,7 @@ export class NewSaleComponent implements OnInit, OnDestroy {
     const detalle = this.products
       .map(
         (producto) =>
-          `• ${producto.name} x${producto.quantity}: $${(producto.salePrice * producto.quantity).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+          `• ${producto.name} x${producto.quantity}: $${this.lineSubtotal(producto).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
       )
       .join('\n');
     const mensaje = [
@@ -1850,7 +1874,7 @@ export class NewSaleComponent implements OnInit, OnDestroy {
 
         iva: product.iva,
 
-        subTotal: product.salePrice * product.quantity,
+        subTotal: this.lineSubtotal(product),
       })),
     };
 
@@ -1870,11 +1894,15 @@ export class NewSaleComponent implements OnInit, OnDestroy {
   // =====================================================
 
   saveCommonSale(saleCommon: SaleCommon): void {
+    if (this.guardandoVenta) return;
     if (!this.selectedClient) {
       this.toastr.error('Debe seleccionar un cliente.');
 
       return;
     }
+
+    this.guardandoVenta = true;
+    this.ventaRequestId ??= crypto.randomUUID();
 
     console.log('==========================================');
 
@@ -1899,6 +1927,7 @@ export class NewSaleComponent implements OnInit, OnDestroy {
     const { numero: _numeroLocal, ...ventaSinNumero } = saleCommon;
     const requestVenta = {
       ...ventaSinNumero,
+      requestId: this.ventaRequestId,
       puntoCajaId: this.puntoCajaId,
       ticketDetails: this.products.map(saleDetailPayload),
     };
@@ -1909,6 +1938,8 @@ export class NewSaleComponent implements OnInit, OnDestroy {
       // =============================================
 
       next: (response: SaleCommon) => {
+        this.guardandoVenta = false;
+        this.ventaRequestId = null;
         console.log('==========================================');
 
         console.log('DOCUMENTO GENERADO CORRECTAMENTE');
@@ -2009,6 +2040,7 @@ export class NewSaleComponent implements OnInit, OnDestroy {
         this.generarPdfAlGuardar = true;
       },
       error: (error: any) => {
+        this.guardandoVenta = false;
         this.generarPdfAlGuardar = true;
         const mensaje =
           error?.error?.message ??
@@ -2507,6 +2539,7 @@ export class NewSaleComponent implements OnInit, OnDestroy {
       product.quantity++;
       if (product.advancedSale) {
         product.baseQuantity = (product.baseQuantity || 0) + factor;
+        if (product.cartUnitSymbol) product.cartQuantity = product.baseQuantity;
         product.displayQuantity =
           `${product.quantity} ${product.displayQuantity?.replace(/^\S+\s*/, '') || ''}`.trim();
       }
@@ -2527,6 +2560,7 @@ export class NewSaleComponent implements OnInit, OnDestroy {
           0,
           (product.baseQuantity || 0) - (product.conversionFactor || 1),
         );
+      if (product.cartUnitSymbol) product.cartQuantity = product.baseQuantity;
 
       return;
     }

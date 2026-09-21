@@ -20,4 +20,14 @@ describe('contrato de disponibilidad en configuraci?n de venta', () => {
     const c=component({availableStock:10,presentations:[{id:1,name:'Caja',active:true,saleEnabled:true,defaultSale:true,conversionFactor:4}]});
     c.quantity=3;expect(c.requestedBase).toBe(12);expect(c.valid).toBeFalse();
   });
+  it('el atajo 50 cm mantiene seleccionado cm y equivale a 0.50 m', () => {
+    const meter={id:4,dimension:'LENGTH',symbol:'m',baseConversionFactor:1};
+    const centimeter={id:3,dimension:'LENGTH',symbol:'cm',baseConversionFactor:.01};
+    const c=component({unit:meter,allowedUnits:[centimeter,meter],availableStock:52});
+    const quick50=c.quickOptions.find((option:any)=>option.label==='50 cm')!;
+    c.selectQuickQuantity(quick50);
+    expect(c.quantity).toBe(50);expect(c.selectedUnitId).toBe(3);
+    expect(c.isQuickSelected(quick50)).toBeTrue();
+    expect(c.requestedBase).toBe(.5);expect(c.equivalence).toContain('50 cm = 0.500 m');
+  });
 });

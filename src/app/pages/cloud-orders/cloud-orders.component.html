@@ -1,0 +1,292 @@
+<section class="cloud-page">
+  <header>
+    <div>
+      <p>PIXELS CLOUD</p>
+      <h1>Pedidos Online</h1>
+      <span>Revisá cada pedido antes de aceptarlo y convertirlo en venta.</span>
+    </div>
+    <button mat-stroked-button (click)="load()">
+      <mat-icon>refresh</mat-icon>Actualizar
+    </button>
+  </header>
+  <section class="card">
+    <div class="filters">
+      <mat-form-field appearance="outline"
+        ><mat-label>Buscar pedido o cliente</mat-label
+        ><input
+          matInput
+          [(ngModel)]="search"
+          (keyup.enter)="filter()" /></mat-form-field
+      ><mat-form-field appearance="outline"
+        ><mat-label>Estado</mat-label
+        ><mat-select [(ngModel)]="status" (selectionChange)="filter()"
+          ><mat-option [value]="undefined">Todos</mat-option
+          ><mat-option *ngFor="let s of statuses" [value]="s">{{
+            label(s)
+          }}</mat-option></mat-select
+        ></mat-form-field
+      ><label class="pending-filter"
+        ><input
+          type="checkbox"
+          [(ngModel)]="cloudPending"
+          (change)="filter()"
+        />
+        Resultado Cloud pendiente/error</label
+      ><button mat-raised-button color="primary" (click)="filter()">
+        Buscar
+      </button>
+    </div>
+    <p *ngIf="loading">Cargando pedidos…</p>
+    <div class="layout">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Número</th>
+              <th>Fecha</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Cloud</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let o of orders"
+              (click)="open(o.id)"
+              [class.active]="selected?.id === o.id"
+            >
+              <td>
+                <b>{{ o.cloudOrderNumber }}</b>
+              </td>
+              <td>{{ o.cloudCreatedAt | date: "dd/MM/yyyy HH:mm" }}</td>
+              <td>
+                {{ o.customerName }}<small>{{ o.customerPhone }}</small>
+              </td>
+              <td>{{ o.total | currency: "ARS" }}</td>
+              <td>
+                <span class="statusstatus" [attr.data-status]="o.status">{{
+                  label(o.status)
+                }}</span>
+              </td>
+              <td>
+                <span
+                  class="cloud-status"
+                  [attr.data-cloud]="o.cloudResultStatus"
+                  >{{ cloudLabel(o.cloudResultStatus) }}</span
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <mat-paginator
+          [length]="total"
+          [pageIndex]="page"
+          [pageSize]="size"
+          [pageSizeOptions]="[10, 20, 50]"
+          (page)="paging($event)"
+        ></mat-paginator>
+      </div>
+      <aside *ngIf="selected as o">
+        <h2>Pedido {{ o.cloudOrderNumber }}</h2>
+        <div class="status-line">
+          <span class="status" [attr.data-status]="o.status">{{
+            label(o.status)
+          }}</span
+          ><span class="cloud-status" [attr.data-cloud]="o.cloudResultStatus">{{
+            cloudLabel(o.cloudResultStatus)
+          }}</span>
+        </div>
+        <div class="cloud-detail" *ngIf="o.cloudResultStatus !== 'SYNCED'">
+          <span>Intentos: {{ o.cloudResultAttempts }}</span
+          ><span
+            >Último:
+            {{
+              o.cloudResultLastAttemptAt
+                ? (o.cloudResultLastAttemptAt | date: "dd/MM/yyyy HH:mm")
+                : "Sin intentos"
+            }}</span
+          ><span class="warning" *ngIf="o.cloudResultLastError">{{
+            o.cloudResultLastError
+          }}</span
+          ><button
+            mat-stroked-button
+            (click)="retryResult()"
+            [disabled]="processing"
+          >
+            Reintentar ahora
+          </button>
+        </div>
+        <h3>Cliente</h3>
+        <p>
+          {{ o.customerName }}<br />{{ o.customerPhone }}<br />{{
+            o.customerEmail
+          }}<br />{{ o.customerDocument }}
+        </p>
+        <h3>Modalidad de entrega</h3>
+        <p *ngIf="o.fulfillmentType === 'DELIVERY'; else pickup">
+          <strong>Envío a domicilio</strong><br />
+          Dirección: {{ o.deliveryAddress }}<br />
+          Localidad: {{ o.deliveryCity }}<br />
+          <ng-container *ngIf="o.deliveryZoneName">Zona: {{ o.deliveryZoneName }}<br /></ng-container>
+          <ng-container *ngIf="o.deliveryReference"
+            >Referencia: {{ o.deliveryReference }}<br
+          /></ng-container>
+          Teléfono de contacto: {{ o.customerPhone }}<br />
+          <ng-container *ngIf="o.shippingCost !== null && o.shippingCost !== undefined">Costo de envío: {{ o.shippingCost | currency: "ARS" }}<br /></ng-container>
+          <strong>Total: {{ o.total | currency: "ARS" }}</strong>
+        </p>
+        <section class="delivery-status" *ngIf="o.fulfillmentType === 'DELIVERY' && (o.status === 'CONVERTED_TO_SALE' || o.logisticsStatus)">
+          <strong>Estado de entrega</strong><span>{{ label(o.logisticsStatus || o.status) }}</span>
+        </section>
+        <ng-template #pickup><p><strong>Retiro en el local</strong></p><section class="delivery-status" *ngIf="o.status === 'CONVERTED_TO_SALE' || o.logisticsStatus"><strong>Estado del retiro</strong><span>{{ label(o.logisticsStatus || o.status) }}</span></section></ng-template>
+        <div class="client-search">
+          <mat-form-field appearance="outline"
+            ><mat-label>Buscar cliente local</mat-label
+            ><input
+              matInput
+              [(ngModel)]="clientQuery"
+              (ngModelChange)="searchClients($event)"
+              placeholder="Nombre, CUIT o teléfono"
+          /></mat-form-field>
+          <div class="suggestions" *ngIf="clients.length">
+            <button
+              type="button"
+              *ngFor="let c of clients"
+              (click)="clientId = c.id; link()"
+            >
+              <b>{{ c.name }}</b
+              ><span
+                >{{ c.document || "Sin documento"
+                }}<ng-container *ngIf="c.currentAccountEnabled">
+                  · Cta. Cte.</ng-container
+                ></span
+              >
+            </button>
+          </div>
+          <small *ngIf="o.localClientId"
+            >Cliente vinculado: #{{ o.localClientId }}</small
+          >
+        </div>
+        <h3>Productos</h3>
+        <div class="item" *ngFor="let i of o.items">
+          <b>{{ i.snapshotName }}</b
+          ><span
+            >{{ i.quantity }} × {{ i.orderUnitPrice | currency: "ARS" }}</span
+          ><span>Stock actual: {{ i.currentStock ?? "—" }}</span
+          ><div class="gastronomy-selections" *ngIf="i.gastronomySelections?.length">
+            <ng-container *ngFor="let selection of i.gastronomySelections; let index = index">
+              <strong class="gastronomy-selection-group" *ngIf="index === 0 || i.gastronomySelections![index - 1].groupName !== selection.groupName">{{ selection.groupName }}</strong>
+              <span class="gastronomy-selection">✓ {{ selection.optionName }}<em *ngIf="selection.priceAdjustment > 0">+{{ selection.priceAdjustment | currency: "ARS":"symbol":"1.0-2" }}</em></span>
+            </ng-container>
+          </div>
+          ><span *ngIf="i.currentPrice !== i.orderUnitPrice"
+            >Pedido: {{ i.orderUnitPrice | currency: "ARS" }} · Actual:
+            {{ i.currentPrice | currency: "ARS" }}</span
+          >
+          <div *ngIf="i.variantSelectionRequired" class="variant">
+            <mat-form-field appearance="outline"
+              ><mat-label>Variante requerida</mat-label
+              ><mat-select
+                [ngModel]="i.resolvedVariantId"
+                (ngModelChange)="assignVariant(i.id, $event)"
+                ><mat-option [value]="null">Sin resolver</mat-option
+                ><mat-option
+                  *ngFor="let v of variantOptions[i.id] || []"
+                  [value]="v.id"
+                  [disabled]="v.stock < i.quantity"
+                  >{{ v.name }} · Stock {{ v.stock }}</mat-option
+                ></mat-select
+              ></mat-form-field
+            >
+          </div>
+          <strong class="warning" *ngIf="i.resolutionStatus !== 'RESOLVED'">{{
+            i.resolutionStatus
+          }}</strong>
+        </div>
+        <div *ngIf="o.currentAccount as c" class="account">
+          <b>Cuenta Corriente</b><span>{{ c.clientName }}</span
+          ><span
+            >Deuda: {{ c.debt | currency: "ARS" }} · Disponible:
+            {{ c.available | currency: "ARS" }}</span
+          ><span>Pedido: {{ c.orderAmount | currency: "ARS" }}</span>
+        </div>
+        <div *ngIf="o.status === 'ACCEPTED'" class="conversion">
+          <mat-form-field appearance="outline"
+            ><mat-label>Comprobante</mat-label
+            ><mat-select [(ngModel)]="tipoDocumento"
+              ><mat-option value="FACTURA_A">Factura A</mat-option
+              ><mat-option value="FACTURA_B">Factura B</mat-option
+              ><mat-option value="FACTURA_C">Factura C</mat-option></mat-select
+            ></mat-form-field
+          ><mat-form-field
+            appearance="outline"
+            *ngIf="o.paymentMethod !== 'CURRENT_ACCOUNT'"
+            ><mat-label>Medio de pago real</mat-label
+            ><mat-select [(ngModel)]="medioPago"
+              ><mat-option
+                *ngFor="
+                  let p of [
+                    'EFECTIVO',
+                    'TRANSFERENCIA',
+                    'DEBITO',
+                    'CREDITO',
+                    'MERCADO_PAGO',
+                    'CHEQUE',
+                    'OTRO',
+                  ]
+                "
+                [value]="p"
+                >{{ p }}</mat-option
+              ></mat-select
+            ></mat-form-field
+          ><mat-form-field appearance="outline"
+            ><mat-label>Punto de caja</mat-label
+            ><mat-select [(ngModel)]="puntoCajaId" (ngModelChange)="cambiarPuntoCaja()"
+              ><mat-option *ngFor="let punto of puntosCaja" [value]="punto.id">{{ punto.nombre }}</mat-option
+            ></mat-select
+          ></mat-form-field><small class="warning" *ngIf="!cajaAbierta">Seleccioná un punto con caja abierta para convertir.</small>
+        </div>
+        <p class="warning" *ngIf="hasUnresolvedVariants()">
+          Resolvé todas las variantes para continuar.
+        </p>
+        <div class="actions">
+          <button
+            mat-raised-button
+            color="primary"
+            *ngIf="canDecide()"
+            (click)="accept()"
+            [disabled]="processing || hasUnresolvedVariants()"
+          >
+            Aceptar</button
+          ><button
+            mat-stroked-button
+            color="warn"
+            *ngIf="canDecide()"
+            (click)="reject()"
+            [disabled]="processing"
+          >
+            Rechazar</button
+          ><button
+            mat-raised-button
+            color="primary"
+            *ngIf="o.status === 'ACCEPTED'"
+            (click)="convert()"
+            [disabled]="processing || !canConvert()"
+          >
+            Convertir en venta
+          </button>
+          <button mat-raised-button color="primary" *ngIf="o.fulfillmentType === 'DELIVERY' && (o.logisticsStatus || o.status) === 'CONVERTED_TO_SALE'" (click)="logistics('PREPARING', 'Pedido en preparación')" [disabled]="processing">Comenzar preparación</button>
+          <button mat-raised-button color="primary" *ngIf="o.fulfillmentType === 'DELIVERY' && (o.logisticsStatus || o.status) === 'PREPARING'" (click)="logistics('READY', 'Pedido listo para enviar')" [disabled]="processing">Marcar como listo</button>
+          <button mat-raised-button color="primary" *ngIf="o.fulfillmentType === 'DELIVERY' && (o.logisticsStatus || o.status) === 'READY'" (click)="$any(logistics)('OUT_FOR_DELIVERY', 'Pedido en camino')" [disabled]="processing">Marcar en camino</button>
+          <button mat-raised-button color="primary" *ngIf="o.fulfillmentType === 'DELIVERY' && (o.logisticsStatus || o.status) === 'OUT_FOR_DELIVERY'" (click)="logistics('DELIVERED', 'Pedido entregado')" [disabled]="processing">Marcar como entregado</button>
+          <span class="delivery-complete" *ngIf="o.fulfillmentType === 'DELIVERY' && (o.logisticsStatus || o.status) === 'DELIVERED'">Pedido entregado</span>
+          <button mat-raised-button color="primary" *ngIf="o.fulfillmentType !== 'DELIVERY' && (o.logisticsStatus || o.status) === 'CONVERTED_TO_SALE'" (click)="logistics('PREPARING', 'Pedido en preparación')" [disabled]="processing">Comenzar preparación</button>
+          <button mat-raised-button color="primary" *ngIf="o.fulfillmentType !== 'DELIVERY' && (o.logisticsStatus || o.status) === 'PREPARING'" (click)="$any(logistics)('READY_FOR_PICKUP', 'Pedido listo para retirar')" [disabled]="processing">Marcar listo para retirar</button>
+          <button mat-raised-button color="primary" *ngIf="o.fulfillmentType !== 'DELIVERY' && (o.logisticsStatus || o.status) === 'READY_FOR_PICKUP'" (click)="$any(logistics)('PICKED_UP', 'Pedido retirado')" [disabled]="processing">Marcar como retirado</button>
+          <span class="delivery-complete" *ngIf="o.fulfillmentType !== 'DELIVERY' && (o.logisticsStatus || o.status) === 'PICKED_UP'">Pedido retirado</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+</section>

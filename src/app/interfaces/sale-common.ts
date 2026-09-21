@@ -35,6 +35,16 @@ export interface TicketDetail {
   unitProfit?: number | null;
 
   totalProfit?: number | null;
+
+  gastronomySelections?: TicketDetailGastronomySelection[];
+}
+
+export interface TicketDetailGastronomySelection {
+  cloudGroupId?: number | null;
+  cloudOptionId?: number | null;
+  groupName: string;
+  optionName: string;
+  priceAdjustment: number;
 }
 
 export interface Marca {
@@ -46,6 +56,7 @@ import { PagoTicketRequest, PagoTicketResponse } from './pago-ticket';
 import { FiscalAuthorizationStatus, ModoFacturacion } from './arca';
 
 export interface SaleCommon {
+  requestId?: string;
   puntoCajaId?: number | null;
   modoFacturacion?: ModoFacturacion;
   fiscalStatus?: FiscalAuthorizationStatus;
