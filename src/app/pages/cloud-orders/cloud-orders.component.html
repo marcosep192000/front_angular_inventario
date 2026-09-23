@@ -132,6 +132,15 @@
           <ng-container *ngIf="o.deliveryReference"
             >Referencia: {{ o.deliveryReference }}<br
           /></ng-container>
+          <ng-container *ngIf="o.latitude !== null && o.longitude !== null">
+            <a
+              [href]="'https://www.google.com/maps?q=' + o.latitude + ',' + o.longitude"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Ver ubicación</a
+            ><br />
+            <small>Ubicación proporcionada por el cliente</small><br />
+          </ng-container>
           Teléfono de contacto: {{ o.customerPhone }}<br />
           <ng-container *ngIf="o.shippingCost !== null && o.shippingCost !== undefined">Costo de envío: {{ o.shippingCost | currency: "ARS" }}<br /></ng-container>
           <strong>Total: {{ o.total | currency: "ARS" }}</strong>
