@@ -1,15 +1,680 @@
 <section class="store-page">
-  <header><div><p>PIXELS CLOUD</p><h1>Tienda Online</h1><span>Administrá la configuración pública de tu tienda.</span></div><button mat-stroked-button (click)="load()" [disabled]="loading"><mat-icon>refresh</mat-icon>Actualizar</button></header>
+  <header>
+    <div>
+      <p>PIXELS CLOUD</p>
+      <h1>Tienda Online</h1>
+      <span>Administrá la configuración pública de tu tienda.</span>
+    </div>
+    <button mat-stroked-button (click)="load()" [disabled]="loading">
+      <mat-icon>refresh</mat-icon>Actualizar
+    </button>
+  </header>
   <p class="loading" *ngIf="loading">Cargando configuración de tienda…</p>
   <ng-container *ngIf="!loading && store">
-    <section class="panel general"><div class="section-title"><mat-icon>storefront</mat-icon><div><h2>General</h2><small>Conexión y datos principales</small></div></div><div class="connection"><span [class.ok]="store.status === 'ACTIVE' || store.status === 'CONNECTED'">{{ store.status }}</span><small>Estado de conexión Cloud</small></div><div class="fields name-fields"><mat-form-field><mat-label>Nombre de tienda</mat-label><input matInput [(ngModel)]="store.name" maxlength="160"></mat-form-field><button mat-raised-button color="primary" (click)="saveName()" [disabled]="saving">Guardar nombre</button></div><p *ngIf="store.slug" class="public-url">Tienda pública: <strong>{{ store.slug }}</strong><button mat-button color="primary" (click)="openStore()">Abrir tienda <mat-icon>open_in_new</mat-icon></button></p><mat-form-field class="full"><mat-label>Descripción</mat-label><textarea matInput [(ngModel)]="commercial.description" rows="3" maxlength="1000"></textarea></mat-form-field><button mat-raised-button color="primary" (click)="saveCommercial()" [disabled]="saving">Guardar general</button></section>
+    <section class="panel general">
+      <div class="section-title">
+        <mat-icon>storefront</mat-icon>
+        <div>
+          <h2>General</h2>
+          <small>Conexión y datos principales</small>
+        </div>
+      </div>
+      <div class="connection">
+        <span
+          [class.ok]="store.status === 'ACTIVE' || store.status === 'CONNECTED'"
+          >{{ store.status }}</span
+        ><small>Estado de conexión Cloud</small>
+      </div>
+      <div class="fields name-fields">
+        <mat-form-field
+          ><mat-label>Nombre de tienda</mat-label
+          ><input
+            matInput
+            [(ngModel)]="store.name"
+            maxlength="160" /></mat-form-field
+        ><button
+          mat-raised-button
+          color="primary"
+          (click)="saveName()"
+          [disabled]="saving"
+        >
+          Guardar nombre
+        </button>
+      </div>
+      <p *ngIf="store.slug" class="public-url">
+        Tienda pública: <strong>{{ store.slug }}</strong
+        ><button mat-button color="primary" (click)="openStore()">
+          Abrir tienda <mat-icon>open_in_new</mat-icon>
+        </button>
+      </p>
+      <mat-form-field class="full"
+        ><mat-label>Descripción</mat-label
+        ><textarea
+          matInput
+          [(ngModel)]="commercial.description"
+          rows="3"
+          maxlength="1000"
+        ></textarea></mat-form-field
+      ><button
+        mat-raised-button
+        color="primary"
+        (click)="saveCommercial()"
+        [disabled]="saving"
+      >
+        Guardar general
+      </button>
+    </section>
 
-    <section class="panel"><div class="section-title"><mat-icon>palette</mat-icon><div><h2>Apariencia</h2><small>Imágenes, colores y textos comerciales</small></div></div><div class="image-grid"><div class="image-control"><span>Logo</span><img *ngIf="commercial.logoUrl" [src]="commercial.logoUrl" alt="Logo de tienda"><div *ngIf="!commercial.logoUrl" class="image-empty">Sin logo</div><label mat-stroked-button><mat-icon>upload</mat-icon>{{ commercial.logoUrl ? 'Reemplazar' : 'Subir logo' }}<input type="file" accept="image/jpeg,image/png,image/webp" (change)="imageSelected('logo', $event)" hidden></label><button mat-button color="warn" *ngIf="commercial.logoUrl" (click)="removeImage('logo')" [disabled]="imageLoading === 'logo'">Eliminar</button></div><div class="image-control banner"><span>Banner</span><img *ngIf="commercial.bannerUrl" [src]="commercial.bannerUrl" alt="Banner de tienda"><div *ngIf="!commercial.bannerUrl" class="image-empty">Sin banner</div><label mat-stroked-button><mat-icon>upload</mat-icon>{{ commercial.bannerUrl ? 'Reemplazar' : 'Subir banner' }}<input type="file" accept="image/jpeg,image/png,image/webp" (change)="imageSelected('banner', $event)" hidden></label><button mat-button color="warn" *ngIf="commercial.bannerUrl" (click)="removeImage('banner')" [disabled]="imageLoading === 'banner'">Eliminar</button></div></div><div class="fields colors"><label>Color primario <input type="color" [(ngModel)]="commercial.primaryColor"><input [(ngModel)]="commercial.primaryColor" maxlength="7"></label><label>Color secundario <input type="color" [(ngModel)]="commercial.secondaryColor"><input [(ngModel)]="commercial.secondaryColor" maxlength="7"></label></div><div class="fields"><mat-form-field><mat-label>Eyebrow de catálogo</mat-label><input matInput [(ngModel)]="commercial.catalogEyebrow" maxlength="120"></mat-form-field><mat-form-field><mat-label>Título de catálogo</mat-label><input matInput [(ngModel)]="commercial.catalogTitle" maxlength="160"></mat-form-field><mat-form-field class="wide"><mat-label>Subtítulo de catálogo</mat-label><input matInput [(ngModel)]="commercial.catalogSubtitle" maxlength="300"></mat-form-field></div><button mat-raised-button color="primary" (click)="saveCommercial()" [disabled]="saving">Guardar apariencia</button></section>
+    <section class="panel">
+      <div class="section-title">
+        <mat-icon>palette</mat-icon>
+        <div>
+          <h2>Apariencia</h2>
+          <small>Imágenes, colores y textos comerciales</small>
+        </div>
+      </div>
+      <div class="image-grid">
+        <div class="image-control">
+          <span>Logo</span
+          ><img
+            *ngIf="commercial.logoUrl"
+            [src]="commercial.logoUrl"
+            alt="Logo de tienda"
+          />
+          <div *ngIf="!commercial.logoUrl" class="image-empty">Sin logo</div>
+          <label mat-stroked-button
+            ><mat-icon>upload</mat-icon
+            >{{ commercial.logoUrl ? "Reemplazar" : "Subir logo"
+            }}<input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              (change)="imageSelected('logo', $event)"
+              hidden /></label
+          ><button
+            mat-button
+            color="warn"
+            *ngIf="commercial.logoUrl"
+            (click)="removeImage('logo')"
+            [disabled]="imageLoading === 'logo'"
+          >
+            Eliminar
+          </button>
+        </div>
+        <div class="image-control banner">
+          <span>Banner</span
+          ><img
+            *ngIf="commercial.bannerUrl"
+            [src]="commercial.bannerUrl"
+            alt="Banner de tienda"
+          />
+          <div *ngIf="!commercial.bannerUrl" class="image-empty">
+            Sin banner
+          </div>
+          <label mat-stroked-button
+            ><mat-icon>upload</mat-icon
+            >{{ commercial.bannerUrl ? "Reemplazar" : "Subir banner"
+            }}<input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              (change)="imageSelected('banner', $event)"
+              hidden /></label
+          ><button
+            mat-button
+            color="warn"
+            *ngIf="commercial.bannerUrl"
+            (click)="removeImage('banner')"
+            [disabled]="imageLoading === 'banner'"
+          >
+            Eliminar
+          </button>
+        </div>
+      </div>
+      <div class="fields colors">
+        <label
+          >Color primario
+          <input type="color" [(ngModel)]="commercial.primaryColor" /><input
+            [(ngModel)]="commercial.primaryColor"
+            maxlength="7" /></label
+        ><label
+          >Color secundario
+          <input type="color" [(ngModel)]="commercial.secondaryColor" /><input
+            [(ngModel)]="commercial.secondaryColor"
+            maxlength="7"
+        /></label>
+      </div>
+      <div class="fields">
+        <mat-form-field
+          ><mat-label>Eyebrow de catálogo</mat-label
+          ><input
+            matInput
+            [(ngModel)]="commercial.catalogEyebrow"
+            maxlength="120" /></mat-form-field
+        ><mat-form-field
+          ><mat-label>Título de catálogo</mat-label
+          ><input
+            matInput
+            [(ngModel)]="commercial.catalogTitle"
+            maxlength="160" /></mat-form-field
+        ><mat-form-field class="wide"
+          ><mat-label>Subtítulo de catálogo</mat-label
+          ><input
+            matInput
+            [(ngModel)]="commercial.catalogSubtitle"
+            maxlength="300"
+        /></mat-form-field>
+      </div>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="saveCommercial()"
+        [disabled]="saving"
+      >
+        Guardar apariencia
+      </button>
+    </section>
 
-    <section class="panel"><div class="section-title"><mat-icon>contact_phone</mat-icon><div><h2>Contacto</h2><small>Datos visibles para tus clientes</small></div></div><div class="fields"><mat-form-field><mat-label>WhatsApp</mat-label><input matInput [(ngModel)]="commercial.whatsapp" maxlength="15"></mat-form-field><mat-form-field><mat-label>Teléfono</mat-label><input matInput [(ngModel)]="commercial.phone" maxlength="40"></mat-form-field><mat-form-field class="wide"><mat-label>Dirección</mat-label><input matInput [(ngModel)]="commercial.address" maxlength="300"></mat-form-field><mat-form-field><mat-label>Horarios</mat-label><input matInput [(ngModel)]="commercial.businessHours" maxlength="300"></mat-form-field><mat-form-field class="wide"><mat-label>Mensaje de bienvenida</mat-label><textarea matInput [(ngModel)]="commercial.welcomeMessage" rows="2" maxlength="500"></textarea></mat-form-field><mat-form-field class="wide"><mat-label>Instrucciones de retiro</mat-label><textarea matInput [(ngModel)]="commercial.pickupInstructions" rows="2" maxlength="500"></textarea></mat-form-field></div><button mat-raised-button color="primary" (click)="saveCommercial()" [disabled]="saving">Guardar contacto</button></section>
+    <section class="panel">
+      <div class="section-title">
+        <mat-icon>contact_phone</mat-icon>
+        <div>
+          <h2>Contacto</h2>
+          <small>Datos visibles para tus clientes</small>
+        </div>
+      </div>
+      <div class="fields">
+        <mat-form-field
+          ><mat-label>WhatsApp</mat-label
+          ><input
+            matInput
+            [(ngModel)]="commercial.whatsapp"
+            maxlength="15" /></mat-form-field
+        ><mat-form-field
+          ><mat-label>Teléfono</mat-label
+          ><input
+            matInput
+            [(ngModel)]="commercial.phone"
+            maxlength="40" /></mat-form-field
+        ><mat-form-field class="wide"
+          ><mat-label>Dirección</mat-label
+          ><input
+            matInput
+            [(ngModel)]="commercial.address"
+            maxlength="300" /></mat-form-field
+        ><mat-form-field
+          ><mat-label>Horarios</mat-label
+          ><input
+            matInput
+            [(ngModel)]="commercial.businessHours"
+            maxlength="300" /></mat-form-field
+        ><mat-form-field class="wide"
+          ><mat-label>Mensaje de bienvenida</mat-label
+          ><textarea
+            matInput
+            [(ngModel)]="commercial.welcomeMessage"
+            rows="2"
+            maxlength="500"
+          ></textarea></mat-form-field
+        ><mat-form-field class="wide"
+          ><mat-label>Instrucciones de retiro</mat-label
+          ><textarea
+            matInput
+            [(ngModel)]="commercial.pickupInstructions"
+            rows="2"
+            maxlength="500"
+          ></textarea>
+        </mat-form-field>
+      </div>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="saveCommercial()"
+        [disabled]="saving"
+      >
+        Guardar contacto
+      </button>
+    </section>
 
-    <section class="panel"><div class="section-title"><mat-icon>local_shipping</mat-icon><div><h2>Pedidos y delivery</h2><small>Horarios de pedido y zonas de entrega</small></div></div><div class="fields"><mat-form-field><mat-label>Disponibilidad</mat-label><mat-select [(ngModel)]="schedule.mode"><mat-option value="ALWAYS_OPEN">Siempre abierto</mat-option><mat-option value="SCHEDULED">Horarios programados</mat-option><mat-option value="TEMPORARILY_CLOSED">Cerrado temporalmente</mat-option></mat-select></mat-form-field><mat-form-field><mat-label>Zona horaria</mat-label><input matInput [(ngModel)]="schedule.timezone" maxlength="80"></mat-form-field></div><div class="schedule-days" *ngIf="schedule.mode === 'SCHEDULED'"><div *ngFor="let day of schedule.days; let i = index"><mat-slide-toggle [(ngModel)]="day.enabled">{{ dayNames[day.dayOfWeek] }}</mat-slide-toggle><input type="time" [(ngModel)]="day.opens" [disabled]="!day.enabled"><span>a</span><input type="time" [(ngModel)]="day.closes" [disabled]="!day.enabled"></div></div><button mat-raised-button color="primary" (click)="saveSchedule()" [disabled]="saving">Guardar pedidos</button><div class="zones-head"><h3>Zonas de delivery</h3><button mat-stroked-button (click)="editZone()"><mat-icon>add</mat-icon>Nueva zona</button></div><div class="zone-form" *ngIf="showZoneForm"><div class="fields"><mat-form-field><mat-label>Nombre</mat-label><input matInput [(ngModel)]="zone.name"></mat-form-field><mat-form-field><mat-label>Ciudad</mat-label><input matInput [(ngModel)]="zone.city"></mat-form-field><mat-form-field><mat-label>Costo de envío</mat-label><input matInput type="number" min="0" [(ngModel)]="zone.shippingCost"></mat-form-field><mat-form-field><mat-label>Mínimo de compra</mat-label><input matInput type="number" min="0" [(ngModel)]="zone.minimumOrderAmount"></mat-form-field><mat-form-field><mat-label>Orden</mat-label><input matInput type="number" min="0" [(ngModel)]="zone.sortOrder"></mat-form-field><mat-slide-toggle [(ngModel)]="zone.active">Activa</mat-slide-toggle><mat-form-field class="wide"><mat-label>Descripción</mat-label><input matInput [(ngModel)]="zone.description"></mat-form-field></div><button mat-raised-button color="primary" (click)="saveZone()" [disabled]="saving">Guardar zona</button><button mat-button (click)="cancelZone()">Cancelar</button></div><div class="zone-list"><article *ngFor="let z of zones"><div><strong>{{ z.name }}</strong><span>{{ z.city || 'Sin ciudad' }} · Envío {{ z.shippingCost | currency:'ARS' }}<ng-container *ngIf="z.minimumOrderAmount !== null"> · Mínimo {{ z.minimumOrderAmount | currency:'ARS' }}</ng-container></span></div><small>{{ z.active ? 'Activa' : 'Inactiva' }}</small><button mat-icon-button (click)="editZone(z)"><mat-icon>edit</mat-icon></button><button mat-icon-button color="warn" (click)="deleteZone(z)"><mat-icon>delete</mat-icon></button></article></div></section>
+    <section class="panel">
+      <div class="section-title">
+        <mat-icon>local_shipping</mat-icon>
+        <div>
+          <h2>Pedidos y delivery</h2>
+          <small>Horarios de pedido y zonas de entrega</small>
+        </div>
+      </div>
+      <div class="fields">
+        <mat-form-field
+          ><mat-label>Disponibilidad</mat-label
+          ><mat-select [(ngModel)]="schedule.mode"
+            ><mat-option value="ALWAYS_OPEN">Siempre abierto</mat-option
+            ><mat-option value="SCHEDULED">Horarios programados</mat-option
+            ><mat-option value="TEMPORARILY_CLOSED"
+              >Cerrado temporalmente</mat-option
+            ></mat-select
+          ></mat-form-field
+        ><mat-form-field
+          ><mat-label>Zona horaria</mat-label
+          ><input matInput [(ngModel)]="schedule.timezone" maxlength="80"
+        /></mat-form-field>
+      </div>
+      <div class="schedule-days" *ngIf="schedule.mode === 'SCHEDULED'">
+        <div *ngFor="let day of schedule.days; let i = index">
+          <mat-slide-toggle [(ngModel)]="day.enabled">{{
+            dayNames[day.dayOfWeek]
+          }}</mat-slide-toggle
+          ><input
+            type="time"
+            [(ngModel)]="day.opens"
+            [disabled]="!day.enabled"
+          /><span>a</span
+          ><input
+            type="time"
+            [(ngModel)]="day.closes"
+            [disabled]="!day.enabled"
+          />
+        </div>
+      </div>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="saveSchedule()"
+        [disabled]="saving"
+      >
+        Guardar pedidos
+      </button>
+      <div class="zones-head">
+        <h3>Zonas de delivery</h3>
+        <button mat-stroked-button (click)="editZone()">
+          <mat-icon>add</mat-icon>Nueva zona
+        </button>
+      </div>
+      <div class="zone-form" *ngIf="showZoneForm">
+        <div class="fields">
+          <mat-form-field
+            ><mat-label>Nombre</mat-label
+            ><input matInput [(ngModel)]="zone.name" /></mat-form-field
+          ><mat-form-field
+            ><mat-label>Ciudad</mat-label
+            ><input matInput [(ngModel)]="zone.city" /></mat-form-field
+          ><mat-form-field
+            ><mat-label>Costo de envío</mat-label
+            ><input
+              matInput
+              type="number"
+              min="0"
+              [(ngModel)]="zone.shippingCost" /></mat-form-field
+          ><mat-form-field
+            ><mat-label>Mínimo de compra</mat-label
+            ><input
+              matInput
+              type="number"
+              min="0"
+              [(ngModel)]="zone.minimumOrderAmount" /></mat-form-field
+          ><mat-form-field
+            ><mat-label>Orden</mat-label
+            ><input
+              matInput
+              type="number"
+              min="0"
+              [(ngModel)]="zone.sortOrder" /></mat-form-field
+          ><mat-slide-toggle [(ngModel)]="zone.active">Activa</mat-slide-toggle
+          ><mat-form-field class="wide"
+            ><mat-label>Descripción</mat-label
+            ><input matInput [(ngModel)]="zone.description"
+          /></mat-form-field>
+        </div>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="saveZone()"
+          [disabled]="saving"
+        >
+          Guardar zona</button
+        ><button mat-button (click)="cancelZone()">Cancelar</button>
+      </div>
+      <div class="zone-list">
+        <article *ngFor="let z of zones">
+          <div>
+            <strong>{{ z.name }}</strong
+            ><span
+              >{{ z.city || "Sin ciudad" }} · Envío
+              {{ z.shippingCost | currency: "ARS"
+              }}<ng-container *ngIf="z.minimumOrderAmount !== null">
+                · Mínimo
+                {{ z.minimumOrderAmount | currency: "ARS" }}</ng-container
+              ></span
+            >
+          </div>
+          <small>{{ z.active ? "Activa" : "Inactiva" }}</small
+          ><button mat-icon-button (click)="editZone(z)">
+            <mat-icon>edit</mat-icon></button
+          ><button mat-icon-button color="warn" (click)="deleteZone(z)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </article>
+      </div>
+    </section>
 
-    <section class="panel"><div class="section-title"><mat-icon>payments</mat-icon><div><h2>Mercado Pago</h2><small>Configuración de cobros online</small></div></div><div class="mp-status" *ngIf="mp"><span [class.ok]="mp.enabled">{{ mp.enabled ? 'Activado' : 'Desactivado' }}</span><span [class.ok]="mp.configured">{{ mp.configured ? 'Configurado' : 'No configurado' }}</span></div><mat-slide-toggle *ngIf="mp" [(ngModel)]="mp.enabled">Habilitar Mercado Pago</mat-slide-toggle><div class="fields secrets"><mat-form-field><mat-label>Access Token</mat-label><input matInput type="password" [(ngModel)]="accessToken" autocomplete="new-password" maxlength="500"></mat-form-field><mat-form-field><mat-label>Webhook Secret</mat-label><input matInput type="password" [(ngModel)]="webhookSecret" autocomplete="new-password" maxlength="500"></mat-form-field></div><small class="security">Los secretos no se muestran ni se almacenan en este equipo. Dejá un campo vacío para conservar su valor actual.</small><button mat-raised-button color="primary" (click)="saveMp()" [disabled]="saving || !mp">Guardar Mercado Pago</button></section>
+    <section class="panel">
+      <div class="section-title">
+        <mat-icon>payments</mat-icon>
+        <div>
+          <h2>Mercado Pago</h2>
+          <small>Configuración de cobros online</small>
+        </div>
+      </div>
+      <div class="mp-status" *ngIf="mp">
+        <span [class.ok]="mp.enabled">{{
+          mp.enabled ? "Activado" : "Desactivado"
+        }}</span
+        ><span [class.ok]="mp.configured">{{
+          mp.configured ? "Configurado" : "No configurado"
+        }}</span>
+      </div>
+      <mat-slide-toggle *ngIf="mp" [(ngModel)]="mp.enabled"
+        >Habilitar Mercado Pago</mat-slide-toggle
+      >
+      <div class="fields secrets">
+        <mat-form-field
+          ><mat-label>Access Token</mat-label
+          ><input
+            matInput
+            type="password"
+            [(ngModel)]="accessToken"
+            autocomplete="new-password"
+            maxlength="500" /></mat-form-field
+        ><mat-form-field
+          ><mat-label>Webhook Secret</mat-label
+          ><input
+            matInput
+            type="password"
+            [(ngModel)]="webhookSecret"
+            autocomplete="new-password"
+            maxlength="500"
+        /></mat-form-field>
+      </div>
+      <small class="security"
+        >Los secretos no se muestran ni se almacenan en este equipo. Dejá un
+        campo vacío para conservar su valor actual.</small
+      ><button
+        mat-raised-button
+        color="primary"
+        (click)="saveMp()"
+        [disabled]="saving || !mp"
+      >
+        Guardar Mercado Pago
+      </button>
+    </section>
+    <section class="panel">
+      <div class="section-title">
+        <mat-icon>wallpaper</mat-icon>
+        <div>
+          <h2>Fondos y tipografía</h2>
+          <small>Configuración independiente de página y catálogo</small>
+        </div>
+      </div>
+      <div class="image-grid">
+        <div class="image-control">
+          <span>Fondo general</span
+          ><img
+            *ngIf="store.pageBackgroundImageUrl"
+            [src]="store.pageBackgroundImageUrl"
+            alt="Fondo general"
+          /><label mat-stroked-button
+            >Seleccionar<input
+              hidden
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              [disabled]="saving"
+              (change)="backgroundSelected(true, $event)" /></label
+          ><button
+            mat-button
+            color="warn"
+            *ngIf="store.pageBackgroundImageUrl"
+            [disabled]="saving"
+            (click)="deleteBackground(true)"
+          >
+            Eliminar
+          </button>
+        </div>
+        <div class="image-control">
+          <span>Fondo del catálogo</span
+          ><img
+            *ngIf="store.catalogBackgroundImageUrl"
+            [src]="store.catalogBackgroundImageUrl"
+            alt="Fondo del catálogo"
+          /><label mat-stroked-button
+            >Seleccionar<input
+              hidden
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              [disabled]="saving"
+              (change)="backgroundSelected(false, $event)" /></label
+          ><button
+            mat-button
+            color="warn"
+            *ngIf="store.catalogBackgroundImageUrl"
+            [disabled]="saving"
+            (click)="deleteBackground(false)"
+          >
+            Eliminar
+          </button>
+        </div>
+      </div>
+      <button mat-raised-button color="primary" (click)="saveCommercial()">
+        Guardar apariencia
+      </button>
+    </section>
+    <section class="panel appearance-complete">
+      <div class="section-title">
+        <mat-icon>palette</mat-icon>
+        <div>
+          <h2>Apariencia avanzada</h2>
+          <small>Fondos, tipografías y vista previa</small>
+        </div>
+      </div>
+      <div class="background-grid">
+        <section class="background-card">
+          <h3>Fondo general</h3>
+          <div
+            class="background-preview"
+            [style.background-image]="
+              store.pageBackgroundImageUrl
+                ? 'url(' + store.pageBackgroundImageUrl + ')'
+                : ''
+            "
+            [style.background-size]="
+              commercial.pageBackgroundSize?.toLowerCase()
+            "
+            [style.background-position]="
+              commercial.pageBackgroundPosition?.toLowerCase()
+            "
+            [style.background-repeat]="
+              commercial.pageBackgroundSize === 'REPEAT'
+                ? 'repeat'
+                : 'no-repeat'
+            "
+          >
+            <i
+              [style.opacity]="(commercial.pageBackgroundOverlay || 0) / 100"
+            ></i>
+          </div>
+          <label mat-stroked-button
+            >{{
+              store.pageBackgroundImageUrl
+                ? "Cambiar imagen"
+                : "Seleccionar imagen"
+            }}<input
+              hidden
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              (change)="backgroundSelected(true, $event)" /></label
+          ><button
+            mat-button
+            color="warn"
+            *ngIf="store.pageBackgroundImageUrl"
+            (click)="deleteBackground(true)"
+          >
+            Eliminar fondo</button
+          ><mat-form-field
+            ><mat-label>Ajuste</mat-label
+            ><mat-select [(ngModel)]="commercial.pageBackgroundSize"
+              ><mat-option *ngFor="let x of sizes" [value]="x[0]">{{
+                x[1]
+              }}</mat-option></mat-select
+            ></mat-form-field
+          ><mat-form-field
+            ><mat-label>Posición</mat-label
+            ><mat-select [(ngModel)]="commercial.pageBackgroundPosition"
+              ><mat-option *ngFor="let x of positions" [value]="x[0]">{{
+                x[1]
+              }}</mat-option></mat-select
+            ></mat-form-field
+          ><label
+            >Overlay {{ commercial.pageBackgroundOverlay || 0 }}%<input
+              type="range"
+              min="0"
+              max="80"
+              step="5"
+              [(ngModel)]="commercial.pageBackgroundOverlay"
+          /></label>
+        </section>
+        <section class="background-card">
+          <h3>Fondo del catálogo</h3>
+          <div
+            class="background-preview"
+            [style.background-image]="
+              store.catalogBackgroundImageUrl
+                ? 'url(' + store.catalogBackgroundImageUrl + ')'
+                : ''
+            "
+            [style.background-size]="
+              commercial.catalogBackgroundSize?.toLowerCase()
+            "
+            [style.background-position]="
+              commercial.catalogBackgroundPosition?.toLowerCase()
+            "
+            [style.background-repeat]="
+              commercial.catalogBackgroundSize === 'REPEAT'
+                ? 'repeat'
+                : 'no-repeat'
+            "
+          >
+            <i
+              [style.opacity]="(commercial.catalogBackgroundOverlay || 0) / 100"
+            ></i>
+          </div>
+          <label mat-stroked-button
+            >{{
+              store.catalogBackgroundImageUrl
+                ? "Cambiar imagen"
+                : "Seleccionar imagen"
+            }}<input
+              hidden
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              (change)="backgroundSelected(false, $event)" /></label
+          ><button
+            mat-button
+            color="warn"
+            *ngIf="store.catalogBackgroundImageUrl"
+            (click)="deleteBackground(false)"
+          >
+            Eliminar fondo</button
+          ><mat-form-field
+            ><mat-label>Ajuste</mat-label
+            ><mat-select [(ngModel)]="commercial.catalogBackgroundSize"
+              ><mat-option *ngFor="let x of sizes" [value]="x[0]">{{
+                x[1]
+              }}</mat-option></mat-select
+            ></mat-form-field
+          ><mat-form-field
+            ><mat-label>Posición</mat-label
+            ><mat-select [(ngModel)]="commercial.catalogBackgroundPosition"
+              ><mat-option *ngFor="let x of positions" [value]="x[0]">{{
+                x[1]
+              }}</mat-option></mat-select
+            ></mat-form-field
+          ><label
+            >Overlay {{ commercial.catalogBackgroundOverlay || 0 }}%<input
+              type="range"
+              min="0"
+              max="80"
+              step="5"
+              [(ngModel)]="commercial.catalogBackgroundOverlay"
+          /></label>
+        </section>
+      </div>
+      <div class="fields">
+        <mat-form-field
+          ><mat-label>Fuente general</mat-label
+          ><mat-select [(ngModel)]="commercial.bodyFontFamily"
+            ><mat-option [value]="null">Predeterminada</mat-option
+            ><mat-option *ngFor="let x of fonts" [value]="x[0]">{{
+              x[1]
+            }}</mat-option></mat-select
+          ></mat-form-field
+        ><mat-form-field
+          ><mat-label>Fuente para títulos</mat-label
+          ><mat-select [(ngModel)]="commercial.headingFontFamily"
+            ><mat-option [value]="null">Predeterminada</mat-option
+            ><mat-option *ngFor="let x of fonts" [value]="x[0]">{{
+              x[1]
+            }}</mat-option></mat-select
+          ></mat-form-field
+        >
+      </div>
+      <div
+        class="store-preview"
+        [style.background-color]="commercial.backgroundColor"
+        [style.background-image]="
+          store.pageBackgroundImageUrl
+            ? 'url(' + store.pageBackgroundImageUrl + ')'
+            : ''
+        "
+        [style.background-size]="commercial.pageBackgroundSize?.toLowerCase()"
+        [style.background-position]="commercial.pageBackgroundPosition?.toLowerCase()"
+        [style.background-repeat]="commercial.pageBackgroundSize === 'REPEAT' ? 'repeat' : 'no-repeat'"
+        [style.font-family]="fontFamily(commercial.bodyFontFamily)"
+      >
+        <i class="preview-page-overlay" [style.opacity]="(commercial.pageBackgroundOverlay || 0) / 100"></i>
+        <h3
+          [style.color]="commercial.primaryColor"
+          [style.font-family]="fontFamily(commercial.headingFontFamily)"
+        >
+          {{ store.name }}
+        </h3>
+        <p>Productos destacados</p>
+        <div
+          class="catalog-mini"
+          [style.background-image]="
+            store.catalogBackgroundImageUrl
+              ? 'url(' + store.catalogBackgroundImageUrl + ')'
+              : ''
+          "
+          [style.background-size]="commercial.catalogBackgroundSize?.toLowerCase()"
+          [style.background-position]="commercial.catalogBackgroundPosition?.toLowerCase()"
+          [style.background-repeat]="commercial.catalogBackgroundSize === 'REPEAT' ? 'repeat' : 'no-repeat'"
+        >
+          <i class="preview-catalog-overlay" [style.opacity]="(commercial.catalogBackgroundOverlay || 0) / 100"></i>
+          <span>Producto A<br /><b>$10.000</b></span
+          ><span>Producto B<br /><b>$15.000</b></span>
+        </div>
+        <button
+          [style.background]="commercial.primaryColor"
+          [style.color]="commercial.secondaryColor"
+        >
+          Botón principal
+        </button>
+      </div>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="saveCommercial()"
+        [disabled]="saving"
+      >
+        Guardar apariencia
+      </button>
+    </section>
   </ng-container>
 </section>
