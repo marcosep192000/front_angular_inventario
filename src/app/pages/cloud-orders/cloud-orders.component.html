@@ -46,8 +46,8 @@
               <th>Fecha</th>
               <th>Cliente</th>
               <th>Total</th>
-              <th>Estado</th>
-              <th>Cloud</th>
+              <th>Estado pedido</th>
+              <th>Estado Cloud</th>
             </tr>
           </thead>
           <tbody>
@@ -88,43 +88,22 @@
         ></mat-paginator>
       </div>
       <aside *ngIf="selected as o">
-        <h2>Pedido {{ o.cloudOrderNumber }}</h2>
+        <h2 class="order-title">Pedido {{ o.cloudOrderNumber }}</h2>
         <div class="status-line">
-          <span class="status" [attr.data-status]="o.status">{{
-            label(o.status)
-          }}</span
-          ><span class="cloud-status" [attr.data-cloud]="o.cloudResultStatus">{{
-            cloudLabel(o.cloudResultStatus)
-          }}</span>
+          <span class="badge-group"><small>Estado pedido</small><span class="status" [attr.data-status]="o.status">{{ label(o.status) }}</span></span>
+          <span class="badge-group"><small>Estado Cloud</small><span class="cloud-status" [attr.data-cloud]="o.cloudResultStatus">{{ cloudLabel(o.cloudResultStatus) }}</span></span>
         </div>
-        <div class="cloud-detail" *ngIf="o.cloudResultStatus !== 'SYNCED'">
-          <span>Intentos: {{ o.cloudResultAttempts }}</span
-          ><span
-            >Último:
-            {{
-              o.cloudResultLastAttemptAt
-                ? (o.cloudResultLastAttemptAt | date: "dd/MM/yyyy HH:mm")
-                : "Sin intentos"
-            }}</span
-          ><span class="warning" *ngIf="o.cloudResultLastError">{{
-            o.cloudResultLastError
-          }}</span
-          ><button
-            mat-stroked-button
-            (click)="retryResult()"
-            [disabled]="processing"
-          >
-            Reintentar ahora
-          </button>
-        </div>
-        <h3>Cliente</h3>
-        <p>
-          {{ o.customerName }}<br />{{ o.customerPhone }}<br />{{
-            o.customerEmail
-          }}<br />{{ o.customerDocument }}
-        </p>
-        <h3>Modalidad de entrega</h3>
-        <p *ngIf="o.fulfillmentType === 'DELIVERY'; else pickup">
+        <section class="detail-section">
+          <h3>Cliente</h3>
+          <p>
+            {{ o.customerName }}<br />{{ o.customerPhone }}<br />{{
+              o.customerEmail
+            }}<br />{{ o.customerDocument }}
+          </p>
+        </section>
+        <section class="detail-section">
+          <h3>Modalidad de entrega</h3>
+          <p *ngIf="o.fulfillmentType === 'DELIVERY'; else pickup">
           <strong>Envío a domicilio</strong><br />
           Dirección: {{ o.deliveryAddress }}<br />
           Localidad: {{ o.deliveryCity }}<br />
@@ -143,12 +122,12 @@
           </ng-container>
           Teléfono de contacto: {{ o.customerPhone }}<br />
           <ng-container *ngIf="o.shippingCost !== null && o.shippingCost !== undefined">Costo de envío: {{ o.shippingCost | currency: "ARS" }}<br /></ng-container>
-          <strong>Total: {{ o.total | currency: "ARS" }}</strong>
-        </p>
-        <section class="delivery-status" *ngIf="o.fulfillmentType === 'DELIVERY' && (o.status === 'CONVERTED_TO_SALE' || o.logisticsStatus)">
+          </p>
+          <section class="delivery-status" *ngIf="o.fulfillmentType === 'DELIVERY' && (o.status === 'CONVERTED_TO_SALE' || o.logisticsStatus)">
           <strong>Estado de entrega</strong><span>{{ label(o.logisticsStatus || o.status) }}</span>
+          </section>
+          <ng-template #pickup><p><strong>Retiro en el local</strong></p><section class="delivery-status" *ngIf="o.status === 'CONVERTED_TO_SALE' || o.logisticsStatus"><strong>Estado del retiro</strong><span>{{ label(o.logisticsStatus || o.status) }}</span></section></ng-template>
         </section>
-        <ng-template #pickup><p><strong>Retiro en el local</strong></p><section class="delivery-status" *ngIf="o.status === 'CONVERTED_TO_SALE' || o.logisticsStatus"><strong>Estado del retiro</strong><span>{{ label(o.logisticsStatus || o.status) }}</span></section></ng-template>
         <div class="client-search">
           <mat-form-field appearance="outline"
             ><mat-label>Buscar cliente local</mat-label
@@ -177,8 +156,9 @@
             >Cliente vinculado: #{{ o.localClientId }}</small
           >
         </div>
-        <h3>Productos</h3>
-        <div class="item" *ngFor="let i of o.items">
+        <section class="detail-section products-section">
+          <h3>Productos</h3>
+          <div class="item" *ngFor="let i of o.items">
           <b>{{ i.snapshotName }}</b
           ><span
             >{{ i.quantity }} × {{ i.orderUnitPrice | currency: "ARS" }}</span
@@ -212,7 +192,8 @@
           <strong class="warning" *ngIf="i.resolutionStatus !== 'RESOLVED'">{{
             i.resolutionStatus
           }}</strong>
-        </div>
+          </div>
+        </section>
         <div *ngIf="o.currentAccount as c" class="account">
           <b>Cuenta Corriente</b><span>{{ c.clientName }}</span
           ><span
@@ -220,6 +201,31 @@
             {{ c.available | currency: "ARS" }}</span
           ><span>Pedido: {{ c.orderAmount | currency: "ARS" }}</span>
         </div>
+        <section class="cloud-detail" *ngIf="o.cloudResultStatus !== 'SYNCED'">
+          <strong>Información Cloud</strong>
+          <span>Intentos: {{ o.cloudResultAttempts }}</span
+          ><span
+            >Último:
+            {{
+              o.cloudResultLastAttemptAt
+                ? (o.cloudResultLastAttemptAt | date: "dd/MM/yyyy HH:mm")
+                : "Sin intentos"
+            }}</span
+          ><span class="warning" *ngIf="o.cloudResultLastError">{{
+            o.cloudResultLastError
+          }}</span
+          ><button
+            mat-stroked-button
+            (click)="retryResult()"
+            [disabled]="processing"
+          >
+            Reintentar ahora
+          </button>
+        </section>
+        <section class="order-total-bar">
+          <span>Total del pedido</span>
+          <strong>{{ o.total | currency: "ARS" }}</strong>
+        </section>
         <div *ngIf="o.status === 'ACCEPTED'" class="conversion">
           <mat-form-field appearance="outline"
             ><mat-label>Comprobante</mat-label

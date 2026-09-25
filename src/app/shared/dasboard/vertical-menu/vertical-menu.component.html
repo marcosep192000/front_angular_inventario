@@ -139,10 +139,6 @@
         Pedidos de compra
       </div>
 
-      <div class="submenu-item" routerLink="cloud-orders" *ngIf="puede('VENTAS_VER')">
-        <app-icon [iconSrc]="'assets/icons/shopping_bag.png'" [size]="'22px'"></app-icon>
-        Pedidos Online
-      </div>
       <div class="submenu-item" routerLink="proveedores/listas-precios" *ngIf="puede('REPORTES_VER') || esAdmin">
         <app-icon [iconSrc]="'assets/icons/monitoring.png'" [size]="'22px'"></app-icon>
         Listas de precios
@@ -150,6 +146,20 @@
     </div>
     }
 
+  </div>
+
+  <div class="menu-item" routerLink="cloud-orders" *ngIf="puede('VENTAS_VER')">
+    <div class="menu-title">
+      <app-icon [iconSrc]="'assets/icons/shopping_bag.png'" [size]="'28px'"></app-icon>
+      @if(!collapsed){<span>Pedidos Online</span>}
+    </div>
+  </div>
+
+  <div class="menu-item" routerLink="cloud-store" *ngIf="esAdmin">
+    <div class="menu-title">
+      <app-icon [iconSrc]="'assets/icons/store1.png'" [size]="'28px'"></app-icon>
+      @if(!collapsed){<span>Tienda Online</span>}
+    </div>
   </div>
 
   <!-- PRODUCTOS -->
