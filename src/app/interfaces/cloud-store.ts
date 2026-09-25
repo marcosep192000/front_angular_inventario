@@ -27,6 +27,7 @@ export interface CommercialSettings {
   description: string | null;
   logoUrl: string | null;
   bannerUrl: string | null;
+  bannerBackgroundColor: string | null;
   primaryColor: string | null;
   secondaryColor: string | null;
   whatsapp: string | null;
@@ -49,6 +50,10 @@ export interface CommercialSettings {
   pageBackgroundOverlay: number | null;
   bodyFontFamily: StoreFont | null;
   headingFontFamily: StoreFont | null;
+  logoOpacity: number | null;
+  bannerOpacity: number | null;
+  pageBackgroundOpacity: number | null;
+  catalogBackgroundOpacity: number | null;
 }
 export interface CloudCommercial {
   storeId: number;

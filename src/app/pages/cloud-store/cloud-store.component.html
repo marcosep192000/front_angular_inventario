@@ -11,6 +11,7 @@
   </header>
   <p class="loading" *ngIf="loading">Cargando configuración de tienda…</p>
   <ng-container *ngIf="!loading && store">
+    <ng-template #generalSection>
     <section class="panel general">
       <div class="section-title">
         <mat-icon>storefront</mat-icon>
@@ -64,6 +65,7 @@
         Guardar general
       </button>
     </section>
+    </ng-template>
 
     <section class="panel">
       <div class="section-title">
@@ -74,14 +76,24 @@
         </div>
       </div>
       <div class="image-grid">
-        <div class="image-control">
+        <div class="image-control upload-card logo-card">
           <span>Logo</span
           ><img
-            *ngIf="commercial.logoUrl"
-            [src]="commercial.logoUrl"
+            *ngIf="imageUrl('logo')"
+            [src]="imageUrl('logo')"
+            [style.opacity]="effectiveOpacity(commercial.logoOpacity)"
             alt="Logo de tienda"
+            (error)="imageFailed('logo')"
           />
-          <div *ngIf="!commercial.logoUrl" class="image-empty">Sin logo</div>
+          <label class="opacity-control">Transparencia <b>{{ transparency(commercial.logoOpacity) }}%</b><input type="range" min="0" max="100" step="5" [ngModel]="transparency(commercial.logoOpacity)" (ngModelChange)="setTransparency('logoOpacity', $event)" /></label>
+          <div *ngIf="!imageUrl('logo')" class="image-empty"><mat-icon>image</mat-icon><b>Logo de la tienda</b><small>PNG, JPG o WEBP · Máx. 5 MB</small></div>
+          <div class="image-actions" *ngIf="hasPendingImage('logo'); else logoPersistentActions">
+            <small>Imagen seleccionada</small>
+            <button mat-raised-button color="primary" (click)="savePendingImage('logo')" [disabled]="imageLoading === 'logo'">Guardar imagen</button>
+            <label mat-stroked-button> Cambiar<input type="file" accept="image/jpeg,image/png,image/webp" (change)="imageSelected('logo', $event)" hidden /></label>
+            <button mat-button (click)="cancelPendingImage('logo')" [disabled]="imageLoading === 'logo'">Cancelar</button>
+          </div>
+          <ng-template #logoPersistentActions><div class="image-actions">
           <label mat-stroked-button
             ><mat-icon>upload</mat-icon
             >{{ commercial.logoUrl ? "Reemplazar" : "Subir logo"
@@ -99,17 +111,34 @@
           >
             Eliminar
           </button>
+          </div></ng-template>
         </div>
-        <div class="image-control banner">
+        <div class="image-control banner upload-card">
           <span>Banner</span
-          ><img
-            *ngIf="commercial.bannerUrl"
-            [src]="commercial.bannerUrl"
-            alt="Banner de tienda"
-          />
-          <div *ngIf="!commercial.bannerUrl" class="image-empty">
-            Sin banner
+          ><div class="banner-preview" [style.background-color]="effectiveBannerBackgroundColor()">
+            <img
+              *ngIf="imageUrl('banner')"
+              [src]="imageUrl('banner')"
+              [style.opacity]="effectiveOpacity(commercial.bannerOpacity)"
+              alt="Banner de tienda"
+              (error)="imageFailed('banner')"
+            />
+            <div *ngIf="!imageUrl('banner')" class="image-empty">
+              <mat-icon>image</mat-icon><b>Banner de la tienda</b><small>Imagen horizontal recomendada · PNG, JPG o WEBP · Máx. 5 MB</small>
+            </div>
           </div>
+          <label class="opacity-control">Transparencia <b>{{ transparency(commercial.bannerOpacity) }}%</b><input type="range" min="0" max="100" step="5" [ngModel]="transparency(commercial.bannerOpacity)" (ngModelChange)="setTransparency('bannerOpacity', $event)" /></label>
+          <label class="color-card banner-color">Color del banner
+            <input type="color" [ngModel]="effectiveBannerBackgroundColor()" (ngModelChange)="setBannerBackgroundColor($event)" />
+            <input [ngModel]="effectiveBannerBackgroundColor()" (ngModelChange)="setBannerBackgroundColor($event)" pattern="#[0-9A-Fa-f]{6}" maxlength="7" />
+          </label>
+          <div class="image-actions" *ngIf="hasPendingImage('banner'); else bannerPersistentActions">
+            <small>Imagen seleccionada</small>
+            <button mat-raised-button color="primary" (click)="savePendingImage('banner')" [disabled]="imageLoading === 'banner'">Guardar imagen</button>
+            <label mat-stroked-button>Cambiar<input type="file" accept="image/jpeg,image/png,image/webp" (change)="imageSelected('banner', $event)" hidden /></label>
+            <button mat-button (click)="cancelPendingImage('banner')" [disabled]="imageLoading === 'banner'">Cancelar</button>
+          </div>
+          <ng-template #bannerPersistentActions><div class="image-actions">
           <label mat-stroked-button
             ><mat-icon>upload</mat-icon
             >{{ commercial.bannerUrl ? "Reemplazar" : "Subir banner"
@@ -127,20 +156,25 @@
           >
             Eliminar
           </button>
+          </div></ng-template>
         </div>
       </div>
-      <div class="fields colors">
-        <label
+      <h3 class="appearance-subtitle">Colores</h3>
+      <div class="fields colors color-cards">
+        <label class="color-card"
           >Color primario
           <input type="color" [(ngModel)]="commercial.primaryColor" /><input
             [(ngModel)]="commercial.primaryColor"
             maxlength="7" /></label
-        ><label
+        ><label class="color-card"
           >Color secundario
           <input type="color" [(ngModel)]="commercial.secondaryColor" /><input
             [(ngModel)]="commercial.secondaryColor"
             maxlength="7"
-        /></label>
+        /></label
+        ><label class="color-card">Fondo<input type="color" [(ngModel)]="commercial.backgroundColor" /><input [(ngModel)]="commercial.backgroundColor" maxlength="7" /></label
+        ><label class="color-card">Texto principal<input type="color" [(ngModel)]="commercial.primaryTextColor" /><input [(ngModel)]="commercial.primaryTextColor" maxlength="7" /></label
+        ><label class="color-card">Texto secundario<input type="color" [(ngModel)]="commercial.secondaryTextColor" /><input [(ngModel)]="commercial.secondaryTextColor" maxlength="7" /></label>
       </div>
       <div class="fields">
         <mat-form-field
@@ -172,6 +206,8 @@
         Guardar apariencia
       </button>
     </section>
+
+    <ng-container [ngTemplateOutlet]="generalSection"></ng-container>
 
     <section class="panel">
       <div class="section-title">
@@ -357,56 +393,6 @@
 
     <section class="panel">
       <div class="section-title">
-        <mat-icon>payments</mat-icon>
-        <div>
-          <h2>Mercado Pago</h2>
-          <small>Configuración de cobros online</small>
-        </div>
-      </div>
-      <div class="mp-status" *ngIf="mp">
-        <span [class.ok]="mp.enabled">{{
-          mp.enabled ? "Activado" : "Desactivado"
-        }}</span
-        ><span [class.ok]="mp.configured">{{
-          mp.configured ? "Configurado" : "No configurado"
-        }}</span>
-      </div>
-      <mat-slide-toggle *ngIf="mp" [(ngModel)]="mp.enabled"
-        >Habilitar Mercado Pago</mat-slide-toggle
-      >
-      <div class="fields secrets">
-        <mat-form-field
-          ><mat-label>Access Token</mat-label
-          ><input
-            matInput
-            type="password"
-            [(ngModel)]="accessToken"
-            autocomplete="new-password"
-            maxlength="500" /></mat-form-field
-        ><mat-form-field
-          ><mat-label>Webhook Secret</mat-label
-          ><input
-            matInput
-            type="password"
-            [(ngModel)]="webhookSecret"
-            autocomplete="new-password"
-            maxlength="500"
-        /></mat-form-field>
-      </div>
-      <small class="security"
-        >Los secretos no se muestran ni se almacenan en este equipo. Dejá un
-        campo vacío para conservar su valor actual.</small
-      ><button
-        mat-raised-button
-        color="primary"
-        (click)="saveMp()"
-        [disabled]="saving || !mp"
-      >
-        Guardar Mercado Pago
-      </button>
-    </section>
-    <section class="panel">
-      <div class="section-title">
         <mat-icon>wallpaper</mat-icon>
         <div>
           <h2>Fondos y tipografía</h2>
@@ -417,8 +403,8 @@
         <div class="image-control">
           <span>Fondo general</span
           ><img
-            *ngIf="store.pageBackgroundImageUrl"
-            [src]="store.pageBackgroundImageUrl"
+            *ngIf="imageUrl('page')"
+            [src]="imageUrl('page')"
             alt="Fondo general"
           /><label mat-stroked-button
             >Seleccionar<input
@@ -440,8 +426,8 @@
         <div class="image-control">
           <span>Fondo del catálogo</span
           ><img
-            *ngIf="store.catalogBackgroundImageUrl"
-            [src]="store.catalogBackgroundImageUrl"
+            *ngIf="imageUrl('catalog')"
+            [src]="imageUrl('catalog')"
             alt="Fondo del catálogo"
           /><label mat-stroked-button
             >Seleccionar<input
@@ -474,31 +460,41 @@
         </div>
       </div>
       <div class="background-grid">
-        <section class="background-card">
+        <section class="background-card upload-card">
           <h3>Fondo general</h3>
-          <div
-            class="background-preview"
-            [style.background-image]="
-              store.pageBackgroundImageUrl
-                ? 'url(' + store.pageBackgroundImageUrl + ')'
+          <div class="background-preview" [class.has-image]="!!imageUrl('page')">
+            <div
+              class="background-image-layer"
+              [style.background-image]="
+              imageUrl('page')
+                ? 'url(' + imageUrl('page') + ')'
                 : ''
-            "
-            [style.background-size]="
+              "
+              [style.background-size]="
               commercial.pageBackgroundSize?.toLowerCase()
-            "
-            [style.background-position]="
+              "
+              [style.background-position]="
               commercial.pageBackgroundPosition?.toLowerCase()
-            "
-            [style.background-repeat]="
+              "
+              [style.background-repeat]="
               commercial.pageBackgroundSize === 'REPEAT'
                 ? 'repeat'
                 : 'no-repeat'
-            "
-          >
+              "
+              [style.opacity]="effectiveOpacity(commercial.pageBackgroundOpacity)"
+            ></div>
             <i
               [style.opacity]="(commercial.pageBackgroundOverlay || 0) / 100"
             ></i>
           </div>
+          <label class="opacity-control">Transparencia <b>{{ transparency(commercial.pageBackgroundOpacity) }}%</b><input type="range" min="0" max="100" step="5" [ngModel]="transparency(commercial.pageBackgroundOpacity)" (ngModelChange)="setTransparency('pageBackgroundOpacity', $event)" /></label>
+          <div class="image-actions" *ngIf="hasPendingImage('page'); else pagePersistentActions">
+            <small>Imagen seleccionada</small>
+            <button mat-raised-button color="primary" (click)="savePendingImage('page')" [disabled]="imageLoading === 'page'">Guardar imagen</button>
+            <label mat-stroked-button>Cambiar<input hidden type="file" accept="image/jpeg,image/png,image/webp" (change)="backgroundSelected(true, $event)" /></label>
+            <button mat-button (click)="cancelPendingImage('page')" [disabled]="imageLoading === 'page'">Cancelar</button>
+          </div>
+          <ng-template #pagePersistentActions><div class="image-actions">
           <label mat-stroked-button
             >{{
               store.pageBackgroundImageUrl
@@ -515,7 +511,8 @@
             *ngIf="store.pageBackgroundImageUrl"
             (click)="deleteBackground(true)"
           >
-            Eliminar fondo</button
+            Eliminar fondo</button>
+          ></div></ng-template>
           ><mat-form-field
             ><mat-label>Ajuste</mat-label
             ><mat-select [(ngModel)]="commercial.pageBackgroundSize"
@@ -539,31 +536,41 @@
               [(ngModel)]="commercial.pageBackgroundOverlay"
           /></label>
         </section>
-        <section class="background-card">
+        <section class="background-card upload-card">
           <h3>Fondo del catálogo</h3>
-          <div
-            class="background-preview"
-            [style.background-image]="
-              store.catalogBackgroundImageUrl
-                ? 'url(' + store.catalogBackgroundImageUrl + ')'
+          <div class="background-preview" [class.has-image]="!!imageUrl('catalog')">
+            <div
+              class="background-image-layer"
+              [style.background-image]="
+              imageUrl('catalog')
+                ? 'url(' + imageUrl('catalog') + ')'
                 : ''
-            "
-            [style.background-size]="
+              "
+              [style.background-size]="
               commercial.catalogBackgroundSize?.toLowerCase()
-            "
-            [style.background-position]="
+              "
+              [style.background-position]="
               commercial.catalogBackgroundPosition?.toLowerCase()
-            "
-            [style.background-repeat]="
+              "
+              [style.background-repeat]="
               commercial.catalogBackgroundSize === 'REPEAT'
                 ? 'repeat'
                 : 'no-repeat'
-            "
-          >
+              "
+              [style.opacity]="effectiveOpacity(commercial.catalogBackgroundOpacity)"
+            ></div>
             <i
               [style.opacity]="(commercial.catalogBackgroundOverlay || 0) / 100"
             ></i>
           </div>
+          <label class="opacity-control">Transparencia <b>{{ transparency(commercial.catalogBackgroundOpacity) }}%</b><input type="range" min="0" max="100" step="5" [ngModel]="transparency(commercial.catalogBackgroundOpacity)" (ngModelChange)="setTransparency('catalogBackgroundOpacity', $event)" /></label>
+          <div class="image-actions" *ngIf="hasPendingImage('catalog'); else catalogPersistentActions">
+            <small>Imagen seleccionada</small>
+            <button mat-raised-button color="primary" (click)="savePendingImage('catalog')" [disabled]="imageLoading === 'catalog'">Guardar imagen</button>
+            <label mat-stroked-button>Cambiar<input hidden type="file" accept="image/jpeg,image/png,image/webp" (change)="backgroundSelected(false, $event)" /></label>
+            <button mat-button (click)="cancelPendingImage('catalog')" [disabled]="imageLoading === 'catalog'">Cancelar</button>
+          </div>
+          <ng-template #catalogPersistentActions><div class="image-actions">
           <label mat-stroked-button
             >{{
               store.catalogBackgroundImageUrl
@@ -581,6 +588,7 @@
             (click)="deleteBackground(false)"
           >
             Eliminar fondo</button
+          ></div></ng-template>
           ><mat-form-field
             ><mat-label>Ajuste</mat-label
             ><mat-select [(ngModel)]="commercial.catalogBackgroundSize"
@@ -627,16 +635,20 @@
       <div
         class="store-preview"
         [style.background-color]="commercial.backgroundColor"
-        [style.background-image]="
-          store.pageBackgroundImageUrl
-            ? 'url(' + store.pageBackgroundImageUrl + ')'
-            : ''
-        "
-        [style.background-size]="commercial.pageBackgroundSize?.toLowerCase()"
-        [style.background-position]="commercial.pageBackgroundPosition?.toLowerCase()"
-        [style.background-repeat]="commercial.pageBackgroundSize === 'REPEAT' ? 'repeat' : 'no-repeat'"
         [style.font-family]="fontFamily(commercial.bodyFontFamily)"
       >
+        <div
+          class="background-image-layer"
+          [style.background-image]="
+          imageUrl('page')
+            ? 'url(' + imageUrl('page') + ')'
+            : ''
+          "
+          [style.background-size]="commercial.pageBackgroundSize?.toLowerCase()"
+          [style.background-position]="commercial.pageBackgroundPosition?.toLowerCase()"
+          [style.background-repeat]="commercial.pageBackgroundSize === 'REPEAT' ? 'repeat' : 'no-repeat'"
+          [style.opacity]="effectiveOpacity(commercial.pageBackgroundOpacity)"
+        ></div>
         <i class="preview-page-overlay" [style.opacity]="(commercial.pageBackgroundOverlay || 0) / 100"></i>
         <h3
           [style.color]="commercial.primaryColor"
@@ -647,15 +659,19 @@
         <p>Productos destacados</p>
         <div
           class="catalog-mini"
-          [style.background-image]="
-            store.catalogBackgroundImageUrl
-              ? 'url(' + store.catalogBackgroundImageUrl + ')'
-              : ''
-          "
-          [style.background-size]="commercial.catalogBackgroundSize?.toLowerCase()"
-          [style.background-position]="commercial.catalogBackgroundPosition?.toLowerCase()"
-          [style.background-repeat]="commercial.catalogBackgroundSize === 'REPEAT' ? 'repeat' : 'no-repeat'"
         >
+          <div
+            class="background-image-layer"
+            [style.background-image]="
+            imageUrl('catalog')
+              ? 'url(' + imageUrl('catalog') + ')'
+              : ''
+            "
+            [style.background-size]="commercial.catalogBackgroundSize?.toLowerCase()"
+            [style.background-position]="commercial.catalogBackgroundPosition?.toLowerCase()"
+            [style.background-repeat]="commercial.catalogBackgroundSize === 'REPEAT' ? 'repeat' : 'no-repeat'"
+            [style.opacity]="effectiveOpacity(commercial.catalogBackgroundOpacity)"
+          ></div>
           <i class="preview-catalog-overlay" [style.opacity]="(commercial.catalogBackgroundOverlay || 0) / 100"></i>
           <span>Producto A<br /><b>$10.000</b></span
           ><span>Producto B<br /><b>$15.000</b></span>
@@ -675,6 +691,33 @@
       >
         Guardar apariencia
       </button>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <mat-icon>payments</mat-icon>
+        <div>
+          <h2>Mercado Pago</h2>
+          <small>Configuración de cobros online</small>
+        </div>
+      </div>
+      <div class="mp-status" *ngIf="mp">
+        <span [class.ok]="mp.enabled">{{ mp.enabled ? "Activado" : "Desactivado" }}</span>
+        <span [class.ok]="mp.configured">{{ mp.configured ? "Configurado" : "No configurado" }}</span>
+      </div>
+      <mat-slide-toggle *ngIf="mp" [(ngModel)]="mp.enabled">Habilitar Mercado Pago</mat-slide-toggle>
+      <div class="fields secrets">
+        <mat-form-field>
+          <mat-label>Access Token</mat-label>
+          <input matInput type="password" [(ngModel)]="accessToken" autocomplete="new-password" maxlength="500" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Webhook Secret</mat-label>
+          <input matInput type="password" [(ngModel)]="webhookSecret" autocomplete="new-password" maxlength="500" />
+        </mat-form-field>
+      </div>
+      <small class="security">Los secretos no se muestran ni se almacenan en este equipo. Dejá un campo vacío para conservar su valor actual.</small>
+      <button mat-raised-button color="primary" (click)="saveMp()" [disabled]="saving || !mp">Guardar Mercado Pago</button>
     </section>
   </ng-container>
 </section>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,10 +18,13 @@ import {
 } from '../../interfaces/cloud-store';
 import { CloudStoreService } from '../../services/cloud-store.service';
 
+type ImageKind = 'logo' | 'banner' | 'page' | 'catalog';
+
 const blankCommercial = (): CommercialSettings => ({
   description: null,
   logoUrl: null,
   bannerUrl: null,
+  bannerBackgroundColor: null,
   primaryColor: null,
   secondaryColor: null,
   whatsapp: null,
@@ -44,6 +47,7 @@ const blankCommercial = (): CommercialSettings => ({
   pageBackgroundOverlay: null,
   bodyFontFamily: null,
   headingFontFamily: null,
+  logoOpacity: null, bannerOpacity: null, pageBackgroundOpacity: null, catalogBackgroundOpacity: null,
 });
 
 @Component({
@@ -61,7 +65,7 @@ const blankCommercial = (): CommercialSettings => ({
   templateUrl: './cloud-store.component.html',
   styleUrl: './cloud-store.component.css',
 })
-export class CloudStoreComponent implements OnInit {
+export class CloudStoreComponent implements OnInit, OnDestroy {
   store: CloudStore | null = null;
   commercial = blankCommercial();
   schedule: OrderSchedule = { mode: 'ALWAYS_OPEN', timezone: '', days: [] };
@@ -69,7 +73,10 @@ export class CloudStoreComponent implements OnInit {
   mp: MercadoPagoStatus | null = null;
   loading = true;
   saving = false;
-  imageLoading: 'logo' | 'banner' | null = null;
+  imageLoading: ImageKind | null = null;
+  private temporaryPreviews: Partial<Record<ImageKind, string>> = {};
+  private pendingFiles: Partial<Record<ImageKind, File>> = {};
+  private failedImages = new Set<ImageKind>();
   accessToken = '';
   webhookSecret = '';
   editingZone: DeliveryZone | null = null;
@@ -121,6 +128,18 @@ export class CloudStoreComponent implements OnInit {
     };
     return font ? families[font] || 'inherit' : 'inherit';
   }
+  transparency(opacity: number | null) { return 100 - (opacity ?? 100); }
+  effectiveOpacity(opacity: number | null) { return (opacity ?? 100) / 100; }
+  effectiveBannerBackgroundColor() {
+    const color = this.commercial.bannerBackgroundColor;
+    return color && /^#[0-9A-Fa-f]{6}$/.test(color) ? color : '#193E4B';
+  }
+  setBannerBackgroundColor(color: string) {
+    if (/^#[0-9A-Fa-f]{6}$/.test(color)) this.commercial.bannerBackgroundColor = color;
+  }
+  setTransparency(field: 'logoOpacity' | 'bannerOpacity' | 'pageBackgroundOpacity' | 'catalogBackgroundOpacity', value: number) {
+    this.commercial[field] = 100 - Number(value);
+  }
   constructor(
     private api: CloudStoreService,
     private toast: ToastrService,
@@ -128,11 +147,47 @@ export class CloudStoreComponent implements OnInit {
   ngOnInit() {
     this.load();
   }
+  ngOnDestroy() { Object.values(this.temporaryPreviews).forEach((url) => url && URL.revokeObjectURL(url)); }
+  imageUrl(kind: ImageKind) {
+    if (this.temporaryPreviews[kind]) return this.temporaryPreviews[kind]!;
+    if (this.failedImages.has(kind)) return null;
+    if (kind === 'logo') return this.resolveCloudImageUrl(this.commercial.logoUrl);
+    if (kind === 'banner') return this.resolveCloudImageUrl(this.commercial.bannerUrl);
+    return this.resolveCloudImageUrl(kind === 'page' ? this.store?.pageBackgroundImageUrl : this.store?.catalogBackgroundImageUrl);
+  }
+  private resolveCloudImageUrl(url: string | null | undefined) {
+    if (!url || /^(https?:|blob:|data:)/i.test(url)) return url || null;
+    return `https://pixelsinventario.tech${url.startsWith('/') ? '' : '/'}${url}`;
+  }
+  persistentImageUrl(kind: ImageKind) {
+    if (kind === 'logo') return this.resolveCloudImageUrl(this.commercial.logoUrl);
+    if (kind === 'banner') return this.resolveCloudImageUrl(this.commercial.bannerUrl);
+    return this.resolveCloudImageUrl(kind === 'page' ? this.store?.pageBackgroundImageUrl : this.store?.catalogBackgroundImageUrl);
+  }
+  hasPendingImage(kind: ImageKind) { return !!this.pendingFiles[kind]; }
+  hasPersistentImage(kind: ImageKind) { return !!this.persistentImageUrl(kind); }
+  imageFailed(kind: ImageKind) { this.failedImages.add(kind); }
+  private setTemporaryPreview(kind: ImageKind, file: File) {
+    this.failedImages.delete(kind);
+    this.clearTemporaryPreview(kind);
+    this.temporaryPreviews[kind] = URL.createObjectURL(file);
+  }
+  private clearTemporaryPreview(kind: ImageKind) {
+    const url = this.temporaryPreviews[kind];
+    if (url) URL.revokeObjectURL(url);
+    delete this.temporaryPreviews[kind];
+  }
+  cancelPendingImage(kind: ImageKind) {
+    this.clearTemporaryPreview(kind);
+    delete this.pendingFiles[kind];
+  }
   load() {
     this.loading = true;
     this.api.store().subscribe({
       next: (store) => {
-        this.store = store;
+        // Store responses can omit image URLs. An omitted field must not erase a
+        // preview; an explicit null still represents a deleted image.
+        this.store = { ...this.store, ...store } as CloudStore;
         this.loadDetails();
       },
       error: (error) => {
@@ -147,7 +202,7 @@ export class CloudStoreComponent implements OnInit {
       if (--left === 0) this.loading = false;
     };
     this.api.commercial().subscribe({
-      next: (r) => (this.commercial = r.settings),
+      next: (r) => this.mergeCommercial(r.settings),
       error: (e) => {
         this.fail(e);
         done();
@@ -190,7 +245,7 @@ export class CloudStoreComponent implements OnInit {
   saveCommercial() {
     this.busy(
       this.api.updateCommercial(this.commercial),
-      (r) => (this.commercial = r.settings),
+      (r) => this.mergeCommercial(r.settings),
       'Información comercial guardada.',
     );
   }
@@ -231,13 +286,7 @@ export class CloudStoreComponent implements OnInit {
       this.toast.warning('Elegí una imagen JPEG, PNG o WEBP de hasta 5 MB.');
       return;
     }
-    this.busy(
-      page
-        ? this.api.uploadPageBackground(file)
-        : this.api.uploadBackground(file),
-      () => this.load(),
-      'Fondo actualizado.',
-    );
+    this.selectPendingImage(page ? 'page' : 'catalog', file);
   }
   deleteBackground(page: boolean) {
     if (!confirm('¿Eliminar este fondo?')) return;
@@ -258,21 +307,49 @@ export class CloudStoreComponent implements OnInit {
       this.toast.warning('Elegí una imagen JPEG, PNG o WEBP de hasta 5 MB.');
       return;
     }
+    this.selectPendingImage(kind, file);
+  }
+  private selectPendingImage(kind: ImageKind, file: File) {
+    this.setTemporaryPreview(kind, file);
+    this.pendingFiles[kind] = file;
+  }
+  savePendingImage(kind: ImageKind) {
+    const file = this.pendingFiles[kind];
+    if (!file || this.imageLoading) return;
     this.imageLoading = kind;
-    this.api
-      .uploadImage(kind, file)
-      .pipe(finalize(() => (this.imageLoading = null)))
-      .subscribe({
-        next: () => {
-          this.toast.success(
-            `${kind === 'logo' ? 'Logo' : 'Banner'} actualizado.`,
-          );
-          this.api
-            .commercial()
-            .subscribe((r) => (this.commercial = r.settings));
-        },
+    const upload = kind === 'logo' || kind === 'banner'
+      ? this.api.uploadImage(kind, file)
+      : kind === 'page'
+        ? this.api.uploadPageBackground(file)
+        : this.api.uploadBackground(file);
+    upload.pipe(finalize(() => (this.imageLoading = null))).subscribe({
+      next: () => this.refreshPersistedImage(kind),
+      // Keep both file and blob preview: the user can retry without selecting again.
+      error: (e) => this.fail(e),
+    });
+  }
+  private refreshPersistedImage(kind: ImageKind) {
+    const complete = () => {
+      // The persisted URL is available before the object URL is released.
+      if (!this.hasPersistentImage(kind)) {
+        this.toast.error('La imagen se subió, pero no se pudo obtener su URL. Podés reintentar sin perder el preview.');
+        return;
+      }
+      this.cancelPendingImage(kind);
+      this.toast.success('Imagen actualizada.');
+    };
+    if (kind === 'logo' || kind === 'banner') {
+      this.api.commercial().subscribe({
+        next: (value) => { this.mergeCommercial(value.settings); complete(); },
         error: (e) => this.fail(e),
       });
+      return;
+    }
+    this.api.store().subscribe({
+      next: (value) => { this.store = { ...this.store, ...value } as CloudStore; complete(); },
+      // Upload succeeded, but retain the local preview until a valid persisted URL can be read.
+      error: (e) => this.fail(e),
+    });
   }
   removeImage(kind: 'logo' | 'banner') {
     if (
@@ -368,6 +445,11 @@ export class CloudStoreComponent implements OnInit {
       active: true,
       sortOrder: this.zones.length,
     };
+  }
+  private mergeCommercial(settings: CommercialSettings) {
+    // Commercial PUT/GET responses may be partial. Keep the independent image
+    // URL state unless the server explicitly includes a replacement or null.
+    this.commercial = { ...this.commercial, ...settings };
   }
   private busy<T>(
     request: Observable<T>,
