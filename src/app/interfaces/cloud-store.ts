@@ -54,6 +54,8 @@ export interface CommercialSettings {
   bannerOpacity: number | null;
   pageBackgroundOpacity: number | null;
   catalogBackgroundOpacity: number | null;
+  pickupEnabled?: boolean | null;
+  deliveryEnabled?: boolean | null;
 }
 export interface CloudCommercial {
   storeId: number;

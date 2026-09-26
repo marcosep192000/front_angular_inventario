@@ -278,6 +278,12 @@
           <small>Horarios de pedido y zonas de entrega</small>
         </div>
       </div>
+      <div class="fields delivery-modes">
+        <h3>Modalidades de entrega</h3>
+        <mat-slide-toggle [(ngModel)]="commercial.pickupEnabled">Retiro en el local</mat-slide-toggle>
+        <mat-slide-toggle [(ngModel)]="commercial.deliveryEnabled">Envío a domicilio</mat-slide-toggle>
+        <small class="error" *ngIf="commercial.pickupEnabled === false && commercial.deliveryEnabled === false">Debés habilitar al menos una modalidad de entrega.</small>
+      </div>
       <div class="fields">
         <mat-form-field
           ><mat-label>Disponibilidad</mat-label

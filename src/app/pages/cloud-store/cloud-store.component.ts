@@ -48,6 +48,7 @@ const blankCommercial = (): CommercialSettings => ({
   bodyFontFamily: null,
   headingFontFamily: null,
   logoOpacity: null, bannerOpacity: null, pageBackgroundOpacity: null, catalogBackgroundOpacity: null,
+  pickupEnabled: null, deliveryEnabled: null,
 });
 
 @Component({
@@ -243,6 +244,10 @@ export class CloudStoreComponent implements OnInit, OnDestroy {
     );
   }
   saveCommercial() {
+    if (this.commercial.pickupEnabled === false && this.commercial.deliveryEnabled === false) {
+      this.toast.error('DebÃ©s habilitar al menos una modalidad de entrega.');
+      return;
+    }
     this.busy(
       this.api.updateCommercial(this.commercial),
       (r) => this.mergeCommercial(r.settings),
@@ -449,7 +454,7 @@ export class CloudStoreComponent implements OnInit, OnDestroy {
   private mergeCommercial(settings: CommercialSettings) {
     // Commercial PUT/GET responses may be partial. Keep the independent image
     // URL state unless the server explicitly includes a replacement or null.
-    this.commercial = { ...this.commercial, ...settings };
+    this.commercial = { ...this.commercial, ...settings, pickupEnabled: settings.pickupEnabled ?? true, deliveryEnabled: settings.deliveryEnabled ?? true };
   }
   private busy<T>(
     request: Observable<T>,
