@@ -1001,6 +1001,7 @@ body{
 .login-button:focus-visible{outline:3px solid rgba(82,46,146,.25);outline-offset:3px}
 .login-button:disabled{box-shadow:none;filter:saturate(.6)}
 .login-button mat-icon{margin:0;display:inline-flex;align-items:center;justify-content:center}
+.activation-button{width:100%;margin-top:12px}
 .security{margin-top:20px}.security mat-icon{display:inline-flex;align-items:center;justify-content:center}
 
 @media(max-height:800px) and (min-width:1101px){

@@ -76,6 +76,10 @@ export class LoginComponent {
     });
   }
 
+  goToActivation(): void {
+    this.route.navigate(['/activacion']);
+  }
+
   register() {
     this.route.navigate(['/registro']);
   }
